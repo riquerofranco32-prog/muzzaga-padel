@@ -333,105 +333,341 @@
     }
 
     /* ==========================================================================
-       HERO (EXPO SIGNATURE: GRADIENT SKY WASH + DEVICE MOCKUP)
+       HERO (ANIMATED MARQUEE HERO WITH REAL PHOTOS & EXPO DESIGN TOKENS)
        ========================================================================== */
-    .hero-container {
+    .animated-marquee-hero {
       position: relative;
-      padding: 72px 0 64px;
+      width: 100%;
+      min-height: 88vh;
       overflow: hidden;
-      background: radial-gradient(100% 85% at 50% -10%, var(--color-gradient-sky-light) 0%, #eaf4fd 40%, var(--color-canvas) 90%);
+      background: radial-gradient(110% 75% at 50% -5%, var(--color-gradient-sky-light) 0%, #edf6fd 45%, var(--color-canvas) 85%);
       border-bottom: 1px solid var(--color-hairline);
-    }
-
-    .hero-content {
-      text-align: center;
-      max-width: 820px;
-      margin: 0 auto;
-    }
-
-    .hero-badge-wrap {
-      display: inline-flex;
-      margin-bottom: var(--spacing-md);
-    }
-
-    .hero-title {
-      font-family: var(--font-primary);
-      font-size: clamp(38px, 5.5vw, var(--text-display-mega));
-      font-weight: 600;
-      line-height: var(--leading-display-mega);
-      letter-spacing: var(--tracking-display-mega);
-      color: var(--color-ink);
-      margin-bottom: var(--spacing-md);
-    }
-
-    .hero-subtitle {
-      font-size: var(--text-title-md);
-      line-height: var(--leading-body-md);
-      color: var(--color-body);
-      max-width: 580px;
-      margin: 0 auto var(--spacing-xl);
-    }
-
-    .hero-cta-group {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      gap: var(--spacing-sm);
-      flex-wrap: wrap;
-      margin-bottom: var(--spacing-xxl);
+      justify-content: center;
+      text-align: center;
+      padding: 68px 16px 40px;
     }
 
-    /* Device Mockup Card (Expo Signature Feature) */
-    .device-mockup-wrap {
-      max-width: 860px;
-      margin: 0 auto;
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-xl);
-      box-shadow: 0 24px 64px rgba(13, 116, 206, 0.08), 0 10px 24px rgba(0, 0, 0, 0.04);
-      padding: var(--spacing-lg);
+    .hero-inner-content {
       position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 840px;
+      margin: 0 auto;
     }
 
-    .mockup-header-bar {
+    .tagline-pill {
+      margin-bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--color-hairline-strong);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-body);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.2s ease;
+    }
+
+    .tagline-pill:hover {
+      border-color: var(--color-ink);
+    }
+
+    .live-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.25);
+      animation: pulseAnim 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseAnim {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.25); opacity: 0.7; }
+    }
+
+    .hero-display-title {
+      font-family: var(--font-primary);
+      font-size: clamp(40px, 6.2vw, 68px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.04;
+      color: var(--color-ink);
+      margin-bottom: 18px;
+    }
+
+    .hero-description-text {
+      font-size: clamp(16px, 1.8vw, 19px);
+      line-height: 1.5;
+      color: var(--color-body);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .hero-cta-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+      margin-bottom: 48px;
+    }
+
+    .btn-action-primary {
+      padding: 13px 30px;
+      border-radius: var(--radius-pill);
+      background: #000000;
+      color: #ffffff;
+      font-family: var(--font-primary);
+      font-size: 15px;
+      font-weight: 600;
+      border: 1px solid #000000;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.22);
+      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, box-shadow 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action-primary:hover {
+      transform: scale(1.05);
+      background: #1a1a1a;
+      box-shadow: 0 14px 30px -4px rgba(0, 0, 0, 0.28);
+    }
+
+    .btn-action-primary:active {
+      transform: scale(0.96);
+    }
+
+    .btn-action-secondary {
+      padding: 13px 24px;
+      border-radius: var(--radius-pill);
+      background: #ffffff;
+      color: var(--color-ink);
+      font-family: var(--font-primary);
+      font-size: 15px;
+      font-weight: 600;
+      border: 1px solid var(--color-hairline-strong);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .btn-action-secondary:hover {
+      transform: scale(1.03);
+      border-color: #999999;
+      background: #fafafa;
+    }
+
+    .btn-action-secondary:active {
+      transform: scale(0.96);
+    }
+
+    .badge-count {
+      background: rgba(22, 163, 74, 0.12);
+      color: #16a34a;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    /* Animated Image Marquee */
+    .marquee-container {
+      position: relative;
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      margin-right: calc(-50vw + 50%);
+      overflow: hidden;
+      padding: 16px 0 28px;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 18px;
+      width: max-content;
+      animation: marqueeContinuous 42s linear infinite;
+      will-change: transform;
+    }
+
+    .marquee-container:hover .marquee-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes marqueeContinuous {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .marquee-card {
+      position: relative;
+      aspect-ratio: 3/4;
+      height: 230px;
+      flex-shrink: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: #f0f0f3;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    }
+
+    .marquee-card:nth-child(odd) {
+      transform: rotate(-2.5deg);
+    }
+
+    .marquee-card:nth-child(even) {
+      transform: rotate(4deg);
+    }
+
+    .marquee-card:nth-child(3n) {
+      transform: rotate(-3.5deg);
+    }
+
+    .marquee-card:nth-child(4n) {
+      transform: rotate(2.5deg);
+    }
+
+    .marquee-card:hover {
+      transform: scale(1.08) rotate(0deg) !important;
+      box-shadow: 0 24px 48px -10px rgba(0, 0, 0, 0.3);
+      z-index: 20;
+    }
+
+    .marquee-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .marquee-card:hover .marquee-img {
+      transform: scale(1.04);
+    }
+
+    .marquee-card-label {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: rgba(18, 18, 20, 0.76);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 500;
+      text-align: left;
+      letter-spacing: -0.2px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--color-hairline);
-      padding-bottom: var(--spacing-sm);
-      margin-bottom: var(--spacing-md);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
-    .mockup-controls {
-      display: flex;
-      gap: 6px;
-    }
-
-    .mockup-dot {
-      width: 10px;
-      height: 10px;
+    .marquee-card-dot {
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: var(--color-hairline-strong);
+      background: #47c2ff;
     }
 
-    .mockup-title {
-      font-family: var(--font-family-3);
-      font-size: var(--text-code);
-      color: var(--color-body);
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      cursor: pointer;
     }
 
-    .mockup-body-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--spacing-md);
-      text-align: left;
+    .lightbox-modal.active {
+      display: flex;
     }
 
-    .mockup-court-card {
-      background: var(--color-canvas-soft);
-      border: 1px solid var(--color-hairline);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-base);
+    .lightbox-content {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      position: relative;
+      cursor: default;
+    }
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      display: block;
+    }
+
+    .lightbox-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      color: #ffffff;
+      padding: 24px 20px 16px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .marquee-card {
+        height: 185px;
+      }
+      .animated-marquee-hero {
+        padding-top: 52px;
+        min-height: auto;
+      }
+      .hero-display-title {
+        font-size: 38px;
+      }
     }
 
     /* ==========================================================================
@@ -981,74 +1217,190 @@
   </header>
 
   <!-- ==========================================================================
-       HERO (EXPO SIGNATURE: GRADIENT SKY WASH + DEVICE MOCKUP)
+       HERO (ANIMATED MARQUEE HERO WITH REAL PHOTOS OF MUZZAGA PÁDEL)
        ========================================================================== -->
-  <section id="top" class="hero-container">
-    <div class="container">
-      <div class="hero-content">
+  <section id="top" class="animated-marquee-hero">
+    <div class="hero-inner-content">
+      
+      <!-- Tagline -->
+      <div class="tagline-pill">
+        <span class="live-pulse"></span>
+        Catriel, Río Negro · 2 Canchas de Cristal Profesionales
+      </div>
+
+      <!-- Main Title -->
+      <h1 class="hero-display-title">
+        El club de pádel<br>de Catriel.
+      </h1>
+
+      <!-- Description -->
+      <p class="hero-description-text">
+        Turnos en vivo cada 90 minutos, iluminación LED de alta potencia, partidos abiertos comunitarios y el mejor tercer tiempo con cantina y cerveza fría.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="hero-cta-buttons">
+        <button type="button" class="btn-action-primary" onclick="scrollToSection('turnos')">
+          Ver Turnos Disponibles ↓
+        </button>
+        <button type="button" class="btn-action-secondary" onclick="scrollToSection('canchas-abiertas')">
+          Canchas Abiertas <span class="badge-count">3 buscando jugador</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Animated Image Marquee with Real Photos of Muzzaga Pádel -->
+    <div class="marquee-container" aria-label="Fotos reales de Muzzaga Pádel">
+      <div class="marquee-track">
         
-        <div class="hero-badge-wrap">
-          <span class="badge-pill badge-success">
-            <span class="pulse-dot"></span> Canchas Abiertas Hoy · Catriel, Río Negro
-          </span>
+        <!-- Loop Set 1 -->
+        <div class="marquee-card" onclick="openLightbox('img/court_blue_glass.jpg', 'Cancha 1 · Cristal Panorámico y Césped Azul')">
+          <img src="img/court_blue_glass.jpg" alt="Cancha 1 Cristal Muzzaga Pádel" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Cancha 1 · Cristal</span>
+            <span class="marquee-card-dot"></span>
+          </div>
         </div>
 
-        <h1 class="hero-title">
-          El club de pádel<br>de Catriel.
-        </h1>
+        <div class="marquee-card" onclick="openLightbox('img/match_action_led.jpg', 'Juego Nocturno · Iluminación LED 200W Sin Sombras')">
+          <img src="img/match_action_led.jpg" alt="Partido de noche con luces LED en Muzzaga" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Juego Nocturno · LED</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
 
-        <p class="hero-subtitle">
-          2 canchas de cristal profesionales, grilla horaria en tiempo real, torneos durante todo el año y cantina propia para el tercer tiempo.
-        </p>
+        <div class="marquee-card" onclick="openLightbox('img/cantina_beer_court.jpg', 'Cantina Muzzaga · Cerveza Tirada y Vista a las Canchas')">
+          <img src="img/cantina_beer_court.jpg" alt="Cantina Muzzaga con vista a las canchas" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Cantina & 3er Tiempo</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
 
-        <div class="hero-cta-group">
-          <button type="button" class="btn btn-primary" onclick="scrollToSection('turnos')">
-            Reservar Cancha →
-          </button>
-          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary">
-            Ver Ubicación
-          </a>
+        <div class="marquee-card" onclick="openLightbox('img/court_arena_wide.jpg', 'Arena Techada · Blindex de 12mm y Estructura de Acero')">
+          <img src="img/court_arena_wide.jpg" alt="Arena techada de Muzzaga Pádel" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Pista Techada Pro</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/bar_coffee_snacks.jpg', 'Cafetería y Bar de Jugadores')">
+          <img src="img/bar_coffee_snacks.jpg" alt="Bar y cafetería en Muzzaga" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Bar & Cafetería</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/court_spectators.jpg', 'Gradas y Zona Social para Torneos')">
+          <img src="img/court_spectators.jpg" alt="Gradas de espectadores en Muzzaga Pádel" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Gradas de Torneo</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/lounge_tv_table.jpg', 'Living Social y Pantallas con Partidos')">
+          <img src="img/lounge_tv_table.jpg" alt="Lounge social con pantallas en Muzzaga" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Lounge Social</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/court_bench_players.jpg', 'Zona de Jugadores y Bancos de Pista')">
+          <img src="img/court_bench_players.jpg" alt="Zona de bancos de jugadores en pista" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Bancos de Pista</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/panoramic_courts.jpg', 'Vista Panorámica del Complejo Muzzaga Pádel')">
+          <img src="img/panoramic_courts.jpg" alt="Vista panorámica de canchas de pádel Catriel" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Complejo Muzzaga</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <!-- Loop Set 2 (Duplicate for smooth infinite marquee) -->
+        <div class="marquee-card" onclick="openLightbox('img/court_blue_glass.jpg', 'Cancha 1 · Cristal Panorámico y Césped Azul')">
+          <img src="img/court_blue_glass.jpg" alt="Cancha 1 Cristal Muzzaga Pádel" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Cancha 1 · Cristal</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/match_action_led.jpg', 'Juego Nocturno · Iluminación LED 200W Sin Sombras')">
+          <img src="img/match_action_led.jpg" alt="Partido de noche con luces LED en Muzzaga" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Juego Nocturno · LED</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/cantina_beer_court.jpg', 'Cantina Muzzaga · Cerveza Tirada y Vista a las Canchas')">
+          <img src="img/cantina_beer_court.jpg" alt="Cantina Muzzaga con vista a las canchas" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Cantina & 3er Tiempo</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/court_arena_wide.jpg', 'Arena Techada · Blindex de 12mm y Estructura de Acero')">
+          <img src="img/court_arena_wide.jpg" alt="Arena techada de Muzzaga Pádel" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Pista Techada Pro</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/bar_coffee_snacks.jpg', 'Cafetería y Bar de Jugadores')">
+          <img src="img/bar_coffee_snacks.jpg" alt="Bar y cafetería en Muzzaga" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Bar & Cafetería</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/court_spectators.jpg', 'Gradas y Zona Social para Torneos')">
+          <img src="img/court_spectators.jpg" alt="Gradas de espectadores en Muzzaga Pádel" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Gradas de Torneo</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/lounge_tv_table.jpg', 'Living Social y Pantallas con Partidos')">
+          <img src="img/lounge_tv_table.jpg" alt="Lounge social con pantallas en Muzzaga" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Lounge Social</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/court_bench_players.jpg', 'Zona de Jugadores y Bancos de Pista')">
+          <img src="img/court_bench_players.jpg" alt="Zona de bancos de jugadores en pista" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Bancos de Pista</span>
+            <span class="marquee-card-dot"></span>
+          </div>
+        </div>
+
+        <div class="marquee-card" onclick="openLightbox('img/panoramic_courts.jpg', 'Vista Panorámica del Complejo Muzzaga Pádel')">
+          <img src="img/panoramic_courts.jpg" alt="Vista panorámica de canchas de pádel Catriel" class="marquee-img" loading="eager">
+          <div class="marquee-card-label">
+            <span>Complejo Muzzaga</span>
+            <span class="marquee-card-dot"></span>
+          </div>
         </div>
 
       </div>
-
-      <!-- Centered Device Mockup Card (Expo signature) -->
-      <div class="device-mockup-wrap">
-        <div class="mockup-header-bar">
-          <div class="mockup-controls">
-            <div class="mockup-dot"></div>
-            <div class="mockup-dot"></div>
-            <div class="mockup-dot"></div>
-          </div>
-          <span class="mockup-title">muzzaga.app/turnos-en-vivo</span>
-          <span class="badge-pill badge-success" style="font-size: 10px;">En línea</span>
-        </div>
-
-        <div class="mockup-body-grid">
-          <div class="mockup-court-card">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-              <strong style="color: var(--color-ink); font-size: 15px;">Cancha 1 · Cristal</strong>
-              <span class="badge-pill badge-success">Disponible</span>
-            </div>
-            <p style="font-size: 13px; color: var(--color-body); margin-bottom: 12px;">Césped sintético monofilamento, blindex panorámico e iluminación LED 200W.</p>
-            <div style="font-family: var(--font-family-3); font-size: 13px; color: var(--color-body-strong);">
-              Próximo turno: 20:00 - 21:30 hs ($15.000 / jug)
-            </div>
-          </div>
-
-          <div class="mockup-court-card">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-              <strong style="color: var(--color-ink); font-size: 15px;">Cancha 2 · Estándar</strong>
-              <span class="badge-pill badge-warning">Cancha Abierta (3/4)</span>
-            </div>
-            <p style="font-size: 13px; color: var(--color-body); margin-bottom: 12px;">Partido abierto de 6ta categoría. Falta 1 jugador para completar el partido.</p>
-            <div style="font-family: var(--font-family-3); font-size: 13px; color: var(--color-body-strong);">
-              Turno hoy: 20:30 hs · ¡Sumate!
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -1248,21 +1600,50 @@
   </section>
 
   <!-- ==========================================================================
-       TORNEOS Y CANTINA
+       TORNEOS OFICIALES (WITH REAL EVENT PHOTOS)
        ========================================================================== -->
   <section id="torneos" class="section-features-two">
     <div class="container">
       
       <div class="section-header-row">
         <div>
+          <span class="badge-pill badge-success" style="margin-bottom: 8px;">Competencia Oficial</span>
           <h2 class="section-title">Torneos Oficiales 2026</h2>
-          <p class="section-desc">Fixture organizado, hidratación, premios de primera línea y tercer tiempo.</p>
+          <p class="section-desc">Cuadros organizados, premiaciones de paletas de primera marca, hidratación y cena de cierre.</p>
         </div>
         <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20inscribir%20mi%20pareja%20al%20pr%C3%B3ximo%20torneo." target="_blank" rel="noopener" class="btn btn-primary">
           Inscribir mi pareja →
         </a>
       </div>
 
+      <!-- Bento Layout: Real Photo + Tournament Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+        
+        <!-- Real Photo Card: Torneo Atmosphere -->
+        <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; min-height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--color-hairline-strong); cursor: pointer;" onclick="openLightbox('img/court_spectators.jpg', 'Gradas y ambiente de torneo en Muzzaga Pádel')">
+          <img src="img/court_spectators.jpg" alt="Ambiente de torneo en Muzzaga Pádel" style="width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.92);">
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,15,15,0.85) 0%, rgba(15,15,15,0.2) 60%, transparent 100%);"></div>
+          <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; color: #fff;">
+            <span class="badge-pill" style="background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 8px;">Ambiente de Club</span>
+            <h3 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 4px;">Gradas colmadas y tercer tiempo</h3>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.4;">Viví los fines de semana de competencia con tribunas llenas y música en vivo.</p>
+          </div>
+        </div>
+
+        <!-- Real Photo Card: Live Match Night -->
+        <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; min-height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--color-hairline-strong); cursor: pointer;" onclick="openLightbox('img/match_action_led.jpg', 'Final de torneo nocturno con iluminación LED')">
+          <img src="img/match_action_led.jpg" alt="Final de torneo nocturno en Muzzaga" style="width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.92);">
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,15,15,0.85) 0%, rgba(15,15,15,0.2) 60%, transparent 100%);"></div>
+          <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; color: #fff;">
+            <span class="badge-pill badge-warning" style="margin-bottom: 8px;">Finales Nocturnas</span>
+            <h3 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 4px;">Partidos definitorios con LED 200W</h3>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.4;">Juego dinámico sin deslumbramiento en las dos canchas de cristal.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tournament Cards Grid -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg);">
         <div class="feature-card-expo">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
@@ -1270,8 +1651,11 @@
             <span style="font-size: 13px; color: var(--color-muted);">Próximo fin de semana</span>
           </div>
           <h3 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 6px 0;">Torneo 6ta Caballeros</h3>
-          <p style="font-size: 14px; color: var(--color-body); margin-bottom: 14px;">Paletas oficiales de premio, indumentaria y cena de premiación.</p>
-          <div style="font-size: 13px; font-weight: 600; color: var(--color-ink);">Cupos: 12 de 16 confirmados</div>
+          <p style="font-size: 14px; color: var(--color-body); margin-bottom: 14px;">Paletas oficiales de premio, indumentaria deportiva y cena de premiación.</p>
+          <div style="font-size: 13px; font-weight: 600; color: var(--color-ink); display: flex; justify-content: space-between; align-items: center;">
+            <span>Cupos: 12 de 16 confirmados</span>
+            <span style="color: var(--color-semantic-success);">¡Últimos 4 lugares!</span>
+          </div>
         </div>
 
         <div class="feature-card-expo">
@@ -1299,18 +1683,43 @@
   </section>
 
   <!-- ==========================================================================
-       CANTINA
+       CANTINA & TERCER TIEMPO (WITH REAL CLUB PHOTOS)
        ========================================================================== -->
-  <section id="cantina" class="section-features-two" style="background: var(--color-canvas-soft);">
+  <section id="cantina" class="section-features-two" style="background: var(--color-canvas-soft); border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline);">
     <div class="container">
       
       <div class="section-header-row">
         <div>
-          <h2 class="section-title">Cantina Propia</h2>
-          <p class="section-desc">Pizza a la piedra casera, sándwiches de milanesa y cervezas heladas para el tercer tiempo.</p>
+          <span class="badge-pill badge-warning" style="margin-bottom: 8px;">Gastronomía & Lounge</span>
+          <h2 class="section-title">Cantina Propia & 3er Tiempo</h2>
+          <p class="section-desc">Pizzas caseras a la piedra, sándwiches abundantes y cervezas heladas con vista directa a la pista.</p>
         </div>
       </div>
 
+      <!-- Real Cantina Photos Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+        
+        <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; height: 260px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--color-hairline-strong); cursor: pointer;" onclick="openLightbox('img/cantina_beer_court.jpg', 'Barra y canillas de cerveza artesanal con vista a la cancha')">
+          <img src="img/cantina_beer_court.jpg" alt="Cantina de Muzzaga con cerveza tirada" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,15,15,0.8) 0%, transparent 60%);"></div>
+          <div style="position: absolute; bottom: 18px; left: 18px; right: 18px; color: #fff;">
+            <strong style="display: block; font-size: 16px; margin-bottom: 2px;">Cerveza Tirada y Vista a Canchas</strong>
+            <span style="font-size: 13px; color: rgba(255,255,255,0.85);">Terminá de jugar y pedite una pinta helada mirando el siguiente partido.</span>
+          </div>
+        </div>
+
+        <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; height: 260px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--color-hairline-strong); cursor: pointer;" onclick="openLightbox('img/bar_coffee_snacks.jpg', 'Sector cafetería y snacks para deportistas')">
+          <img src="img/bar_coffee_snacks.jpg" alt="Cafetería y barra de snacks en Muzzaga" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,15,15,0.8) 0%, transparent 60%);"></div>
+          <div style="position: absolute; bottom: 18px; left: 18px; right: 18px; color: #fff;">
+            <strong style="display: block; font-size: 16px; margin-bottom: 2px;">Cafetería & Hidratación</strong>
+            <span style="font-size: 13px; color: rgba(255,255,255,0.85);">Café de especialidad, aguas isotónicas y barritas energéticas.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Menu Items -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--spacing-md);">
         <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
           <div>
@@ -1323,7 +1732,7 @@
         <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <strong style="color: var(--color-ink); font-size: 15px; display: block;">Pizza Napolitana</strong>
-            <span style="font-size: 13px; color: var(--color-body);">Tomate natural y oliva</span>
+            <span style="font-size: 13px; color: var(--color-body);">Tomate natural, ajo y oliva</span>
           </div>
           <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$20.000</span>
         </div>
@@ -1339,7 +1748,7 @@
         <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <strong style="color: var(--color-ink); font-size: 15px; display: block;">Heineken 975 ml</strong>
-            <span style="font-size: 13px; color: var(--color-body);">Botella helada</span>
+            <span style="font-size: 13px; color: var(--color-body);">Botella bien fría</span>
           </div>
           <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$9.000</span>
         </div>
@@ -1356,8 +1765,9 @@
       
       <div class="section-header-row">
         <div>
-          <h2 class="section-title">Ubicación</h2>
-          <p class="section-desc">Muzzaga Pádel se encuentra en Catriel, Río Negro. Estacionamiento privado e iluminación nocturna.</p>
+          <span class="badge-pill badge-success" style="margin-bottom: 8px;">Catriel, Río Negro</span>
+          <h2 class="section-title">Cómo Llegar al Club</h2>
+          <p class="section-desc">Muzzaga Pádel está ubicado en Catriel, Río Negro. Estacionamiento privado iluminado y acceso asfaltado.</p>
         </div>
         <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary">
           📍 Abrir en Google Maps →
@@ -1797,6 +2207,31 @@
       });
     });
 
+    // Lightbox modal logic
+    function openLightbox(src, caption) {
+      const modal = document.getElementById('lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      const cap = document.getElementById('lightbox-caption');
+      if (modal && img) {
+        img.src = src;
+        cap.textContent = caption || 'Muzzaga Pádel · Catriel, Río Negro';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeLightbox() {
+      const modal = document.getElementById('lightbox-modal');
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
     document.getElementById('modal-paddles').addEventListener('change', updateModalConfirmLink);
     document.getElementById('modal-cantina-preorder').addEventListener('change', updateModalConfirmLink);
 
@@ -1812,5 +2247,15 @@
       renderSlotsGrid();
     });
   </script>
+
+  <!-- Real Photo Lightbox Modal -->
+  <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()">
+    <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <img id="lightbox-img" src="" alt="Foto Muzzaga Pádel" class="lightbox-img">
+      <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
 </body>
 </html>
