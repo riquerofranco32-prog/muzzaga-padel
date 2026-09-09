@@ -3,60 +3,136 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>Muzzaga Pádel — Turnos Online, Canchas Abiertas y Torneos en Catriel</title>
-  <meta name="description" content="Plataforma de reservas de Muzzaga Pádel en Catriel. Reservá turnos en tiempo real por grilla horaria, sumate a Canchas Abiertas estilo Set Plus y Playtomic, y anotate a torneos oficiales.">
-  <meta name="keywords" content="set plus padel, playtomic catriel, turnos padel catriel, muzzaga padel, canchas abiertas padel, reservar cancha padel rio negro">
+  <title>Muzzaga Pádel — Club de Pádel en Catriel, Río Negro</title>
+  <meta name="description" content="Plataforma de reservas de Muzzaga Pádel en Catriel. Reservá turnos online en tiempo real, sumate a Canchas Abiertas y seguí tu nivel de juego.">
+  <meta name="keywords" content="muzzaga padel, padel catriel, turnos padel, canchas abiertas catriel, rio negro padel">
   
   <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Muzzaga Pádel — Turnos en Vivo y Cancha Abierta estilo Set Plus">
-  <meta property="og:description" content="Elegí tu turno en la grilla en vivo, sumate a partidos abiertos cuando te falte gente y viví el tercer tiempo en Catriel.">
+  <meta property="og:title" content="Muzzaga Pádel — Turnos en Vivo y Cancha Abierta en Catriel">
+  <meta property="og:description" content="2 canchas de cristal profesionales, torneos oficiales y la comunidad de pádel de Catriel.">
   <meta property="og:locale" content="es_AR">
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts: Inter & JetBrains Mono (Expo Typography) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       DESIGN SYSTEM: SET PLUS & PLAYTOMIC PRO DARK SPORT
+       EXPO DESIGN SYSTEM TOKENS (LIGHT THEME)
        ========================================================================== */
     :root {
-      --bg-app: #0D0E11;
-      --bg-surface: #15161B;
-      --bg-surface-elevated: #1F2128;
-      --bg-surface-hover: #2A2D36;
-      --bg-cream: #F5F1E8;
-      
-      --text-main: #F7F8FA;
-      --text-muted: #8F93A0;
-      --text-subtle: #5A5E6B;
-      --text-dark: #101114;
-      
-      --primary: #FF5500;
-      --primary-hover: #E04B00;
-      --primary-glow: rgba(255, 85, 0, 0.24);
-      
-      --court-green: #00D26A;
-      --court-green-glow: rgba(0, 210, 106, 0.18);
-      --court-blue: #0284C7;
-      --warning-amber: #F59E0B;
-      
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.2);
-      --border-active: rgba(255, 85, 0, 0.45);
-      --border-green: rgba(0, 210, 106, 0.35);
-      
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
+      --color-primary: #000000;
+      --color-primary-active: #1a1a1a;
+      --color-text-link: #0d74ce;
+      --color-text-link-secondary: #476cff;
+      --color-ink: #171717;
+      --color-body: #60646c;
+      --color-body-strong: #171717;
+      --color-muted: #999999;
+      --color-muted-soft: #cccccc;
+      --color-hairline: #f0f0f3;
+      --color-hairline-soft: #f5f5f7;
+      --color-hairline-strong: #dcdee0;
+      --color-canvas: #ffffff;
+      --color-canvas-soft: #fafafa;
+      --color-surface-card: #ffffff;
+      --color-surface-strong: #f0f0f3;
+      --color-surface-dark: #171717;
+      --color-surface-dark-elevated: #1a1a1a;
+      --color-on-primary: #ffffff;
+      --color-on-dark: #ffffff;
+      --color-on-dark-soft: #b0b4ba;
+      --color-gradient-sky-light: #cfe7ff;
+      --color-gradient-sky-mid: #a8c8e8;
+      --color-accent-warning: #ab6400;
+      --color-accent-preview: #8145b5;
+      --color-accent-link-bright: #47c2ff;
+      --color-semantic-error: #eb8e90;
+      --color-semantic-success: #16a34a;
+
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-family-2: 'Inter', sans-serif;
+      --font-family-3: 'JetBrains Mono', 'Fira Code', monospace;
+
+      --text-display-mega: 64px;
+      --leading-display-mega: 1.05;
+      --tracking-display-mega: -1.92px;
+
+      --text-display-xl: 48px;
+      --leading-display-xl: 1.1;
+      --tracking-display-xl: -1.44px;
+
+      --text-display-lg: 36px;
+      --leading-display-lg: 1.15;
+      --tracking-display-lg: -1.08px;
+
+      --text-display-md: 28px;
+      --leading-display-md: 1.2;
+      --tracking-display-md: -0.84px;
+
+      --text-display-sm: 22px;
+      --leading-display-sm: 1.25;
+      --tracking-display-sm: -0.5px;
+
+      --text-title-md: 18px;
+      --leading-title-md: 1.4;
+      --tracking-title-md: 0;
+
+      --text-title-sm: 16px;
+      --leading-title-sm: 1.4;
+      --tracking-title-sm: 0;
+
+      --text-body-md: 16px;
+      --leading-body-md: 1.5;
+      --tracking-body-md: 0;
+
+      --text-body-sm: 14px;
+      --leading-body-sm: 1.5;
+      --tracking-body-sm: 0;
+
+      --text-caption: 13px;
+      --leading-caption: 1.4;
+      --tracking-caption: 0;
+
+      --text-caption-uppercase: 11px;
+      --leading-caption-uppercase: 1.4;
+      --tracking-caption-uppercase: 0.88px;
+
+      --text-code: 13px;
+      --leading-code: 1.5;
+      --tracking-code: 0;
+
+      --text-button: 14px;
+      --leading-button: 1;
+      --tracking-button: 0;
+
+      --text-nav-link: 14px;
+      --leading-nav-link: 1.4;
+      --tracking-nav-link: 0;
+
+      --spacing-xxs: 4px;
+      --spacing-xs: 8px;
+      --spacing-sm: 12px;
+      --spacing-base: 16px;
+      --spacing-md: 20px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-xxl: 48px;
+      --spacing-section: 96px;
+
+      --radius-none: 0px;
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-xxl: 24px;
       --radius-pill: 9999px;
-      
-      --font-display: 'Anton', sans-serif;
-      --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      
-      --bottom-bar-h: 70px;
+      --radius-full: 9999px;
+
+      --bottom-bar-h: 68px;
     }
 
     *, *::before, *::after {
@@ -69,14 +145,15 @@
     html {
       scroll-behavior: smooth;
       font-size: 16px;
-      background: var(--bg-app);
+      background: var(--color-canvas);
     }
 
     body {
-      background: var(--bg-app);
-      color: var(--text-main);
-      font-family: var(--font-body);
-      line-height: 1.5;
+      background: var(--color-canvas);
+      color: var(--color-body);
+      font-family: var(--font-primary);
+      font-size: var(--text-body-md);
+      line-height: var(--leading-body-md);
       -webkit-font-smoothing: antialiased;
       padding-bottom: calc(var(--bottom-bar-h) + 20px);
     }
@@ -84,6 +161,7 @@
     a {
       color: inherit;
       text-decoration: none;
+      transition: color 0.15s ease;
     }
 
     button, input, select {
@@ -95,46 +173,7 @@
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    /* Badges */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .badge-live {
-      background: var(--court-green-glow);
-      color: var(--court-green);
-      border: 1px solid var(--border-green);
-    }
-
-    .badge-orange {
-      background: var(--primary-glow);
-      color: var(--primary);
-      border: 1px solid var(--border-active);
-    }
-
-    .badge-open {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--warning-amber);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-    }
-
-    .pulse-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-      box-shadow: 0 0 8px currentColor;
+      padding: 0 var(--spacing-lg);
     }
 
     /* Buttons */
@@ -142,206 +181,293 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 12px 22px;
-      border-radius: var(--radius-pill);
-      font-weight: 700;
-      font-size: 0.9rem;
+      gap: var(--spacing-xs);
+      font-family: var(--font-primary);
+      font-size: var(--text-button);
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      padding: 10px 18px;
+      height: 40px;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      letter-spacing: 0.02em;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn:active {
-      transform: translateY(1px);
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      white-space: nowrap;
     }
 
     .btn-primary {
-      background: var(--primary);
-      color: #FFF;
-      box-shadow: 0 6px 20px rgba(255, 85, 0, 0.3);
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+      border: 1px solid var(--color-primary);
     }
 
     .btn-primary:hover {
-      background: var(--primary-hover);
-      box-shadow: 0 10px 28px rgba(255, 85, 0, 0.45);
+      background: var(--color-primary-active);
+      border-color: var(--color-primary-active);
     }
 
-    .btn-surface {
-      background: var(--bg-surface-elevated);
-      color: var(--text-main);
-      border: 1px solid var(--border-subtle);
+    .btn-secondary {
+      background: var(--color-surface-card);
+      color: var(--color-ink);
+      border: 1px solid var(--color-hairline-strong);
     }
 
-    .btn-surface:hover {
-      background: var(--bg-surface-hover);
-      border-color: var(--border-hover);
+    .btn-secondary:hover {
+      background: var(--color-hairline-soft);
+      border-color: #b0b4ba;
     }
 
     .btn-whatsapp {
-      background: #25D366;
-      color: #063415;
-      font-weight: 800;
+      background: #16a34a;
+      color: #ffffff;
+      border: 1px solid #16a34a;
     }
 
     .btn-whatsapp:hover {
-      background: #20BD5A;
-      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+      background: #15803d;
+      border-color: #15803d;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-surface-strong);
+      color: var(--color-ink);
+      font-size: var(--text-caption-uppercase);
+      letter-spacing: var(--tracking-caption-uppercase);
+      text-transform: uppercase;
+      font-weight: 600;
+      border-radius: var(--radius-pill);
+      padding: 4px 10px;
+    }
+
+    .badge-success {
+      background: rgba(22, 163, 74, 0.1);
+      color: var(--color-semantic-success);
+      border: 1px solid rgba(22, 163, 74, 0.2);
+    }
+
+    .badge-warning {
+      background: rgba(171, 100, 0, 0.1);
+      color: var(--color-accent-warning);
+      border: 1px solid rgba(171, 100, 0, 0.2);
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
     }
 
     /* ==========================================================================
-       APP HEADER / NAVBAR
+       TOP NAV (EXPO ROLE: TOP NAV)
        ========================================================================== */
-    .app-header {
+    .app-top-nav {
       position: sticky;
       top: 0;
-      z-index: 90;
-      background: rgba(13, 14, 17, 0.92);
+      z-index: 100;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 12px 0;
+      border-bottom: 1px solid var(--color-hairline);
     }
 
-    .header-inner {
+    .nav-inner {
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: var(--spacing-md);
     }
 
-    .app-brand {
+    .brand-group {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .app-brand-name {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      letter-spacing: 0.04em;
-      line-height: 1;
-      text-transform: uppercase;
-      color: var(--text-main);
-    }
-
-    .app-brand-badge {
-      font-size: 0.65rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--primary);
-    }
-
-    .nav-tabs {
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--color-primary);
+      border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: var(--bg-surface);
-      padding: 4px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .nav-tab-btn {
-      padding: 8px 18px;
-      border-radius: var(--radius-pill);
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      background: transparent;
-      transition: all 0.2s ease;
-    }
-
-    .nav-tab-btn:hover {
-      color: var(--text-main);
-    }
-
-    .nav-tab-btn.active {
-      background: var(--primary);
+      justify-content: center;
       color: #FFF;
-      box-shadow: 0 2px 10px rgba(255, 85, 0, 0.35);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .brand-text {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--color-ink);
+      letter-spacing: -0.2px;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--color-muted);
+      margin-left: 4px;
+    }
+
+    .nav-links-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+    }
+
+    .nav-link {
+      font-size: var(--text-nav-link);
+      color: var(--color-body);
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--color-ink);
     }
 
     /* ==========================================================================
-       HERO APP BANNER
+       HERO (EXPO SIGNATURE: GRADIENT SKY WASH + DEVICE MOCKUP)
        ========================================================================== */
-    .hero-banner {
-      padding: 36px 0 28px;
+    .hero-container {
       position: relative;
+      padding: 72px 0 64px;
       overflow: hidden;
-      border-bottom: 1px solid var(--border-subtle);
-      background: radial-gradient(circle at 85% 20%, rgba(255, 85, 0, 0.12), transparent 50%),
-                  radial-gradient(circle at 10% 80%, rgba(0, 210, 106, 0.06), transparent 50%);
+      background: radial-gradient(100% 85% at 50% -10%, var(--color-gradient-sky-light) 0%, #eaf4fd 40%, var(--color-canvas) 90%);
+      border-bottom: 1px solid var(--color-hairline);
     }
 
-    .hero-flex {
+    .hero-content {
+      text-align: center;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .hero-badge-wrap {
+      display: inline-flex;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .hero-title {
+      font-family: var(--font-primary);
+      font-size: clamp(38px, 5.5vw, var(--text-display-mega));
+      font-weight: 600;
+      line-height: var(--leading-display-mega);
+      letter-spacing: var(--tracking-display-mega);
+      color: var(--color-ink);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .hero-subtitle {
+      font-size: var(--text-title-md);
+      line-height: var(--leading-body-md);
+      color: var(--color-body);
+      max-width: 580px;
+      margin: 0 auto var(--spacing-xl);
+    }
+
+    .hero-cta-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--spacing-xxl);
+    }
+
+    /* Device Mockup Card (Expo Signature Feature) */
+    .device-mockup-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 24px 64px rgba(13, 116, 206, 0.08), 0 10px 24px rgba(0, 0, 0, 0.04);
+      padding: var(--spacing-lg);
+      position: relative;
+    }
+
+    .mockup-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--color-hairline);
+      padding-bottom: var(--spacing-sm);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .mockup-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--color-hairline-strong);
+    }
+
+    .mockup-title {
+      font-family: var(--font-family-3);
+      font-size: var(--text-code);
+      color: var(--color-body);
+    }
+
+    .mockup-body-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+      text-align: left;
+    }
+
+    .mockup-court-card {
+      background: var(--color-canvas-soft);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-base);
+    }
+
+    /* ==========================================================================
+       GRILLA DE TURNOS EN VIVO (SET PLUS STYLE IN EXPO LIGHT)
+       ========================================================================== */
+    .section-turnos {
+      padding: var(--spacing-section) 0;
+    }
+
+    .section-header-row {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: flex-end;
-      gap: 24px;
+      margin-bottom: var(--spacing-xl);
+      gap: var(--spacing-md);
     }
 
-    .club-title {
-      font-family: var(--font-display);
-      font-size: clamp(2.4rem, 6vw, 4.4rem);
-      line-height: 0.95;
-      text-transform: uppercase;
-      letter-spacing: -0.01em;
-      margin-top: 12px;
-      margin-bottom: 10px;
+    .section-title {
+      font-family: var(--font-primary);
+      font-size: var(--text-display-lg);
+      font-weight: 600;
+      line-height: var(--leading-display-lg);
+      letter-spacing: var(--tracking-display-lg);
+      color: var(--color-ink);
     }
 
-    .club-subtitle {
-      color: var(--text-muted);
-      font-size: 1rem;
-      max-width: 52ch;
+    .section-desc {
+      font-size: var(--text-body-md);
+      color: var(--color-body);
+      margin-top: var(--spacing-xs);
     }
 
-    .club-quick-stats {
-      display: flex;
-      gap: 20px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px 20px;
-    }
-
-    .quick-stat-item {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .quick-stat-val {
-      font-family: var(--font-display);
-      font-size: 1.4rem;
-      color: var(--primary);
-      line-height: 1;
-    }
-
-    .quick-stat-lbl {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-top: 4px;
-    }
-
-    /* ==========================================================================
-       SET PLUS ENGINE: DATE PICKER HORIZONTAL CAROUSEL
-       ========================================================================== */
-    .booking-engine-section {
-      padding: 32px 0 60px;
-    }
-
+    /* Date Picker Horizontal Carousel */
     .date-carousel-wrap {
-      margin-bottom: 24px;
+      margin-bottom: var(--spacing-lg);
       overflow-x: auto;
       padding-bottom: 6px;
       scrollbar-width: none;
@@ -353,439 +479,417 @@
 
     .date-strip {
       display: inline-flex;
-      gap: 10px;
+      gap: var(--spacing-sm);
       min-width: 100%;
     }
 
     .date-card {
-      flex: 0 0 88px;
-      background: var(--bg-surface);
-      border: 1.5px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 12px 8px;
+      flex: 0 0 92px;
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
+      border-radius: var(--radius-lg);
+      padding: 14px 10px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
       user-select: none;
     }
 
     .date-card:hover {
-      border-color: var(--border-hover);
-      background: var(--bg-surface-elevated);
+      border-color: var(--color-ink);
     }
 
     .date-card.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      box-shadow: 0 6px 18px rgba(255, 85, 0, 0.35);
-    }
-
-    .date-card.active * {
-      color: #FFF !important;
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-on-primary);
     }
 
     .date-card-day {
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: var(--text-caption-uppercase);
+      font-weight: 600;
       text-transform: uppercase;
-      color: var(--text-muted);
-      letter-spacing: 0.06em;
+      letter-spacing: var(--tracking-caption-uppercase);
+      color: var(--color-body);
+    }
+
+    .date-card.active .date-card-day {
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .date-card-num {
-      font-family: var(--font-display);
-      font-size: 1.8rem;
-      line-height: 1.1;
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.2;
       margin: 2px 0;
-      color: var(--text-main);
+      color: var(--color-ink);
+    }
+
+    .date-card.active .date-card-num {
+      color: #ffffff;
     }
 
     .date-card-month {
-      font-size: 0.7rem;
-      color: var(--text-subtle);
+      font-size: 11px;
+      color: var(--color-muted);
       text-transform: uppercase;
     }
 
-    /* Filter Chips (Like Playtomic / Set Plus) */
-    .filter-bar-flex {
+    .date-card.active .date-card-month {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Filter Bar */
+    .filter-bar {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 24px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 12px 18px;
-    }
-
-    .filter-chips-group {
-      display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      padding: var(--spacing-sm) var(--spacing-base);
+      background: var(--color-canvas-soft);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-md);
     }
 
-    .filter-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: var(--text-subtle);
-      letter-spacing: 0.08em;
-      margin-right: 4px;
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
-    .chip-btn {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
+    .filter-btn {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
       border-radius: var(--radius-pill);
       padding: 6px 14px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-body);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
 
-    .chip-btn:hover {
-      color: var(--text-main);
-      background: var(--bg-surface-hover);
+    .filter-btn:hover {
+      color: var(--color-ink);
+      border-color: #b0b4ba;
     }
 
-    .chip-btn.active {
-      background: var(--text-main);
-      color: var(--text-dark);
-      border-color: var(--text-main);
-      font-weight: 700;
+    .filter-btn.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-on-primary);
+      font-weight: 600;
     }
 
-    /* Grilla de Turnos (Slots Grid) */
+    /* Slots Grid */
     .slots-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: var(--spacing-base);
     }
 
     .slot-card {
-      background: var(--bg-surface);
-      border: 1.5px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 18px;
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 14px;
+      gap: var(--spacing-md);
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-      overflow: hidden;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .slot-card:hover:not(.disabled) {
-      transform: translateY(-4px);
-      border-color: var(--primary);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      border-color: var(--color-primary);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+      transform: translateY(-2px);
     }
 
     .slot-card.disabled {
-      opacity: 0.45;
+      background: var(--color-canvas-soft);
+      border-color: var(--color-hairline);
+      opacity: 0.6;
       cursor: not-allowed;
-      background: rgba(21, 22, 27, 0.6);
     }
 
     .slot-card.open-match {
-      border-color: rgba(245, 158, 11, 0.5);
-      background: linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, var(--bg-surface) 100%);
+      border-color: rgba(171, 100, 0, 0.35);
+      background: linear-gradient(180deg, rgba(171, 100, 0, 0.03) 0%, #ffffff 100%);
     }
 
-    .slot-card-header {
+    .slot-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
     }
 
     .slot-time {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      line-height: 1;
-      color: var(--text-main);
+      font-size: var(--text-title-md);
+      font-weight: 600;
+      color: var(--color-ink);
     }
 
     .slot-duration {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-top: 4px;
+      font-size: var(--text-caption);
+      color: var(--color-muted);
+      margin-top: 2px;
     }
 
-    .slot-court-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .slot-court {
+      font-size: var(--text-body-sm);
+      font-weight: 500;
+      color: var(--color-body);
+      margin-top: var(--spacing-sm);
     }
 
     .slot-price-row {
       display: flex;
-      align-items: baseline;
       justify-content: space-between;
-      padding-top: 10px;
-      border-top: 1px solid var(--border-subtle);
+      align-items: baseline;
+      padding-top: var(--spacing-sm);
+      border-top: 1px solid var(--color-hairline);
     }
 
-    .slot-price-per-player {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .slot-price-total {
+      font-family: var(--font-primary);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-ink);
     }
 
-    .slot-price-val {
-      font-family: var(--font-display);
-      font-size: 1.3rem;
-      color: var(--primary);
-    }
-
-    /* Avatares de Cancha Abierta */
-    .open-players-row {
+    /* Open match players */
+    .open-avatars-row {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      gap: 6px;
       margin-top: 8px;
     }
 
-    .player-avatar {
-      width: 30px;
-      height: 30px;
+    .avatar-circle {
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: var(--bg-surface-hover);
-      border: 1.5px solid var(--border-subtle);
+      background: var(--color-surface-strong);
+      border: 1px solid var(--color-hairline-strong);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-ink);
     }
 
-    .player-avatar.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #FFF;
-    }
-
-    .player-avatar.empty {
-      border: 1.5px dashed var(--warning-amber);
-      color: var(--warning-amber);
-      background: transparent;
+    .avatar-circle.empty {
+      border: 1px dashed var(--color-accent-warning);
+      color: var(--color-accent-warning);
+      background: rgba(171, 100, 0, 0.05);
     }
 
     /* ==========================================================================
-       MODAL CHECKOUT (ESTILO APP SET PLUS)
+       CANCHAS ABIERTAS FEED (PLAYTOMIC COMMUNITY)
        ========================================================================== */
-    .booking-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+    .section-community {
+      padding: var(--spacing-section) 0;
+      background: var(--color-canvas-soft);
+      border-top: 1px solid var(--color-hairline);
+      border-bottom: 1px solid var(--color-hairline);
     }
 
-    .booking-modal-overlay.active {
-      display: flex;
-      animation: modalFadeIn 0.25s ease;
-    }
-
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .booking-modal {
-      background: var(--bg-surface);
-      border: 1.5px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      width: 100%;
-      max-width: 520px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 28px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
-      position: relative;
-    }
-
-    .modal-close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: var(--bg-surface-elevated);
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .modal-close-btn:hover {
-      background: var(--bg-surface-hover);
-      color: var(--text-main);
-    }
-
-    .modal-slot-summary {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin: 18px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .type-switcher-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 18px 0;
-    }
-
-    .type-option-btn {
-      background: var(--bg-surface-elevated);
-      border: 2px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      color: var(--text-main);
-    }
-
-    .type-option-btn.active {
-      border-color: var(--primary);
-      background: rgba(255, 85, 0, 0.08);
-    }
-
-    /* ==========================================================================
-       SECCIÓN: "CANCHAS ABIERTAS" FEED (PLAYTOMIC / SET PLUS COMMUNITY)
-       ========================================================================== */
-    .section-open-matches {
-      padding: 48px 0;
-      border-top: 1px solid var(--border-subtle);
-      border-bottom: 1px solid var(--border-subtle);
-      background: linear-gradient(180deg, rgba(21, 22, 27, 0.4) 0%, rgba(13, 14, 17, 0.8) 100%);
-    }
-
-    .section-heading-flex {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 4vw, 2.8rem);
-      text-transform: uppercase;
-      letter-spacing: -0.01em;
-      line-height: 1;
-    }
-
-    .open-matches-grid {
+    .open-cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
+      gap: var(--spacing-lg);
     }
 
-    .open-match-card {
-      background: var(--bg-surface);
-      border: 1.5px solid var(--border-subtle);
+    .open-card {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
       border-radius: var(--radius-lg);
-      padding: 24px;
+      padding: var(--spacing-lg);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 20px;
-      transition: transform 0.2s, border-color 0.2s;
+      gap: var(--spacing-base);
     }
 
-    .open-match-card:hover {
-      border-color: var(--warning-amber);
-      transform: translateY(-3px);
+    .open-card:hover {
+      border-color: var(--color-ink);
     }
 
-    .match-meta-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .match-players-grid {
+    .player-slots-layout {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin: 14px 0;
+      gap: 6px;
+      margin: var(--spacing-sm) 0;
     }
 
-    .match-slot-box {
-      background: var(--bg-surface-elevated);
+    .player-slot-item {
+      background: var(--color-surface-strong);
+      border: 1px solid var(--color-hairline);
       border-radius: var(--radius-sm);
-      padding: 10px 6px;
+      padding: 8px 4px;
       text-align: center;
-      border: 1px solid var(--border-subtle);
+      font-size: 12px;
     }
 
-    .match-slot-box.taken {
-      border-color: rgba(0, 210, 106, 0.4);
-      background: rgba(0, 210, 106, 0.06);
+    .player-slot-item.taken {
+      border-color: rgba(22, 163, 74, 0.3);
+      color: var(--color-semantic-success);
     }
 
-    .match-slot-box.free {
-      border: 1.5px dashed var(--warning-amber);
-      background: rgba(245, 158, 11, 0.05);
+    .player-slot-item.free {
+      border: 1px dashed var(--color-accent-warning);
+      color: var(--color-accent-warning);
+      font-weight: 600;
     }
 
     /* ==========================================================================
-       SECCIÓN: RANKING & SISTEMA DE NIVELES (PLAYTOMIC RATING 1.0 - 7.0)
+       RATING PLAYTOMIC (EXPO INTERACTIVE SLIDER)
        ========================================================================== */
-    .rating-section {
-      padding: 56px 0;
+    .section-rating {
+      padding: var(--spacing-section) 0;
     }
 
-    .rating-layout {
+    .rating-grid-layout {
       display: grid;
       grid-template-columns: 1.1fr 0.9fr;
-      gap: 36px;
+      gap: var(--spacing-xxl);
       align-items: center;
     }
 
-    .rating-card {
-      background: var(--bg-surface);
-      border: 1.5px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 32px;
+    .rating-box {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
     }
 
-    .level-badge-display {
-      font-family: var(--font-display);
-      font-size: 3.8rem;
-      color: var(--primary);
+    .rating-display-val {
+      font-family: var(--font-family-3);
+      font-size: 56px;
+      font-weight: 600;
+      color: var(--color-ink);
       line-height: 1;
       margin: 10px 0;
     }
 
     /* ==========================================================================
-       BOTTOM APP BAR (MÓVIL - ESTILO SET PLUS / PLAYTOMIC)
+       TORNEOS & CANTINA CARDS
        ========================================================================== */
+    .section-features-two {
+      padding: var(--spacing-section) 0;
+      border-top: 1px solid var(--color-hairline);
+    }
+
+    .feature-card-expo {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+    }
+
+    /* ==========================================================================
+       CHECKOUT MODAL
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-base);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: var(--spacing-xl);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: var(--color-surface-strong);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-body);
+      cursor: pointer;
+    }
+
+    .type-switcher {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-sm);
+      margin: var(--spacing-base) 0;
+    }
+
+    .type-btn {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-hairline-strong);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .type-btn.active {
+      border-color: var(--color-primary);
+      background: var(--color-hairline-soft);
+    }
+
+    /* ==========================================================================
+       FOOTER LIGHT (EXPO ROLE: FOOTER LIGHT)
+       ========================================================================== */
+    .app-footer {
+      background: var(--color-canvas);
+      border-top: 1px solid var(--color-hairline);
+      padding: 64px 0 48px;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--spacing-xl);
+      padding-bottom: var(--spacing-xl);
+      border-bottom: 1px solid var(--color-hairline);
+    }
+
+    .footer-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--spacing-base);
+      margin-top: var(--spacing-lg);
+      font-size: var(--text-body-sm);
+      color: var(--color-body);
+    }
+
+    /* Mobile Bottom App Bar */
     .mobile-bottom-bar {
       display: none;
       position: fixed;
@@ -793,11 +897,10 @@
       left: 0;
       right: 0;
       height: var(--bottom-bar-h);
-      background: rgba(21, 22, 27, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-top: 1px solid var(--border-subtle);
-      z-index: 100;
+      border-top: 1px solid var(--color-hairline);
+      z-index: 90;
       align-items: center;
       justify-content: space-around;
       padding: 0 10px;
@@ -807,38 +910,33 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-      color: var(--text-muted);
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
+      gap: 3px;
+      color: var(--color-body);
+      font-size: 11px;
+      font-weight: 500;
       cursor: pointer;
     }
 
     .bottom-bar-item.active, .bottom-bar-item:hover {
-      color: var(--primary);
+      color: var(--color-ink);
     }
 
     .bottom-bar-item svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
     }
 
-    /* ==========================================================================
-       RESPONSIVE BREAKPOINTS
-       ========================================================================== */
     @media (max-width: 860px) {
       .mobile-bottom-bar {
         display: flex;
       }
-      .nav-tabs {
+      .nav-links-row {
         display: none;
       }
-      .rating-layout {
+      .mockup-body-grid {
         grid-template-columns: 1fr;
       }
-      .slots-grid {
+      .rating-grid-layout {
         grid-template-columns: 1fr;
       }
     }
@@ -847,240 +945,231 @@
 <body>
 
   <!-- ==========================================================================
-       APP HEADER
+       TOP NAV
        ========================================================================== -->
-  <header class="app-header">
-    <div class="container">
-      <div class="header-inner">
-        
-        <a href="#top" class="app-brand" aria-label="Muzzaga Pádel Home">
-          <svg width="34" height="34" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-            <circle cx="20" cy="20" r="20" fill="#FF5500"/>
-            <ellipse cx="20" cy="16" rx="9" ry="10" stroke="#FFF" stroke-width="2.2"/>
-            <path d="M20 26 L20 33" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="16" cy="13" r="1.2" fill="#FFF"/>
-            <circle cx="20" cy="13" r="1.2" fill="#FFF"/>
-            <circle cx="24" cy="13" r="1.2" fill="#FFF"/>
-            <circle cx="16" cy="17" r="1.2" fill="#FFF"/>
-            <circle cx="20" cy="17" r="1.2" fill="#FFF"/>
-            <circle cx="24" cy="17" r="1.2" fill="#FFF"/>
-            <circle cx="18" cy="21" r="1.2" fill="#FFF"/>
-            <circle cx="22" cy="21" r="1.2" fill="#FFF"/>
-          </svg>
-          <div>
-            <span class="app-brand-name">Muzzaga</span>
-            <span class="app-brand-badge">Catriel · Set+ Edition</span>
-          </div>
-        </a>
-
-        <!-- Desktop Navigation Tabs -->
-        <nav class="nav-tabs" aria-label="Navegación principal">
-          <button type="button" class="nav-tab-btn active" onclick="scrollToSection('grilla-turnos')">📅 Turnos en Vivo</button>
-          <button type="button" class="nav-tab-btn" onclick="scrollToSection('canchas-abiertas')">👥 Cancha Abierta (Falta 1)</button>
-          <button type="button" class="nav-tab-btn" onclick="scrollToSection('sistema-nivel')">🎯 Rating & Nivel</button>
-          <button type="button" class="nav-tab-btn" onclick="scrollToSection('torneos')">🏆 Torneos 2026</button>
-          <button type="button" class="nav-tab-btn" onclick="scrollToSection('cantina')">🍕 Cantina</button>
-          <button type="button" class="nav-tab-btn" onclick="scrollToSection('ubicacion')">📍 Ubicación</button>
-        </nav>
-
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 9px 16px; font-size: 0.82rem;">
-            WhatsApp Club
-          </a>
+  <header class="app-top-nav">
+    <div class="container nav-inner">
+      
+      <a href="#top" class="brand-group" aria-label="Muzzaga Pádel Home">
+        <div class="brand-mark">M</div>
+        <div>
+          <span class="brand-text">Muzzaga</span>
+          <span class="brand-sub">Catriel</span>
         </div>
+      </a>
 
+      <!-- Desktop Nav Links -->
+      <nav class="nav-links-row" aria-label="Navegación">
+        <a class="nav-link" onclick="scrollToSection('turnos')">Turnos</a>
+        <a class="nav-link" onclick="scrollToSection('canchas-abiertas')">Canchas Abiertas</a>
+        <a class="nav-link" onclick="scrollToSection('rating')">Rating Playtomic</a>
+        <a class="nav-link" onclick="scrollToSection('torneos')">Torneos</a>
+        <a class="nav-link" onclick="scrollToSection('cantina')">Cantina</a>
+        <a class="nav-link" onclick="scrollToSection('ubicacion')">Ubicación</a>
+      </nav>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary" style="height: 36px; padding: 6px 14px;">
+          📍 Google Maps
+        </a>
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" class="btn btn-primary" style="height: 36px; padding: 6px 14px;">
+          WhatsApp Club
+        </a>
       </div>
+
     </div>
   </header>
 
   <!-- ==========================================================================
-       HERO / APP BANNER
+       HERO (EXPO SIGNATURE: GRADIENT SKY WASH + DEVICE MOCKUP)
        ========================================================================== -->
-  <section id="top" class="hero-banner">
+  <section id="top" class="hero-container">
     <div class="container">
-      <div class="hero-flex">
+      <div class="hero-content">
         
-        <div>
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <span class="badge badge-live">
-              <span class="pulse-dot"></span> Canchas Operativas Hoy
-            </span>
-            <span class="badge badge-orange">
-              Catriel, Río Negro · 24°C Despejado
-            </span>
-          </div>
-
-          <h1 class="club-title">
-            Reservá tu turno.<br>
-            <span style="color: var(--primary);">Jugá cuando quieras.</span>
-          </h1>
-
-          <p class="club-subtitle">
-            Experimentá la forma más rápida de reservar pádel en Catriel. Grilla de turnos en tiempo real, partidos abiertos para sumarte si te falta gente y rankings de club estilo <strong>Set Plus</strong> y <strong>Playtomic</strong>.
-          </p>
+        <div class="hero-badge-wrap">
+          <span class="badge-pill badge-success">
+            <span class="pulse-dot"></span> Canchas Abiertas Hoy · Catriel, Río Negro
+          </span>
         </div>
 
-        <div class="club-quick-stats">
-          <div class="quick-stat-item">
-            <span class="quick-stat-val">2</span>
-            <span class="quick-stat-lbl">Canchas Cristal</span>
-          </div>
-          <div style="width: 1px; background: var(--border-subtle);"></div>
-          <div class="quick-stat-item">
-            <span class="quick-stat-val">90'</span>
-            <span class="quick-stat-lbl">Por Turno</span>
-          </div>
-          <div style="width: 1px; background: var(--border-subtle);"></div>
-          <div class="quick-stat-item">
-            <span class="quick-stat-val">$15k</span>
-            <span class="quick-stat-lbl">x Jugador</span>
-          </div>
+        <h1 class="hero-title">
+          El club de pádel<br>de Catriel.
+        </h1>
+
+        <p class="hero-subtitle">
+          2 canchas de cristal profesionales, grilla horaria en tiempo real, torneos durante todo el año y cantina propia para el tercer tiempo.
+        </p>
+
+        <div class="hero-cta-group">
+          <button type="button" class="btn btn-primary" onclick="scrollToSection('turnos')">
+            Reservar Cancha →
+          </button>
+          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary">
+            Ver Ubicación
+          </a>
         </div>
 
       </div>
+
+      <!-- Centered Device Mockup Card (Expo signature) -->
+      <div class="device-mockup-wrap">
+        <div class="mockup-header-bar">
+          <div class="mockup-controls">
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+          </div>
+          <span class="mockup-title">muzzaga.app/turnos-en-vivo</span>
+          <span class="badge-pill badge-success" style="font-size: 10px;">En línea</span>
+        </div>
+
+        <div class="mockup-body-grid">
+          <div class="mockup-court-card">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <strong style="color: var(--color-ink); font-size: 15px;">Cancha 1 · Cristal</strong>
+              <span class="badge-pill badge-success">Disponible</span>
+            </div>
+            <p style="font-size: 13px; color: var(--color-body); margin-bottom: 12px;">Césped sintético monofilamento, blindex panorámico e iluminación LED 200W.</p>
+            <div style="font-family: var(--font-family-3); font-size: 13px; color: var(--color-body-strong);">
+              Próximo turno: 20:00 - 21:30 hs ($15.000 / jug)
+            </div>
+          </div>
+
+          <div class="mockup-court-card">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <strong style="color: var(--color-ink); font-size: 15px;">Cancha 2 · Estándar</strong>
+              <span class="badge-pill badge-warning">Cancha Abierta (3/4)</span>
+            </div>
+            <p style="font-size: 13px; color: var(--color-body); margin-bottom: 12px;">Partido abierto de 6ta categoría. Falta 1 jugador para completar el partido.</p>
+            <div style="font-family: var(--font-family-3); font-size: 13px; color: var(--color-body-strong);">
+              Turno hoy: 20:30 hs · ¡Sumate!
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
   <!-- ==========================================================================
-       SET PLUS ENGINE: GRILLA DE TURNOS EN VIVO
+       GRILLA DE TURNOS EN VIVO (SET PLUS STYLE)
        ========================================================================== -->
-  <section id="grilla-turnos" class="booking-engine-section">
+  <section id="turnos" class="section-turnos">
     <div class="container">
       
-      <!-- Date Carousel (Selector de Días) -->
+      <div class="section-header-row">
+        <div>
+          <h2 class="section-title">Turnos Disponibles</h2>
+          <p class="section-desc">Elegí el día y horario que prefieras. Turnos de 90 minutos con luz LED incluida.</p>
+        </div>
+        <div style="font-family: var(--font-family-3); font-size: 13px; color: var(--color-body);">
+          $15.000 por jugador · $60.000 cancha completa
+        </div>
+      </div>
+
+      <!-- Date Carousel -->
       <div class="date-carousel-wrap">
-        <div class="date-strip" id="date-strip">
-          <!-- Generado dinámicamente con JavaScript -->
+        <div class="date-strip" id="date-strip"></div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted);">Cancha:</span>
+          <button type="button" class="filter-btn active" data-filter="court" data-val="all">Todas</button>
+          <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 1">Cancha 1 (Cristal)</button>
+          <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 2">Cancha 2</button>
+        </div>
+
+        <div class="filter-group">
+          <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted);">Franja:</span>
+          <button type="button" class="filter-btn active" data-filter="time" data-val="all">Todo el día</button>
+          <button type="button" class="filter-btn" data-filter="time" data-val="tarde">Tarde (14 a 19)</button>
+          <button type="button" class="filter-btn" data-filter="time" data-val="noche">Noche (19 a 00)</button>
         </div>
       </div>
 
-      <!-- Filtros estilo Playtomic / Set Plus -->
-      <div class="filter-bar-flex">
-        <div class="filter-chips-group">
-          <span class="filter-label">Cancha:</span>
-          <button type="button" class="chip-btn active" data-filter="court" data-val="all">Todas</button>
-          <button type="button" class="chip-btn" data-filter="court" data-val="Cancha 1">Cancha 1 (Cristal)</button>
-          <button type="button" class="chip-btn" data-filter="court" data-val="Cancha 2">Cancha 2</button>
-        </div>
-
-        <div class="filter-chips-group">
-          <span class="filter-label">Franja:</span>
-          <button type="button" class="chip-btn active" data-filter="time" data-val="all">Todo el día</button>
-          <button type="button" class="chip-btn" data-filter="time" data-val="tarde">Tarde (14 a 19)</button>
-          <button type="button" class="chip-btn" data-filter="time" data-val="noche">Noche (19 a 00)</button>
-        </div>
-      </div>
-
-      <!-- Grilla de Slots Horarios -->
-      <div class="slots-grid" id="slots-container">
-        <!-- Renderizado dinámicamente por JavaScript -->
-      </div>
+      <!-- Slots Grid -->
+      <div class="slots-grid" id="slots-container"></div>
 
     </div>
   </section>
 
   <!-- ==========================================================================
-       CANCHAS ABIERTAS (PARTIDOS ABIERTOS / PLAYTOMIC MATCHMAKING)
+       CANCHAS ABIERTAS (PLAYTOMIC COMMUNITY FEED)
        ========================================================================== -->
-  <section id="canchas-abiertas" class="section-open-matches">
+  <section id="canchas-abiertas" class="section-community">
     <div class="container">
       
-      <div class="section-heading-flex">
+      <div class="section-header-row">
         <div>
-          <span class="badge badge-open" style="margin-bottom: 8px;">Comunidad Playtomic & Set+</span>
-          <h2 class="section-title">Partidos Abiertos en Catriel</h2>
-          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">
-            ¿Te falta uno o dos para completar el cuarto? Sumate a un partido abierto o publicá el tuyo.
-          </p>
+          <span class="badge-pill badge-warning" style="margin-bottom: 8px;">Comunidad & Matchmaking</span>
+          <h2 class="section-title">Canchas Abiertas en Catriel</h2>
+          <p class="section-desc">Sumate a partidos que están buscando jugador o abrí tu propia convocatoria si te falta gente.</p>
         </div>
-
-        <button type="button" class="btn btn-primary" onclick="openCreateMatchModal()">
+        <button type="button" class="btn btn-secondary" onclick="openCreateMatchModal()">
           + Publicar Partido Abierto
         </button>
       </div>
 
-      <div class="open-matches-grid">
+      <div class="open-cards-grid">
         
         <!-- Partido 1 -->
-        <div class="open-match-card">
+        <div class="open-card">
           <div>
-            <div class="match-meta-bar">
-              <span class="badge badge-orange">6ta Categoría (Nivel 3.0 - 3.5)</span>
-              <span style="font-family: var(--font-display); font-size: 1.1rem; color: var(--primary);">Hoy · 20:30 hs</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="badge-pill badge-warning">6ta Categoría · Nivel 3.0 - 3.5</span>
+              <span style="font-family: var(--font-family-3); font-size: 13px; font-weight: 600;">Hoy · 20:30 hs</span>
             </div>
 
-            <h3 style="font-size: 1.15rem; font-weight: 700; margin: 12px 0 6px;">Cancha 1 · Cristal Panorámico</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Organiza: <strong>Franco R.</strong> · Partido competitivo para subir ranking.</p>
+            <h3 style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin: 12px 0 4px;">Cancha 1 · Cristal</h3>
+            <p style="font-size: 14px; color: var(--color-body);">Organiza: Franco R. · Partido parejo para subir ranking.</p>
 
-            <!-- 4 Slots de jugadores -->
-            <div class="match-players-grid">
-              <div class="match-slot-box taken">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--court-green);">FR</span>
-                <div style="font-size: 0.65rem; color: var(--text-muted);">Franco</div>
-              </div>
-              <div class="match-slot-box taken">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--court-green);">MG</span>
-                <div style="font-size: 0.65rem; color: var(--text-muted);">Martín</div>
-              </div>
-              <div class="match-slot-box taken">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--court-green);">LV</span>
-                <div style="font-size: 0.65rem; color: var(--text-muted);">Lucas</div>
-              </div>
-              <div class="match-slot-box free">
-                <span style="font-size: 0.75rem; font-weight: 800; color: var(--warning-amber);">+1</span>
-                <div style="font-size: 0.65rem; color: var(--warning-amber); font-weight: 700;">¡LIBRE!</div>
-              </div>
+            <div class="player-slots-layout">
+              <div class="player-slot-item taken">Franco (P1)</div>
+              <div class="player-slot-item taken">Martín (P2)</div>
+              <div class="player-slot-item taken">Lucas (P3)</div>
+              <div class="player-slot-item free">+1 ¡Libre!</div>
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-hairline); padding-top: 12px;">
             <div>
-              <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Tu plaza:</span>
-              <span style="font-family: var(--font-display); font-size: 1.25rem; color: var(--text-main);">$15.000</span>
+              <span style="font-size: 12px; color: var(--color-muted); display: block;">Tu plaza:</span>
+              <strong style="color: var(--color-ink);">$15.000</strong>
             </div>
-            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20sumarme%20al%20partido%20abierto%20de%206ta%20de%20Hoy%20a%20las%2020:30%20hs%20(Lugar%204)." target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 9px 18px; font-size: 0.85rem;">
+            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20sumarme%20al%20partido%20abierto%20de%206ta%20de%20Hoy%20a%20las%2020:30%20hs." target="_blank" rel="noopener" class="btn btn-whatsapp" style="height: 36px;">
               Sumarme al partido →
             </a>
           </div>
         </div>
 
         <!-- Partido 2 -->
-        <div class="open-match-card">
+        <div class="open-card">
           <div>
-            <div class="match-meta-bar">
-              <span class="badge badge-live">7ma / Inicial (Nivel 1.5 - 2.5)</span>
-              <span style="font-family: var(--font-display); font-size: 1.1rem; color: var(--primary);">Mañana · 19:00 hs</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="badge-pill badge-success">7ma / Inicial · Nivel 1.5 - 2.5</span>
+              <span style="font-family: var(--font-family-3); font-size: 13px; font-weight: 600;">Mañana · 19:00 hs</span>
             </div>
 
-            <h3 style="font-size: 1.15rem; font-weight: 700; margin: 12px 0 6px;">Cancha 2</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Organiza: <strong>Nico B.</strong> · Partido amistoso, buen ritmo y tercer tiempo.</p>
+            <h3 style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin: 12px 0 4px;">Cancha 2</h3>
+            <p style="font-size: 14px; color: var(--color-body);">Organiza: Nico B. · Partido distendido con tercer tiempo en la cantina.</p>
 
-            <div class="match-players-grid">
-              <div class="match-slot-box taken">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--court-green);">NB</span>
-                <div style="font-size: 0.65rem; color: var(--text-muted);">Nico</div>
-              </div>
-              <div class="match-slot-box taken">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--court-green);">GA</span>
-                <div style="font-size: 0.65rem; color: var(--text-muted);">Gastón</div>
-              </div>
-              <div class="match-slot-box free">
-                <span style="font-size: 0.75rem; font-weight: 800; color: var(--warning-amber);">+1</span>
-                <div style="font-size: 0.65rem; color: var(--warning-amber); font-weight: 700;">¡LIBRE!</div>
-              </div>
-              <div class="match-slot-box free">
-                <span style="font-size: 0.75rem; font-weight: 800; color: var(--warning-amber);">+2</span>
-                <div style="font-size: 0.65rem; color: var(--warning-amber); font-weight: 700;">¡LIBRE!</div>
-              </div>
+            <div class="player-slots-layout">
+              <div class="player-slot-item taken">Nico (P1)</div>
+              <div class="player-slot-item taken">Gastón (P2)</div>
+              <div class="player-slot-item free">+1 ¡Libre!</div>
+              <div class="player-slot-item free">+2 ¡Libre!</div>
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-hairline); padding-top: 12px;">
             <div>
-              <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Tu plaza:</span>
-              <span style="font-family: var(--font-display); font-size: 1.25rem; color: var(--text-main);">$15.000</span>
+              <span style="font-size: 12px; color: var(--color-muted); display: block;">Tu plaza:</span>
+              <strong style="color: var(--color-ink);">$15.000</strong>
             </div>
-            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Me%20quiero%20anotar%20en%20el%20partido%20abierto%20de%207ma%20de%20Ma%C3%B1ana%20a%20las%2019:00%20hs." target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 9px 18px; font-size: 0.85rem;">
+            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Me%20quiero%20anotar%20en%20el%20partido%20abierto%20de%207ma%20de%20Ma%C3%B1ana%20a%20las%2019:00%20hs." target="_blank" rel="noopener" class="btn btn-whatsapp" style="height: 36px;">
               Sumarme al partido →
             </a>
           </div>
@@ -1092,121 +1181,117 @@
   </section>
 
   <!-- ==========================================================================
-       SISTEMA DE NIVELES & RATING PLAYTOMIC / CATEGORÍAS ARGENTINA
+       RATING PLAYTOMIC / NIVELES
        ========================================================================== -->
-  <section id="sistema-nivel" class="rating-section">
+  <section id="rating" class="section-rating">
     <div class="container">
-      
-      <div class="rating-layout">
+      <div class="rating-grid-layout">
         
         <div>
-          <span class="badge badge-orange" style="margin-bottom: 10px;">Algoritmo de Nivelación</span>
-          <h2 class="section-title">¿Cuál es tu nivel<br>real de juego?</h2>
-          <p style="color: var(--text-muted); margin: 16px 0 24px; line-height: 1.6;">
-            En Set Plus y Playtomic, los partidos son parejos porque cada jugador tiene un índice preciso. En Muzzaga adaptamos la escala mundial (1.0 a 7.0) a las categorías argentinas (7ma a 1ra) para armar partidos equilibrados.
+          <span class="badge-pill badge-success" style="margin-bottom: 8px;">Sistema de Niveles</span>
+          <h2 class="section-title">Calculá tu nivel<br>de juego</h2>
+          <p class="section-desc" style="margin-top: 12px; margin-bottom: 24px;">
+            Mapeamos la escala global de Playtomic (1.0 a 7.0) con las categorías del pádel argentino (7ma a 1ra) para que siempre juegues con rivales de tu nivel.
           </p>
 
-          <div style="display: flex; flex-direction: column; gap: 14px;">
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <strong style="display: block;">7ma Categoría · Iniciación</strong>
-                <span style="font-size: 0.8rem; color: var(--text-muted);">Golpes de fondo, aprendiendo rebote en blindex.</span>
+                <strong style="color: var(--color-ink); display: block; font-size: 15px;">7ma Categoría · Iniciación</strong>
+                <span style="font-size: 13px; color: var(--color-body);">Golpes de fondo, aprendiendo rebote en paredes.</span>
               </div>
-              <span class="badge badge-live">Nivel 1.5 - 2.5</span>
+              <span class="badge-pill badge-success">1.5 - 2.5</span>
             </div>
 
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <strong style="display: block;">6ta Categoría · Intermedio</strong>
-                <span style="font-size: 0.8rem; color: var(--text-muted);">Volea consistente, bandeja controlada y salida de pared.</span>
+                <strong style="color: var(--color-ink); display: block; font-size: 15px;">6ta Categoría · Intermedio</strong>
+                <span style="font-size: 13px; color: var(--color-body);">Voleas consistentes, salida de pared y bandeja.</span>
               </div>
-              <span class="badge badge-orange">Nivel 3.0 - 3.8</span>
+              <span class="badge-pill badge-warning">3.0 - 3.8</span>
             </div>
 
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <strong style="display: block;">5ta / Libre · Avanzado</strong>
-                <span style="font-size: 0.8rem; color: var(--text-muted);">Juego táctico veloz, smash definitorio por 3 y por 4.</span>
+                <strong style="color: var(--color-ink); display: block; font-size: 15px;">5ta / Libre · Avanzado</strong>
+                <span style="font-size: 13px; color: var(--color-body);">Juego táctico veloz, smash definitorio por 3.</span>
               </div>
-              <span class="badge" style="background: rgba(2, 132, 199, 0.2); color: #38BDF8; border: 1px solid rgba(2, 132, 199, 0.4);">Nivel 4.0 - 5.5+</span>
+              <span class="badge-pill" style="background: #eef2ff; color: #476cff; border: 1px solid #c7d2fe;">4.0 - 5.5+</span>
             </div>
           </div>
         </div>
 
-        <!-- Tarjeta Interactiva de Cálculo de Rating -->
-        <div class="rating-card">
-          <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-subtle); font-weight: 700;">Calculadora de Rating Playtomic / Set+</span>
-          <div class="level-badge-display" id="calculated-rating">3.4</div>
-          <div style="font-weight: 700; font-size: 1.1rem; color: var(--primary);" id="calculated-category-label">6TA CATEGORÍA (Nivel Intermedio)</div>
-          
-          <div style="margin: 20px 0;">
-            <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Ajustá tu experiencia:</label>
-            <input type="range" id="rating-slider" min="15" max="55" value="34" style="width: 100%; accent-color: var(--primary); cursor: pointer;">
+        <!-- Rating Box -->
+        <div class="rating-box">
+          <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted);">Rating Playtomic Estimado</span>
+          <div class="rating-display-val" id="calculated-rating">3.4</div>
+          <div style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin-bottom: 16px;" id="calculated-category-label">
+            6TA CATEGORÍA (Intermedio)
           </div>
 
-          <p id="rating-description" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
-            Tu nivel te permite competir en los torneos oficiales de 6ta categoría de Muzzaga o jugar desafíos abiertos nocturnos.
+          <div style="margin-bottom: 20px;">
+            <label style="font-size: 13px; color: var(--color-body); display: block; margin-bottom: 8px;">Ajustá tu experiencia:</label>
+            <input type="range" id="rating-slider" min="15" max="55" value="34" style="width: 100%; accent-color: var(--color-primary); cursor: pointer;">
+          </div>
+
+          <p id="rating-description" style="font-size: 14px; color: var(--color-body); margin-bottom: 20px; line-height: 1.5;">
+            Tu nivel te permite competir en los torneos de 6ta de Muzzaga o jugar desafíos abiertos nocturnos.
           </p>
 
-          <a id="btn-rating-whatsapp" href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Tengo%20nivel%206ta%20(3.4)%20y%20quiero%20sumarme%20a%20los%20desaf%C3%ADos." target="_blank" rel="noopener" class="btn btn-primary" style="width: 100%;">
+          <a id="btn-rating-whatsapp" href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Tengo%20nivel%206ta%20y%20quiero%20sumarme%20al%20grupo%20de%20mi%20categor%C3%ADa." target="_blank" rel="noopener" class="btn btn-primary" style="width: 100%;">
             Unirme al grupo de mi nivel →
           </a>
         </div>
 
       </div>
-
     </div>
   </section>
 
   <!-- ==========================================================================
-       TORNEOS OFICIALES & CANCHA
+       TORNEOS Y CANTINA
        ========================================================================== -->
-  <section id="torneos" class="booking-engine-section" style="border-top: 1px solid var(--border-subtle); background: var(--bg-surface);">
+  <section id="torneos" class="section-features-two">
     <div class="container">
       
-      <div class="section-heading-flex">
+      <div class="section-header-row">
         <div>
-          <span class="badge badge-orange" style="margin-bottom: 8px;">Torneos Muzzaga 2026</span>
-          <h2 class="section-title">Calendario de Competencia</h2>
-          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">
-            Inscripciones abiertas por llave con formato Set Plus.
-          </p>
+          <h2 class="section-title">Torneos Oficiales 2026</h2>
+          <p class="section-desc">Fixture organizado, hidratación, premios de primera línea y tercer tiempo.</p>
         </div>
-
-        <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20inscribir%20mi%20pareja%20para%20el%20pr%C3%B3ximo%20torneo." target="_blank" rel="noopener" class="btn btn-primary">
+        <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20inscribir%20mi%20pareja%20al%20pr%C3%B3ximo%20torneo." target="_blank" rel="noopener" class="btn btn-primary">
           Inscribir mi pareja →
         </a>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;">
-        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span class="badge badge-live">Inscripciones Abiertas</span>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Próximo finde</span>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg);">
+        <div class="feature-card-expo">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+            <span class="badge-pill badge-success">Inscripciones Abiertas</span>
+            <span style="font-size: 13px; color: var(--color-muted);">Próximo fin de semana</span>
           </div>
-          <h3 style="font-family: var(--font-display); font-size: 1.5rem; text-transform: uppercase;">Torneo 6ta Caballeros</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0 16px;">Premios: Paletas de primera línea + Indumentaria + Trofeos oficiales.</p>
-          <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">Cupos: 12 de 16 confirmados</div>
+          <h3 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 6px 0;">Torneo 6ta Caballeros</h3>
+          <p style="font-size: 14px; color: var(--color-body); margin-bottom: 14px;">Paletas oficiales de premio, indumentaria y cena de premiación.</p>
+          <div style="font-size: 13px; font-weight: 600; color: var(--color-ink);">Cupos: 12 de 16 confirmados</div>
         </div>
 
-        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span class="badge badge-orange">Próximamente</span>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Fin de mes</span>
+        <div class="feature-card-expo">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+            <span class="badge-pill badge-warning">Próximamente</span>
+            <span style="font-size: 13px; color: var(--color-muted);">Fin de mes</span>
           </div>
-          <h3 style="font-family: var(--font-display); font-size: 1.5rem; text-transform: uppercase;">Torneo 7ma Iniciación</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0 16px;">La oportunidad ideal para debutar en un torneo con fixture accesible y tercer tiempo.</p>
-          <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">Inscripción anticipada disponible</div>
+          <h3 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 6px 0;">Torneo 7ma Principiantes</h3>
+          <p style="font-size: 14px; color: var(--color-body); margin-bottom: 14px;">El torneo perfecto para ganar experiencia en un ambiente distendido y competitivo.</p>
+          <div style="font-size: 13px; font-weight: 600; color: var(--color-ink);">Inscripción anticipada abierta</div>
         </div>
 
-        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span class="badge badge-live">Inscripciones Abiertas</span>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Quincena</span>
+        <div class="feature-card-expo">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+            <span class="badge-pill badge-success">Inscripciones Abiertas</span>
+            <span style="font-size: 13px; color: var(--color-muted);">Quincena</span>
           </div>
-          <h3 style="font-family: var(--font-display); font-size: 1.5rem; text-transform: uppercase;">Torneo Damas A & B</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0 16px;">Cuadro doble eliminación, hidratación deportiva y cena post-torneo en la cantina.</p>
-          <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">Cupos: 8 de 12 confirmados</div>
+          <h3 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 6px 0;">Torneo Damas A & B</h3>
+          <p style="font-size: 14px; color: var(--color-body); margin-bottom: 14px;">Cuadro doble eliminación, trofeos artesanales y catering para todas las parejas.</p>
+          <div style="font-size: 13px; font-weight: 600; color: var(--color-ink);">Cupos: 8 de 12 confirmados</div>
         </div>
       </div>
 
@@ -1214,198 +1299,164 @@
   </section>
 
   <!-- ==========================================================================
-       CANTINA POST-MATCH
+       CANTINA
        ========================================================================== -->
-  <section id="cantina" class="section-open-matches">
+  <section id="cantina" class="section-features-two" style="background: var(--color-canvas-soft);">
     <div class="container">
-      <div class="section-heading-flex">
+      
+      <div class="section-header-row">
         <div>
-          <span class="badge badge-orange" style="margin-bottom: 8px;">Tercer Tiempo Muzzaga</span>
-          <h2 class="section-title">Cantina & After Pádel</h2>
-          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">
-            Pedí desde la cancha y tené tu mesa lista al terminar el set.
-          </p>
+          <h2 class="section-title">Cantina Propia</h2>
+          <p class="section-desc">Pizza a la piedra casera, sándwiches de milanesa y cervezas heladas para el tercer tiempo.</p>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--spacing-md);">
+        <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <strong>Pizza Muzzarella a la piedra</strong>
-            <span style="display: block; font-size: 0.78rem; color: var(--text-muted);">Casera, abundante</span>
+            <strong style="color: var(--color-ink); font-size: 15px; display: block;">Pizza Muzzarella</strong>
+            <span style="font-size: 13px; color: var(--color-body);">A la piedra casera</span>
           </div>
-          <span style="font-family: var(--font-display); font-size: 1.2rem; color: var(--primary);">$18.000</span>
+          <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$18.000</span>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <strong>Pizza Napolitana</strong>
-            <span style="display: block; font-size: 0.78rem; color: var(--text-muted);">Tomate fresco, ajo y oliva</span>
+            <strong style="color: var(--color-ink); font-size: 15px; display: block;">Pizza Napolitana</strong>
+            <span style="font-size: 13px; color: var(--color-body);">Tomate natural y oliva</span>
           </div>
-          <span style="font-family: var(--font-display); font-size: 1.2rem; color: var(--primary);">$20.000</span>
+          <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$20.000</span>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <strong>Sándwich de Mila Completo</strong>
-            <span style="display: block; font-size: 0.78rem; color: var(--text-muted);">Jamón, queso, huevo y lechuga</span>
+            <strong style="color: var(--color-ink); font-size: 15px; display: block;">Sándwich de Mila</strong>
+            <span style="font-size: 13px; color: var(--color-body);">Completo abundante</span>
           </div>
-          <span style="font-family: var(--font-display); font-size: 1.2rem; color: var(--primary);">$22.000</span>
+          <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$22.000</span>
         </div>
 
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <strong>Heineken 975 ml</strong>
-            <span style="display: block; font-size: 0.78rem; color: var(--text-muted);">Super helada</span>
+            <strong style="color: var(--color-ink); font-size: 15px; display: block;">Heineken 975 ml</strong>
+            <span style="font-size: 13px; color: var(--color-body);">Botella helada</span>
           </div>
-          <span style="font-family: var(--font-display); font-size: 1.2rem; color: var(--primary);">$9.000</span>
+          <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$9.000</span>
         </div>
       </div>
+
     </div>
   </section>
 
   <!-- ==========================================================================
-       UBICACIÓN Y CONTACTO
+       UBICACIÓN & GOOGLE MAPS
        ========================================================================== -->
-  <section id="ubicacion" class="booking-engine-section">
+  <section id="ubicacion" class="section-turnos">
     <div class="container">
-      <div class="section-heading-flex">
+      
+      <div class="section-header-row">
         <div>
-          <span class="badge badge-orange" style="margin-bottom: 8px;">Ubicación Oficial</span>
-          <h2 class="section-title">Muzzaga Pádel en Catriel</h2>
-          <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">
-            Vení a jugar a nuestras canchas en Catriel, Río Negro. Fácil acceso, estacionamiento y tercer tiempo.
-          </p>
+          <h2 class="section-title">Ubicación</h2>
+          <p class="section-desc">Muzzaga Pádel se encuentra en Catriel, Río Negro. Estacionamiento privado e iluminación nocturna.</p>
         </div>
-        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-primary">
+        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary">
           📍 Abrir en Google Maps →
         </a>
       </div>
 
-      <!-- Mapa Interactivo Embebido con Modo Oscuro -->
-      <div style="border-radius: var(--radius-lg); overflow: hidden; border: 1.5px solid var(--border-subtle); height: 380px; position: relative; margin-bottom: 24px; box-shadow: 0 12px 36px rgba(0,0,0,0.5);">
+      <!-- Google Maps Embed -->
+      <div style="border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--color-hairline-strong); height: 380px; position: relative; margin-bottom: var(--spacing-lg); box-shadow: 0 8px 30px rgba(0,0,0,0.04);">
         <iframe
           title="Mapa de Muzzaga Pádel en Catriel"
           src="https://maps.google.com/maps?q=-37.8832905,-67.8005469&hl=es&z=16&output=embed"
           width="100%"
           height="100%"
-          style="border:0; filter: invert(90%) hue-rotate(180deg) contrast(105%) grayscale(20%);"
+          style="border:0;"
           allowfullscreen=""
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade">
         </iframe>
         <div style="position: absolute; bottom: 16px; left: 16px; right: 16px; display: flex; flex-wrap: wrap; gap: 10px; pointer-events: none;">
-          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-primary" style="pointer-events: auto; padding: 10px 18px; font-size: 0.85rem; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
-            📍 Cómo Llegar (Google Maps)
+          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-primary" style="pointer-events: auto; height: 36px;">
+            📍 Google Maps
           </a>
-          <a href="https://waze.com/ul?ll=-37.8832905,-67.8005469&navigate=yes" target="_blank" rel="noopener" class="btn btn-surface" style="pointer-events: auto; padding: 10px 18px; font-size: 0.85rem; backdrop-filter: blur(8px); background: rgba(21,22,27,0.85);">
-            🚗 Abrir con Waze
+          <a href="https://waze.com/ul?ll=-37.8832905,-67.8005469&navigate=yes" target="_blank" rel="noopener" class="btn btn-secondary" style="pointer-events: auto; height: 36px; background: rgba(255,255,255,0.9);">
+            🚗 Navegar con Waze
           </a>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-base);">
+        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-lg); padding: var(--spacing-lg); display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary); font-weight: 700;">Google Maps Oficial</span>
-            <div style="font-family: var(--font-display); font-size: 1.4rem; color: var(--text-main); margin-top: 4px;">Muzzaga Pádel</div>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Catriel, Río Negro</span>
+            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--color-muted);">Ubicación Oficial</span>
+            <div style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin-top: 4px;">Muzzaga Pádel</div>
+            <span style="font-size: 13px; color: var(--color-body);">Catriel, Río Negro</span>
           </div>
-          <span style="font-size: 1.5rem; color: var(--primary);">↗</span>
+          <span style="font-size: 18px; color: var(--color-body);">↗</span>
         </a>
 
-        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s;">
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-lg); padding: var(--spacing-lg); display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--court-green); font-weight: 700;">WhatsApp Oficial</span>
-            <div style="font-family: var(--font-display); font-size: 1.4rem; color: var(--text-main); margin-top: 4px;">+54 9 299 597-4176</div>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Atención todos los días</span>
+            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--color-semantic-success);">WhatsApp</span>
+            <div style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin-top: 4px;">+54 9 299 597-4176</div>
+            <span style="font-size: 13px; color: var(--color-body);">Atención directa</span>
           </div>
-          <span style="font-size: 1.5rem; color: var(--court-green);">→</span>
+          <span style="font-size: 18px; color: var(--color-semantic-success);">→</span>
         </a>
 
-        <a href="https://instagram.com/muzzagapadel" target="_blank" rel="noopener" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s;">
+        <a href="https://instagram.com/muzzagapadel" target="_blank" rel="noopener" style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-lg); padding: var(--spacing-lg); display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Instagram Oficial</span>
-            <div style="font-family: var(--font-display); font-size: 1.4rem; color: var(--text-main); margin-top: 4px;">@muzzagapadel</div>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Comunidad, fotos y fixture</span>
+            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--color-muted);">Instagram</span>
+            <div style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin-top: 4px;">@muzzagapadel</div>
+            <span style="font-size: 13px; color: var(--color-body);">Fotos, novedades y torneos</span>
           </div>
-          <span style="font-size: 1.5rem; color: var(--primary);">→</span>
+          <span style="font-size: 18px; color: var(--color-body);">↗</span>
         </a>
       </div>
+
     </div>
   </section>
 
   <!-- ==========================================================================
-       FOOTER
+       CHECKOUT MODAL
        ========================================================================== -->
-  <footer style="background: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding: 40px 0 24px;">
-    <div class="container">
-      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle);">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <span style="font-family: var(--font-display); font-size: 1.6rem; text-transform: uppercase;">Muzzaga Pádel</span>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">· Catriel, Río Negro</span>
-        </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 18px; font-size: 0.85rem; color: var(--text-muted);">
-          <a href="#grilla-turnos" style="color: var(--text-main);">Turnos</a>
-          <a href="#canchas-abiertas" style="color: var(--text-main);">Canchas Abiertas</a>
-          <a href="#sistema-nivel" style="color: var(--text-main);">Rating Playtomic</a>
-          <a href="#torneos" style="color: var(--text-main);">Torneos</a>
-          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="color: var(--primary);">Google Maps Oficial</a>
-        </div>
-      </div>
-      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 20px; font-size: 0.78rem; color: var(--text-subtle);">
-        <span>© 2026 Muzzaga Pádel — Catriel, Río Negro. Todos los derechos reservados.</span>
-        <span>2 Canchas de Cristal · Cantina Propia · Torneos Oficiales</span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- ==========================================================================
-       MODAL CHECKOUT RESERVA (SET PLUS STYLE)
-       ========================================================================== -->
-  <div class="booking-modal-overlay" id="booking-modal-overlay">
-    <div class="booking-modal">
-      <button type="button" class="modal-close-btn" onclick="closeBookingModal()" aria-label="Cerrar modal">✕</button>
+  <div class="modal-overlay" id="booking-modal-overlay">
+    <div class="modal-card">
+      <button type="button" class="modal-close" onclick="closeBookingModal()" aria-label="Cerrar modal">✕</button>
       
-      <span class="badge badge-orange">Confirmar Reserva</span>
-      <h2 style="font-family: var(--font-display); font-size: 1.8rem; text-transform: uppercase; margin-top: 6px;">
-        Tu Turno en Muzzaga
-      </h2>
+      <span class="badge-pill badge-success" style="margin-bottom: 8px;">Confirmar Turno</span>
+      <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin-top: 4px;">Reserva en Muzzaga</h2>
 
-      <!-- Resumen de Horario y Cancha -->
-      <div class="modal-slot-summary">
+      <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 16px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <span id="modal-slot-court" style="font-size: 0.85rem; font-weight: 700; color: var(--primary); display: block;">Cancha 1 (Cristal)</span>
-          <span id="modal-slot-time" style="font-family: var(--font-display); font-size: 1.6rem; color: var(--text-main);">20:00 - 21:30 hs</span>
-          <span id="modal-slot-date" style="font-size: 0.8rem; color: var(--text-muted); display: block;">Hoy, 10 de Septiembre</span>
+          <span id="modal-slot-court" style="font-size: 14px; font-weight: 600; color: var(--color-ink); display: block;">Cancha 1 (Cristal)</span>
+          <span id="modal-slot-time" style="font-family: var(--font-family-3); font-size: 16px; font-weight: 600; color: var(--color-ink);">20:00 - 21:30 hs</span>
+          <span id="modal-slot-date" style="font-size: 13px; color: var(--color-body); display: block;">Hoy, 10 de Septiembre</span>
         </div>
         <div style="text-align: right;">
-          <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Total del turno:</span>
-          <span style="font-family: var(--font-display); font-size: 1.5rem; color: var(--text-main);">$60.000</span>
-          <span style="font-size: 0.75rem; color: var(--court-green); font-weight: 700;">$15.000 / jugador</span>
+          <span style="font-size: 12px; color: var(--color-muted); display: block;">Total:</span>
+          <span style="font-family: var(--font-family-3); font-size: 18px; font-weight: 600; color: var(--color-ink);">$60.000</span>
+          <span style="font-size: 12px; color: var(--color-semantic-success); display: block;">$15.000 / jug</span>
         </div>
       </div>
 
-      <!-- Switch: Partido Privado vs Cancha Abierta -->
-      <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">
-        Modalidad de Reserva:
-      </label>
-      <div class="type-switcher-grid">
-        <button type="button" class="type-option-btn active" id="btn-mode-private" onclick="setBookingMode('private')">
-          <strong style="display: block; font-size: 0.95rem;">🔒 Partido Privado</strong>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">Ya tenemos los 4 jugadores listos</span>
+      <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted); display: block;">Modalidad:</label>
+      <div class="type-switcher">
+        <button type="button" class="type-btn active" id="btn-mode-private" onclick="setBookingMode('private')">
+          <strong style="color: var(--color-ink); display: block; font-size: 14px;">🔒 Privado</strong>
+          <span style="font-size: 12px; color: var(--color-body);">4 jugadores listos</span>
         </button>
-        <button type="button" class="type-option-btn" id="btn-mode-open" onclick="setBookingMode('open')">
-          <strong style="display: block; font-size: 0.95rem;">👥 Cancha Abierta</strong>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">Nos falta 1 o 2 para completar</span>
+        <button type="button" class="type-btn" id="btn-mode-open" onclick="setBookingMode('open')">
+          <strong style="color: var(--color-ink); display: block; font-size: 14px;">👥 Abierto</strong>
+          <span style="font-size: 12px; color: var(--color-body);">Falta 1 o 2 jugadores</span>
         </button>
       </div>
 
-      <!-- Opciones Extras -->
-      <div style="margin: 18px 0; display: flex; flex-direction: column; gap: 12px;">
-        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.88rem; cursor: pointer; background: var(--bg-surface-elevated); padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-          <span>🎾 ¿Necesitan alquiler de paletas?</span>
-          <select id="modal-paddles" style="background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 4px 8px; font-size: 0.82rem;">
+      <div style="margin: 16px 0; display: flex; flex-direction: column; gap: 10px;">
+        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: var(--color-canvas-soft); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--color-hairline);">
+          <span style="color: var(--color-body-strong);">🎾 ¿Alquiler de paletas?</span>
+          <select id="modal-paddles" style="background: var(--color-surface-card); color: var(--color-ink); border: 1px solid var(--color-hairline-strong); border-radius: 4px; padding: 4px 8px; font-size: 12px;">
             <option value="No, paletas propias" selected>No, tenemos propias</option>
             <option value="Sí, 1 paleta">Sí, 1 paleta</option>
             <option value="Sí, 2 paletas">Sí, 2 paletas</option>
@@ -1413,27 +1464,71 @@
           </select>
         </label>
 
-        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.88rem; cursor: pointer; background: var(--bg-surface-elevated); padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-          <span>🍕 Reservar pizza para el post-partido</span>
-          <input type="checkbox" id="modal-cantina-preorder" style="accent-color: var(--primary); width: 18px; height: 18px;">
+        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: var(--color-canvas-soft); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--color-hairline);">
+          <span style="color: var(--color-body-strong);">🍕 Reservar pizza para después</span>
+          <input type="checkbox" id="modal-cantina-preorder" style="accent-color: var(--color-primary); width: 16px; height: 16px;">
         </label>
       </div>
 
-      <!-- Botón Enviar WhatsApp con ID de turno -->
-      <a id="btn-modal-confirm" href="#" target="_blank" rel="noopener" class="btn btn-whatsapp" style="width: 100%; padding: 14px; font-size: 1rem;">
-        Confirmar por WhatsApp (#MUZZ-8492) →
+      <a id="btn-modal-confirm" href="#" target="_blank" rel="noopener" class="btn btn-primary" style="width: 100%; height: 44px;">
+        Confirmar por WhatsApp →
       </a>
-      <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 10px;">
-        Sin tarjetas ni comisiones: confirmás directo con el club por WhatsApp.
+      <p style="font-size: 12px; color: var(--color-muted); text-align: center; margin-top: 10px;">
+        Confirmación directa con el club por WhatsApp.
       </p>
     </div>
   </div>
 
   <!-- ==========================================================================
-       BOTTOM APP BAR (MÓVIL - ESTILO SET PLUS / PLAYTOMIC)
+       FOOTER LIGHT (EXPO ROLE)
        ========================================================================== -->
-  <nav class="mobile-bottom-bar" aria-label="Barra de navegación móvil">
-    <div class="bottom-bar-item active" onclick="scrollToSection('grilla-turnos')">
+  <footer class="app-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div class="brand-mark" style="width: 24px; height: 24px; font-size: 12px;">M</div>
+            <strong style="font-size: 16px; color: var(--color-ink);">Muzzaga Pádel</strong>
+          </div>
+          <p style="font-size: 14px; color: var(--color-body); max-width: 340px;">
+            Club de pádel en Catriel, Río Negro. Canchas de cristal profesionales, torneos y cantina.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: var(--spacing-xxl); flex-wrap: wrap;">
+          <div>
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted); margin-bottom: 12px;">Navegación</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+              <a href="#turnos" style="color: var(--color-body);">Turnos en Vivo</a>
+              <a href="#canchas-abiertas" style="color: var(--color-body);">Canchas Abiertas</a>
+              <a href="#rating" style="color: var(--color-body);">Rating Playtomic</a>
+              <a href="#torneos" style="color: var(--color-body);">Torneos 2026</a>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted); margin-bottom: 12px;">Contacto</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+              <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="color: var(--color-body);">WhatsApp: +54 9 299 597-4176</a>
+              <a href="https://instagram.com/muzzagapadel" target="_blank" rel="noopener" style="color: var(--color-body);">Instagram: @muzzagapadel</a>
+              <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="color: var(--color-text-link);">Google Maps Oficial</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 Muzzaga Pádel — Catriel, Río Negro. Todos los derechos reservados.</div>
+        <div>2 Canchas de Cristal · Cantina Propia · Torneos Oficiales</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       MOBILE BOTTOM APP BAR
+       ========================================================================== -->
+  <nav class="mobile-bottom-bar" aria-label="Navegación móvil">
+    <div class="bottom-bar-item active" onclick="scrollToSection('turnos')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -1450,10 +1545,10 @@
         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
       </svg>
-      <span>Cancha Abierta</span>
+      <span>Abiertas</span>
     </div>
 
-    <div class="bottom-bar-item" onclick="scrollToSection('sistema-nivel')">
+    <div class="bottom-bar-item" onclick="scrollToSection('rating')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"></circle>
         <path d="m4.93 4.93 4.24 4.24"></path>
@@ -1461,34 +1556,29 @@
         <path d="m14.83 14.83 4.24 4.24"></path>
         <path d="m9.17 14.83-4.24 4.24"></path>
       </svg>
-      <span>Nivel</span>
+      <span>Rating</span>
     </div>
 
-    <div class="bottom-bar-item" onclick="scrollToSection('torneos')">
+    <div class="bottom-bar-item" onclick="scrollToSection('ubicacion')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-        <path d="M4 22h16"></path>
-        <path d="M10 14.66V17c0 .55-.45 1-1 1H7"></path>
-        <path d="M14 14.66V17c0 .55.45 1 1 1h2"></path>
-        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
       </svg>
-      <span>Torneos</span>
+      <span>Mapa</span>
     </div>
 
     <div class="bottom-bar-item" onclick="window.open('https://wa.me/5492995974176', '_blank')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2.2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2">
         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
       </svg>
-      <span style="color: #25D366;">WhatsApp</span>
+      <span style="color: #16a34a;">WhatsApp</span>
     </div>
   </nav>
 
   <!-- ==========================================================================
-       JAVASCRIPT: ENGINE SET PLUS & INTERACTIVIDAD
+       JAVASCRIPT
        ========================================================================== -->
   <script>
-    // 1. Datos del carrusel de fechas
     const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     
@@ -1496,7 +1586,7 @@
     let selectedCourtFilter = 'all';
     let selectedTimeFilter = 'all';
     let currentSlotData = null;
-    let currentBookingMode = 'private'; // 'private' or 'open'
+    let currentBookingMode = 'private';
 
     const dateList = [];
     const today = new Date();
@@ -1512,7 +1602,6 @@
       });
     }
 
-    // 2. Modelo de Turnos (Slots) para la grilla
     const timeSlotsModel = [
       { id: 1, time: '14:00 - 15:30', court: 'Cancha 1', type: 'Cristal', shift: 'tarde', status: 'available', price: 60000 },
       { id: 2, time: '15:30 - 17:00', court: 'Cancha 2', type: 'Estándar', shift: 'tarde', status: 'available', price: 60000 },
@@ -1525,7 +1614,6 @@
       { id: 9, time: '23:00 - 00:30', court: 'Cancha 1', type: 'Cristal', shift: 'noche', status: 'available', price: 60000 }
     ];
 
-    // 3. Renderizar Carrusel de Fechas
     function renderDateStrip() {
       const container = document.getElementById('date-strip');
       if (!container) return;
@@ -1545,7 +1633,6 @@
       renderSlotsGrid();
     }
 
-    // 4. Renderizar Grilla de Slots
     function renderSlotsGrid() {
       const container = document.getElementById('slots-container');
       if (!container) return;
@@ -1558,8 +1645,8 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); background: var(--bg-surface); border-radius: var(--radius-md);">
-            No hay turnos con los filtros seleccionados para este día.
+          <div style="grid-column: 1/-1; text-align: center; padding: 32px; color: var(--color-body); background: var(--color-canvas-soft); border-radius: var(--radius-md); border: 1px solid var(--color-hairline);">
+            No hay turnos disponibles con los filtros seleccionados.
           </div>
         `;
         return;
@@ -1569,58 +1656,52 @@
         const isTaken = slot.status === 'taken';
         const isOpen = slot.status === 'open';
 
-        let statusBadge = `<span class="badge badge-live">Disponible</span>`;
+        let badge = `<span class="badge-pill badge-success">Disponible</span>`;
         let cardClass = 'slot-card';
 
         if (isTaken) {
-          statusBadge = `<span class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">Ocupado</span>`;
+          badge = `<span class="badge-pill" style="background: var(--color-hairline); color: var(--color-muted);">Ocupado</span>`;
           cardClass += ' disabled';
         } else if (isOpen) {
-          statusBadge = `<span class="badge badge-open">Cancha Abierta (${slot.openSlots})</span>`;
+          badge = `<span class="badge-pill badge-warning">Cancha Abierta (${slot.openSlots})</span>`;
           cardClass += ' open-match';
         }
 
         return `
           <div class="${cardClass}" onclick="${isTaken ? '' : `openBookingModal(${slot.id})`}">
             <div>
-              <div class="slot-card-header">
+              <div class="slot-header">
                 <div>
                   <div class="slot-time">${slot.time}</div>
-                  <div class="slot-duration">90 minutos · Iluminación LED</div>
+                  <div class="slot-duration">90 min · Iluminación LED</div>
                 </div>
-                ${statusBadge}
+                ${badge}
               </div>
 
-              <div style="margin-top: 14px;">
-                <div class="slot-court-name">
-                  <span style="color: var(--primary);">●</span> ${slot.court} (${slot.type})
-                </div>
-
-                ${isOpen ? `
-                  <div class="open-players-row">
-                    <div class="player-avatar active">P1</div>
-                    <div class="player-avatar active">P2</div>
-                    <div class="player-avatar active">P3</div>
-                    <div class="player-avatar empty">+1</div>
-                    <span style="font-size: 0.72rem; color: var(--warning-amber); font-weight: 700; margin-left: 4px;">Falta 1</span>
-                  </div>
-                ` : ''}
+              <div class="slot-court">
+                ${slot.court} (${slot.type})
               </div>
+
+              ${isOpen ? `
+                <div class="open-avatars-row">
+                  <div class="avatar-circle">P1</div>
+                  <div class="avatar-circle">P2</div>
+                  <div class="avatar-circle">P3</div>
+                  <div class="avatar-circle empty">+1</div>
+                  <span style="font-size: 11px; color: var(--color-accent-warning); font-weight: 600; align-self: center; margin-left: 4px;">Falta 1</span>
+                </div>
+              ` : ''}
             </div>
 
             <div class="slot-price-row">
-              <div>
-                <span class="slot-price-per-player">4 jugadores:</span>
-                <span style="font-size: 0.75rem; color: var(--court-green); display: block; font-weight: 700;">$15.000 c/u</span>
-              </div>
-              <div class="slot-price-val">$60.000</div>
+              <span style="font-size: 13px; color: var(--color-semantic-success); font-weight: 600;">$15.000 / jug</span>
+              <span class="slot-price-total">$60.000</span>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    // 5. Checkout Modal Lógica
     function openBookingModal(slotId) {
       currentSlotData = timeSlotsModel.find(s => s.id === slotId);
       if (!currentSlotData) return;
@@ -1630,7 +1711,6 @@
       document.getElementById('modal-slot-time').textContent = currentSlotData.time;
       document.getElementById('modal-slot-date').textContent = `${dateObj.dayName}, ${dateObj.dayNum} de ${dateObj.month}`;
 
-      // Si el slot ya era cancha abierta, preseleccionar ese modo
       if (currentSlotData.status === 'open') {
         setBookingMode('open');
       } else {
@@ -1669,13 +1749,11 @@
       confirmBtn.textContent = `Confirmar por WhatsApp (${turnCode}) →`;
     }
 
-    // 6. Publicar Partido Abierto Modal
     function openCreateMatchModal() {
       const msg = "¡Hola Muzzaga! 👋 Quiero armar una Cancha Abierta para jugar hoy/mañana. ¿Me ayudan a publicar la convocatoria en el grupo del club?";
       window.open(`https://wa.me/5492995974176?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // 7. Calculadora de Rating Playtomic
     const ratingSlider = document.getElementById('rating-slider');
     const ratingDisplay = document.getElementById('calculated-rating');
     const ratingCategory = document.getElementById('calculated-category-label');
@@ -1704,13 +1782,12 @@
       });
     }
 
-    // 8. Event listeners para chips de filtros
-    document.querySelectorAll('.chip-btn').forEach(btn => {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const filterType = this.getAttribute('data-filter');
         const val = this.getAttribute('data-val');
 
-        document.querySelectorAll(`.chip-btn[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
+        document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
         this.classList.add('active');
 
         if (filterType === 'court') selectedCourtFilter = val;
@@ -1720,11 +1797,9 @@
       });
     });
 
-    // Eventos dentro del modal
     document.getElementById('modal-paddles').addEventListener('change', updateModalConfirmLink);
     document.getElementById('modal-cantina-preorder').addEventListener('change', updateModalConfirmLink);
 
-    // Scroll helper
     function scrollToSection(id) {
       const el = document.getElementById(id);
       if (el) {
@@ -1732,7 +1807,6 @@
       }
     }
 
-    // Inicializar
     document.addEventListener('DOMContentLoaded', () => {
       renderDateStrip();
       renderSlotsGrid();
