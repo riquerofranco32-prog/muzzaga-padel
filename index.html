@@ -227,6 +227,38 @@
       border-color: #15803d;
     }
 
+    .btn-tertiary {
+      background: transparent;
+      color: var(--color-text-link);
+      font-family: var(--font-primary);
+      font-size: var(--text-button);
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.15s ease;
+      border: none;
+      padding: 0;
+    }
+
+    .btn-tertiary:hover {
+      text-decoration: underline;
+      opacity: 0.85;
+    }
+
+    .link-accent {
+      color: var(--color-text-link);
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.15s ease;
+    }
+
+    .link-accent:hover {
+      text-decoration: underline;
+      opacity: 0.85;
+    }
+
     .badge-pill {
       display: inline-flex;
       align-items: center;
@@ -1162,18 +1194,274 @@
       height: 18px;
     }
 
-    @media (max-width: 860px) {
-      .mobile-bottom-bar {
-        display: flex;
+    .modal-sheet-handle {
+      display: none;
+    }
+
+    /* ==========================================================================
+       MOBILE OPTIMIZATIONS (SMARTPHONES & TABLETS)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      :root {
+        --spacing-section: 48px;
+        --bottom-bar-h: 62px;
       }
+      
+      .container {
+        padding: 0 16px;
+      }
+
+      body {
+        padding-bottom: calc(var(--bottom-bar-h) + 20px);
+      }
+
+      /* Top nav mobile */
+      .app-top-nav {
+        height: 54px;
+      }
+
+      .nav-inner {
+        padding: 0;
+      }
+
+      .brand-mark {
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
+      }
+
+      .brand-text {
+        font-size: 15px;
+      }
+
       .nav-links-row {
         display: none;
       }
-      .mockup-body-grid {
-        grid-template-columns: 1fr;
+
+      /* Animated Marquee Hero Mobile */
+      .animated-marquee-hero {
+        padding: 44px 14px 20px;
+        min-height: auto;
       }
+
+      .tagline-pill {
+        font-size: 11px;
+        padding: 5px 12px;
+        margin-bottom: 14px;
+        max-width: 100%;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .hero-display-title {
+        font-size: 34px;
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+        margin-bottom: 12px;
+      }
+
+      .hero-description-text {
+        font-size: 14px;
+        line-height: 1.45;
+        margin-bottom: 20px;
+        padding: 0 4px;
+      }
+
+      .hero-cta-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        margin-top: 18px;
+        margin-bottom: 24px;
+      }
+
+      .btn-action-primary, .btn-action-secondary {
+        width: 100%;
+        height: 46px;
+        font-size: 14.5px;
+        justify-content: center;
+      }
+
+      .marquee-container {
+        padding: 8px 0 14px;
+      }
+
+      .marquee-card {
+        height: 160px;
+        width: 120px;
+        border-radius: 14px;
+      }
+
+      .marquee-card-label {
+        font-size: 9.5px;
+        padding: 4px 8px;
+        bottom: 6px;
+        left: 6px;
+        right: 6px;
+        border-radius: 8px;
+      }
+
+      /* Section headers */
+      .section-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .section-title {
+        font-size: 24px;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+      }
+
+      .section-desc {
+        font-size: 13.5px;
+      }
+
+      /* Date carousel */
+      .date-carousel-wrap {
+        margin: 0 -16px 14px;
+        padding: 0 16px 6px;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+      }
+
+      .date-strip {
+        gap: 8px;
+      }
+
+      .date-card {
+        flex: 0 0 70px;
+        padding: 10px 4px;
+        border-radius: 12px;
+        scroll-snap-align: start;
+      }
+
+      .date-card-num {
+        font-size: 20px;
+      }
+
+      .date-card-day {
+        font-size: 10px;
+      }
+
+      /* Filter bar */
+      .filter-bar {
+        padding: 10px;
+        gap: 8px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .filter-group {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      .filter-group::-webkit-scrollbar {
+        display: none;
+      }
+
+      .filter-btn {
+        padding: 5px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      /* Slots Grid */
+      .slots-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .slot-card {
+        padding: 16px;
+      }
+
+      /* Open matches */
+      .open-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .player-slots-layout {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+
+      .player-slot-item {
+        font-size: 11.5px;
+        padding: 8px 4px;
+      }
+
+      /* Rating */
       .rating-grid-layout {
         grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .rating-box {
+        padding: 20px 16px;
+        border-radius: 16px;
+      }
+
+      .rating-display-val {
+        font-size: 44px;
+      }
+
+      /* Torneos & Cantina Bento */
+      .section-features-two {
+        padding: 44px 0;
+      }
+
+      /* Bottom sheet modal on mobile */
+      .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      .modal-card {
+        max-width: 100%;
+        border-radius: 24px 24px 0 0;
+        max-height: 88vh;
+        padding: 16px 18px calc(24px + env(safe-area-inset-bottom, 12px));
+        animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes slideUpMobile {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+      }
+
+      .modal-sheet-handle {
+        display: block;
+        width: 36px;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--color-hairline-strong);
+        margin: 0 auto 14px;
+      }
+
+      /* Mobile bottom bar */
+      .mobile-bottom-bar {
+        display: flex;
+      }
+
+      /* Lightbox modal */
+      .lightbox-content {
+        max-width: 96vw;
+        max-height: 80vh;
+      }
+
+      .lightbox-close {
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
       }
     }
   </style>
@@ -1833,6 +2121,7 @@
        ========================================================================== -->
   <div class="modal-overlay" id="booking-modal-overlay">
     <div class="modal-card">
+      <div class="modal-sheet-handle"></div>
       <button type="button" class="modal-close" onclick="closeBookingModal()" aria-label="Cerrar modal">✕</button>
       
       <span class="badge-pill badge-success" style="margin-bottom: 8px;">Confirmar Turno</span>
