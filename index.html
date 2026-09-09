@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Muzzaga Pádel — Club de pádel en Catriel, Río Negro</title>
+<meta name="description" content="Muzzaga es el club de pádel de Catriel: 2 canchas, torneos todo el año en todas las categorías y cantina propia. Reservá tu turno por WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: #F5F1E8; color: #1C1C1A; font-family: Outfit, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: #C85A18; text-decoration: none; }
+  a:hover { color: #E8722A; }
+  ::selection { background: #E8722A; color: #F5F1E8; }
+  :focus-visible { outline: 2px solid #E8722A; outline-offset: 3px; }
+  @keyframes muzz-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes muzz-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes muzz-bounce { 0%,100% { transform: translateY(0); opacity:0.6; } 50% { transform: translateY(8px); opacity:1; } }
+  @keyframes muzz-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .muzz-court { background-image: linear-gradient(rgba(245,241,232,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(245,241,232,0.07) 1px, transparent 1px); background-size: 44px 44px; }
+  .muzz-rise { animation: muzz-rise 0.8s cubic-bezier(.16,1,.3,1) both; }
+  .muzz-heroMock { display: none; }
+  @media (min-width: 980px) {
+    .muzz-heroMock { display: block; }
+    .muzz-heroText { max-width: calc(100% - 340px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .muzz-rise { animation: none; }
+    #muzz-scrollcue, .muzz-heroMock { animation: none; }
+    div[style*="muzz-ticker"] { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div style="min-height:100vh; background:#F5F1E8; overflow-x:hidden;">
+
+  <div style="position:sticky; top:0; z-index:50; padding:14px 16px 0;">
+    <header style="max-width:1200px; margin:0 auto; background:rgba(245,241,232,0.9); backdrop-filter:blur(10px); border:1px solid rgba(28,28,26,0.1); border-radius:999px; box-shadow:0 8px 24px rgba(28,28,26,0.08);">
+      <div style="padding:10px 12px 10px 20px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+        <a href="#top" style="display:flex; align-items:center; gap:10px; color:#1C1C1A;">
+          <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#1C1C1A"></circle><ellipse cx="20" cy="16" rx="9" ry="10" fill="none" stroke="#E8722A" stroke-width="2"></ellipse><path d="M20 26 L20 33" stroke="#E8722A" stroke-width="2.5" stroke-linecap="round"></path><circle cx="16" cy="13" r="1.1" fill="#E8722A"></circle><circle cx="20" cy="13" r="1.1" fill="#E8722A"></circle><circle cx="24" cy="13" r="1.1" fill="#E8722A"></circle><circle cx="16" cy="17" r="1.1" fill="#E8722A"></circle><circle cx="20" cy="17" r="1.1" fill="#E8722A"></circle><circle cx="24" cy="17" r="1.1" fill="#E8722A"></circle><circle cx="18" cy="21" r="1.1" fill="#E8722A"></circle><circle cx="22" cy="21" r="1.1" fill="#E8722A"></circle></svg>
+          <span style="font-family:Anton, sans-serif; font-size:19px; letter-spacing:0.02em; text-transform:uppercase;">Muzzaga</span>
+        </a>
+        <nav style="display:flex; align-items:center; gap:22px; margin-left:auto; flex-wrap:wrap;">
+          <a href="#club" style="font-size:14px; font-weight:500; letter-spacing:0.04em; color:#1C1C1A;" style-hover="color:#C85A18">El club</a>
+          <a href="#precios" style="font-size:14px; font-weight:500; letter-spacing:0.04em; color:#1C1C1A;" style-hover="color:#C85A18">Precios</a>
+          <a href="#torneos" style="font-size:14px; font-weight:500; letter-spacing:0.04em; color:#1C1C1A;" style-hover="color:#C85A18">Torneos</a>
+          <a href="#cantina" style="font-size:14px; font-weight:500; letter-spacing:0.04em; color:#1C1C1A;" style-hover="color:#C85A18">Cantina</a>
+          <a href="#ubicacion" style="font-size:14px; font-weight:500; letter-spacing:0.04em; color:#1C1C1A;" style-hover="color:#C85A18">Ubicación</a>
+          <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="background:#1C1C1A; color:#F5F1E8; font-weight:600; font-size:14px; letter-spacing:0.03em; padding:10px 20px; border-radius:999px; display:inline-flex; align-items:center; min-height:40px;" style-hover="background:#E8722A; color:#1C1C1A">Reservar cancha</a>
+        </nav>
+      </div>
+    </header>
+  </div>
+
+  <section id="top" style="position:relative; max-width:1240px; margin:0 auto; padding:clamp(52px,8vw,120px) 20px clamp(56px,7vw,96px); overflow:hidden;">
+    <div aria-hidden="true" style="position:absolute; inset:-10% -10% auto -10%; height:130%; z-index:0; background:
+      radial-gradient(46% 40% at 18% 10%, rgba(232,114,42,0.20), transparent 70%),
+      radial-gradient(50% 46% at 88% 22%, rgba(232,114,42,0.14), transparent 70%),
+      radial-gradient(60% 50% at 50% 78%, rgba(28,28,26,0.05), transparent 72%);
+      filter: blur(6px);"></div>
+    <p aria-hidden="true" style="position:absolute; top:clamp(20px,4vw,40px); right:-4px; margin:0; font-family:Anton,sans-serif; font-size:clamp(90px,22vw,320px); line-height:0.8; color:transparent; -webkit-text-stroke:1.5px rgba(28,28,26,0.06); letter-spacing:-0.02em; z-index:0; user-select:none; pointer-events:none;">PADEL</p>
+
+    <div class="muzz-heroMock" aria-hidden="true" style="position:absolute; top:6%; right:0; z-index:2; width:300px; animation:muzz-float 5s ease-in-out infinite;">
+      <div style="background:#F5F1E8; border:1px solid rgba(28,28,26,0.1); border-radius:22px; box-shadow:0 30px 60px rgba(28,28,26,0.18); padding:16px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <span style="font-family:Anton,sans-serif; font-size:13px; letter-spacing:0.08em; text-transform:uppercase;">Así reservás</span>
+          <span style="width:8px; height:8px; border-radius:50%; background:#2E9E5B;"></span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; gap:8px; background:rgba(46,158,91,0.12); border:1px solid rgba(46,158,91,0.3); border-radius:10px; padding:8px 10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4h16v12H8l-4 4V4Z" stroke="#217b46" stroke-width="2" stroke-linejoin="round"/></svg>
+            <span style="font-size:12px; color:#217b46;">Escribís por WhatsApp</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:rgba(232,114,42,0.1); border:1px solid rgba(232,114,42,0.28); border-radius:10px; padding:8px 10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#C85A18" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="#C85A18" stroke-width="2" stroke-linecap="round"/><path d="m8.5 14.5 2 2 4.5-4.5" stroke="#C85A18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:12px; color:#C85A18;">Te confirmamos el turno</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:rgba(46,158,91,0.12); border:1px solid rgba(46,158,91,0.3); border-radius:10px; padding:8px 10px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#217b46" stroke-width="2"/><path d="M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18" stroke="#217b46" stroke-width="1.4"/></svg>
+            <span style="font-size:12px; color:#217b46;">Venís a jugar</span>
+          </div>
+        </div>
+        <p style="margin:12px 0 0; font-size:11px; color:#8A8477; text-align:center;">Disponibilidad se confirma por WhatsApp</p>
+      </div>
+    </div>
+
+    <div class="muzz-heroText" style="position:relative; z-index:1;">
+      <p class="muzz-rise" style="font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#8A8477; margin:0 0 clamp(20px,3vw,32px);">Catriel · Río Negro · Argentina</p>
+      <h1 class="muzz-rise" style="animation-delay:.08s; font-family:Anton, sans-serif; font-weight:400; font-size:clamp(52px,11vw,150px); line-height:0.95; letter-spacing:-0.01em; text-transform:uppercase; margin:0; max-width:12ch;">El juego <span style="color:#E8722A;">empieza acá</span></h1>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:clamp(28px,4vw,64px); margin-top:clamp(32px,4vw,56px); align-items:start;">
+        <p class="muzz-rise" style="animation-delay:.16s; margin:0; font-size:clamp(17px,2vw,21px); line-height:1.6; color:#3a3833; max-width:52ch; text-wrap:pretty;">Muzzaga es el club de pádel de Catriel: 2 canchas para jugar con amigos, torneos durante todo el año en todas las categorías y cantina propia para quedarse después del último punto.</p>
+        <div class="muzz-rise" style="animation-delay:.24s; display:flex; flex-wrap:wrap; gap:12px;">
+          <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="background:#1C1C1A; color:#F5F1E8; font-weight:600; font-size:16px; padding:16px 28px; border-radius:999px; min-height:52px; display:inline-flex; align-items:center; gap:10px;" style-hover="background:#E8722A; color:#1C1C1A">Reservar por WhatsApp →</a>
+          <a href="#precios" style="border:2px solid #1C1C1A; color:#1C1C1A; font-weight:600; font-size:16px; padding:14px 28px; border-radius:999px; min-height:52px; display:inline-flex; align-items:center;" style-hover="background:#1C1C1A; color:#F5F1E8">Ver precios</a>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0; margin-top:clamp(40px,6vw,80px); padding-top:clamp(24px,3vw,32px); border-top:2px solid #1C1C1A;">
+        <div class="muzz-rise" style="animation-delay:.3s; display:flex; align-items:center; gap:14px;">
+          <span style="font-family:Anton,sans-serif; font-size:14px; color:#E8722A;">01</span>
+          <div><p style="font-family:Anton,sans-serif; font-size:clamp(20px,2.4vw,26px); margin:0; text-transform:uppercase; line-height:1;">Todo el año</p><p style="margin:6px 0 0; font-size:13px; color:#8A8477;">Torneos abiertos</p></div>
+        </div>
+        <span aria-hidden="true" style="color:#E8722A; font-size:22px; margin:0 22px; display:inline-flex;">→</span>
+        <div class="muzz-rise" style="animation-delay:.36s; display:flex; align-items:center; gap:14px;">
+          <span style="font-family:Anton,sans-serif; font-size:14px; color:#E8722A;">02</span>
+          <div><p style="font-family:Anton,sans-serif; font-size:clamp(20px,2.4vw,26px); margin:0; text-transform:uppercase; line-height:1;">Cantina propia</p><p style="margin:6px 0 0; font-size:13px; color:#8A8477;">Pizza y barra</p></div>
+        </div>
+        <span aria-hidden="true" style="color:#E8722A; font-size:22px; margin:0 22px; display:inline-flex;">→</span>
+        <div class="muzz-rise" style="animation-delay:.42s; display:flex; align-items:center; gap:14px;">
+          <span style="font-family:Anton,sans-serif; font-size:14px; color:#E8722A;">03</span>
+          <div><p style="font-family:Anton,sans-serif; font-size:clamp(20px,2.4vw,26px); margin:0; text-transform:uppercase; line-height:1;">Comunidad</p><p style="margin:6px 0 0; font-size:13px; color:#8A8477;">De damas a libre</p></div>
+        </div>
+      </div>
+
+      <div id="muzz-scrollcue" style="animation:muzz-bounce 2.2s ease-in-out infinite; display:flex; justify-content:center; margin-top:clamp(36px,5vw,56px);" aria-hidden="true">
+        <span style="font-size:22px; color:#8A8477;">↓</span>
+      </div>
+    </div>
+  </section>
+
+  <div style="background:#1C1C1A; color:#F5F1E8; padding:16px 0; overflow:hidden; white-space:nowrap;">
+    <div style="display:inline-flex; gap:0; animation:muzz-ticker 32s linear infinite; will-change:transform;">
+      <span style="display:inline-flex; align-items:center; gap:34px; padding-right:34px; font-family:Anton,sans-serif; font-size:18px; letter-spacing:0.08em; text-transform:uppercase;">
+        <span>Torneo de séptima</span><span style="color:#E8722A;">●</span>
+        <span>Categoría libre</span><span style="color:#E8722A;">●</span>
+        <span>Cantina abierta</span><span style="color:#E8722A;">●</span>
+        <span>Catriel, Río Negro</span><span style="color:#E8722A;">●</span>
+        <span>Más que pádel</span><span style="color:#E8722A;">●</span>
+      </span>
+      <span style="display:inline-flex; align-items:center; gap:34px; padding-right:34px; font-family:Anton,sans-serif; font-size:18px; letter-spacing:0.08em; text-transform:uppercase;">
+        <span>Torneo de séptima</span><span style="color:#E8722A;">●</span>
+        <span>Categoría libre</span><span style="color:#E8722A;">●</span>
+        <span>Cantina abierta</span><span style="color:#E8722A;">●</span>
+        <span>Catriel, Río Negro</span><span style="color:#E8722A;">●</span>
+        <span>Más que pádel</span><span style="color:#E8722A;">●</span>
+      </span>
+    </div>
+  </div>
+
+  <section id="club" style="max-width:1240px; margin:0 auto; padding:clamp(56px,8vw,110px) 20px;">
+    <p style="font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#E8722A; margin:0 0 18px;">El club</p>
+    <h2 style="font-family:Anton,sans-serif; font-weight:400; font-size:clamp(34px,6vw,72px); line-height:0.94; text-transform:uppercase; margin:0; max-width:18ch;">Venís a jugar,<br>te quedás un rato más</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:clamp(16px,2vw,24px); margin-top:clamp(36px,5vw,64px); align-items:stretch;">
+      <div style="position:relative; border:2px solid #1C1C1A; border-radius:20px; padding:clamp(28px,3.6vw,40px); display:flex; flex-direction:column; gap:14px; background:#1C1C1A; color:#F5F1E8; overflow:hidden;">
+        <span aria-hidden="true" style="position:absolute; top:-0.15em; right:12px; font-family:Anton,sans-serif; font-size:clamp(120px,14vw,180px); line-height:1; color:rgba(245,241,232,0.05); z-index:0;">01</span>
+        <span style="position:relative; font-family:Anton,sans-serif; font-size:15px; letter-spacing:0.12em; color:#E8722A;">01</span>
+        <h3 style="position:relative; font-family:Anton,sans-serif; font-weight:400; font-size:clamp(26px,3vw,34px); text-transform:uppercase; margin:0; line-height:1.05;">Reservá por WhatsApp</h3>
+        <p style="position:relative; margin:0; font-size:16px; line-height:1.6; opacity:0.85; max-width:38ch;">Escribinos y coordinamos tu turno. Sin app, sin vueltas: te confirmamos disponibilidad al momento.</p>
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="position:relative; margin-top:auto; padding-top:14px; font-weight:600; font-size:15px; color:#E8722A;" style-hover="color:#F5F1E8">Escribir ahora →</a>
+      </div>
+      <div style="border:2px solid #1C1C1A; border-radius:20px; padding:clamp(24px,3vw,34px); display:flex; flex-direction:column; gap:14px; transition:background .2s,color .2s,transform .2s,box-shadow .2s;" style-hover="background:#1C1C1A; color:#F5F1E8; transform:translateY(-4px); box-shadow:0 16px 32px rgba(28,28,26,0.16)">
+        <span style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:0.12em; color:#E8722A;">02</span>
+        <h3 style="font-family:Anton,sans-serif; font-weight:400; font-size:clamp(24px,2.6vw,30px); text-transform:uppercase; margin:0; line-height:1.05;">Torneos todo el año</h3>
+        <p style="margin:0; font-size:16px; line-height:1.6; opacity:0.82;">De séptima a libre, damas y caballeros. Fixture, premios y la cancha llena de gente del pueblo.</p>
+        <a href="#torneos" style="margin-top:auto; padding-top:14px; font-weight:600; font-size:15px; color:#C85A18;">Ver categorías →</a>
+      </div>
+      <div style="border:2px solid #1C1C1A; border-radius:20px; padding:clamp(24px,3vw,34px); display:flex; flex-direction:column; gap:14px; transition:background .2s,color .2s,transform .2s,box-shadow .2s;" style-hover="background:#1C1C1A; color:#F5F1E8; transform:translateY(-4px); box-shadow:0 16px 32px rgba(28,28,26,0.16)">
+        <span style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:0.12em; color:#E8722A;">03</span>
+        <h3 style="font-family:Anton,sans-serif; font-weight:400; font-size:clamp(24px,2.6vw,30px); text-transform:uppercase; margin:0; line-height:1.05;">Cantina propia</h3>
+        <p style="margin:0; font-size:16px; line-height:1.6; opacity:0.82;">Pizza recién hecha, sándwich de mila y la barra abierta para el tercer tiempo.</p>
+        <a href="#cantina" style="margin-top:auto; padding-top:14px; font-weight:600; font-size:15px; color:#C85A18;">Ver el menú →</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="precios" class="muzz-court" style="background:#1C1C1A; color:#F5F1E8;">
+    <div style="max-width:1240px; margin:0 auto; padding:clamp(56px,8vw,110px) 20px;">
+      <p style="font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#E8722A; margin:0 0 18px;">Precios</p>
+      <h2 style="font-family:Anton,sans-serif; font-weight:400; font-size:clamp(34px,5.4vw,66px); line-height:0.94; text-transform:uppercase; margin:0 0 clamp(32px,4vw,52px); max-width:16ch;">Lo que cuesta<br>tu turno</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:clamp(16px,2vw,24px);">
+        <div style="background:rgba(245,241,232,0.04); border:1px solid rgba(245,241,232,0.18); border-radius:18px; padding:clamp(26px,3.2vw,36px); display:flex; flex-direction:column; gap:10px; transition:border-color .2s,transform .2s;" style-hover="border-color:#E8722A; transform:translateY(-4px)">
+          <span style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#b9b4a8;">Por jugador · el turno</span>
+          <span style="font-family:Anton,sans-serif; font-size:clamp(36px,4vw,48px); color:#E8722A; line-height:1;">$15.000</span>
+          <span style="font-size:14px; color:#b9b4a8;">Partido de 4 jugadores</span>
+        </div>
+        <div style="background:rgba(245,241,232,0.04); border:1px solid rgba(245,241,232,0.18); border-radius:18px; padding:clamp(26px,3.2vw,36px); display:flex; flex-direction:column; gap:10px; transition:border-color .2s,transform .2s;" style-hover="border-color:#E8722A; transform:translateY(-4px)">
+          <span style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#b9b4a8;">Cancha completa</span>
+          <span style="font-family:Anton,sans-serif; font-size:clamp(36px,4vw,48px); color:#E8722A; line-height:1;">$60.000</span>
+          <span style="font-size:14px; color:#b9b4a8;">$15.000 x 4 jugadores, el turno</span>
+        </div>
+        <div style="background:rgba(245,241,232,0.04); border:1px solid rgba(245,241,232,0.18); border-radius:18px; padding:clamp(26px,3.2vw,36px); display:flex; flex-direction:column; gap:10px; transition:border-color .2s,transform .2s;" style-hover="border-color:#E8722A; transform:translateY(-4px)">
+          <span style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#b9b4a8;">Alquiler de paletas</span>
+          <span style="font-family:Anton,sans-serif; font-size:clamp(28px,3.2vw,36px); color:#E8722A; line-height:1;">Consultanos</span>
+          <span style="font-size:14px; color:#b9b4a8;">Te pasamos el precio por WhatsApp</span>
+        </div>
+        <div style="background:#E8722A; color:#1C1C1A; border-radius:18px; padding:clamp(26px,3.2vw,36px); display:flex; flex-direction:column; gap:10px;">
+          <span style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#5c2c0c;">Cumpleaños y eventos</span>
+          <span style="font-family:Anton,sans-serif; font-size:clamp(28px,3.2vw,36px); line-height:1;">A medida</span>
+          <span style="font-size:14px;">Cancha + cantina, consultanos</span>
+        </div>
+      </div>
+      <p style="margin:24px 0 0; font-size:13px; line-height:1.5; color:#8A8477;">Precios sujetos a cambio. Confirmá disponibilidad de cancha por WhatsApp antes de venir.</p>
+      <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="margin-top:28px; background:#F5F1E8; color:#1C1C1A; font-weight:600; font-size:16px; padding:16px 28px; border-radius:999px; min-height:52px; display:inline-flex; align-items:center;" style-hover="background:#E8722A; color:#1C1C1A">Reservar mi turno →</a>
+    </div>
+  </section>
+
+  <section id="torneos" class="muzz-court" style="background:#1C1C1A; color:#F5F1E8; border-top:1px solid rgba(245,241,232,0.1);">
+    <div style="max-width:1240px; margin:0 auto; padding:clamp(56px,8vw,110px) 20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:clamp(36px,5vw,72px); align-items:start;">
+      <div>
+        <p style="font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#E8722A; margin:0 0 18px;">Torneos</p>
+        <h2 style="font-family:Anton,sans-serif; font-weight:400; font-size:clamp(34px,5.4vw,66px); line-height:0.94; text-transform:uppercase; margin:0;">Hay torneo<br>para tu nivel</h2>
+        <p style="font-size:17px; line-height:1.65; color:#b9b4a8; margin:24px 0 32px; max-width:44ch;">Jugués hace un mes o hace diez años, entrás. Las categorías se arman por nivel y la inscripción se hace por WhatsApp.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+          <span style="border:1px solid rgba(245,241,232,0.35); border-radius:999px; padding:10px 16px; font-size:14px; letter-spacing:0.06em; text-transform:uppercase;">Séptima</span>
+          <span style="border:1px solid rgba(245,241,232,0.35); border-radius:999px; padding:10px 16px; font-size:14px; letter-spacing:0.06em; text-transform:uppercase;">Sexta</span>
+          <span style="border:1px solid rgba(245,241,232,0.35); border-radius:999px; padding:10px 16px; font-size:14px; letter-spacing:0.06em; text-transform:uppercase;">Libre</span>
+          <span style="border:1px solid rgba(245,241,232,0.35); border-radius:999px; padding:10px 16px; font-size:14px; letter-spacing:0.06em; text-transform:uppercase;">Damas</span>
+          <span style="border:1px solid rgba(245,241,232,0.35); border-radius:999px; padding:10px 16px; font-size:14px; letter-spacing:0.06em; text-transform:uppercase;">Caballeros</span>
+        </div>
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="margin-top:34px; background:#E8722A; color:#1C1C1A; font-weight:700; font-size:16px; padding:16px 28px; border-radius:999px; min-height:52px; display:inline-flex; align-items:center;" style-hover="background:#F5F1E8; color:#1C1C1A">Anotarme en el próximo →</a>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); border-top:1px solid rgba(245,241,232,0.25); border-left:1px solid rgba(245,241,232,0.25); border-radius:16px; overflow:hidden;">
+        <div style="padding:clamp(22px,3vw,32px); border-bottom:1px solid rgba(245,241,232,0.25); border-right:1px solid rgba(245,241,232,0.25);">
+          <p style="font-family:Anton,sans-serif; font-size:clamp(40px,5vw,60px); line-height:1; color:#E8722A; margin:0;">2026</p>
+          <p style="margin:12px 0 0; font-size:13px; letter-spacing:0.1em; text-transform:uppercase; color:#b9b4a8;">Temporada en curso</p>
+        </div>
+        <div style="padding:clamp(22px,3vw,32px); border-bottom:1px solid rgba(245,241,232,0.25); border-right:1px solid rgba(245,241,232,0.25);">
+          <p style="font-family:Anton,sans-serif; font-size:clamp(40px,5vw,60px); line-height:1; color:#E8722A; margin:0;">5</p>
+          <p style="margin:12px 0 0; font-size:13px; letter-spacing:0.1em; text-transform:uppercase; color:#b9b4a8;">Categorías en juego</p>
+        </div>
+        <div style="padding:clamp(22px,3vw,32px); border-bottom:1px solid rgba(245,241,232,0.25); border-right:1px solid rgba(245,241,232,0.25);">
+          <p style="font-family:Anton,sans-serif; font-size:clamp(30px,3.6vw,44px); line-height:1; color:#E8722A; margin:0; text-transform:uppercase;">Catriel</p>
+          <p style="margin:12px 0 0; font-size:13px; letter-spacing:0.1em; text-transform:uppercase; color:#b9b4a8;">Y toda la zona</p>
+        </div>
+        <div style="padding:clamp(22px,3vw,32px); border-bottom:1px solid rgba(245,241,232,0.25); border-right:1px solid rgba(245,241,232,0.25);">
+          <p style="font-family:Anton,sans-serif; font-size:clamp(40px,5vw,60px); line-height:1; color:#E8722A; margin:0;">24/7</p>
+          <p style="margin:12px 0 0; font-size:13px; letter-spacing:0.1em; text-transform:uppercase; color:#b9b4a8;">Inscripción por WhatsApp</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cantina" style="max-width:1240px; margin:0 auto; padding:clamp(56px,8vw,110px) 20px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:clamp(36px,5vw,72px); align-items:start;">
+      <div>
+        <p style="font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#E8722A; margin:0 0 18px;">Cantina</p>
+        <h2 style="font-family:Anton,sans-serif; font-weight:400; font-size:clamp(34px,5.4vw,66px); line-height:0.94; text-transform:uppercase; margin:0;">El tercer<br>tiempo también<br>es del club</h2>
+        <div style="margin-top:clamp(28px,4vw,44px); display:flex; flex-direction:column;">
+          <div style="display:flex; gap:20px; padding:22px 0; border-top:1px solid rgba(28,28,26,0.15);">
+            <span style="font-family:Anton,sans-serif; font-size:20px; color:#E8722A; min-width:32px;">01</span>
+            <div><p style="margin:0; font-weight:600; font-size:18px;">Pizza a la piedra</p><p style="margin:6px 0 0; font-size:15px; line-height:1.55; color:#8A8477;">Muzza y napo, hechas en el club. La excusa perfecta para quedarse.</p></div>
+          </div>
+          <div style="display:flex; gap:20px; padding:22px 0; border-top:1px solid rgba(28,28,26,0.15);">
+            <span style="font-family:Anton,sans-serif; font-size:20px; color:#E8722A; min-width:32px;">02</span>
+            <div><p style="margin:0; font-weight:600; font-size:18px;">Barra abierta</p><p style="margin:6px 0 0; font-size:15px; line-height:1.55; color:#8A8477;">Fernet, cerveza fría y lo que haga falta para el after.</p></div>
+          </div>
+          <div style="display:flex; gap:20px; padding:22px 0; border-top:1px solid rgba(28,28,26,0.15); border-bottom:1px solid rgba(28,28,26,0.15);">
+            <span style="font-family:Anton,sans-serif; font-size:20px; color:#E8722A; min-width:32px;">03</span>
+            <div><p style="margin:0; font-weight:600; font-size:18px;">Sin cortar el juego</p><p style="margin:6px 0 0; font-size:15px; line-height:1.55; color:#8A8477;">Pedís desde la cancha y te lo llevamos cuando terminás el set.</p></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#1C1C1A; color:#F5F1E8; border-radius:20px; padding:clamp(28px,4vw,44px);">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:16px; border-bottom:2px solid #E8722A; padding-bottom:18px;">
+          <p style="font-family:Anton,sans-serif; font-size:clamp(26px,3.2vw,36px); text-transform:uppercase; margin:0; line-height:1;">Menú</p>
+          <p style="margin:0; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:#8A8477;">Cantina Muzzaga</p>
+        </div>
+        <div style="display:flex; flex-direction:column;">
+          <div style="display:flex; justify-content:space-between; gap:18px; padding:20px 0; border-bottom:1px solid rgba(245,241,232,0.16);"><span style="font-size:17px; font-weight:500;">Pizza muzzarella</span><span style="font-family:Anton,sans-serif; font-size:20px; color:#E8722A; white-space:nowrap;">$18.000</span></div>
+          <div style="display:flex; justify-content:space-between; gap:18px; padding:20px 0; border-bottom:1px solid rgba(245,241,232,0.16);"><span style="font-size:17px; font-weight:500;">Pizza napolitana</span><span style="font-family:Anton,sans-serif; font-size:20px; color:#E8722A; white-space:nowrap;">$20.000</span></div>
+          <div style="display:flex; justify-content:space-between; gap:18px; padding:20px 0; border-bottom:1px solid rgba(245,241,232,0.16);"><span style="font-size:17px; font-weight:500;">Sándwich de mila</span><span style="font-family:Anton,sans-serif; font-size:20px; color:#E8722A; white-space:nowrap;">$22.000</span></div>
+          <div style="display:flex; justify-content:space-between; gap:18px; padding:20px 0; border-bottom:1px solid rgba(245,241,232,0.16);"><span style="font-size:17px; font-weight:500;">Fernet &amp; coca</span><span style="font-family:Anton,sans-serif; font-size:20px; color:#E8722A; white-space:nowrap;">$10.000</span></div>
+          <div style="display:flex; justify-content:space-between; gap:18px; padding:20px 0;"><span style="font-size:17px; font-weight:500;">Heineken 975 ml</span><span style="font-family:Anton,sans-serif; font-size:20px; color:#E8722A; white-space:nowrap;">$9.000</span></div>
+        </div>
+        <p style="margin:14px 0 0; font-size:13px; line-height:1.5; color:#8A8477;">Precios sujetos a cambio. Consultá disponibilidad del día por WhatsApp.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#E8722A; color:#1C1C1A;">
+    <div style="max-width:1240px; margin:0 auto; padding:clamp(44px,6vw,80px) 20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:clamp(28px,4vw,56px); align-items:center;">
+      <div>
+        <p style="font-size:12px; letter-spacing:0.24em; text-transform:uppercase; margin:0 0 16px; color:#5c2c0c;">Próximamente</p>
+        <h2 style="font-family:Anton,sans-serif; font-weight:400; font-size:clamp(32px,5vw,60px); line-height:0.95; text-transform:uppercase; margin:0;">La app de Muzzaga<br>está en camino</h2>
+      </div>
+      <div>
+        <p style="margin:0 0 24px; font-size:18px; line-height:1.6; max-width:42ch;">Vas a poder ver canchas libres y reservar desde el celular. Mientras la terminamos de construir, reservás como siempre: por WhatsApp.</p>
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="background:#1C1C1A; color:#F5F1E8; font-weight:600; font-size:16px; padding:16px 28px; border-radius:999px; min-height:52px; display:inline-flex; align-items:center;" style-hover="background:#F5F1E8; color:#1C1C1A">Reservar por WhatsApp →</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="ubicacion" style="max-width:1240px; margin:0 auto; padding:clamp(56px,8vw,110px) 20px;">
+    <p style="font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#E8722A; margin:0 0 18px;">Ubicación y contacto</p>
+    <h2 style="font-family:Anton,sans-serif; font-weight:400; font-size:clamp(34px,5.4vw,66px); line-height:0.94; text-transform:uppercase; margin:0 0 clamp(32px,4vw,56px);">Nos encontrás<br>en Catriel</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:clamp(20px,3vw,32px); align-items:stretch;">
+      <div class="muzz-court" style="background:#1C1C1A; color:#F5F1E8; border-radius:20px; padding:clamp(28px,4vw,44px); min-height:clamp(280px,32vw,400px); display:flex; flex-direction:column; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="width:12px; height:12px; background:#E8722A; border-radius:50%; display:block;"></span>
+          <span style="font-size:12px; letter-spacing:0.2em; text-transform:uppercase; color:#b9b4a8;">Río Negro, Argentina</span>
+        </div>
+        <p style="font-family:Anton,sans-serif; font-size:clamp(56px,11vw,120px); line-height:0.85; text-transform:uppercase; margin:0; color:#F5F1E8;">Catriel</p>
+        <p style="margin:0; font-size:15px; color:#b9b4a8; max-width:34ch;">La dirección exacta y cómo llegar te las pasamos por WhatsApp al confirmar tu turno.</p>
+      </div>
+      <div style="display:flex; flex-direction:column;">
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; gap:16px; padding:clamp(22px,3vw,30px) 0; border-top:2px solid #1C1C1A; color:#1C1C1A;" style-hover="color:#C85A18">
+          <span><span style="display:block; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:#8A8477; margin-bottom:8px;">WhatsApp</span><span style="font-family:Anton,sans-serif; font-size:clamp(22px,2.8vw,30px); text-transform:uppercase;">+54 9 299 597-4176</span></span>
+          <span style="font-size:24px; color:#E8722A;">→</span>
+        </a>
+        <a href="https://instagram.com/muzzagapadel" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; gap:16px; padding:clamp(22px,3vw,30px) 0; border-top:1px solid rgba(28,28,26,0.18); color:#1C1C1A;" style-hover="color:#C85A18">
+          <span><span style="display:block; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:#8A8477; margin-bottom:8px;">Instagram</span><span style="font-family:Anton,sans-serif; font-size:clamp(22px,2.8vw,30px); text-transform:uppercase;">@muzzagapadel</span></span>
+          <span style="font-size:24px; color:#E8722A;">→</span>
+        </a>
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="display:flex; justify-content:space-between; align-items:center; gap:16px; padding:clamp(22px,3vw,30px) 0; border-top:1px solid rgba(28,28,26,0.18); border-bottom:1px solid rgba(28,28,26,0.18); color:#1C1C1A;" style-hover="color:#C85A18">
+          <span><span style="display:block; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:#8A8477; margin-bottom:8px;">Cómo llegar</span><span style="font-family:Anton,sans-serif; font-size:clamp(22px,2.8vw,30px); text-transform:uppercase;">Pedí la ubicación</span></span>
+          <span style="font-size:24px; color:#E8722A;">→</span>
+        </a>
+        <p style="margin:22px 0 0; font-size:15px; line-height:1.6; color:#8A8477; max-width:40ch;">Horarios, disponibilidad de canchas y precio del turno se confirman por WhatsApp.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="muzz-court" style="background:#1C1C1A; color:#F5F1E8;">
+    <div style="max-width:1240px; margin:0 auto; padding:clamp(44px,6vw,72px) 20px clamp(28px,4vw,40px);">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:clamp(28px,4vw,48px); align-items:start;">
+        <div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <svg width="44" height="44" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#F5F1E8"></circle><ellipse cx="20" cy="16" rx="9" ry="10" fill="none" stroke="#E8722A" stroke-width="2"></ellipse><path d="M20 26 L20 33" stroke="#E8722A" stroke-width="2.5" stroke-linecap="round"></path><circle cx="16" cy="13" r="1.1" fill="#E8722A"></circle><circle cx="20" cy="13" r="1.1" fill="#E8722A"></circle><circle cx="24" cy="13" r="1.1" fill="#E8722A"></circle><circle cx="16" cy="17" r="1.1" fill="#E8722A"></circle><circle cx="20" cy="17" r="1.1" fill="#E8722A"></circle><circle cx="24" cy="17" r="1.1" fill="#E8722A"></circle><circle cx="18" cy="21" r="1.1" fill="#E8722A"></circle><circle cx="22" cy="21" r="1.1" fill="#E8722A"></circle></svg>
+            <span style="display:flex; flex-direction:column; line-height:1;">
+              <span style="font-family:Anton,sans-serif; font-size:26px; text-transform:uppercase; letter-spacing:0.02em;">Muzzaga</span>
+              <span style="font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8A8477; margin-top:5px;">Más que pádel</span>
+            </span>
+          </div>
+          <p style="margin:20px 0 0; font-size:15px; color:#8A8477;">Club de pádel · Catriel, Río Negro</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <p style="margin:0 0 4px; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:#8A8477;">Navegar</p>
+          <a href="#club" style="color:#F5F1E8; font-size:15px;" style-hover="color:#E8722A">El club</a>
+          <a href="#precios" style="color:#F5F1E8; font-size:15px;" style-hover="color:#E8722A">Precios</a>
+          <a href="#torneos" style="color:#F5F1E8; font-size:15px;" style-hover="color:#E8722A">Torneos</a>
+          <a href="#cantina" style="color:#F5F1E8; font-size:15px;" style-hover="color:#E8722A">Cantina</a>
+          <a href="#ubicacion" style="color:#F5F1E8; font-size:15px;" style-hover="color:#E8722A">Ubicación</a>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <p style="margin:0 0 4px; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:#8A8477;">Contacto</p>
+          <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="color:#F5F1E8; font-size:15px;" style-hover="color:#E8722A">WhatsApp +54 9 299 597-4176</a>
+          <a href="https://instagram.com/muzzagapadel" target="_blank" rel="noopener" style="color:#F5F1E8; font-size:15px;" style-hover="color:#E8722A">@muzzagapadel</a>
+        </div>
+      </div>
+      <p style="margin:clamp(32px,4vw,52px) 0 0; padding-top:22px; border-top:1px solid rgba(245,241,232,0.18); font-size:13px; line-height:1.6; color:#8A8477;">Precios, horarios y disponibilidad se confirman por WhatsApp. © 2026 Muzzaga Pádel, Catriel.</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('[style-hover]').forEach(function (el) {
+    var base = el.getAttribute('style') || '';
+    var hover = el.getAttribute('style-hover');
+    el.addEventListener('mouseenter', function () { el.style.cssText = base + ';' + hover; });
+    el.addEventListener('mouseleave', function () { el.style.cssText = base; });
+  });
+</script>
+</body>
+</html>
