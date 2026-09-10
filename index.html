@@ -702,208 +702,47 @@
       margin-top: 6px;
     }
 
-    /* Date Carousel */
-    .date-carousel-wrap {
-      margin-bottom: 24px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      scrollbar-width: none;
-    }
-
-    .date-carousel-wrap::-webkit-scrollbar {
-      display: none;
-    }
-
-    .date-strip {
-      display: inline-flex;
-      gap: 10px;
-      min-width: 100%;
-    }
-
-    .date-card {
-      flex: 0 0 88px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 12px 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-      user-select: none;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    }
-
-    .date-card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-strong);
-      transform: translateY(-1px);
-    }
-
-    .date-card.active {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%), #E8722A;
-      border-color: rgba(255, 255, 255, 0.3);
-      color: #ffffff;
-      box-shadow: 0 0 20px rgba(232, 114, 42, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-
-    .date-card-day {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-    }
-
-    .date-card.active .date-card-day {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .date-card-num {
-      font-size: 22px;
-      font-weight: 700;
-      line-height: 1.2;
-      margin: 2px 0;
-      color: var(--text-primary);
-    }
-
-    .date-card.active .date-card-num {
-      color: #ffffff;
-    }
-
-    .date-card-month {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .date-card.active .date-card-month {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    /* Filter Bar */
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
-      padding: 10px 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    }
-
-    .filter-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-pill);
-      padding: 5px 14px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .filter-btn:hover {
-      color: var(--text-primary);
-      border-color: var(--border-strong);
-      background: rgba(255, 255, 255, 0.07);
-    }
-
-    .filter-btn.active {
-      background: var(--text-primary);
-      border-color: var(--text-primary);
-      color: var(--bg-floor);
-      font-weight: 600;
-    }
-
-    /* Slots Grid */
-    .slots-grid {
+    /* Booking App Promo (real app, replaces mock schedule grid) */
+    .booking-app-promo {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    .slot-card {
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 40px;
+      align-items: center;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: var(--radius-xl);
+      padding: 32px;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-      position: relative;
     }
 
-    .slot-card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-strong);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    .booking-app-shot {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      max-width: 320px;
+      margin: 0 auto;
     }
 
-    .slot-card.booked {
-      opacity: 0.45;
-      pointer-events: none;
-      filter: grayscale(0.6);
-    }
-
-    .slot-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 12px;
-    }
-
-    .slot-time {
-      font-family: var(--font-mono);
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .slot-meta {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-    }
-
-    .slot-meta strong {
-      color: var(--text-primary);
-    }
-
-    .slot-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--border-subtle);
-      padding-top: 14px;
-      margin-top: 4px;
-    }
-
-    .slot-price {
-      font-family: var(--font-mono);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .slot-price-sub {
-      font-size: 11px;
-      color: var(--text-muted);
+    .booking-app-shot img {
+      width: 100%;
       display: block;
+    }
+
+    .booking-app-copy h3 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 14px 0 10px;
+    }
+
+    .booking-app-copy p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 22px;
+      max-width: 46ch;
     }
 
     /* ==========================================================================
@@ -1123,97 +962,6 @@
       position: relative;
       margin-bottom: 24px;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-    }
-
-    /* ==========================================================================
-       CHECKOUT MODAL (BOTTOM SHEET ON MOBILE, FOCUSED ON DESKTOP)
-       ========================================================================== */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(4, 5, 7, 0.78);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius-xl);
-      width: 100%;
-      max-width: 480px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 28px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      position: relative;
-      animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .modal-sheet-handle {
-      display: none;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease;
-    }
-
-    .modal-close:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
-    }
-
-    .type-switcher {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 16px 0;
-    }
-
-    .type-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 12px;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .type-btn:hover {
-      border-color: var(--border-strong);
-    }
-
-    .type-btn.active {
-      border-color: var(--accent-linear);
-      background: rgba(232, 114, 42, 0.12);
-      box-shadow: 0 0 14px rgba(232, 114, 42, 0.2);
     }
 
     /* ==========================================================================
@@ -1464,63 +1212,16 @@
         font-size: 13.5px;
       }
 
-      .date-carousel-wrap {
-        margin: 0 -16px 14px;
-        padding: 0 16px 6px;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
-      }
-
-      .date-strip {
-        gap: 8px;
-      }
-
-      .date-card {
-        flex: 0 0 70px;
-        padding: 10px 4px;
-        border-radius: 12px;
-        scroll-snap-align: start;
-      }
-
-      .date-card-num {
-        font-size: 20px;
-      }
-
-      .date-card-day {
-        font-size: 10px;
-      }
-
-      .filter-bar {
-        padding: 10px;
-        gap: 8px;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .filter-group {
-        width: 100%;
-        overflow-x: auto;
-        padding-bottom: 2px;
-        scrollbar-width: none;
-      }
-
-      .filter-group::-webkit-scrollbar {
-        display: none;
-      }
-
-      .filter-btn {
-        padding: 5px 12px;
-        font-size: 12px;
-        white-space: nowrap;
-      }
-
-      .slots-grid {
+      .booking-app-promo {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 24px;
+        padding: 22px;
+        text-align: center;
       }
 
-      .slot-card {
-        padding: 16px;
+      .booking-app-copy p {
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .open-cards-grid {
@@ -1554,34 +1255,6 @@
 
       .section-bento {
         padding: 44px 0;
-      }
-
-      /* Native Bottom Sheet on Mobile */
-      .modal-overlay {
-        align-items: flex-end;
-        padding: 0;
-      }
-
-      .modal-card {
-        max-width: 100%;
-        border-radius: 24px 24px 0 0;
-        max-height: 88vh;
-        padding: 16px 18px calc(24px + env(safe-area-inset-bottom, 12px));
-        animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      @keyframes slideUpMobile {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-      }
-
-      .modal-sheet-handle {
-        display: block;
-        width: 36px;
-        height: 4px;
-        border-radius: 2px;
-        background: var(--border-strong);
-        margin: 0 auto 14px;
       }
 
       .mobile-bottom-bar {
@@ -1861,42 +1534,31 @@
        ========================================================================== -->
   <section id="turnos" class="section-turnos">
     <div class="container">
-      
+
       <div class="section-header-row">
         <div>
-          <span class="badge-linear badge-indigo" style="margin-bottom: 8px;">Ejemplo de horarios</span>
-          <h2 class="section-title">Elegí tu turno</h2>
-          <p class="section-desc">Así se ve nuestra grilla de horarios. La disponibilidad real del día se confirma por WhatsApp. Turnos de 90 minutos con iluminación LED incluida.</p>
+          <h2 class="section-title">Reservá tu cancha</h2>
+          <p class="section-desc">Mirá disponibilidad real, elegí día y horario, y confirmá tu turno desde la app de Muzzaga.</p>
         </div>
         <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 6px 12px; border-radius: var(--radius-sm);">
           $15.000 por jugador · $60.000 cancha completa
         </div>
       </div>
 
-      <!-- Date Carousel -->
-      <div class="date-carousel-wrap">
-        <div class="date-strip" id="date-strip"></div>
-      </div>
-
-      <!-- Filter Bar -->
-      <div class="filter-bar">
-        <div class="filter-group">
-          <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;">Cancha:</span>
-          <button type="button" class="filter-btn active" data-filter="court" data-val="all" aria-pressed="true">Todas</button>
-          <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 1" aria-pressed="false">Cancha 1 (Cristal)</button>
-          <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 2" aria-pressed="false">Cancha 2</button>
+      <div class="booking-app-promo">
+        <div class="booking-app-shot">
+          <img src="img/app_reservas_preview.png" alt="App de Muzzaga mostrando el próximo turno reservado y accesos rápidos a Reservar, Mis turnos y Cantina" loading="lazy">
         </div>
-
-        <div class="filter-group">
-          <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;">Franja:</span>
-          <button type="button" class="filter-btn active" data-filter="time" data-val="all" aria-pressed="true">Todo el día</button>
-          <button type="button" class="filter-btn" data-filter="time" data-val="tarde" aria-pressed="false">Tarde (14 a 19)</button>
-          <button type="button" class="filter-btn" data-filter="time" data-val="noche" aria-pressed="false">Noche (19 a 00)</button>
+        <div class="booking-app-copy">
+          <span class="badge-linear badge-emerald"><span class="pulse-dot"></span> Disponibilidad en tiempo real</span>
+          <h3>Reservá online, sin vueltas</h3>
+          <p>Elegí Cancha 1 o Cancha 2, confirmá tu turno de 90 minutos con luz LED, invitá a tus compañeros si te falta gente y pedile algo a la cantina antes de llegar. Todo desde la app del club.</p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="https://courageous-scone-fde3f3.netlify.app/" target="_blank" rel="noopener" class="btn btn-linear-primary">Reservar en la app →</a>
+            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20reservar%20una%20cancha." target="_blank" rel="noopener" class="btn btn-secondary">Coordinar por WhatsApp</a>
+          </div>
         </div>
       </div>
-
-      <!-- Slots Grid -->
-      <div class="slots-grid" id="slots-container"></div>
 
     </div>
   </section>
@@ -2262,68 +1924,6 @@
     </div>
   </section>
 
-  <!-- ==========================================================================
-       CHECKOUT MODAL (BOTTOM SHEET ON MOBILE, FOCUSED ON DESKTOP)
-       ========================================================================== -->
-  <div class="modal-overlay" id="booking-modal-overlay">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
-      <div class="modal-sheet-handle"></div>
-      <button type="button" class="modal-close" onclick="closeBookingModal()" aria-label="Cerrar modal">✕</button>
-
-      <span class="badge-linear badge-emerald" style="margin-bottom: 8px;">Confirmar Turno</span>
-      <h2 id="booking-modal-title" style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">Reserva en Muzzaga</h2>
-
-      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <span id="modal-slot-court" style="font-size: 14px; font-weight: 600; color: var(--text-primary); display: block;">Cancha 1 (Cristal)</span>
-          <span id="modal-slot-time" style="font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text-primary);">20:00 - 21:30 hs</span>
-          <span id="modal-slot-date" style="font-size: 13px; color: var(--text-secondary); display: block;">Hoy, 10 de Septiembre</span>
-        </div>
-        <div style="text-align: right;">
-          <span style="font-size: 11px; color: var(--text-muted); display: block;">Total:</span>
-          <span style="font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text-primary);">$60.000</span>
-          <span style="font-size: 12px; color: #34d399; display: block;">$15.000 / jug</span>
-        </div>
-      </div>
-
-      <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; letter-spacing: 0.04em;">Modalidad de Partido:</label>
-      <div class="type-switcher">
-        <button type="button" class="type-btn active" id="btn-mode-private" onclick="setBookingMode('private')" aria-pressed="true">
-          <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 6px; font-size: 14px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Privado</strong>
-          <span style="font-size: 12px; color: var(--text-secondary);">4 jugadores listos</span>
-        </button>
-        <button type="button" class="type-btn" id="btn-mode-open" onclick="setBookingMode('open')" aria-pressed="false">
-          <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 6px; font-size: 14px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Abierto</strong>
-          <span style="font-size: 12px; color: var(--text-secondary);">Falta 1 o 2 jugadores</span>
-        </button>
-      </div>
-
-      <div style="margin: 16px 0; display: flex; flex-direction: column; gap: 10px;">
-        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: rgba(255, 255, 255, 0.04); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-          <span style="color: var(--text-primary);">¿Alquiler de paletas?</span>
-          <select id="modal-paddles" style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 4px 8px; font-size: 12px;">
-            <option value="No, paletas propias" selected>No, tenemos propias</option>
-            <option value="Sí, 1 paleta">Sí, 1 paleta</option>
-            <option value="Sí, 2 paletas">Sí, 2 paletas</option>
-            <option value="Sí, 4 paletas">Sí, 4 paletas</option>
-          </select>
-        </label>
-
-        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: rgba(255, 255, 255, 0.04); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-          <span style="color: var(--text-primary);">Reservar pizza para después</span>
-          <input type="checkbox" id="modal-cantina-preorder" style="accent-color: var(--accent-linear); width: 16px; height: 16px;">
-        </label>
-      </div>
-
-      <a id="btn-modal-confirm" href="#" target="_blank" rel="noopener" class="btn btn-linear-primary" style="width: 100%; height: 46px;">
-        Confirmar por WhatsApp →
-      </a>
-      <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-        Confirmación directa con el club por WhatsApp.
-      </p>
-    </div>
-  </div>
-
   <!-- Real Photo Lightbox Modal -->
   <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()" role="dialog" aria-modal="true" aria-label="Foto ampliada de Muzzaga Pádel">
     <button type="button" class="lightbox-close" onclick="closeLightbox()" aria-label="Cerrar imagen">&times;</button>
@@ -2433,183 +2033,6 @@
        JAVASCRIPT
        ========================================================================== -->
   <script>
-    const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    
-    let activeDateIndex = 0;
-    let selectedCourtFilter = 'all';
-    let selectedTimeFilter = 'all';
-    let currentSlotData = null;
-    let currentBookingMode = 'private';
-
-    const dateList = [];
-    const today = new Date();
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(today.getDate() + i);
-      dateList.push({
-        dayName: i === 0 ? 'Hoy' : daysOfWeek[d.getDay()],
-        dayNumber: d.getDate(),
-        monthName: months[d.getMonth()],
-        fullString: `${daysOfWeek[d.getDay()]} ${d.getDate()} de ${months[d.getMonth()]}`
-      });
-    }
-
-    const mockSlotsByDay = {
-      0: [
-        { time: '14:30 - 16:00', court: 'Cancha 1', type: 'Cristal', booked: true, open: false, period: 'tarde' },
-        { time: '16:00 - 17:30', court: 'Cancha 2', type: 'Estándar', booked: false, open: false, period: 'tarde' },
-        { time: '17:30 - 19:00', court: 'Cancha 1', type: 'Cristal', booked: true, open: false, period: 'tarde' },
-        { time: '18:00 - 19:30', court: 'Cancha 2', type: 'Estándar', booked: false, open: false, period: 'tarde' },
-        { time: '19:30 - 21:00', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' },
-        { time: '20:30 - 22:00', court: 'Cancha 2', type: 'Estándar', booked: false, open: true, players: 3, period: 'noche' },
-        { time: '21:00 - 22:30', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' },
-        { time: '22:30 - 00:00', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' }
-      ],
-      1: [
-        { time: '15:00 - 16:30', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'tarde' },
-        { time: '16:30 - 18:00', court: 'Cancha 2', type: 'Estándar', booked: false, open: false, period: 'tarde' },
-        { time: '18:00 - 19:30', court: 'Cancha 1', type: 'Cristal', booked: true, open: false, period: 'tarde' },
-        { time: '19:00 - 20:30', court: 'Cancha 2', type: 'Estándar', booked: false, open: true, players: 2, period: 'noche' },
-        { time: '20:00 - 21:30', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' },
-        { time: '21:30 - 23:00', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' }
-      ]
-    };
-
-    function renderDateStrip() {
-      const container = document.getElementById('date-strip');
-      container.innerHTML = '';
-      dateList.forEach((item, index) => {
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = `date-card ${index === activeDateIndex ? 'active' : ''}`;
-        card.setAttribute('aria-pressed', String(index === activeDateIndex));
-        card.innerHTML = `
-          <div class="date-card-day">${item.dayName}</div>
-          <div class="date-card-num">${item.dayNumber}</div>
-          <div class="date-card-month">${item.monthName}</div>
-        `;
-        card.onclick = () => {
-          activeDateIndex = index;
-          renderDateStrip();
-          renderSlotsGrid();
-        };
-        container.appendChild(card);
-      });
-    }
-
-    function renderSlotsGrid() {
-      const container = document.getElementById('slots-container');
-      container.innerHTML = '';
-      
-      const slots = mockSlotsByDay[activeDateIndex] || mockSlotsByDay[0];
-      const filtered = slots.filter(slot => {
-        if (selectedCourtFilter !== 'all' && slot.court !== selectedCourtFilter) return false;
-        if (selectedTimeFilter !== 'all' && slot.period !== selectedTimeFilter) return false;
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
-            No hay turnos disponibles con los filtros seleccionados. Probá otra franja u otra cancha.
-          </div>
-        `;
-        return;
-      }
-
-      filtered.forEach(slot => {
-        const card = document.createElement('div');
-        card.className = `slot-card ${slot.booked ? 'booked' : ''}`;
-        
-        let badgeHtml = '';
-        if (slot.booked) {
-          badgeHtml = `<span class="badge-linear" style="color: var(--text-muted);">Ocupado</span>`;
-        } else if (slot.open) {
-          badgeHtml = `<span class="badge-linear badge-amber">Cancha Abierta (${slot.players}/4)</span>`;
-        } else {
-          badgeHtml = `<span class="badge-linear badge-emerald"><span class="pulse-dot"></span> Disponible</span>`;
-        }
-
-        card.innerHTML = `
-          <div>
-            <div class="slot-header">
-              <span class="slot-time">${slot.time.split(' - ')[0]} hs</span>
-              ${badgeHtml}
-            </div>
-            <div class="slot-meta">
-              <strong>${slot.court}</strong> · ${slot.type}<br>
-              Duración: 90 minutos con luz LED
-            </div>
-          </div>
-          <div class="slot-footer">
-            <div>
-              <span class="slot-price">$15.000</span>
-              <span class="slot-price-sub">por jugador</span>
-            </div>
-            ${slot.booked ? '<span style="font-size: 13px; color: var(--text-muted);">No disp.</span>' : `
-              <button type="button" class="btn btn-linear-primary" style="height: 34px; padding: 0 14px; font-size: 13px;" onclick="openBookingModal('${slot.court}', '${slot.type}', '${slot.time}')">
-                Reservar →
-              </button>
-            `}
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    let lastFocusedEl = null;
-
-    function openBookingModal(court, type, time) {
-      currentSlotData = { court, type, time };
-      const dateObj = dateList[activeDateIndex];
-
-      document.getElementById('modal-slot-court').textContent = `${court} (${type})`;
-      document.getElementById('modal-slot-time').textContent = `${time} hs`;
-      document.getElementById('modal-slot-date').textContent = dateObj.fullString;
-
-      updateModalConfirmLink();
-      lastFocusedEl = document.activeElement;
-      document.getElementById('booking-modal-overlay').classList.add('active');
-      document.body.style.overflow = 'hidden';
-      document.querySelector('#booking-modal-overlay .modal-close').focus();
-    }
-
-    function closeBookingModal() {
-      document.getElementById('booking-modal-overlay').classList.remove('active');
-      document.body.style.overflow = '';
-      if (lastFocusedEl) lastFocusedEl.focus();
-    }
-
-    function setBookingMode(mode) {
-      currentBookingMode = mode;
-      const btnPrivate = document.getElementById('btn-mode-private');
-      const btnOpen = document.getElementById('btn-mode-open');
-      btnPrivate.classList.toggle('active', mode === 'private');
-      btnPrivate.setAttribute('aria-pressed', String(mode === 'private'));
-      btnOpen.classList.toggle('active', mode === 'open');
-      btnOpen.setAttribute('aria-pressed', String(mode === 'open'));
-      updateModalConfirmLink();
-    }
-
-    function updateModalConfirmLink() {
-      if (!currentSlotData) return;
-      const dateObj = dateList[activeDateIndex];
-      const paddles = document.getElementById('modal-paddles').value;
-      const cantinaPreorder = document.getElementById('modal-cantina-preorder').checked;
-      
-      const turnCode = `MUZZ-${Math.floor(1000 + Math.random() * 9000)}`;
-      const modeText = currentBookingMode === 'private' ? 'Partido Privado (4 jugadores completos)' : 'Cancha Abierta (Falta gente / Busco jugadores de mi nivel)';
-      const cantinaText = cantinaPreorder ? '🍕 Sí, queremos dejar encargada una pizza para el post-partido' : 'No';
-
-      const msg = `¡Hola Muzzaga! 👋 Quiero solicitar la reserva del turno [#${turnCode}]:\n\n📅 Fecha: ${dateObj.fullString}\n⏰ Horario: ${currentSlotData.time}\n🎾 Cancha: ${currentSlotData.court} (${currentSlotData.type})\n👥 Modalidad: ${modeText}\n🏓 Paletas: ${paddles}\n🍕 Cantina: ${cantinaText}\n\n¿Me confirman disponibilidad?`;
-
-      const confirmBtn = document.getElementById('btn-modal-confirm');
-      confirmBtn.href = `https://wa.me/5492995974176?text=${encodeURIComponent(msg)}`;
-      confirmBtn.textContent = `Confirmar por WhatsApp (${turnCode}) →`;
-    }
-
     function openCreateMatchModal() {
       const msg = "¡Hola Muzzaga! 👋 Quiero armar una Cancha Abierta para jugar hoy/mañana. ¿Me ayudan a publicar la convocatoria en el grupo del club?";
       window.open(`https://wa.me/5492995974176?text=${encodeURIComponent(msg)}`, '_blank');
@@ -2643,24 +2066,7 @@
       });
     }
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const filterType = this.getAttribute('data-filter');
-        const val = this.getAttribute('data-val');
-
-        document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-pressed', 'false');
-        });
-        this.classList.add('active');
-        this.setAttribute('aria-pressed', 'true');
-
-        if (filterType === 'court') selectedCourtFilter = val;
-        if (filterType === 'time') selectedTimeFilter = val;
-
-        renderSlotsGrid();
-      });
-    });
+    let lastFocusedEl = null;
 
     // Lightbox modal logic
     function openLightbox(src, caption) {
@@ -2689,13 +2095,9 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeLightbox();
-        closeBookingModal();
         closeMobileNav();
       }
     });
-
-    document.getElementById('modal-paddles').addEventListener('change', updateModalConfirmLink);
-    document.getElementById('modal-cantina-preorder').addEventListener('change', updateModalConfirmLink);
 
     function scrollToSection(id) {
       const el = document.getElementById(id);
@@ -2721,9 +2123,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      renderDateStrip();
-      renderSlotsGrid();
-
       if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {
         const revealTargets = document.querySelectorAll('.section-header-row, .photo-bento-card, .open-card, .rating-box, .map-frame-wrap');
         revealTargets.forEach(el => el.classList.add('reveal-up'));
