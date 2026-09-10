@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
   { href: "#turnos", label: "Turnos" },
+  { href: "#instalaciones", label: "Instalaciones" },
   { href: "#canchas-abiertas", label: "Canchas Abiertas" },
   { href: "#rating", label: "Tu Nivel" },
-  { href: "#torneos", label: "Torneos" },
   { href: "#cantina", label: "Cantina" },
+  { href: "#torneos", label: "Torneos" },
+  { href: "#faq", label: "FAQ" },
   { href: "#ubicacion", label: "Ubicación" },
 ];
 

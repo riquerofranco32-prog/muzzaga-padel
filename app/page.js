@@ -1,7 +1,11 @@
 import Header from "../components/Header";
 import HeroMarquee from "../components/HeroMarquee";
 import BookingCalendar from "../components/BookingCalendar";
+import AmenitiesSection from "../components/AmenitiesSection";
 import RatingCalculator from "../components/RatingCalculator";
+import CantinaSection from "../components/CantinaSection";
+import TestimonialsSection from "../components/TestimonialsSection";
+import FaqSection from "../components/FaqSection";
 import { BentoPhotoCard } from "../components/PhotoCard";
 import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
@@ -82,6 +86,9 @@ export default function Home() {
           <BookingCalendar />
         </div>
       </section>
+
+      {/* INSTALACIONES & SERVICIOS */}
+      <AmenitiesSection />
 
       {/* CANCHAS ABIERTAS */}
       <section id="canchas-abiertas" className="section-community">
@@ -589,111 +596,13 @@ export default function Home() {
       </section>
 
       {/* CANTINA */}
-      <section
-        id="cantina"
-        className="section-bento"
-        style={{ background: "var(--bg-surface)" }}
-      >
-        <div className="container">
-          <div className="section-header-row">
-            <div>
-              <h2 className="section-title">Cantina Propia &amp; 3er Tiempo</h2>
-              <p className="section-desc">
-                Pizzas caseras a la piedra, sándwiches abundantes y cervezas
-                heladas con vista directa a la pista.
-              </p>
-            </div>
-          </div>
+      <CantinaSection />
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-              gap: 20,
-              marginBottom: 24,
-            }}
-          >
-            <BentoPhotoCard
-              src="/img/cantina_beer_court.jpg"
-              alt="Cantina de Muzzaga con cerveza tirada"
-              caption="Barra y canillas de cerveza artesanal con vista a la cancha"
-              title="Cerveza Tirada y Vista a Canchas"
-            >
-              Terminá de jugar y pedite una pinta helada mirando el siguiente
-              partido.
-            </BentoPhotoCard>
-            <BentoPhotoCard
-              src="/img/bar_coffee_snacks.jpg"
-              alt="Empanadas y pantalla grande en la cantina de Muzzaga"
-              caption="Empanadas y pantalla grande en la cantina"
-              title="Empanadas & Pantalla Grande"
-            >
-              Mirá los partidos en la pantalla de la cantina con algo rico para
-              picar.
-            </BentoPhotoCard>
-          </div>
+      {/* TESTIMONIOS Y COMUNIDAD */}
+      <TestimonialsSection />
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: 14,
-            }}
-          >
-            {[
-              {
-                name: "Pizza Muzzarella",
-                desc: "A la piedra casera",
-                price: "$18.000",
-              },
-              {
-                name: "Pizza Napolitana",
-                desc: "Tomate natural, ajo y oliva",
-                price: "$20.000",
-              },
-              {
-                name: "Sándwich de Mila",
-                desc: "Completo abundante",
-                price: "$22.000",
-              },
-              {
-                name: "Heineken 975 ml",
-                desc: "Botella bien fría",
-                price: "$9.000",
-              },
-            ].map((item) => (
-              <div className="menu-item-card" key={item.name}>
-                <div>
-                  <strong
-                    style={{
-                      color: "var(--text-primary)",
-                      fontSize: 15,
-                      display: "block",
-                    }}
-                  >
-                    {item.name}
-                  </strong>
-                  <span
-                    style={{ fontSize: 13, color: "var(--text-secondary)" }}
-                  >
-                    {item.desc}
-                  </span>
-                </div>
-                <span
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                    fontSize: 16,
-                  }}
-                >
-                  {item.price}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* PREGUNTAS FRECUENTES */}
+      <FaqSection />
 
       {/* UBICACIÓN */}
       <section id="ubicacion" className="section-turnos">
