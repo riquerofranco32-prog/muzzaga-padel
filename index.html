@@ -2,16 +2,44 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Muzzaga Pádel — Reservá tu Cancha, Canchas Abiertas y Torneos en Catriel</title>
   <meta name="description" content="Club de pádel en Catriel, Río Negro. Reservá tu cancha, sumate a Canchas Abiertas comunitarias y descubrí tu nivel de juego.">
-  <meta name="keywords" content="muzzaga padel, padel catriel, turnos padel catriel, canchas abiertas catriel, rio negro padel, set plus catriel">
-  
+  <meta name="keywords" content="muzzaga padel, padel catriel, turnos padel catriel, canchas abiertas catriel, rio negro padel">
+  <meta name="theme-color" content="#08090a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2308090a'/%3E%3Ctext x='50%25' y='54%25' font-family='Arial,sans-serif' font-weight='700' font-size='22' fill='%23E8722A' text-anchor='middle' dominant-baseline='middle'%3EM%3C/text%3E%3C/svg%3E">
+
   <!-- Open Graph -->
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Muzzaga Pádel">
   <meta property="og:title" content="Muzzaga Pádel — Reservá tu Cancha en Catriel">
   <meta property="og:description" content="2 canchas de cristal profesionales, iluminación LED, torneos y cantina propia para el tercer tiempo en Catriel.">
+  <meta property="og:image" content="/img/court_spectators.jpg">
   <meta property="og:locale" content="es_AR">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Muzzaga Pádel — Reservá tu Cancha en Catriel">
+  <meta name="twitter:description" content="2 canchas de cristal profesionales, iluminación LED, torneos y cantina propia para el tercer tiempo en Catriel.">
+  <meta name="twitter:image" content="/img/court_spectators.jpg">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SportsActivityLocation",
+    "name": "Muzzaga Pádel",
+    "description": "Club de pádel en Catriel, Río Negro. 2 canchas, torneos todo el año y cantina propia.",
+    "telephone": "+5492995974176",
+    "sameAs": ["https://instagram.com/muzzagapadel"],
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Catriel",
+      "addressRegion": "Río Negro",
+      "addressCountry": "AR"
+    }
+  }
+  </script>
 
   <!-- Fonts: Inter & JetBrains Mono (Linear & Expo Typography) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -102,7 +130,12 @@
     button, input, select {
       font-family: inherit;
       border: none;
-      outline: none;
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid #E8722A;
+      outline-offset: 2px;
+      border-radius: 4px;
     }
 
     .container {
