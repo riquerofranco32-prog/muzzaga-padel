@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Muzzaga Pádel — Reservá tu Cancha, Canchas Abiertas y Torneos en Catriel</title>
+  <title>Muzzaga Pádel · Reservá tu Cancha, Canchas Abiertas y Torneos en Catriel</title>
   <meta name="description" content="Club de pádel en Catriel, Río Negro. Reservá tu cancha, sumate a Canchas Abiertas comunitarias y descubrí tu nivel de juego.">
   <meta name="keywords" content="muzzaga padel, padel catriel, turnos padel catriel, canchas abiertas catriel, rio negro padel">
   <meta name="theme-color" content="#08090a">
@@ -12,14 +12,14 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Muzzaga Pádel">
-  <meta property="og:title" content="Muzzaga Pádel — Reservá tu Cancha en Catriel">
+  <meta property="og:title" content="Muzzaga Pádel · Reservá tu Cancha en Catriel">
   <meta property="og:description" content="2 canchas de cristal profesionales, iluminación LED, torneos y cantina propia para el tercer tiempo en Catriel.">
   <meta property="og:image" content="/img/court_spectators.jpg">
   <meta property="og:locale" content="es_AR">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Muzzaga Pádel — Reservá tu Cancha en Catriel">
+  <meta name="twitter:title" content="Muzzaga Pádel · Reservá tu Cancha en Catriel">
   <meta name="twitter:description" content="2 canchas de cristal profesionales, iluminación LED, torneos y cantina propia para el tercer tiempo en Catriel.">
   <meta name="twitter:image" content="/img/court_spectators.jpg">
 
@@ -1583,17 +1583,18 @@
 
       <!-- Desktop Nav Links -->
       <nav class="nav-links-row" aria-label="Navegación">
-        <a class="nav-link" onclick="scrollToSection('turnos')">Turnos</a>
-        <a class="nav-link" onclick="scrollToSection('canchas-abiertas')">Canchas Abiertas</a>
-        <a class="nav-link" onclick="scrollToSection('rating')">Tu Nivel</a>
-        <a class="nav-link" onclick="scrollToSection('torneos')">Torneos</a>
-        <a class="nav-link" onclick="scrollToSection('cantina')">Cantina</a>
-        <a class="nav-link" onclick="scrollToSection('ubicacion')">Ubicación</a>
+        <a class="nav-link" href="#turnos">Turnos</a>
+        <a class="nav-link" href="#canchas-abiertas">Canchas Abiertas</a>
+        <a class="nav-link" href="#rating">Tu Nivel</a>
+        <a class="nav-link" href="#torneos">Torneos</a>
+        <a class="nav-link" href="#cantina">Cantina</a>
+        <a class="nav-link" href="#ubicacion">Ubicación</a>
       </nav>
 
       <div style="display: flex; align-items: center; gap: 8px;">
-        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary header-maps-btn" style="height: 36px; padding: 6px 14px;">
-          📍 Google Maps
+        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary header-maps-btn" style="height: 36px; padding: 6px 14px; gap: 6px;">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          Google Maps
         </a>
         <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" class="btn btn-linear-primary" style="height: 36px; padding: 6px 14px;">
           WhatsApp Club
@@ -1608,13 +1609,16 @@
 
   <!-- Mobile Nav Panel -->
   <div id="mobile-nav-panel" class="mobile-nav-panel">
-    <a class="mobile-nav-link" onclick="scrollToSection('turnos'); toggleMobileNav()">Turnos</a>
-    <a class="mobile-nav-link" onclick="scrollToSection('canchas-abiertas'); toggleMobileNav()">Canchas Abiertas</a>
-    <a class="mobile-nav-link" onclick="scrollToSection('rating'); toggleMobileNav()">Tu Nivel</a>
-    <a class="mobile-nav-link" onclick="scrollToSection('torneos'); toggleMobileNav()">Torneos</a>
-    <a class="mobile-nav-link" onclick="scrollToSection('cantina'); toggleMobileNav()">Cantina</a>
-    <a class="mobile-nav-link" onclick="scrollToSection('ubicacion'); toggleMobileNav()">Ubicación</a>
-    <a class="mobile-nav-link" href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener">📍 Google Maps</a>
+    <a class="mobile-nav-link" href="#turnos" onclick="closeMobileNav()">Turnos</a>
+    <a class="mobile-nav-link" href="#canchas-abiertas" onclick="closeMobileNav()">Canchas Abiertas</a>
+    <a class="mobile-nav-link" href="#rating" onclick="closeMobileNav()">Tu Nivel</a>
+    <a class="mobile-nav-link" href="#torneos" onclick="closeMobileNav()">Torneos</a>
+    <a class="mobile-nav-link" href="#cantina" onclick="closeMobileNav()">Cantina</a>
+    <a class="mobile-nav-link" href="#ubicacion" onclick="closeMobileNav()">Ubicación</a>
+    <a class="mobile-nav-link" href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px;">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      Google Maps
+    </a>
     <a class="mobile-nav-link" href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="color: #34d399;">WhatsApp Club →</a>
   </div>
   <div id="mobile-nav-backdrop" class="mobile-nav-backdrop" onclick="toggleMobileNav()"></div>
@@ -1821,7 +1825,7 @@
         <div>
           <span class="badge-linear badge-indigo" style="margin-bottom: 8px;">Ejemplo de horarios</span>
           <h2 class="section-title">Elegí tu turno</h2>
-          <p class="section-desc">Así se ve nuestra grilla de horarios. La disponibilidad real del día se confirma por WhatsApp — turnos de 90 minutos con iluminación LED incluida.</p>
+          <p class="section-desc">Así se ve nuestra grilla de horarios. La disponibilidad real del día se confirma por WhatsApp. Turnos de 90 minutos con iluminación LED incluida.</p>
         </div>
         <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 6px 12px; border-radius: var(--radius-sm);">
           $15.000 por jugador · $60.000 cancha completa
@@ -1837,16 +1841,16 @@
       <div class="filter-bar">
         <div class="filter-group">
           <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;">Cancha:</span>
-          <button type="button" class="filter-btn active" data-filter="court" data-val="all">Todas</button>
-          <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 1">Cancha 1 (Cristal)</button>
-          <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 2">Cancha 2</button>
+          <button type="button" class="filter-btn active" data-filter="court" data-val="all" aria-pressed="true">Todas</button>
+          <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 1" aria-pressed="false">Cancha 1 (Cristal)</button>
+          <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 2" aria-pressed="false">Cancha 2</button>
         </div>
 
         <div class="filter-group">
           <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;">Franja:</span>
-          <button type="button" class="filter-btn active" data-filter="time" data-val="all">Todo el día</button>
-          <button type="button" class="filter-btn" data-filter="time" data-val="tarde">Tarde (14 a 19)</button>
-          <button type="button" class="filter-btn" data-filter="time" data-val="noche">Noche (19 a 00)</button>
+          <button type="button" class="filter-btn active" data-filter="time" data-val="all" aria-pressed="true">Todo el día</button>
+          <button type="button" class="filter-btn" data-filter="time" data-val="tarde" aria-pressed="false">Tarde (14 a 19)</button>
+          <button type="button" class="filter-btn" data-filter="time" data-val="noche" aria-pressed="false">Noche (19 a 00)</button>
         </div>
       </div>
 
@@ -1948,7 +1952,6 @@
       <div class="rating-grid-layout">
         
         <div>
-          <span class="badge-linear badge-emerald" style="margin-bottom: 8px;">Nivelación Exacta</span>
           <h2 class="section-title">Calculá tu nivel<br>de juego</h2>
           <p class="section-desc" style="margin-top: 10px; margin-bottom: 24px;">
             Mapeamos la escala internacional de nivel (1.0 a 7.0) con las categorías del pádel argentino (7ma a 1ra) para que siempre compitas de igual a igual.
@@ -2013,7 +2016,6 @@
       
       <div class="section-header-row">
         <div>
-          <span class="badge-linear badge-indigo" style="margin-bottom: 8px;">Temporada 2026</span>
           <h2 class="section-title">Torneos en Muzzaga</h2>
           <p class="section-desc">Torneos organizados durante todo el año, en todas las categorías. Consultá fechas y premios por WhatsApp.</p>
         </div>
@@ -2089,7 +2091,6 @@
       
       <div class="section-header-row">
         <div>
-          <span class="badge-linear badge-amber" style="margin-bottom: 8px;">Gastronomía & Lounge</span>
           <h2 class="section-title">Cantina Propia & 3er Tiempo</h2>
           <p class="section-desc">Pizzas caseras a la piedra, sándwiches abundantes y cervezas heladas con vista directa a la pista.</p>
         </div>
@@ -2164,12 +2165,12 @@
       
       <div class="section-header-row">
         <div>
-          <span class="badge-linear badge-emerald" style="margin-bottom: 8px;">Catriel, Río Negro</span>
           <h2 class="section-title">Cómo Llegar al Club</h2>
           <p class="section-desc">Muzzaga Pádel está ubicado en Catriel, Río Negro.</p>
         </div>
-        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary">
-          📍 Abrir en Google Maps →
+        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary" style="gap: 6px;">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          Abrir en Google Maps →
         </a>
       </div>
 
@@ -2186,11 +2187,13 @@
           referrerpolicy="no-referrer-when-downgrade">
         </iframe>
         <div style="position: absolute; bottom: 16px; left: 16px; right: 16px; display: flex; flex-wrap: wrap; gap: 10px; pointer-events: none;">
-          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-linear-primary" style="pointer-events: auto; height: 38px;">
-            📍 Abrir en Google Maps
+          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-linear-primary" style="pointer-events: auto; height: 38px; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            Abrir en Google Maps
           </a>
-          <a href="https://waze.com/ul?ll=-37.8832905,-67.8005469&navigate=yes" target="_blank" rel="noopener" class="btn btn-secondary" style="pointer-events: auto; height: 38px;">
-            🚗 Navegar con Waze
+          <a href="https://waze.com/ul?ll=-37.8832905,-67.8005469&navigate=yes" target="_blank" rel="noopener" class="btn btn-secondary" style="pointer-events: auto; height: 38px; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+            Navegar con Waze
           </a>
         </div>
       </div>
@@ -2222,12 +2225,12 @@
        CHECKOUT MODAL (BOTTOM SHEET ON MOBILE, FOCUSED ON DESKTOP)
        ========================================================================== -->
   <div class="modal-overlay" id="booking-modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
       <div class="modal-sheet-handle"></div>
       <button type="button" class="modal-close" onclick="closeBookingModal()" aria-label="Cerrar modal">✕</button>
-      
+
       <span class="badge-linear badge-emerald" style="margin-bottom: 8px;">Confirmar Turno</span>
-      <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">Reserva en Muzzaga</h2>
+      <h2 id="booking-modal-title" style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">Reserva en Muzzaga</h2>
 
       <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center;">
         <div>
@@ -2244,19 +2247,19 @@
 
       <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; letter-spacing: 0.04em;">Modalidad de Partido:</label>
       <div class="type-switcher">
-        <button type="button" class="type-btn active" id="btn-mode-private" onclick="setBookingMode('private')">
-          <strong style="color: var(--text-primary); display: block; font-size: 14px;">🔒 Privado</strong>
+        <button type="button" class="type-btn active" id="btn-mode-private" onclick="setBookingMode('private')" aria-pressed="true">
+          <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 6px; font-size: 14px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Privado</strong>
           <span style="font-size: 12px; color: var(--text-secondary);">4 jugadores listos</span>
         </button>
-        <button type="button" class="type-btn" id="btn-mode-open" onclick="setBookingMode('open')">
-          <strong style="color: var(--text-primary); display: block; font-size: 14px;">👥 Abierto</strong>
+        <button type="button" class="type-btn" id="btn-mode-open" onclick="setBookingMode('open')" aria-pressed="false">
+          <strong style="color: var(--text-primary); display: flex; align-items: center; gap: 6px; font-size: 14px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Abierto</strong>
           <span style="font-size: 12px; color: var(--text-secondary);">Falta 1 o 2 jugadores</span>
         </button>
       </div>
 
       <div style="margin: 16px 0; display: flex; flex-direction: column; gap: 10px;">
         <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: rgba(255, 255, 255, 0.04); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-          <span style="color: var(--text-primary);">🎾 ¿Alquiler de paletas?</span>
+          <span style="color: var(--text-primary);">¿Alquiler de paletas?</span>
           <select id="modal-paddles" style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 4px 8px; font-size: 12px;">
             <option value="No, paletas propias" selected>No, tenemos propias</option>
             <option value="Sí, 1 paleta">Sí, 1 paleta</option>
@@ -2266,7 +2269,7 @@
         </label>
 
         <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: rgba(255, 255, 255, 0.04); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-          <span style="color: var(--text-primary);">🍕 Reservar pizza para después</span>
+          <span style="color: var(--text-primary);">Reservar pizza para después</span>
           <input type="checkbox" id="modal-cantina-preorder" style="accent-color: var(--accent-linear); width: 16px; height: 16px;">
         </label>
       </div>
@@ -2281,8 +2284,8 @@
   </div>
 
   <!-- Real Photo Lightbox Modal -->
-  <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()">
-    <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
+  <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()" role="dialog" aria-modal="true" aria-label="Foto ampliada de Muzzaga Pádel">
+    <button type="button" class="lightbox-close" onclick="closeLightbox()" aria-label="Cerrar imagen">&times;</button>
     <div class="lightbox-content" onclick="event.stopPropagation()">
       <img id="lightbox-img" src="" alt="Foto Muzzaga Pádel" class="lightbox-img">
       <div id="lightbox-caption" class="lightbox-caption"></div>
@@ -2328,7 +2331,7 @@
       </div>
 
       <div class="footer-bottom">
-        <div>© 2026 Muzzaga Pádel — Catriel, Río Negro. Todos los derechos reservados.</div>
+        <div>© 2026 Muzzaga Pádel · Catriel, Río Negro. Todos los derechos reservados.</div>
         <div>2 Canchas de Cristal · Cantina Propia · Torneos Oficiales</div>
       </div>
     </div>
@@ -2338,7 +2341,7 @@
        MOBILE BOTTOM APP BAR
        ========================================================================== -->
   <nav class="mobile-bottom-bar" aria-label="Navegación móvil">
-    <div class="bottom-bar-item active" onclick="scrollToSection('turnos')">
+    <a class="bottom-bar-item active" href="#turnos" aria-current="page">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -2346,9 +2349,9 @@
         <line x1="3" y1="10" x2="21" y2="10"></line>
       </svg>
       <span>Turnos</span>
-    </div>
+    </a>
 
-    <div class="bottom-bar-item" onclick="scrollToSection('canchas-abiertas')">
+    <a class="bottom-bar-item" href="#canchas-abiertas">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
         <circle cx="9" cy="7" r="4"></circle>
@@ -2356,9 +2359,9 @@
         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
       </svg>
       <span>Abiertas</span>
-    </div>
+    </a>
 
-    <div class="bottom-bar-item" onclick="scrollToSection('rating')">
+    <a class="bottom-bar-item" href="#rating">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"></circle>
         <path d="m4.93 4.93 4.24 4.24"></path>
@@ -2367,22 +2370,22 @@
         <path d="m9.17 14.83-4.24 4.24"></path>
       </svg>
       <span>Rating</span>
-    </div>
+    </a>
 
-    <div class="bottom-bar-item" onclick="scrollToSection('ubicacion')">
+    <a class="bottom-bar-item" href="#ubicacion">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
         <circle cx="12" cy="10" r="3"></circle>
       </svg>
       <span>Mapa</span>
-    </div>
+    </a>
 
-    <div class="bottom-bar-item" onclick="window.open('https://wa.me/5492995974176', '_blank')">
+    <a class="bottom-bar-item" href="https://wa.me/5492995974176" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2">
         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
       </svg>
       <span style="color: #10b981;">WhatsApp</span>
-    </div>
+    </a>
   </nav>
 
   <!-- ==========================================================================
@@ -2437,8 +2440,10 @@
       const container = document.getElementById('date-strip');
       container.innerHTML = '';
       dateList.forEach((item, index) => {
-        const card = document.createElement('div');
+        const card = document.createElement('button');
+        card.type = 'button';
         card.className = `date-card ${index === activeDateIndex ? 'active' : ''}`;
+        card.setAttribute('aria-pressed', String(index === activeDateIndex));
         card.innerHTML = `
           <div class="date-card-day">${item.dayName}</div>
           <div class="date-card-num">${item.dayNumber}</div>
@@ -2513,28 +2518,37 @@
       });
     }
 
+    let lastFocusedEl = null;
+
     function openBookingModal(court, type, time) {
       currentSlotData = { court, type, time };
       const dateObj = dateList[activeDateIndex];
-      
+
       document.getElementById('modal-slot-court').textContent = `${court} (${type})`;
       document.getElementById('modal-slot-time').textContent = `${time} hs`;
       document.getElementById('modal-slot-date').textContent = dateObj.fullString;
-      
+
       updateModalConfirmLink();
+      lastFocusedEl = document.activeElement;
       document.getElementById('booking-modal-overlay').classList.add('active');
       document.body.style.overflow = 'hidden';
+      document.querySelector('#booking-modal-overlay .modal-close').focus();
     }
 
     function closeBookingModal() {
       document.getElementById('booking-modal-overlay').classList.remove('active');
       document.body.style.overflow = '';
+      if (lastFocusedEl) lastFocusedEl.focus();
     }
 
     function setBookingMode(mode) {
       currentBookingMode = mode;
-      document.getElementById('btn-mode-private').classList.toggle('active', mode === 'private');
-      document.getElementById('btn-mode-open').classList.toggle('active', mode === 'open');
+      const btnPrivate = document.getElementById('btn-mode-private');
+      const btnOpen = document.getElementById('btn-mode-open');
+      btnPrivate.classList.toggle('active', mode === 'private');
+      btnPrivate.setAttribute('aria-pressed', String(mode === 'private'));
+      btnOpen.classList.toggle('active', mode === 'open');
+      btnOpen.setAttribute('aria-pressed', String(mode === 'open'));
       updateModalConfirmLink();
     }
 
@@ -2593,8 +2607,12 @@
         const filterType = this.getAttribute('data-filter');
         const val = this.getAttribute('data-val');
 
-        document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
+        document.querySelectorAll(`.filter-btn[data-filter="${filterType}"]`).forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
         this.classList.add('active');
+        this.setAttribute('aria-pressed', 'true');
 
         if (filterType === 'court') selectedCourtFilter = val;
         if (filterType === 'time') selectedTimeFilter = val;
@@ -2611,8 +2629,10 @@
       if (modal && img) {
         img.src = src;
         cap.textContent = caption || 'Muzzaga Pádel · Catriel, Río Negro';
+        lastFocusedEl = document.activeElement;
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
+        modal.querySelector('.lightbox-close').focus();
       }
     }
 
@@ -2621,6 +2641,7 @@
       if (modal) {
         modal.classList.remove('active');
         document.body.style.overflow = '';
+        if (lastFocusedEl) lastFocusedEl.focus();
       }
     }
 
