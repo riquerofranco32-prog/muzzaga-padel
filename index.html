@@ -177,6 +177,22 @@
     }
 
     /* ==========================================================================
+       SCROLL REVEAL (native IntersectionObserver, motion-safe)
+       ========================================================================== */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal-up {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .reveal-up.in-view {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ==========================================================================
        BUTTONS & BADGES (LINEAR SPECULAR FEEL)
        ========================================================================== */
     .btn {
@@ -451,6 +467,28 @@
       text-align: center;
       padding: 72px 20px 48px;
       border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .hero-bg-photo {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-bg-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 35%;
+      filter: brightness(0.38) saturate(1.05);
+    }
+
+    .hero-bg-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, var(--bg-floor) 0%, rgba(8, 9, 10, 0.55) 22%, rgba(8, 9, 10, 0.55) 62%, var(--bg-floor) 100%);
     }
 
     .hero-inner-content {
@@ -1630,6 +1668,9 @@
        HERO: ANIMATED MARQUEE HERO WITH REAL PHOTOS OF MUZZAGA PÁDEL
        ========================================================================== -->
   <section id="top" class="animated-marquee-hero">
+    <div class="hero-bg-photo" aria-hidden="true">
+      <img src="img/match_action_led.jpg" alt="" loading="eager">
+    </div>
     <div class="hero-inner-content">
       
       <!-- Tagline -->
@@ -2682,6 +2723,20 @@
     document.addEventListener('DOMContentLoaded', () => {
       renderDateStrip();
       renderSlotsGrid();
+
+      if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {
+        const revealTargets = document.querySelectorAll('.section-header-row, .photo-bento-card, .open-card, .rating-box, .map-frame-wrap');
+        revealTargets.forEach(el => el.classList.add('reveal-up'));
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in-view');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15 });
+        revealTargets.forEach(el => io.observe(el));
+      }
     });
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
