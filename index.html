@@ -3,136 +3,68 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>Muzzaga Pádel — Club de Pádel en Catriel, Río Negro</title>
-  <meta name="description" content="Plataforma de reservas de Muzzaga Pádel en Catriel. Reservá turnos online en tiempo real, sumate a Canchas Abiertas y seguí tu nivel de juego.">
-  <meta name="keywords" content="muzzaga padel, padel catriel, turnos padel, canchas abiertas catriel, rio negro padel">
+  <title>Muzzaga Pádel — Turnos en Vivo, Canchas Abiertas y Torneos en Catriel</title>
+  <meta name="description" content="Club de pádel en Catriel, Río Negro. Reservá turnos online en tiempo real, sumate a Canchas Abiertas comunitarias y seguí tu nivel Playtomic.">
+  <meta name="keywords" content="muzzaga padel, padel catriel, turnos padel catriel, canchas abiertas catriel, rio negro padel, set plus catriel">
   
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Muzzaga Pádel — Turnos en Vivo y Cancha Abierta en Catriel">
-  <meta property="og:description" content="2 canchas de cristal profesionales, torneos oficiales y la comunidad de pádel de Catriel.">
+  <meta property="og:description" content="2 canchas de cristal profesionales, iluminación LED, torneos y cantina propia para el tercer tiempo en Catriel.">
   <meta property="og:locale" content="es_AR">
 
-  <!-- Google Fonts: Inter & JetBrains Mono (Expo Typography) -->
+  <!-- Fonts: Inter & JetBrains Mono (Linear & Expo Typography) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     /* ==========================================================================
-       EXPO DESIGN SYSTEM TOKENS (LIGHT THEME)
+       LINEAR + EXPO DESIGN SYSTEM TOKENS (HIGH-CRAFT DARK CANVAS)
        ========================================================================== */
     :root {
-      --color-primary: #000000;
-      --color-primary-active: #1a1a1a;
-      --color-text-link: #0d74ce;
-      --color-text-link-secondary: #476cff;
-      --color-ink: #171717;
-      --color-body: #60646c;
-      --color-body-strong: #171717;
-      --color-muted: #999999;
-      --color-muted-soft: #cccccc;
-      --color-hairline: #f0f0f3;
-      --color-hairline-soft: #f5f5f7;
-      --color-hairline-strong: #dcdee0;
-      --color-canvas: #ffffff;
-      --color-canvas-soft: #fafafa;
-      --color-surface-card: #ffffff;
-      --color-surface-strong: #f0f0f3;
-      --color-surface-dark: #171717;
-      --color-surface-dark-elevated: #1a1a1a;
-      --color-on-primary: #ffffff;
-      --color-on-dark: #ffffff;
-      --color-on-dark-soft: #b0b4ba;
-      --color-gradient-sky-light: #cfe7ff;
-      --color-gradient-sky-mid: #a8c8e8;
-      --color-accent-warning: #ab6400;
-      --color-accent-preview: #8145b5;
-      --color-accent-link-bright: #47c2ff;
-      --color-semantic-error: #eb8e90;
-      --color-semantic-success: #16a34a;
-
-      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-family-2: 'Inter', sans-serif;
-      --font-family-3: 'JetBrains Mono', 'Fira Code', monospace;
-
-      --text-display-mega: 64px;
-      --leading-display-mega: 1.05;
-      --tracking-display-mega: -1.92px;
-
-      --text-display-xl: 48px;
-      --leading-display-xl: 1.1;
-      --tracking-display-xl: -1.44px;
-
-      --text-display-lg: 36px;
-      --leading-display-lg: 1.15;
-      --tracking-display-lg: -1.08px;
-
-      --text-display-md: 28px;
-      --leading-display-md: 1.2;
-      --tracking-display-md: -0.84px;
-
-      --text-display-sm: 22px;
-      --leading-display-sm: 1.25;
-      --tracking-display-sm: -0.5px;
-
-      --text-title-md: 18px;
-      --leading-title-md: 1.4;
-      --tracking-title-md: 0;
-
-      --text-title-sm: 16px;
-      --leading-title-sm: 1.4;
-      --tracking-title-sm: 0;
-
-      --text-body-md: 16px;
-      --leading-body-md: 1.5;
-      --tracking-body-md: 0;
-
-      --text-body-sm: 14px;
-      --leading-body-sm: 1.5;
-      --tracking-body-sm: 0;
-
-      --text-caption: 13px;
-      --leading-caption: 1.4;
-      --tracking-caption: 0;
-
-      --text-caption-uppercase: 11px;
-      --leading-caption-uppercase: 1.4;
-      --tracking-caption-uppercase: 0.88px;
-
-      --text-code: 13px;
-      --leading-code: 1.5;
-      --tracking-code: 0;
-
-      --text-button: 14px;
-      --leading-button: 1;
-      --tracking-button: 0;
-
-      --text-nav-link: 14px;
-      --leading-nav-link: 1.4;
-      --tracking-nav-link: 0;
-
-      --spacing-xxs: 4px;
-      --spacing-xs: 8px;
-      --spacing-sm: 12px;
-      --spacing-base: 16px;
-      --spacing-md: 20px;
-      --spacing-lg: 24px;
-      --spacing-xl: 32px;
-      --spacing-xxl: 48px;
-      --spacing-section: 96px;
-
-      --radius-none: 0px;
+      /* Background Canvas & Surfaces */
+      --bg-floor: #08090a;
+      --bg-surface: #0f1013;
+      --bg-surface-subtle: #14161a;
+      --bg-card: rgba(255, 255, 255, 0.035);
+      --bg-card-hover: rgba(255, 255, 255, 0.065);
+      --bg-elevated: #1a1c23;
+      
+      /* Hairlines & Specular Borders */
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --border-glow: rgba(94, 106, 210, 0.45);
+      
+      /* Brand Accents (Linear Indigo + Expo Sky Blue) */
+      --accent-linear: #5e6ad2;
+      --accent-linear-hover: #6e7ae6;
+      --accent-sky: #47c2ff;
+      --accent-blue-link: #3b82f6;
+      --accent-emerald: #10b981;
+      --accent-warning: #f59e0b;
+      
+      /* Typography Colors */
+      --text-primary: #f7f8f8;
+      --text-secondary: #8a8f98;
+      --text-muted: #5e646e;
+      --text-on-accent: #ffffff;
+      
+      /* Fonts */
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      
+      /* Radii */
       --radius-xs: 4px;
-      --radius-sm: 6px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-      --radius-xxl: 24px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
       --radius-pill: 9999px;
-      --radius-full: 9999px;
-
-      --bottom-bar-h: 68px;
+      
+      /* Spacings */
+      --spacing-section: 96px;
+      --bottom-bar-h: 64px;
     }
 
     *, *::before, *::after {
@@ -145,23 +77,26 @@
     html {
       scroll-behavior: smooth;
       font-size: 16px;
-      background: var(--color-canvas);
+      background: var(--bg-floor);
+      color-scheme: dark;
     }
 
     body {
-      background: var(--color-canvas);
-      color: var(--color-body);
-      font-family: var(--font-primary);
-      font-size: var(--text-body-md);
-      line-height: var(--leading-body-md);
+      background: var(--bg-floor);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
-      padding-bottom: calc(var(--bottom-bar-h) + 20px);
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      padding-bottom: calc(var(--bottom-bar-h) + 24px);
     }
 
     a {
       color: inherit;
       text-decoration: none;
-      transition: color 0.15s ease;
+      transition: color 0.15s ease, opacity 0.15s ease;
     }
 
     button, input, select {
@@ -173,116 +108,147 @@
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 var(--spacing-lg);
+      padding: 0 24px;
     }
 
-    /* Buttons */
+    /* Ambient Lighting Glows (Linear Signature) */
+    .glow-ambient {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: 1;
+      opacity: 0.5;
+    }
+
+    .glow-hero-top {
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(94, 106, 210, 0.22) 0%, rgba(71, 194, 255, 0.12) 45%, transparent 70%);
+    }
+
+    /* Shimmer gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #ffffff 15%, #b2b8c4 65%, #626978 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-accent {
+      background: linear-gradient(135deg, #7c88f2 0%, #47c2ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ==========================================================================
+       BUTTONS & BADGES (LINEAR SPECULAR FEEL)
+       ========================================================================== */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: var(--spacing-xs);
-      font-family: var(--font-primary);
-      font-size: var(--text-button);
-      font-weight: 600;
+      gap: 8px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 500;
       border-radius: var(--radius-md);
       padding: 10px 18px;
       height: 40px;
       cursor: pointer;
-      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
       user-select: none;
       white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
 
-    .btn-primary {
-      background: var(--color-primary);
-      color: var(--color-on-primary);
-      border: 1px solid var(--color-primary);
+    .btn-linear-primary {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%), #5e6ad2;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 0 20px rgba(94, 106, 210, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      font-weight: 600;
     }
 
-    .btn-primary:hover {
-      background: var(--color-primary-active);
-      border-color: var(--color-primary-active);
+    .btn-linear-primary:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), #6875e2;
+      box-shadow: 0 0 28px rgba(94, 106, 210, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-linear-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 0 12px rgba(94, 106, 210, 0.25);
     }
 
     .btn-secondary {
-      background: var(--color-surface-card);
-      color: var(--color-ink);
-      border: 1px solid var(--color-hairline-strong);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .btn-secondary:hover {
-      background: var(--color-hairline-soft);
-      border-color: #b0b4ba;
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--border-strong);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(0);
     }
 
     .btn-whatsapp {
-      background: #16a34a;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%), #10b981;
       color: #ffffff;
-      border: 1px solid #16a34a;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
+      font-weight: 600;
     }
 
     .btn-whatsapp:hover {
-      background: #15803d;
-      border-color: #15803d;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 100%), #13c98d;
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
+      transform: translateY(-1px);
     }
 
-    .btn-tertiary {
-      background: transparent;
-      color: var(--color-text-link);
-      font-family: var(--font-primary);
-      font-size: var(--text-button);
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: opacity 0.15s ease;
-      border: none;
-      padding: 0;
-    }
-
-    .btn-tertiary:hover {
-      text-decoration: underline;
-      opacity: 0.85;
-    }
-
-    .link-accent {
-      color: var(--color-text-link);
-      text-decoration: none;
-      font-weight: 500;
-      transition: opacity 0.15s ease;
-    }
-
-    .link-accent:hover {
-      text-decoration: underline;
-      opacity: 0.85;
-    }
-
-    .badge-pill {
+    .badge-linear {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--color-surface-strong);
-      color: var(--color-ink);
-      font-size: var(--text-caption-uppercase);
-      letter-spacing: var(--tracking-caption-uppercase);
-      text-transform: uppercase;
-      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
       border-radius: var(--radius-pill);
-      padding: 4px 10px;
+      padding: 4px 12px;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
-    .badge-success {
-      background: rgba(22, 163, 74, 0.1);
-      color: var(--color-semantic-success);
-      border: 1px solid rgba(22, 163, 74, 0.2);
+    .badge-emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: #34d399;
     }
 
-    .badge-warning {
-      background: rgba(171, 100, 0, 0.1);
-      color: var(--color-accent-warning);
-      border: 1px solid rgba(171, 100, 0, 0.2);
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: #fbbf24;
+    }
+
+    .badge-indigo {
+      background: rgba(94, 106, 210, 0.14);
+      border-color: rgba(94, 106, 210, 0.3);
+      color: #a5b4fc;
     }
 
     .pulse-dot {
@@ -290,20 +256,21 @@
       height: 6px;
       border-radius: 50%;
       background: currentColor;
+      box-shadow: 0 0 8px currentColor;
     }
 
     /* ==========================================================================
-       TOP NAV (EXPO ROLE: TOP NAV)
+       TOP NAVIGATION
        ========================================================================== */
     .app-top-nav {
       position: sticky;
       top: 0;
       z-index: 100;
       height: 64px;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(8, 9, 10, 0.82);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--color-hairline);
+      border-bottom: 1px solid var(--border-subtle);
     }
 
     .nav-inner {
@@ -311,7 +278,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: var(--spacing-md);
+      gap: 16px;
     }
 
     .brand-group {
@@ -323,63 +290,63 @@
     .brand-mark {
       width: 28px;
       height: 28px;
-      background: var(--color-primary);
+      background: linear-gradient(135deg, #5e6ad2 0%, #47c2ff 100%);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #FFF;
+      color: #fff;
       font-weight: 700;
       font-size: 14px;
+      box-shadow: 0 0 14px rgba(94, 106, 210, 0.4);
     }
 
     .brand-text {
       font-weight: 600;
       font-size: 16px;
-      color: var(--color-ink);
-      letter-spacing: -0.2px;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
     }
 
     .brand-sub {
       font-size: 12px;
-      color: var(--color-muted);
+      color: var(--text-muted);
       margin-left: 4px;
     }
 
     .nav-links-row {
       display: flex;
       align-items: center;
-      gap: var(--spacing-lg);
+      gap: 24px;
     }
 
     .nav-link {
-      font-size: var(--text-nav-link);
-      color: var(--color-body);
+      font-size: 14px;
+      color: var(--text-secondary);
       font-weight: 500;
       cursor: pointer;
       transition: color 0.15s ease;
     }
 
     .nav-link:hover {
-      color: var(--color-ink);
+      color: var(--text-primary);
     }
 
     /* ==========================================================================
-       HERO (ANIMATED MARQUEE HERO WITH REAL PHOTOS & EXPO DESIGN TOKENS)
+       HERO: ANIMATED MARQUEE HERO (LINEAR DARK SPECULAR + REAL PHOTOS)
        ========================================================================== */
     .animated-marquee-hero {
       position: relative;
       width: 100%;
       min-height: 88vh;
       overflow: hidden;
-      background: radial-gradient(110% 75% at 50% -5%, var(--color-gradient-sky-light) 0%, #edf6fd 45%, var(--color-canvas) 85%);
-      border-bottom: 1px solid var(--color-hairline);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 68px 16px 40px;
+      padding: 72px 20px 48px;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
     .hero-inner-content {
@@ -388,61 +355,48 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      max-width: 840px;
+      max-width: 860px;
       margin: 0 auto;
     }
 
     .tagline-pill {
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       border-radius: var(--radius-pill);
-      border: 1px solid var(--color-hairline-strong);
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       padding: 6px 16px;
       font-size: 13px;
       font-weight: 500;
-      color: var(--color-body);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-      transition: border-color 0.2s ease;
+      color: var(--text-secondary);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
     .tagline-pill:hover {
-      border-color: var(--color-ink);
-    }
-
-    .live-pulse {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #16a34a;
-      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.25);
-      animation: pulseAnim 2s infinite ease-in-out;
-    }
-
-    @keyframes pulseAnim {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.25); opacity: 0.7; }
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
     }
 
     .hero-display-title {
-      font-family: var(--font-primary);
-      font-size: clamp(40px, 6.2vw, 68px);
+      font-family: var(--font-sans);
+      font-size: clamp(38px, 6.5vw, 68px);
       font-weight: 700;
       letter-spacing: -0.04em;
       line-height: 1.04;
-      color: var(--color-ink);
+      color: var(--text-primary);
       margin-bottom: 18px;
     }
 
     .hero-description-text {
       font-size: clamp(16px, 1.8vw, 19px);
-      line-height: 1.5;
-      color: var(--color-body);
-      max-width: 600px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      max-width: 620px;
       margin: 0 auto;
     }
 
@@ -452,83 +406,29 @@
       justify-content: center;
       gap: 14px;
       flex-wrap: wrap;
-      margin-top: 28px;
+      margin-top: 32px;
       margin-bottom: 48px;
     }
 
-    .btn-action-primary {
-      padding: 13px 30px;
-      border-radius: var(--radius-pill);
-      background: #000000;
-      color: #ffffff;
-      font-family: var(--font-primary);
-      font-size: 15px;
-      font-weight: 600;
-      border: 1px solid #000000;
-      cursor: pointer;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.22);
-      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, box-shadow 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-action-primary:hover {
-      transform: scale(1.05);
-      background: #1a1a1a;
-      box-shadow: 0 14px 30px -4px rgba(0, 0, 0, 0.28);
-    }
-
-    .btn-action-primary:active {
-      transform: scale(0.96);
-    }
-
-    .btn-action-secondary {
-      padding: 13px 24px;
-      border-radius: var(--radius-pill);
-      background: #ffffff;
-      color: var(--color-ink);
-      font-family: var(--font-primary);
-      font-size: 15px;
-      font-weight: 600;
-      border: 1px solid var(--color-hairline-strong);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-    }
-
-    .btn-action-secondary:hover {
-      transform: scale(1.03);
-      border-color: #999999;
-      background: #fafafa;
-    }
-
-    .btn-action-secondary:active {
-      transform: scale(0.96);
-    }
-
     .badge-count {
-      background: rgba(22, 163, 74, 0.12);
-      color: #16a34a;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
       font-size: 11px;
       font-weight: 700;
       padding: 2px 8px;
-      border-radius: 999px;
+      border-radius: var(--radius-pill);
     }
 
-    /* Animated Image Marquee */
+    /* Marquee Track */
     .marquee-container {
       position: relative;
       width: 100vw;
       margin-left: calc(-50vw + 50%);
       margin-right: calc(-50vw + 50%);
       overflow: hidden;
-      padding: 16px 0 28px;
-      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-      mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+      padding: 14px 0 28px;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
     }
 
     .marquee-track {
@@ -553,13 +453,13 @@
       aspect-ratio: 3/4;
       height: 230px;
       flex-shrink: 0;
-      border-radius: 20px;
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.16);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: #f0f0f3;
+      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface-subtle);
       cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
     }
 
     .marquee-card:nth-child(odd) {
@@ -567,20 +467,21 @@
     }
 
     .marquee-card:nth-child(even) {
-      transform: rotate(4deg);
+      transform: rotate(3.5deg);
     }
 
     .marquee-card:nth-child(3n) {
-      transform: rotate(-3.5deg);
+      transform: rotate(-3deg);
     }
 
     .marquee-card:nth-child(4n) {
-      transform: rotate(2.5deg);
+      transform: rotate(2deg);
     }
 
     .marquee-card:hover {
       transform: scale(1.08) rotate(0deg) !important;
-      box-shadow: 0 24px 48px -10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 24px 50px -10px rgba(94, 106, 210, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      border-color: rgba(94, 106, 210, 0.5);
       z-index: 20;
     }
 
@@ -589,11 +490,13 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.4s ease;
+      transition: transform 0.4s ease, filter 0.3s ease;
+      filter: brightness(0.92);
     }
 
     .marquee-card:hover .marquee-img {
-      transform: scale(1.04);
+      transform: scale(1.05);
+      filter: brightness(1);
     }
 
     .marquee-card-label {
@@ -602,8 +505,8 @@
       left: 10px;
       right: 10px;
       padding: 6px 12px;
-      border-radius: 12px;
-      background: rgba(18, 18, 20, 0.76);
+      border-radius: var(--radius-sm);
+      background: rgba(10, 11, 14, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       color: #ffffff;
@@ -614,27 +517,576 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .marquee-card-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #47c2ff;
+      background: var(--accent-sky);
+      box-shadow: 0 0 6px var(--accent-sky);
     }
 
-    /* Lightbox Modal */
+    /* ==========================================================================
+       SECTION: TURNOS EN VIVO (SET PLUS STYLE IN LINEAR DARK)
+       ========================================================================== */
+    .section-turnos {
+      padding: var(--spacing-section) 0;
+      position: relative;
+    }
+
+    .section-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 28px;
+      gap: 16px;
+    }
+
+    .section-title {
+      font-family: var(--font-sans);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--text-primary);
+    }
+
+    .section-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* Date Carousel */
+    .date-carousel-wrap {
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+
+    .date-carousel-wrap::-webkit-scrollbar {
+      display: none;
+    }
+
+    .date-strip {
+      display: inline-flex;
+      gap: 10px;
+      min-width: 100%;
+    }
+
+    .date-card {
+      flex: 0 0 88px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .date-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .date-card.active {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%), #5e6ad2;
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(94, 106, 210, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .date-card-day {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .date-card.active .date-card-day {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .date-card-num {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 2px 0;
+      color: var(--text-primary);
+    }
+
+    .date-card.active .date-card-num {
+      color: #ffffff;
+    }
+
+    .date-card-month {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .date-card.active .date-card-month {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 10px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .filter-btn.active {
+      background: var(--text-primary);
+      border-color: var(--text-primary);
+      color: var(--bg-floor);
+      font-weight: 600;
+    }
+
+    /* Slots Grid */
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .slot-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      position: relative;
+    }
+
+    .slot-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .slot-card.booked {
+      opacity: 0.45;
+      pointer-events: none;
+      filter: grayscale(0.6);
+    }
+
+    .slot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .slot-time {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .slot-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .slot-meta strong {
+      color: var(--text-primary);
+    }
+
+    .slot-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+      margin-top: 4px;
+    }
+
+    .slot-price {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .slot-price-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    /* ==========================================================================
+       CANCHAS ABIERTAS (PLAYTOMIC COMMUNITY MATCHES)
+       ========================================================================== */
+    .section-community {
+      padding: var(--spacing-section) 0;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      position: relative;
+    }
+
+    .open-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .open-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .open-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .player-slots-layout {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .player-slot-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 6px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .player-slot-item.taken {
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .player-slot-item.free {
+      border: 1px dashed rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      font-weight: 600;
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    /* ==========================================================================
+       RATING PLAYTOMIC (LINEAR INTERACTIVE SLIDER)
+       ========================================================================== */
+    .section-rating {
+      padding: var(--spacing-section) 0;
+    }
+
+    .rating-grid-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .rating-category-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .rating-box {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%), var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      padding: 32px 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .rating-display-val {
+      font-family: var(--font-mono);
+      font-size: 54px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1;
+      margin: 12px 0 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Custom range slider with Linear metallic look */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #5e6ad2;
+      box-shadow: 0 0 12px rgba(94, 106, 210, 0.6);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* ==========================================================================
+       TORNEOS & CANTINA BENTO (WITH REAL CLUB PHOTOS)
+       ========================================================================== */
+    .section-bento {
+      padding: var(--spacing-section) 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .photo-bento-card {
+      position: relative;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      min-height: 280px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .photo-bento-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-strong);
+      box-shadow: 0 24px 50px rgba(94, 106, 210, 0.25);
+    }
+
+    .photo-bento-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.85);
+      transition: transform 0.4s ease, filter 0.3s ease;
+    }
+
+    .photo-bento-card:hover .photo-bento-img {
+      transform: scale(1.04);
+      filter: brightness(0.95);
+    }
+
+    .photo-bento-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8, 9, 10, 0.92) 0%, rgba(8, 9, 10, 0.2) 60%, transparent 100%);
+    }
+
+    .photo-bento-body {
+      position: absolute;
+      bottom: 22px;
+      left: 22px;
+      right: 22px;
+      color: #fff;
+    }
+
+    .menu-item-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.15s ease;
+    }
+
+    .menu-item-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    /* ==========================================================================
+       UBICACIÓN & GOOGLE MAPS
+       ========================================================================== */
+    .map-frame-wrap {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      height: 380px;
+      position: relative;
+      margin-bottom: 24px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ==========================================================================
+       CHECKOUT MODAL (BOTTOM SHEET ON MOBILE, FOCUSED ON DESKTOP)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 5, 7, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      position: relative;
+      animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-sheet-handle {
+      display: none;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    .type-switcher {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .type-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .type-btn:hover {
+      border-color: var(--border-strong);
+    }
+
+    .type-btn.active {
+      border-color: var(--accent-linear);
+      background: rgba(94, 106, 210, 0.12);
+      box-shadow: 0 0 14px rgba(94, 106, 210, 0.2);
+    }
+
+    /* ==========================================================================
+       LIGHTBOX MODAL
+       ========================================================================== */
     .lightbox-modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.88);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(12px);
       z-index: 2000;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px;
       cursor: pointer;
     }
 
@@ -645,9 +1097,10 @@
     .lightbox-content {
       max-width: 90vw;
       max-height: 85vh;
-      border-radius: 16px;
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      border: 1px solid var(--border-strong);
       position: relative;
       cursor: default;
     }
@@ -664,7 +1117,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      background: linear-gradient(to top, rgba(8, 9, 10, 0.95), transparent);
       color: #ffffff;
       padding: 24px 20px 16px;
       font-size: 14px;
@@ -675,7 +1128,7 @@
       position: absolute;
       top: 20px;
       right: 20px;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 50%;
       width: 40px;
       height: 40px;
@@ -689,452 +1142,12 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    @media (max-width: 768px) {
-      .marquee-card {
-        height: 185px;
-      }
-      .animated-marquee-hero {
-        padding-top: 52px;
-        min-height: auto;
-      }
-      .hero-display-title {
-        font-size: 38px;
-      }
-    }
-
     /* ==========================================================================
-       GRILLA DE TURNOS EN VIVO (SET PLUS STYLE IN EXPO LIGHT)
-       ========================================================================== */
-    .section-turnos {
-      padding: var(--spacing-section) 0;
-    }
-
-    .section-header-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: var(--spacing-xl);
-      gap: var(--spacing-md);
-    }
-
-    .section-title {
-      font-family: var(--font-primary);
-      font-size: var(--text-display-lg);
-      font-weight: 600;
-      line-height: var(--leading-display-lg);
-      letter-spacing: var(--tracking-display-lg);
-      color: var(--color-ink);
-    }
-
-    .section-desc {
-      font-size: var(--text-body-md);
-      color: var(--color-body);
-      margin-top: var(--spacing-xs);
-    }
-
-    /* Date Picker Horizontal Carousel */
-    .date-carousel-wrap {
-      margin-bottom: var(--spacing-lg);
-      overflow-x: auto;
-      padding-bottom: 6px;
-      scrollbar-width: none;
-    }
-
-    .date-carousel-wrap::-webkit-scrollbar {
-      display: none;
-    }
-
-    .date-strip {
-      display: inline-flex;
-      gap: var(--spacing-sm);
-      min-width: 100%;
-    }
-
-    .date-card {
-      flex: 0 0 92px;
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-lg);
-      padding: 14px 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      user-select: none;
-    }
-
-    .date-card:hover {
-      border-color: var(--color-ink);
-    }
-
-    .date-card.active {
-      background: var(--color-primary);
-      border-color: var(--color-primary);
-      color: var(--color-on-primary);
-    }
-
-    .date-card-day {
-      font-size: var(--text-caption-uppercase);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-caption-uppercase);
-      color: var(--color-body);
-    }
-
-    .date-card.active .date-card-day {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .date-card-num {
-      font-size: 24px;
-      font-weight: 600;
-      line-height: 1.2;
-      margin: 2px 0;
-      color: var(--color-ink);
-    }
-
-    .date-card.active .date-card-num {
-      color: #ffffff;
-    }
-
-    .date-card-month {
-      font-size: 11px;
-      color: var(--color-muted);
-      text-transform: uppercase;
-    }
-
-    .date-card.active .date-card-month {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    /* Filter Bar */
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--spacing-md);
-      margin-bottom: var(--spacing-lg);
-      padding: var(--spacing-sm) var(--spacing-base);
-      background: var(--color-canvas-soft);
-      border: 1px solid var(--color-hairline);
-      border-radius: var(--radius-md);
-    }
-
-    .filter-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-pill);
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--color-body);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .filter-btn:hover {
-      color: var(--color-ink);
-      border-color: #b0b4ba;
-    }
-
-    .filter-btn.active {
-      background: var(--color-primary);
-      border-color: var(--color-primary);
-      color: var(--color-on-primary);
-      font-weight: 600;
-    }
-
-    /* Slots Grid */
-    .slots-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-      gap: var(--spacing-base);
-    }
-
-    .slot-card {
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: var(--spacing-md);
-      cursor: pointer;
-      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .slot-card:hover:not(.disabled) {
-      border-color: var(--color-primary);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
-      transform: translateY(-2px);
-    }
-
-    .slot-card.disabled {
-      background: var(--color-canvas-soft);
-      border-color: var(--color-hairline);
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .slot-card.open-match {
-      border-color: rgba(171, 100, 0, 0.35);
-      background: linear-gradient(180deg, rgba(171, 100, 0, 0.03) 0%, #ffffff 100%);
-    }
-
-    .slot-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .slot-time {
-      font-size: var(--text-title-md);
-      font-weight: 600;
-      color: var(--color-ink);
-    }
-
-    .slot-duration {
-      font-size: var(--text-caption);
-      color: var(--color-muted);
-      margin-top: 2px;
-    }
-
-    .slot-court {
-      font-size: var(--text-body-sm);
-      font-weight: 500;
-      color: var(--color-body);
-      margin-top: var(--spacing-sm);
-    }
-
-    .slot-price-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding-top: var(--spacing-sm);
-      border-top: 1px solid var(--color-hairline);
-    }
-
-    .slot-price-total {
-      font-family: var(--font-primary);
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--color-ink);
-    }
-
-    /* Open match players */
-    .open-avatars-row {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .avatar-circle {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--color-surface-strong);
-      border: 1px solid var(--color-hairline-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--color-ink);
-    }
-
-    .avatar-circle.empty {
-      border: 1px dashed var(--color-accent-warning);
-      color: var(--color-accent-warning);
-      background: rgba(171, 100, 0, 0.05);
-    }
-
-    /* ==========================================================================
-       CANCHAS ABIERTAS FEED (PLAYTOMIC COMMUNITY)
-       ========================================================================== */
-    .section-community {
-      padding: var(--spacing-section) 0;
-      background: var(--color-canvas-soft);
-      border-top: 1px solid var(--color-hairline);
-      border-bottom: 1px solid var(--color-hairline);
-    }
-
-    .open-cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: var(--spacing-lg);
-    }
-
-    .open-card {
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: var(--spacing-base);
-    }
-
-    .open-card:hover {
-      border-color: var(--color-ink);
-    }
-
-    .player-slots-layout {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin: var(--spacing-sm) 0;
-    }
-
-    .player-slot-item {
-      background: var(--color-surface-strong);
-      border: 1px solid var(--color-hairline);
-      border-radius: var(--radius-sm);
-      padding: 8px 4px;
-      text-align: center;
-      font-size: 12px;
-    }
-
-    .player-slot-item.taken {
-      border-color: rgba(22, 163, 74, 0.3);
-      color: var(--color-semantic-success);
-    }
-
-    .player-slot-item.free {
-      border: 1px dashed var(--color-accent-warning);
-      color: var(--color-accent-warning);
-      font-weight: 600;
-    }
-
-    /* ==========================================================================
-       RATING PLAYTOMIC (EXPO INTERACTIVE SLIDER)
-       ========================================================================== */
-    .section-rating {
-      padding: var(--spacing-section) 0;
-    }
-
-    .rating-grid-layout {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: var(--spacing-xxl);
-      align-items: center;
-    }
-
-    .rating-box {
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing-xl);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-    }
-
-    .rating-display-val {
-      font-family: var(--font-family-3);
-      font-size: 56px;
-      font-weight: 600;
-      color: var(--color-ink);
-      line-height: 1;
-      margin: 10px 0;
-    }
-
-    /* ==========================================================================
-       TORNEOS & CANTINA CARDS
-       ========================================================================== */
-    .section-features-two {
-      padding: var(--spacing-section) 0;
-      border-top: 1px solid var(--color-hairline);
-    }
-
-    .feature-card-expo {
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-    }
-
-    /* ==========================================================================
-       CHECKOUT MODAL
-       ========================================================================== */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: var(--spacing-base);
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-card {
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-xl);
-      width: 100%;
-      max-width: 480px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: var(--spacing-xl);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-      position: relative;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      background: var(--color-surface-strong);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--color-body);
-      cursor: pointer;
-    }
-
-    .type-switcher {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--spacing-sm);
-      margin: var(--spacing-base) 0;
-    }
-
-    .type-btn {
-      background: var(--color-surface-card);
-      border: 1px solid var(--color-hairline-strong);
-      border-radius: var(--radius-md);
-      padding: 12px;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .type-btn.active {
-      border-color: var(--color-primary);
-      background: var(--color-hairline-soft);
-    }
-
-    /* ==========================================================================
-       FOOTER LIGHT (EXPO ROLE: FOOTER LIGHT)
+       FOOTER & MOBILE BOTTOM BAR
        ========================================================================== */
     .app-footer {
-      background: var(--color-canvas);
-      border-top: 1px solid var(--color-hairline);
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
       padding: 64px 0 48px;
     }
 
@@ -1142,19 +1155,19 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      gap: var(--spacing-xl);
-      padding-bottom: var(--spacing-xl);
-      border-bottom: 1px solid var(--color-hairline);
+      gap: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
     .footer-bottom {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      gap: var(--spacing-base);
-      margin-top: var(--spacing-lg);
-      font-size: var(--text-body-sm);
-      color: var(--color-body);
+      gap: 16px;
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
     }
 
     /* Mobile Bottom App Bar */
@@ -1165,9 +1178,10 @@
       left: 0;
       right: 0;
       height: var(--bottom-bar-h);
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(14px);
-      border-top: 1px solid var(--color-hairline);
+      background: rgba(8, 9, 10, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-subtle);
       z-index: 90;
       align-items: center;
       justify-content: space-around;
@@ -1178,15 +1192,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
-      color: var(--color-body);
+      gap: 4px;
+      color: var(--text-muted);
       font-size: 11px;
       font-weight: 500;
       cursor: pointer;
+      transition: color 0.15s ease;
     }
 
     .bottom-bar-item.active, .bottom-bar-item:hover {
-      color: var(--color-ink);
+      color: var(--text-primary);
     }
 
     .bottom-bar-item svg {
@@ -1194,12 +1209,8 @@
       height: 18px;
     }
 
-    .modal-sheet-handle {
-      display: none;
-    }
-
     /* ==========================================================================
-       MOBILE OPTIMIZATIONS (SMARTPHONES & TABLETS)
+       MOBILE RESPONSIVENESS (SMARTPHONES)
        ========================================================================== */
     @media (max-width: 768px) {
       :root {
@@ -1215,23 +1226,8 @@
         padding-bottom: calc(var(--bottom-bar-h) + 20px);
       }
 
-      /* Top nav mobile */
       .app-top-nav {
         height: 54px;
-      }
-
-      .nav-inner {
-        padding: 0;
-      }
-
-      .brand-mark {
-        width: 26px;
-        height: 26px;
-        font-size: 13px;
-      }
-
-      .brand-text {
-        font-size: 15px;
       }
 
       .nav-links-row {
@@ -1275,7 +1271,7 @@
         margin-bottom: 24px;
       }
 
-      .btn-action-primary, .btn-action-secondary {
+      .btn-linear-primary, .btn-secondary {
         width: 100%;
         height: 46px;
         font-size: 14.5px;
@@ -1301,7 +1297,6 @@
         border-radius: 8px;
       }
 
-      /* Section headers */
       .section-header-row {
         flex-direction: column;
         align-items: flex-start;
@@ -1319,7 +1314,6 @@
         font-size: 13.5px;
       }
 
-      /* Date carousel */
       .date-carousel-wrap {
         margin: 0 -16px 14px;
         padding: 0 16px 6px;
@@ -1346,7 +1340,6 @@
         font-size: 10px;
       }
 
-      /* Filter bar */
       .filter-bar {
         padding: 10px;
         gap: 8px;
@@ -1371,7 +1364,6 @@
         white-space: nowrap;
       }
 
-      /* Slots Grid */
       .slots-grid {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -1381,7 +1373,6 @@
         padding: 16px;
       }
 
-      /* Open matches */
       .open-cards-grid {
         grid-template-columns: 1fr;
         gap: 14px;
@@ -1397,7 +1388,6 @@
         padding: 8px 4px;
       }
 
-      /* Rating */
       .rating-grid-layout {
         grid-template-columns: 1fr;
         gap: 20px;
@@ -1412,12 +1402,11 @@
         font-size: 44px;
       }
 
-      /* Torneos & Cantina Bento */
-      .section-features-two {
+      .section-bento {
         padding: 44px 0;
       }
 
-      /* Bottom sheet modal on mobile */
+      /* Native Bottom Sheet on Mobile */
       .modal-overlay {
         align-items: flex-end;
         padding: 0;
@@ -1441,16 +1430,14 @@
         width: 36px;
         height: 4px;
         border-radius: 2px;
-        background: var(--color-hairline-strong);
+        background: var(--border-strong);
         margin: 0 auto 14px;
       }
 
-      /* Mobile bottom bar */
       .mobile-bottom-bar {
         display: flex;
       }
 
-      /* Lightbox modal */
       .lightbox-content {
         max-width: 96vw;
         max-height: 80vh;
@@ -1469,12 +1456,12 @@
 <body>
 
   <!-- ==========================================================================
-       TOP NAV
+       TOP NAVIGATION
        ========================================================================== -->
   <header class="app-top-nav">
     <div class="container nav-inner">
       
-      <a href="#top" class="brand-group" aria-label="Muzzaga Pádel Home">
+      <a href="#top" class="brand-group" aria-label="Muzzaga Pádel Catriel">
         <div class="brand-mark">M</div>
         <div>
           <span class="brand-text">Muzzaga</span>
@@ -1496,7 +1483,7 @@
         <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary" style="height: 36px; padding: 6px 14px;">
           📍 Google Maps
         </a>
-        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" class="btn btn-primary" style="height: 36px; padding: 6px 14px;">
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" class="btn btn-linear-primary" style="height: 36px; padding: 6px 14px;">
           WhatsApp Club
         </a>
       </div>
@@ -1504,34 +1491,38 @@
     </div>
   </header>
 
+  <!-- Ambient background glow behind hero -->
+  <div class="glow-ambient glow-hero-top"></div>
+
   <!-- ==========================================================================
-       HERO (ANIMATED MARQUEE HERO WITH REAL PHOTOS OF MUZZAGA PÁDEL)
+       HERO: ANIMATED MARQUEE HERO WITH REAL PHOTOS OF MUZZAGA PÁDEL
        ========================================================================== -->
   <section id="top" class="animated-marquee-hero">
     <div class="hero-inner-content">
       
       <!-- Tagline -->
       <div class="tagline-pill">
-        <span class="live-pulse"></span>
+        <span class="pulse-dot" style="color: #10b981;"></span>
         Catriel, Río Negro · 2 Canchas de Cristal Profesionales
       </div>
 
       <!-- Main Title -->
       <h1 class="hero-display-title">
-        El club de pádel<br>de Catriel.
+        Turnos en vivo.<br>
+        <span class="gradient-text">Pádel de verdad.</span>
       </h1>
 
       <!-- Description -->
       <p class="hero-description-text">
-        Turnos en vivo cada 90 minutos, iluminación LED de alta potencia, partidos abiertos comunitarios y el mejor tercer tiempo con cantina y cerveza fría.
+        Reservá turnos de 90 minutos con iluminación LED sin sombras, sumate a Canchas Abiertas comunitarias y disfrutá del mejor tercer tiempo en nuestra cantina.
       </p>
 
       <!-- Action Buttons -->
       <div class="hero-cta-buttons">
-        <button type="button" class="btn-action-primary" onclick="scrollToSection('turnos')">
+        <button type="button" class="btn btn-linear-primary" onclick="scrollToSection('turnos')">
           Ver Turnos Disponibles ↓
         </button>
-        <button type="button" class="btn-action-secondary" onclick="scrollToSection('canchas-abiertas')">
+        <button type="button" class="btn btn-secondary" onclick="scrollToSection('canchas-abiertas')">
           Canchas Abiertas <span class="badge-count">3 buscando jugador</span>
         </button>
       </div>
@@ -1700,10 +1691,11 @@
       
       <div class="section-header-row">
         <div>
-          <h2 class="section-title">Turnos Disponibles</h2>
-          <p class="section-desc">Elegí el día y horario que prefieras. Turnos de 90 minutos con luz LED incluida.</p>
+          <span class="badge-linear badge-indigo" style="margin-bottom: 8px;">Disponibilidad 24/7</span>
+          <h2 class="section-title">Turnos en Tiempo Real</h2>
+          <p class="section-desc">Elegí el día y horario que prefieras. Turnos de 90 minutos con iluminación LED incluida.</p>
         </div>
-        <div style="font-family: var(--font-family-3); font-size: 13px; color: var(--color-body);">
+        <div style="font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 6px 12px; border-radius: var(--radius-sm);">
           $15.000 por jugador · $60.000 cancha completa
         </div>
       </div>
@@ -1716,14 +1708,14 @@
       <!-- Filter Bar -->
       <div class="filter-bar">
         <div class="filter-group">
-          <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted);">Cancha:</span>
+          <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;">Cancha:</span>
           <button type="button" class="filter-btn active" data-filter="court" data-val="all">Todas</button>
           <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 1">Cancha 1 (Cristal)</button>
           <button type="button" class="filter-btn" data-filter="court" data-val="Cancha 2">Cancha 2</button>
         </div>
 
         <div class="filter-group">
-          <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted);">Franja:</span>
+          <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em;">Franja:</span>
           <button type="button" class="filter-btn active" data-filter="time" data-val="all">Todo el día</button>
           <button type="button" class="filter-btn" data-filter="time" data-val="tarde">Tarde (14 a 19)</button>
           <button type="button" class="filter-btn" data-filter="time" data-val="noche">Noche (19 a 00)</button>
@@ -1744,7 +1736,7 @@
       
       <div class="section-header-row">
         <div>
-          <span class="badge-pill badge-warning" style="margin-bottom: 8px;">Comunidad & Matchmaking</span>
+          <span class="badge-linear badge-amber" style="margin-bottom: 8px;">Matchmaking & Comunidad</span>
           <h2 class="section-title">Canchas Abiertas en Catriel</h2>
           <p class="section-desc">Sumate a partidos que están buscando jugador o abrí tu propia convocatoria si te falta gente.</p>
         </div>
@@ -1759,12 +1751,12 @@
         <div class="open-card">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span class="badge-pill badge-warning">6ta Categoría · Nivel 3.0 - 3.5</span>
-              <span style="font-family: var(--font-family-3); font-size: 13px; font-weight: 600;">Hoy · 20:30 hs</span>
+              <span class="badge-linear badge-amber">6ta Categoría · Nivel 3.0 - 3.5</span>
+              <span style="font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text-primary);">Hoy · 20:30 hs</span>
             </div>
 
-            <h3 style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin: 12px 0 4px;">Cancha 1 · Cristal</h3>
-            <p style="font-size: 14px; color: var(--color-body);">Organiza: Franco R. · Partido parejo para subir ranking.</p>
+            <h3 style="font-size: 17px; font-weight: 600; color: var(--text-primary); margin: 12px 0 4px;">Cancha 1 · Cristal</h3>
+            <p style="font-size: 14px; color: var(--text-secondary);">Organiza: Franco R. · Partido parejo para subir nivel y ranking.</p>
 
             <div class="player-slots-layout">
               <div class="player-slot-item taken">Franco (P1)</div>
@@ -1774,12 +1766,12 @@
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-hairline); padding-top: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
             <div>
-              <span style="font-size: 12px; color: var(--color-muted); display: block;">Tu plaza:</span>
-              <strong style="color: var(--color-ink);">$15.000</strong>
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">Tu plaza:</span>
+              <strong style="color: var(--text-primary); font-family: var(--font-mono); font-size: 16px;">$15.000</strong>
             </div>
-            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20sumarme%20al%20partido%20abierto%20de%206ta%20de%20Hoy%20a%20las%2020:30%20hs." target="_blank" rel="noopener" class="btn btn-whatsapp" style="height: 36px;">
+            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20sumarme%20al%20partido%20abierto%20de%206ta%20de%20Hoy%20a%20las%2020:30%20hs." target="_blank" rel="noopener" class="btn btn-whatsapp" style="height: 36px; padding: 6px 14px;">
               Sumarme al partido →
             </a>
           </div>
@@ -1789,12 +1781,12 @@
         <div class="open-card">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span class="badge-pill badge-success">7ma / Inicial · Nivel 1.5 - 2.5</span>
-              <span style="font-family: var(--font-family-3); font-size: 13px; font-weight: 600;">Mañana · 19:00 hs</span>
+              <span class="badge-linear badge-emerald">7ma / Inicial · Nivel 1.5 - 2.5</span>
+              <span style="font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text-primary);">Mañana · 19:00 hs</span>
             </div>
 
-            <h3 style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin: 12px 0 4px;">Cancha 2</h3>
-            <p style="font-size: 14px; color: var(--color-body);">Organiza: Nico B. · Partido distendido con tercer tiempo en la cantina.</p>
+            <h3 style="font-size: 17px; font-weight: 600; color: var(--text-primary); margin: 12px 0 4px;">Cancha 2</h3>
+            <p style="font-size: 14px; color: var(--text-secondary);">Organiza: Nico B. · Partido distendido con tercer tiempo en la cantina.</p>
 
             <div class="player-slots-layout">
               <div class="player-slot-item taken">Nico (P1)</div>
@@ -1804,12 +1796,12 @@
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-hairline); padding-top: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
             <div>
-              <span style="font-size: 12px; color: var(--color-muted); display: block;">Tu plaza:</span>
-              <strong style="color: var(--color-ink);">$15.000</strong>
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">Tu plaza:</span>
+              <strong style="color: var(--text-primary); font-family: var(--font-mono); font-size: 16px;">$15.000</strong>
             </div>
-            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Me%20quiero%20anotar%20en%20el%20partido%20abierto%20de%207ma%20de%20Ma%C3%B1ana%20a%20las%2019:00%20hs." target="_blank" rel="noopener" class="btn btn-whatsapp" style="height: 36px;">
+            <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Me%20quiero%20anotar%20en%20el%20partido%20abierto%20de%207ma%20de%20Ma%C3%B1ana%20a%20las%2019:00%20hs." target="_blank" rel="noopener" class="btn btn-whatsapp" style="height: 36px; padding: 6px 14px;">
               Sumarme al partido →
             </a>
           </div>
@@ -1821,64 +1813,62 @@
   </section>
 
   <!-- ==========================================================================
-       RATING PLAYTOMIC / NIVELES
+       RATING PLAYTOMIC (LINEAR INTERACTIVE SLIDER)
        ========================================================================== -->
   <section id="rating" class="section-rating">
     <div class="container">
       <div class="rating-grid-layout">
         
         <div>
-          <span class="badge-pill badge-success" style="margin-bottom: 8px;">Sistema de Niveles</span>
+          <span class="badge-linear badge-emerald" style="margin-bottom: 8px;">Nivelación Exacta</span>
           <h2 class="section-title">Calculá tu nivel<br>de juego</h2>
-          <p class="section-desc" style="margin-top: 12px; margin-bottom: 24px;">
-            Mapeamos la escala global de Playtomic (1.0 a 7.0) con las categorías del pádel argentino (7ma a 1ra) para que siempre juegues con rivales de tu nivel.
+          <p class="section-desc" style="margin-top: 10px; margin-bottom: 24px;">
+            Mapeamos la escala global de Playtomic (1.0 a 7.0) con las categorías del pádel argentino (7ma a 1ra) para que siempre compitas de igual a igual.
           </p>
 
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <strong style="color: var(--color-ink); display: block; font-size: 15px;">7ma Categoría · Iniciación</strong>
-                <span style="font-size: 13px; color: var(--color-body);">Golpes de fondo, aprendiendo rebote en paredes.</span>
-              </div>
-              <span class="badge-pill badge-success">1.5 - 2.5</span>
+          <div class="rating-category-card">
+            <div>
+              <strong style="color: var(--text-primary); display: block; font-size: 15px;">7ma Categoría · Iniciación</strong>
+              <span style="font-size: 13px; color: var(--text-secondary);">Golpes de fondo, aprendiendo rebote en paredes.</span>
             </div>
+            <span class="badge-linear badge-emerald">1.5 - 2.5</span>
+          </div>
 
-            <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <strong style="color: var(--color-ink); display: block; font-size: 15px;">6ta Categoría · Intermedio</strong>
-                <span style="font-size: 13px; color: var(--color-body);">Voleas consistentes, salida de pared y bandeja.</span>
-              </div>
-              <span class="badge-pill badge-warning">3.0 - 3.8</span>
+          <div class="rating-category-card">
+            <div>
+              <strong style="color: var(--text-primary); display: block; font-size: 15px;">6ta Categoría · Intermedio</strong>
+              <span style="font-size: 13px; color: var(--text-secondary);">Voleas consistentes, salida de pared y bandeja.</span>
             </div>
+            <span class="badge-linear badge-amber">3.0 - 3.8</span>
+          </div>
 
-            <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <strong style="color: var(--color-ink); display: block; font-size: 15px;">5ta / Libre · Avanzado</strong>
-                <span style="font-size: 13px; color: var(--color-body);">Juego táctico veloz, smash definitorio por 3.</span>
-              </div>
-              <span class="badge-pill" style="background: #eef2ff; color: #476cff; border: 1px solid #c7d2fe;">4.0 - 5.5+</span>
+          <div class="rating-category-card">
+            <div>
+              <strong style="color: var(--text-primary); display: block; font-size: 15px;">5ta / Libre · Avanzado</strong>
+              <span style="font-size: 13px; color: var(--text-secondary);">Juego táctico veloz, smash definitorio por 3.</span>
             </div>
+            <span class="badge-linear badge-indigo">4.0 - 5.5+</span>
           </div>
         </div>
 
         <!-- Rating Box -->
         <div class="rating-box">
-          <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted);">Rating Playtomic Estimado</span>
+          <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.06em;">Rating Playtomic Estimado</span>
           <div class="rating-display-val" id="calculated-rating">3.4</div>
-          <div style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin-bottom: 16px;" id="calculated-category-label">
+          <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px;" id="calculated-category-label">
             6TA CATEGORÍA (Intermedio)
           </div>
 
           <div style="margin-bottom: 20px;">
-            <label style="font-size: 13px; color: var(--color-body); display: block; margin-bottom: 8px;">Ajustá tu experiencia:</label>
-            <input type="range" id="rating-slider" min="15" max="55" value="34" style="width: 100%; accent-color: var(--color-primary); cursor: pointer;">
+            <label style="font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 8px;">Ajustá tu nivel en pista:</label>
+            <input type="range" id="rating-slider" min="15" max="55" value="34">
           </div>
 
-          <p id="rating-description" style="font-size: 14px; color: var(--color-body); margin-bottom: 20px; line-height: 1.5;">
-            Tu nivel te permite competir en los torneos de 6ta de Muzzaga o jugar desafíos abiertos nocturnos.
+          <p id="rating-description" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 22px; line-height: 1.5;">
+            Tu nivel te permite competir en los torneos oficiales de 6ta de Muzzaga o jugar desafíos abiertos nocturnos.
           </p>
 
-          <a id="btn-rating-whatsapp" href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Tengo%20nivel%206ta%20y%20quiero%20sumarme%20al%20grupo%20de%20mi%20categor%C3%ADa." target="_blank" rel="noopener" class="btn btn-primary" style="width: 100%;">
+          <a id="btn-rating-whatsapp" href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Tengo%20nivel%206ta%20y%20quiero%20sumarme%20al%20grupo%20de%20mi%20categor%C3%ADa." target="_blank" rel="noopener" class="btn btn-linear-primary" style="width: 100%;">
             Unirme al grupo de mi nivel →
           </a>
         </div>
@@ -1888,82 +1878,80 @@
   </section>
 
   <!-- ==========================================================================
-       TORNEOS OFICIALES (WITH REAL EVENT PHOTOS)
+       TORNEOS OFICIALES (WITH REAL CLUB PHOTOS)
        ========================================================================== -->
-  <section id="torneos" class="section-features-two">
+  <section id="torneos" class="section-bento">
     <div class="container">
       
       <div class="section-header-row">
         <div>
-          <span class="badge-pill badge-success" style="margin-bottom: 8px;">Competencia Oficial</span>
+          <span class="badge-linear badge-indigo" style="margin-bottom: 8px;">Circuito Oficial</span>
           <h2 class="section-title">Torneos Oficiales 2026</h2>
           <p class="section-desc">Cuadros organizados, premiaciones de paletas de primera marca, hidratación y cena de cierre.</p>
         </div>
-        <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20inscribir%20mi%20pareja%20al%20pr%C3%B3ximo%20torneo." target="_blank" rel="noopener" class="btn btn-primary">
+        <a href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20inscribir%20mi%20pareja%20al%20pr%C3%B3ximo%20torneo." target="_blank" rel="noopener" class="btn btn-linear-primary">
           Inscribir mi pareja →
         </a>
       </div>
 
-      <!-- Bento Layout: Real Photo + Tournament Cards -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+      <!-- Bento Cards with Real Photos -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 20px;">
         
-        <!-- Real Photo Card: Torneo Atmosphere -->
-        <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; min-height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--color-hairline-strong); cursor: pointer;" onclick="openLightbox('img/court_spectators.jpg', 'Gradas y ambiente de torneo en Muzzaga Pádel')">
-          <img src="img/court_spectators.jpg" alt="Ambiente de torneo en Muzzaga Pádel" style="width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.92);">
-          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,15,15,0.85) 0%, rgba(15,15,15,0.2) 60%, transparent 100%);"></div>
-          <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; color: #fff;">
-            <span class="badge-pill" style="background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 8px;">Ambiente de Club</span>
-            <h3 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 4px;">Gradas colmadas y tercer tiempo</h3>
-            <p style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.4;">Viví los fines de semana de competencia con tribunas llenas y música en vivo.</p>
+        <div class="photo-bento-card" onclick="openLightbox('img/court_spectators.jpg', 'Gradas y ambiente de torneo en Muzzaga Pádel')">
+          <img src="img/court_spectators.jpg" alt="Ambiente de torneo en Muzzaga Pádel" class="photo-bento-img">
+          <div class="photo-bento-overlay"></div>
+          <div class="photo-bento-body">
+            <span class="badge-linear" style="background: rgba(255,255,255,0.15); color: #fff; margin-bottom: 8px;">Ambiente de Club</span>
+            <h3 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px;">Gradas colmadas y tercer tiempo</h3>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.4;">Viví los fines de semana de competencia con tribunas llenas y música en vivo.</p>
           </div>
         </div>
 
-        <!-- Real Photo Card: Live Match Night -->
-        <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; min-height: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--color-hairline-strong); cursor: pointer;" onclick="openLightbox('img/match_action_led.jpg', 'Final de torneo nocturno con iluminación LED')">
-          <img src="img/match_action_led.jpg" alt="Final de torneo nocturno en Muzzaga" style="width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.92);">
-          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,15,15,0.85) 0%, rgba(15,15,15,0.2) 60%, transparent 100%);"></div>
-          <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; color: #fff;">
-            <span class="badge-pill badge-warning" style="margin-bottom: 8px;">Finales Nocturnas</span>
-            <h3 style="font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 4px;">Partidos definitorios con LED 200W</h3>
-            <p style="font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.4;">Juego dinámico sin deslumbramiento en las dos canchas de cristal.</p>
+        <div class="photo-bento-card" onclick="openLightbox('img/match_action_led.jpg', 'Final de torneo nocturno con iluminación LED')">
+          <img src="img/match_action_led.jpg" alt="Final de torneo nocturno en Muzzaga" class="photo-bento-img">
+          <div class="photo-bento-overlay"></div>
+          <div class="photo-bento-body">
+            <span class="badge-linear badge-amber" style="margin-bottom: 8px;">Finales Nocturnas</span>
+            <h3 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px;">Partidos definitorios con LED 200W</h3>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.4;">Juego dinámico sin deslumbramiento en las dos canchas de cristal.</p>
           </div>
         </div>
 
       </div>
 
       <!-- Tournament Cards Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg);">
-        <div class="feature-card-expo">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-            <span class="badge-pill badge-success">Inscripciones Abiertas</span>
-            <span style="font-size: 13px; color: var(--color-muted);">Próximo fin de semana</span>
+            <span class="badge-linear badge-emerald">Inscripciones Abiertas</span>
+            <span style="font-size: 12px; color: var(--text-muted);">Próximo fin de semana</span>
           </div>
-          <h3 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 6px 0;">Torneo 6ta Caballeros</h3>
-          <p style="font-size: 14px; color: var(--color-body); margin-bottom: 14px;">Paletas oficiales de premio, indumentaria deportiva y cena de premiación.</p>
-          <div style="font-size: 13px; font-weight: 600; color: var(--color-ink); display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 6px 0;">Torneo 6ta Caballeros</h3>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 14px;">Paletas oficiales de premio, indumentaria deportiva y cena de premiación.</p>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; justify-content: space-between; align-items: center;">
             <span>Cupos: 12 de 16 confirmados</span>
-            <span style="color: var(--color-semantic-success);">¡Últimos 4 lugares!</span>
+            <span style="color: #34d399;">¡Últimos 4 lugares!</span>
           </div>
         </div>
 
-        <div class="feature-card-expo">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-            <span class="badge-pill badge-warning">Próximamente</span>
-            <span style="font-size: 13px; color: var(--color-muted);">Fin de mes</span>
+            <span class="badge-linear badge-amber">Próximamente</span>
+            <span style="font-size: 12px; color: var(--text-muted);">Fin de mes</span>
           </div>
-          <h3 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 6px 0;">Torneo 7ma Principiantes</h3>
-          <p style="font-size: 14px; color: var(--color-body); margin-bottom: 14px;">El torneo perfecto para ganar experiencia en un ambiente distendido y competitivo.</p>
-          <div style="font-size: 13px; font-weight: 600; color: var(--color-ink);">Inscripción anticipada abierta</div>
+          <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 6px 0;">Torneo 7ma Principiantes</h3>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 14px;">El torneo perfecto para ganar experiencia en un ambiente distendido y competitivo.</p>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Inscripción anticipada abierta</div>
         </div>
 
-        <div class="feature-card-expo">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-            <span class="badge-pill badge-success">Inscripciones Abiertas</span>
-            <span style="font-size: 13px; color: var(--color-muted);">Quincena</span>
+            <span class="badge-linear badge-emerald">Inscripciones Abiertas</span>
+            <span style="font-size: 12px; color: var(--text-muted);">Quincena</span>
           </div>
-          <h3 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 6px 0;">Torneo Damas A & B</h3>
-          <p style="font-size: 14px; color: var(--color-body); margin-bottom: 14px;">Cuadro doble eliminación, trofeos artesanales y catering para todas las parejas.</p>
-          <div style="font-size: 13px; font-weight: 600; color: var(--color-ink);">Cupos: 8 de 12 confirmados</div>
+          <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 6px 0;">Torneo Damas A & B</h3>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 14px;">Cuadro doble eliminación, trofeos artesanales y catering para todas las parejas.</p>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Cupos: 8 de 12 confirmados</div>
         </div>
       </div>
 
@@ -1973,72 +1961,72 @@
   <!-- ==========================================================================
        CANTINA & TERCER TIEMPO (WITH REAL CLUB PHOTOS)
        ========================================================================== -->
-  <section id="cantina" class="section-features-two" style="background: var(--color-canvas-soft); border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline);">
+  <section id="cantina" class="section-bento" style="background: var(--bg-surface);">
     <div class="container">
       
       <div class="section-header-row">
         <div>
-          <span class="badge-pill badge-warning" style="margin-bottom: 8px;">Gastronomía & Lounge</span>
+          <span class="badge-linear badge-amber" style="margin-bottom: 8px;">Gastronomía & Lounge</span>
           <h2 class="section-title">Cantina Propia & 3er Tiempo</h2>
           <p class="section-desc">Pizzas caseras a la piedra, sándwiches abundantes y cervezas heladas con vista directa a la pista.</p>
         </div>
       </div>
 
-      <!-- Real Cantina Photos Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+      <!-- Real Cantina Photos Bento -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px;">
         
-        <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; height: 260px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--color-hairline-strong); cursor: pointer;" onclick="openLightbox('img/cantina_beer_court.jpg', 'Barra y canillas de cerveza artesanal con vista a la cancha')">
-          <img src="img/cantina_beer_court.jpg" alt="Cantina de Muzzaga con cerveza tirada" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,15,15,0.8) 0%, transparent 60%);"></div>
-          <div style="position: absolute; bottom: 18px; left: 18px; right: 18px; color: #fff;">
-            <strong style="display: block; font-size: 16px; margin-bottom: 2px;">Cerveza Tirada y Vista a Canchas</strong>
+        <div class="photo-bento-card" onclick="openLightbox('img/cantina_beer_court.jpg', 'Barra y canillas de cerveza artesanal con vista a la cancha')">
+          <img src="img/cantina_beer_court.jpg" alt="Cantina de Muzzaga con cerveza tirada" class="photo-bento-img">
+          <div class="photo-bento-overlay"></div>
+          <div class="photo-bento-body">
+            <strong style="display: block; font-size: 17px; margin-bottom: 4px;">Cerveza Tirada y Vista a Canchas</strong>
             <span style="font-size: 13px; color: rgba(255,255,255,0.85);">Terminá de jugar y pedite una pinta helada mirando el siguiente partido.</span>
           </div>
         </div>
 
-        <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; height: 260px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid var(--color-hairline-strong); cursor: pointer;" onclick="openLightbox('img/bar_coffee_snacks.jpg', 'Sector cafetería y snacks para deportistas')">
-          <img src="img/bar_coffee_snacks.jpg" alt="Cafetería y barra de snacks en Muzzaga" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,15,15,0.8) 0%, transparent 60%);"></div>
-          <div style="position: absolute; bottom: 18px; left: 18px; right: 18px; color: #fff;">
-            <strong style="display: block; font-size: 16px; margin-bottom: 2px;">Cafetería & Hidratación</strong>
-            <span style="font-size: 13px; color: rgba(255,255,255,0.85);">Café de especialidad, aguas isotónicas y barritas energéticas.</span>
+        <div class="photo-bento-card" onclick="openLightbox('img/bar_coffee_snacks.jpg', 'Sector cafetería y snacks para deportistas')">
+          <img src="img/bar_coffee_snacks.jpg" alt="Cafetería y barra de snacks en Muzzaga" class="photo-bento-img">
+          <div class="photo-bento-overlay"></div>
+          <div class="photo-bento-body">
+            <strong style="display: block; font-size: 17px; margin-bottom: 4px;">Cafetería & Hidratación</strong>
+            <span style="font-size: 13px; color: rgba(255,255,255,0.85);">Café de especialidad, bebidas isotónicas y barritas energéticas.</span>
           </div>
         </div>
 
       </div>
 
       <!-- Menu Items -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--spacing-md);">
-        <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+        <div class="menu-item-card">
           <div>
-            <strong style="color: var(--color-ink); font-size: 15px; display: block;">Pizza Muzzarella</strong>
-            <span style="font-size: 13px; color: var(--color-body);">A la piedra casera</span>
+            <strong style="color: var(--text-primary); font-size: 15px; display: block;">Pizza Muzzarella</strong>
+            <span style="font-size: 13px; color: var(--text-secondary);">A la piedra casera</span>
           </div>
-          <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$18.000</span>
+          <span style="font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); font-size: 16px;">$18.000</span>
         </div>
 
-        <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="menu-item-card">
           <div>
-            <strong style="color: var(--color-ink); font-size: 15px; display: block;">Pizza Napolitana</strong>
-            <span style="font-size: 13px; color: var(--color-body);">Tomate natural, ajo y oliva</span>
+            <strong style="color: var(--text-primary); font-size: 15px; display: block;">Pizza Napolitana</strong>
+            <span style="font-size: 13px; color: var(--text-secondary);">Tomate natural, ajo y oliva</span>
           </div>
-          <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$20.000</span>
+          <span style="font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); font-size: 16px;">$20.000</span>
         </div>
 
-        <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="menu-item-card">
           <div>
-            <strong style="color: var(--color-ink); font-size: 15px; display: block;">Sándwich de Mila</strong>
-            <span style="font-size: 13px; color: var(--color-body);">Completo abundante</span>
+            <strong style="color: var(--text-primary); font-size: 15px; display: block;">Sándwich de Mila</strong>
+            <span style="font-size: 13px; color: var(--text-secondary);">Completo abundante</span>
           </div>
-          <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$22.000</span>
+          <span style="font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); font-size: 16px;">$22.000</span>
         </div>
 
-        <div style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-md); padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="menu-item-card">
           <div>
-            <strong style="color: var(--color-ink); font-size: 15px; display: block;">Heineken 975 ml</strong>
-            <span style="font-size: 13px; color: var(--color-body);">Botella bien fría</span>
+            <strong style="color: var(--text-primary); font-size: 15px; display: block;">Heineken 975 ml</strong>
+            <span style="font-size: 13px; color: var(--text-secondary);">Botella bien fría</span>
           </div>
-          <span style="font-family: var(--font-family-3); font-weight: 600; color: var(--color-ink); font-size: 16px;">$9.000</span>
+          <span style="font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); font-size: 16px;">$9.000</span>
         </div>
       </div>
 
@@ -2053,9 +2041,9 @@
       
       <div class="section-header-row">
         <div>
-          <span class="badge-pill badge-success" style="margin-bottom: 8px;">Catriel, Río Negro</span>
+          <span class="badge-linear badge-emerald" style="margin-bottom: 8px;">Catriel, Río Negro</span>
           <h2 class="section-title">Cómo Llegar al Club</h2>
-          <p class="section-desc">Muzzaga Pádel está ubicado en Catriel, Río Negro. Estacionamiento privado iluminado y acceso asfaltado.</p>
+          <p class="section-desc">Muzzaga Pádel está ubicado en Catriel, Río Negro. Estacionamiento privado iluminado y acceso directo.</p>
         </div>
         <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-secondary">
           📍 Abrir en Google Maps →
@@ -2063,7 +2051,7 @@
       </div>
 
       <!-- Google Maps Embed -->
-      <div style="border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--color-hairline-strong); height: 380px; position: relative; margin-bottom: var(--spacing-lg); box-shadow: 0 8px 30px rgba(0,0,0,0.04);">
+      <div class="map-frame-wrap">
         <iframe
           title="Mapa de Muzzaga Pádel en Catriel"
           src="https://maps.google.com/maps?q=-37.8832905,-67.8005469&hl=es&z=16&output=embed"
@@ -2075,41 +2063,32 @@
           referrerpolicy="no-referrer-when-downgrade">
         </iframe>
         <div style="position: absolute; bottom: 16px; left: 16px; right: 16px; display: flex; flex-wrap: wrap; gap: 10px; pointer-events: none;">
-          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-primary" style="pointer-events: auto; height: 36px;">
-            📍 Google Maps
+          <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" class="btn btn-linear-primary" style="pointer-events: auto; height: 38px;">
+            📍 Abrir en Google Maps
           </a>
-          <a href="https://waze.com/ul?ll=-37.8832905,-67.8005469&navigate=yes" target="_blank" rel="noopener" class="btn btn-secondary" style="pointer-events: auto; height: 36px; background: rgba(255,255,255,0.9);">
+          <a href="https://waze.com/ul?ll=-37.8832905,-67.8005469&navigate=yes" target="_blank" rel="noopener" class="btn btn-secondary" style="pointer-events: auto; height: 38px;">
             🚗 Navegar con Waze
           </a>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-base);">
-        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-lg); padding: var(--spacing-lg); display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);">
           <div>
-            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--color-muted);">Ubicación Oficial</span>
-            <div style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin-top: 4px;">Muzzaga Pádel</div>
-            <span style="font-size: 13px; color: var(--color-body);">Catriel, Río Negro</span>
+            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-muted);">Ubicación Oficial</span>
+            <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-top: 4px;">Muzzaga Pádel</div>
+            <span style="font-size: 13px; color: var(--text-secondary);">Catriel, Río Negro</span>
           </div>
-          <span style="font-size: 18px; color: var(--color-body);">↗</span>
+          <span style="font-size: 18px; color: var(--text-secondary);">↗</span>
         </a>
 
-        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-lg); padding: var(--spacing-lg); display: flex; justify-content: space-between; align-items: center;">
+        <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);">
           <div>
-            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--color-semantic-success);">WhatsApp</span>
-            <div style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin-top: 4px;">+54 9 299 597-4176</div>
-            <span style="font-size: 13px; color: var(--color-body);">Atención directa</span>
+            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-muted);">Atención Directa</span>
+            <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-top: 4px;">WhatsApp del Club</div>
+            <span style="font-size: 13px; color: #34d399;">+54 9 299 597-4176</span>
           </div>
-          <span style="font-size: 18px; color: var(--color-semantic-success);">→</span>
-        </a>
-
-        <a href="https://instagram.com/muzzagapadel" target="_blank" rel="noopener" style="background: var(--color-surface-card); border: 1px solid var(--color-hairline-strong); border-radius: var(--radius-lg); padding: var(--spacing-lg); display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--color-muted);">Instagram</span>
-            <div style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin-top: 4px;">@muzzagapadel</div>
-            <span style="font-size: 13px; color: var(--color-body);">Fotos, novedades y torneos</span>
-          </div>
-          <span style="font-size: 18px; color: var(--color-body);">↗</span>
+          <span style="font-size: 18px; color: var(--text-secondary);">↗</span>
         </a>
       </div>
 
@@ -2117,45 +2096,45 @@
   </section>
 
   <!-- ==========================================================================
-       CHECKOUT MODAL
+       CHECKOUT MODAL (BOTTOM SHEET ON MOBILE, FOCUSED ON DESKTOP)
        ========================================================================== -->
   <div class="modal-overlay" id="booking-modal-overlay">
     <div class="modal-card">
       <div class="modal-sheet-handle"></div>
       <button type="button" class="modal-close" onclick="closeBookingModal()" aria-label="Cerrar modal">✕</button>
       
-      <span class="badge-pill badge-success" style="margin-bottom: 8px;">Confirmar Turno</span>
-      <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin-top: 4px;">Reserva en Muzzaga</h2>
+      <span class="badge-linear badge-emerald" style="margin-bottom: 8px;">Confirmar Turno</span>
+      <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">Reserva en Muzzaga</h2>
 
-      <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 16px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center;">
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin: 16px 0; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <span id="modal-slot-court" style="font-size: 14px; font-weight: 600; color: var(--color-ink); display: block;">Cancha 1 (Cristal)</span>
-          <span id="modal-slot-time" style="font-family: var(--font-family-3); font-size: 16px; font-weight: 600; color: var(--color-ink);">20:00 - 21:30 hs</span>
-          <span id="modal-slot-date" style="font-size: 13px; color: var(--color-body); display: block;">Hoy, 10 de Septiembre</span>
+          <span id="modal-slot-court" style="font-size: 14px; font-weight: 600; color: var(--text-primary); display: block;">Cancha 1 (Cristal)</span>
+          <span id="modal-slot-time" style="font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text-primary);">20:00 - 21:30 hs</span>
+          <span id="modal-slot-date" style="font-size: 13px; color: var(--text-secondary); display: block;">Hoy, 10 de Septiembre</span>
         </div>
         <div style="text-align: right;">
-          <span style="font-size: 12px; color: var(--color-muted); display: block;">Total:</span>
-          <span style="font-family: var(--font-family-3); font-size: 18px; font-weight: 600; color: var(--color-ink);">$60.000</span>
-          <span style="font-size: 12px; color: var(--color-semantic-success); display: block;">$15.000 / jug</span>
+          <span style="font-size: 11px; color: var(--text-muted); display: block;">Total:</span>
+          <span style="font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text-primary);">$60.000</span>
+          <span style="font-size: 12px; color: #34d399; display: block;">$15.000 / jug</span>
         </div>
       </div>
 
-      <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted); display: block;">Modalidad:</label>
+      <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); display: block; letter-spacing: 0.04em;">Modalidad de Partido:</label>
       <div class="type-switcher">
         <button type="button" class="type-btn active" id="btn-mode-private" onclick="setBookingMode('private')">
-          <strong style="color: var(--color-ink); display: block; font-size: 14px;">🔒 Privado</strong>
-          <span style="font-size: 12px; color: var(--color-body);">4 jugadores listos</span>
+          <strong style="color: var(--text-primary); display: block; font-size: 14px;">🔒 Privado</strong>
+          <span style="font-size: 12px; color: var(--text-secondary);">4 jugadores listos</span>
         </button>
         <button type="button" class="type-btn" id="btn-mode-open" onclick="setBookingMode('open')">
-          <strong style="color: var(--color-ink); display: block; font-size: 14px;">👥 Abierto</strong>
-          <span style="font-size: 12px; color: var(--color-body);">Falta 1 o 2 jugadores</span>
+          <strong style="color: var(--text-primary); display: block; font-size: 14px;">👥 Abierto</strong>
+          <span style="font-size: 12px; color: var(--text-secondary);">Falta 1 o 2 jugadores</span>
         </button>
       </div>
 
       <div style="margin: 16px 0; display: flex; flex-direction: column; gap: 10px;">
-        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: var(--color-canvas-soft); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--color-hairline);">
-          <span style="color: var(--color-body-strong);">🎾 ¿Alquiler de paletas?</span>
-          <select id="modal-paddles" style="background: var(--color-surface-card); color: var(--color-ink); border: 1px solid var(--color-hairline-strong); border-radius: 4px; padding: 4px 8px; font-size: 12px;">
+        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: rgba(255, 255, 255, 0.04); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <span style="color: var(--text-primary);">🎾 ¿Alquiler de paletas?</span>
+          <select id="modal-paddles" style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 4px; padding: 4px 8px; font-size: 12px;">
             <option value="No, paletas propias" selected>No, tenemos propias</option>
             <option value="Sí, 1 paleta">Sí, 1 paleta</option>
             <option value="Sí, 2 paletas">Sí, 2 paletas</option>
@@ -2163,23 +2142,32 @@
           </select>
         </label>
 
-        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: var(--color-canvas-soft); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--color-hairline);">
-          <span style="color: var(--color-body-strong);">🍕 Reservar pizza para después</span>
-          <input type="checkbox" id="modal-cantina-preorder" style="accent-color: var(--color-primary); width: 16px; height: 16px;">
+        <label style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; background: rgba(255, 255, 255, 0.04); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <span style="color: var(--text-primary);">🍕 Reservar pizza para después</span>
+          <input type="checkbox" id="modal-cantina-preorder" style="accent-color: var(--accent-linear); width: 16px; height: 16px;">
         </label>
       </div>
 
-      <a id="btn-modal-confirm" href="#" target="_blank" rel="noopener" class="btn btn-primary" style="width: 100%; height: 44px;">
+      <a id="btn-modal-confirm" href="#" target="_blank" rel="noopener" class="btn btn-linear-primary" style="width: 100%; height: 46px;">
         Confirmar por WhatsApp →
       </a>
-      <p style="font-size: 12px; color: var(--color-muted); text-align: center; margin-top: 10px;">
+      <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
         Confirmación directa con el club por WhatsApp.
       </p>
     </div>
   </div>
 
+  <!-- Real Photo Lightbox Modal -->
+  <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()">
+    <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <img id="lightbox-img" src="" alt="Foto Muzzaga Pádel" class="lightbox-img">
+      <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
   <!-- ==========================================================================
-       FOOTER LIGHT (EXPO ROLE)
+       FOOTER
        ========================================================================== -->
   <footer class="app-footer">
     <div class="container">
@@ -2187,30 +2175,30 @@
         <div>
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
             <div class="brand-mark" style="width: 24px; height: 24px; font-size: 12px;">M</div>
-            <strong style="font-size: 16px; color: var(--color-ink);">Muzzaga Pádel</strong>
+            <strong style="font-size: 16px; color: var(--text-primary);">Muzzaga Pádel</strong>
           </div>
-          <p style="font-size: 14px; color: var(--color-body); max-width: 340px;">
-            Club de pádel en Catriel, Río Negro. Canchas de cristal profesionales, torneos y cantina.
+          <p style="font-size: 14px; color: var(--text-secondary); max-width: 340px;">
+            Club de pádel en Catriel, Río Negro. Canchas de cristal profesionales, torneos y cantina propia.
           </p>
         </div>
 
-        <div style="display: flex; gap: var(--spacing-xxl); flex-wrap: wrap;">
+        <div style="display: flex; gap: 48px; flex-wrap: wrap;">
           <div>
-            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted); margin-bottom: 12px;">Navegación</div>
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 0.04em;">Navegación</div>
             <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
-              <a href="#turnos" style="color: var(--color-body);">Turnos en Vivo</a>
-              <a href="#canchas-abiertas" style="color: var(--color-body);">Canchas Abiertas</a>
-              <a href="#rating" style="color: var(--color-body);">Rating Playtomic</a>
-              <a href="#torneos" style="color: var(--color-body);">Torneos 2026</a>
+              <a href="#turnos" style="color: var(--text-secondary);">Turnos en Vivo</a>
+              <a href="#canchas-abiertas" style="color: var(--text-secondary);">Canchas Abiertas</a>
+              <a href="#rating" style="color: var(--text-secondary);">Rating Playtomic</a>
+              <a href="#torneos" style="color: var(--text-secondary);">Torneos 2026</a>
             </div>
           </div>
 
           <div>
-            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--color-muted); margin-bottom: 12px;">Contacto</div>
+            <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 0.04em;">Contacto</div>
             <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
-              <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="color: var(--color-body);">WhatsApp: +54 9 299 597-4176</a>
-              <a href="https://instagram.com/muzzagapadel" target="_blank" rel="noopener" style="color: var(--color-body);">Instagram: @muzzagapadel</a>
-              <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="color: var(--color-text-link);">Google Maps Oficial</a>
+              <a href="https://wa.me/5492995974176" target="_blank" rel="noopener" style="color: var(--text-secondary);">WhatsApp: +54 9 299 597-4176</a>
+              <a href="https://instagram.com/muzzagapadel" target="_blank" rel="noopener" style="color: var(--text-secondary);">Instagram: @muzzagapadel</a>
+              <a href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7" target="_blank" rel="noopener" style="color: var(--accent-sky);">Google Maps Oficial</a>
             </div>
           </div>
         </div>
@@ -2267,10 +2255,10 @@
     </div>
 
     <div class="bottom-bar-item" onclick="window.open('https://wa.me/5492995974176', '_blank')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2">
         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
       </svg>
-      <span style="color: #16a34a;">WhatsApp</span>
+      <span style="color: #10b981;">WhatsApp</span>
     </div>
   </nav>
 
@@ -2295,133 +2283,129 @@
       d.setDate(today.getDate() + i);
       dateList.push({
         dayName: i === 0 ? 'Hoy' : daysOfWeek[d.getDay()],
-        dayNum: d.getDate(),
-        month: months[d.getMonth()],
+        dayNumber: d.getDate(),
+        monthName: months[d.getMonth()],
         fullString: `${daysOfWeek[d.getDay()]} ${d.getDate()} de ${months[d.getMonth()]}`
       });
     }
 
-    const timeSlotsModel = [
-      { id: 1, time: '14:00 - 15:30', court: 'Cancha 1', type: 'Cristal', shift: 'tarde', status: 'available', price: 60000 },
-      { id: 2, time: '15:30 - 17:00', court: 'Cancha 2', type: 'Estándar', shift: 'tarde', status: 'available', price: 60000 },
-      { id: 3, time: '17:00 - 18:30', court: 'Cancha 1', type: 'Cristal', shift: 'tarde', status: 'taken', price: 60000 },
-      { id: 4, time: '18:30 - 20:00', court: 'Cancha 2', type: 'Estándar', shift: 'tarde', status: 'open', openSlots: '3/4', price: 60000 },
-      { id: 5, time: '20:00 - 21:30', court: 'Cancha 1', type: 'Cristal', shift: 'noche', status: 'available', price: 60000 },
-      { id: 6, time: '20:30 - 22:00', court: 'Cancha 2', type: 'Estándar', shift: 'noche', status: 'open', openSlots: '2/4', price: 60000 },
-      { id: 7, time: '21:30 - 23:00', court: 'Cancha 1', type: 'Cristal', shift: 'noche', status: 'available', price: 60000 },
-      { id: 8, time: '22:00 - 23:30', court: 'Cancha 2', type: 'Estándar', shift: 'noche', status: 'available', price: 60000 },
-      { id: 9, time: '23:00 - 00:30', court: 'Cancha 1', type: 'Cristal', shift: 'noche', status: 'available', price: 60000 }
-    ];
+    const mockSlotsByDay = {
+      0: [
+        { time: '14:30 - 16:00', court: 'Cancha 1', type: 'Cristal', booked: true, open: false, period: 'tarde' },
+        { time: '16:00 - 17:30', court: 'Cancha 2', type: 'Estándar', booked: false, open: false, period: 'tarde' },
+        { time: '17:30 - 19:00', court: 'Cancha 1', type: 'Cristal', booked: true, open: false, period: 'tarde' },
+        { time: '18:00 - 19:30', court: 'Cancha 2', type: 'Estándar', booked: false, open: false, period: 'tarde' },
+        { time: '19:30 - 21:00', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' },
+        { time: '20:30 - 22:00', court: 'Cancha 2', type: 'Estándar', booked: false, open: true, players: 3, period: 'noche' },
+        { time: '21:00 - 22:30', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' },
+        { time: '22:30 - 00:00', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' }
+      ],
+      1: [
+        { time: '15:00 - 16:30', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'tarde' },
+        { time: '16:30 - 18:00', court: 'Cancha 2', type: 'Estándar', booked: false, open: false, period: 'tarde' },
+        { time: '18:00 - 19:30', court: 'Cancha 1', type: 'Cristal', booked: true, open: false, period: 'tarde' },
+        { time: '19:00 - 20:30', court: 'Cancha 2', type: 'Estándar', booked: false, open: true, players: 2, period: 'noche' },
+        { time: '20:00 - 21:30', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' },
+        { time: '21:30 - 23:00', court: 'Cancha 1', type: 'Cristal', booked: false, open: false, period: 'noche' }
+      ]
+    };
 
     function renderDateStrip() {
       const container = document.getElementById('date-strip');
-      if (!container) return;
-
-      container.innerHTML = dateList.map((item, idx) => `
-        <div class="date-card ${idx === activeDateIndex ? 'active' : ''}" onclick="selectDate(${idx})">
+      container.innerHTML = '';
+      dateList.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = `date-card ${index === activeDateIndex ? 'active' : ''}`;
+        card.innerHTML = `
           <div class="date-card-day">${item.dayName}</div>
-          <div class="date-card-num">${item.dayNum}</div>
-          <div class="date-card-month">${item.month}</div>
-        </div>
-      `).join('');
-    }
-
-    function selectDate(idx) {
-      activeDateIndex = idx;
-      renderDateStrip();
-      renderSlotsGrid();
+          <div class="date-card-num">${item.dayNumber}</div>
+          <div class="date-card-month">${item.monthName}</div>
+        `;
+        card.onclick = () => {
+          activeDateIndex = index;
+          renderDateStrip();
+          renderSlotsGrid();
+        };
+        container.appendChild(card);
+      });
     }
 
     function renderSlotsGrid() {
       const container = document.getElementById('slots-container');
-      if (!container) return;
-
-      const filtered = timeSlotsModel.filter(slot => {
-        const matchesCourt = selectedCourtFilter === 'all' || slot.court.includes(selectedCourtFilter);
-        const matchesTime = selectedTimeFilter === 'all' || slot.shift === selectedTimeFilter;
-        return matchesCourt && matchesTime;
+      container.innerHTML = '';
+      
+      const slots = mockSlotsByDay[activeDateIndex] || mockSlotsByDay[0];
+      const filtered = slots.filter(slot => {
+        if (selectedCourtFilter !== 'all' && slot.court !== selectedCourtFilter) return false;
+        if (selectedTimeFilter !== 'all' && slot.period !== selectedTimeFilter) return false;
+        return true;
       });
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 32px; color: var(--color-body); background: var(--color-canvas-soft); border-radius: var(--radius-md); border: 1px solid var(--color-hairline);">
-            No hay turnos disponibles con los filtros seleccionados.
+          <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
+            No hay turnos disponibles con los filtros seleccionados. Probá otra franja u otra cancha.
           </div>
         `;
         return;
       }
 
-      container.innerHTML = filtered.map(slot => {
-        const isTaken = slot.status === 'taken';
-        const isOpen = slot.status === 'open';
-
-        let badge = `<span class="badge-pill badge-success">Disponible</span>`;
-        let cardClass = 'slot-card';
-
-        if (isTaken) {
-          badge = `<span class="badge-pill" style="background: var(--color-hairline); color: var(--color-muted);">Ocupado</span>`;
-          cardClass += ' disabled';
-        } else if (isOpen) {
-          badge = `<span class="badge-pill badge-warning">Cancha Abierta (${slot.openSlots})</span>`;
-          cardClass += ' open-match';
+      filtered.forEach(slot => {
+        const card = document.createElement('div');
+        card.className = `slot-card ${slot.booked ? 'booked' : ''}`;
+        
+        let badgeHtml = '';
+        if (slot.booked) {
+          badgeHtml = `<span class="badge-linear" style="color: var(--text-muted);">Ocupado</span>`;
+        } else if (slot.open) {
+          badgeHtml = `<span class="badge-linear badge-amber">Cancha Abierta (${slot.players}/4)</span>`;
+        } else {
+          badgeHtml = `<span class="badge-linear badge-emerald"><span class="pulse-dot"></span> Disponible</span>`;
         }
 
-        return `
-          <div class="${cardClass}" onclick="${isTaken ? '' : `openBookingModal(${slot.id})`}">
-            <div>
-              <div class="slot-header">
-                <div>
-                  <div class="slot-time">${slot.time}</div>
-                  <div class="slot-duration">90 min · Iluminación LED</div>
-                </div>
-                ${badge}
-              </div>
-
-              <div class="slot-court">
-                ${slot.court} (${slot.type})
-              </div>
-
-              ${isOpen ? `
-                <div class="open-avatars-row">
-                  <div class="avatar-circle">P1</div>
-                  <div class="avatar-circle">P2</div>
-                  <div class="avatar-circle">P3</div>
-                  <div class="avatar-circle empty">+1</div>
-                  <span style="font-size: 11px; color: var(--color-accent-warning); font-weight: 600; align-self: center; margin-left: 4px;">Falta 1</span>
-                </div>
-              ` : ''}
+        card.innerHTML = `
+          <div>
+            <div class="slot-header">
+              <span class="slot-time">${slot.time.split(' - ')[0]} hs</span>
+              ${badgeHtml}
             </div>
-
-            <div class="slot-price-row">
-              <span style="font-size: 13px; color: var(--color-semantic-success); font-weight: 600;">$15.000 / jug</span>
-              <span class="slot-price-total">$60.000</span>
+            <div class="slot-meta">
+              <strong>${slot.court}</strong> · ${slot.type}<br>
+              Duración: 90 minutos con luz LED
             </div>
           </div>
+          <div class="slot-footer">
+            <div>
+              <span class="slot-price">$15.000</span>
+              <span class="slot-price-sub">por jugador</span>
+            </div>
+            ${slot.booked ? '<span style="font-size: 13px; color: var(--text-muted);">No disp.</span>' : `
+              <button type="button" class="btn btn-linear-primary" style="height: 34px; padding: 0 14px; font-size: 13px;" onclick="openBookingModal('${slot.court}', '${slot.type}', '${slot.time}')">
+                Reservar →
+              </button>
+            `}
+          </div>
         `;
-      }).join('');
+        container.appendChild(card);
+      });
     }
 
-    function openBookingModal(slotId) {
-      currentSlotData = timeSlotsModel.find(s => s.id === slotId);
-      if (!currentSlotData) return;
-
+    function openBookingModal(court, type, time) {
+      currentSlotData = { court, type, time };
       const dateObj = dateList[activeDateIndex];
-      document.getElementById('modal-slot-court').textContent = `${currentSlotData.court} · ${currentSlotData.type}`;
-      document.getElementById('modal-slot-time').textContent = currentSlotData.time;
-      document.getElementById('modal-slot-date').textContent = `${dateObj.dayName}, ${dateObj.dayNum} de ${dateObj.month}`;
-
-      if (currentSlotData.status === 'open') {
-        setBookingMode('open');
-      } else {
-        setBookingMode('private');
-      }
-
+      
+      document.getElementById('modal-slot-court').textContent = `${court} (${type})`;
+      document.getElementById('modal-slot-time').textContent = `${time} hs`;
+      document.getElementById('modal-slot-date').textContent = dateObj.fullString;
+      
       updateModalConfirmLink();
       document.getElementById('booking-modal-overlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
 
     function closeBookingModal() {
       document.getElementById('booking-modal-overlay').classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     function setBookingMode(mode) {
@@ -2518,7 +2502,10 @@
     }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeBookingModal();
+      }
     });
 
     document.getElementById('modal-paddles').addEventListener('change', updateModalConfirmLink);
@@ -2536,15 +2523,5 @@
       renderSlotsGrid();
     });
   </script>
-
-  <!-- Real Photo Lightbox Modal -->
-  <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()">
-    <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
-    <div class="lightbox-content" onclick="event.stopPropagation()">
-      <img id="lightbox-img" src="" alt="Foto Muzzaga Pádel" class="lightbox-img">
-      <div id="lightbox-caption" class="lightbox-caption"></div>
-    </div>
-  </div>
-
 </body>
 </html>
