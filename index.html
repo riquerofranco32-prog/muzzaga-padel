@@ -34,13 +34,13 @@
       /* Hairlines & Specular Borders */
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-strong: rgba(255, 255, 255, 0.16);
-      --border-glow: rgba(94, 106, 210, 0.45);
+      --border-glow: rgba(232, 114, 42, 0.45);
       
-      /* Brand Accents (Linear Indigo + Expo Sky Blue) */
-      --accent-linear: #5e6ad2;
-      --accent-linear-hover: #6e7ae6;
-      --accent-sky: #47c2ff;
-      --accent-blue-link: #3b82f6;
+      /* Brand Accents (Muzzaga Naranja) */
+      --accent-linear: #E8722A;
+      --accent-linear-hover: #F0863A;
+      --accent-sky: #C85A18;
+      --accent-blue-link: #E8722A;
       --accent-emerald: #10b981;
       --accent-warning: #f59e0b;
       
@@ -127,7 +127,7 @@
       transform: translateX(-50%);
       width: 700px;
       height: 400px;
-      background: radial-gradient(circle, rgba(94, 106, 210, 0.22) 0%, rgba(71, 194, 255, 0.12) 45%, transparent 70%);
+      background: radial-gradient(circle, rgba(232, 114, 42, 0.22) 0%, rgba(200, 90, 24, 0.12) 45%, transparent 70%);
     }
 
     /* Shimmer gradient text */
@@ -138,7 +138,7 @@
     }
 
     .gradient-accent {
-      background: linear-gradient(135deg, #7c88f2 0%, #47c2ff 100%);
+      background: linear-gradient(135deg, #FFA35C 0%, #C85A18 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -165,22 +165,22 @@
     }
 
     .btn-linear-primary {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%), #5e6ad2;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%), #E8722A;
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.22);
-      box-shadow: 0 0 20px rgba(94, 106, 210, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 20px rgba(232, 114, 42, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
       font-weight: 600;
     }
 
     .btn-linear-primary:hover {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), #6875e2;
-      box-shadow: 0 0 28px rgba(94, 106, 210, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), #F0863A;
+      box-shadow: 0 0 28px rgba(232, 114, 42, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
       transform: translateY(-1px);
     }
 
     .btn-linear-primary:active {
       transform: translateY(0);
-      box-shadow: 0 0 12px rgba(94, 106, 210, 0.25);
+      box-shadow: 0 0 12px rgba(232, 114, 42, 0.25);
     }
 
     .btn-secondary {
@@ -246,9 +246,9 @@
     }
 
     .badge-indigo {
-      background: rgba(94, 106, 210, 0.14);
-      border-color: rgba(94, 106, 210, 0.3);
-      color: #a5b4fc;
+      background: rgba(232, 114, 42, 0.14);
+      border-color: rgba(232, 114, 42, 0.3);
+      color: #FFCBA1;
     }
 
     .pulse-dot {
@@ -290,7 +290,7 @@
     .brand-mark {
       width: 28px;
       height: 28px;
-      background: linear-gradient(135deg, #5e6ad2 0%, #47c2ff 100%);
+      background: linear-gradient(135deg, #E8722A 0%, #C85A18 100%);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
@@ -298,7 +298,7 @@
       color: #fff;
       font-weight: 700;
       font-size: 14px;
-      box-shadow: 0 0 14px rgba(94, 106, 210, 0.4);
+      box-shadow: 0 0 14px rgba(232, 114, 42, 0.4);
     }
 
     .brand-text {
@@ -480,8 +480,8 @@
 
     .marquee-card:hover {
       transform: scale(1.08) rotate(0deg) !important;
-      box-shadow: 0 24px 50px -10px rgba(94, 106, 210, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      border-color: rgba(94, 106, 210, 0.5);
+      box-shadow: 0 24px 50px -10px rgba(232, 114, 42, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      border-color: rgba(232, 114, 42, 0.5);
       z-index: 20;
     }
 
@@ -598,10 +598,10 @@
     }
 
     .date-card.active {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%), #5e6ad2;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%), #E8722A;
       border-color: rgba(255, 255, 255, 0.3);
       color: #ffffff;
-      box-shadow: 0 0 20px rgba(94, 106, 210, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 20px rgba(232, 114, 42, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
     }
 
     .date-card-day {
@@ -871,7 +871,7 @@
       color: #ffffff;
       line-height: 1;
       margin: 12px 0 8px;
-      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #FFCBA1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -892,8 +892,8 @@
       height: 22px;
       border-radius: 50%;
       background: #ffffff;
-      border: 2px solid #5e6ad2;
-      box-shadow: 0 0 12px rgba(94, 106, 210, 0.6);
+      border: 2px solid #E8722A;
+      box-shadow: 0 0 12px rgba(232, 114, 42, 0.6);
       cursor: pointer;
       transition: transform 0.1s ease;
     }
@@ -924,7 +924,7 @@
     .photo-bento-card:hover {
       transform: translateY(-3px);
       border-color: var(--border-strong);
-      box-shadow: 0 24px 50px rgba(94, 106, 210, 0.25);
+      box-shadow: 0 24px 50px rgba(232, 114, 42, 0.25);
     }
 
     .photo-bento-img {
@@ -1070,8 +1070,8 @@
 
     .type-btn.active {
       border-color: var(--accent-linear);
-      background: rgba(94, 106, 210, 0.12);
-      box-shadow: 0 0 14px rgba(94, 106, 210, 0.2);
+      background: rgba(232, 114, 42, 0.12);
+      box-shadow: 0 0 14px rgba(232, 114, 42, 0.2);
     }
 
     /* ==========================================================================
@@ -1509,7 +1509,7 @@
       <!-- Main Title -->
       <h1 class="hero-display-title">
         Reservá tu cancha.<br>
-        <span class="gradient-text">Pádel de verdad.</span>
+        <span class="gradient-accent">Pádel de verdad.</span>
       </h1>
 
       <!-- Description -->
