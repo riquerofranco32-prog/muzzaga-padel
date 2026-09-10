@@ -1982,5 +1982,529 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .testimonials-grid {
     grid-template-columns: 1fr;
   }
+  .split-calculator-grid {
+    grid-template-columns: 1fr;
+  }
+  .tactical-board-grid {
+    grid-template-columns: 1fr;
+  }
+  .americano-layout-grid {
+    grid-template-columns: 1fr;
+  }
+  .americano-count-tabs {
+    flex-wrap: wrap;
+  }
 }
+
+/* ==========================================================================
+   SPLIT COST CALCULATOR (FINTECH FOR PADEL GROUPS)
+   ========================================================================== */
+.split-calculator-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.split-config-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.split-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.split-step-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-orange);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.split-step-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.split-step-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.players-selector-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.player-count-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.player-count-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+.player-count-btn.active {
+  background: rgba(232, 114, 42, 0.15);
+  border-color: var(--accent-orange);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.extras-selector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.extra-item-row {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.15s ease;
+}
+
+.extra-item-row:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.extra-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.extra-icon {
+  font-size: 20px;
+}
+
+.extra-name {
+  display: block;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.extra-price {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.extra-counter-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.counter-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.counter-qty {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+  min-width: 16px;
+  text-align: center;
+}
+
+.split-summary-card {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    ),
+    var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 90px;
+}
+
+.split-ticket-top {
+  text-align: center;
+  border-bottom: 1px dashed var(--border-subtle);
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+.split-ticket-badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.split-amount-big {
+  font-family: var(--font-mono);
+  font-size: 42px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-top: 6px;
+  background: linear-gradient(135deg, #ffffff 0%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.split-amount-sub {
+  display: block;
+  font-size: 12.5px;
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.split-ticket-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.ticket-row strong {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.ticket-row.total {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ticket-row.total strong {
+  font-size: 17px;
+  color: #34d399;
+}
+
+.ticket-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 6px 0;
+}
+
+.split-alias-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 14px;
+}
+
+.split-alias-notice code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   TACTICAL COURT SIMULATOR
+   ========================================================================== */
+.tactical-board-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.tactical-court-wrap {
+  background: #020617;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(56, 189, 248, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tactical-court-svg {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.2));
+}
+
+.animated-ball-trajectory {
+  stroke-dasharray: 8 4;
+  animation: trajectoryPulse 2s linear infinite;
+}
+
+@keyframes trajectoryPulse {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.court-glass-indicator {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 14px;
+  opacity: 0.8;
+}
+
+.tactical-info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.tactic-buttons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tactic-select-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.tactic-select-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+.tactic-select-btn.active {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.tactic-detail-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.pro-tip-box {
+  background: rgba(56, 189, 248, 0.06);
+  border-left: 3px solid #38bdf8;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 12px 14px;
+}
+
+/* ==========================================================================
+   AMERICANO TOURNAMENT GENERATOR
+   ========================================================================== */
+.americano-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.americano-config-card,
+.americano-fixture-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.americano-count-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.americano-count-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.americano-count-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+.americano-count-btn.active {
+  background: var(--accent-orange);
+  border-color: var(--accent-orange);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.americano-names-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.americano-name-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.name-idx-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.americano-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.americano-input:focus {
+  border-color: var(--accent-orange);
+}
+
+.fixture-rounds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fixture-round-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+}
+
+.fixture-round-badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #f59e0b;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.fixture-matchup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.fixture-team {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.fixture-vs {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.fixture-bye {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 6px;
+}
+
 

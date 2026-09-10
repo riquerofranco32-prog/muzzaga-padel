@@ -2,6 +2,9 @@ import Header from "../components/Header";
 import HeroMarquee from "../components/HeroMarquee";
 import BookingCalendar from "../components/BookingCalendar";
 import AmenitiesSection from "../components/AmenitiesSection";
+import SplitCostCalculator from "../components/SplitCostCalculator";
+import TacticalCourtSimulator from "../components/TacticalCourtSimulator";
+import AmericanoGenerator from "../components/AmericanoGenerator";
 import RatingCalculator from "../components/RatingCalculator";
 import CantinaSection from "../components/CantinaSection";
 import TestimonialsSection from "../components/TestimonialsSection";
@@ -89,6 +92,9 @@ export default function Home() {
 
       {/* INSTALACIONES & SERVICIOS */}
       <AmenitiesSection />
+
+      {/* CALCULADORA SPLIT COST & 3ER TIEMPO */}
+      <SplitCostCalculator />
 
       {/* CANCHAS ABIERTAS */}
       <section id="canchas-abiertas" className="section-community">
@@ -389,6 +395,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PIZARRA TÁCTICA INTERACTIVA */}
+      <TacticalCourtSimulator />
+
       {/* TORNEOS */}
       <section id="torneos" className="section-bento">
         <div className="container">
@@ -594,6 +603,9 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      {/* GENERADOR DE TORNEO AMERICANO EXPRESS */}
+      <AmericanoGenerator />
 
       {/* CANTINA */}
       <CantinaSection />
