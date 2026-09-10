@@ -1212,6 +1212,17 @@
         font-size: 13.5px;
       }
 
+      /* Fintech-style floating cards on mobile: real elevation instead of a flat hairline border */
+      .booking-app-promo,
+      .open-card,
+      .rating-category-card,
+      .menu-item-card,
+      .photo-bento-card,
+      .rating-box {
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
       .booking-app-promo {
         grid-template-columns: 1fr;
         gap: 24px;
@@ -1226,7 +1237,19 @@
 
       .open-cards-grid {
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 16px;
+      }
+
+      .open-card {
+        padding: 22px;
+      }
+
+      .rating-category-card {
+        padding: 18px 20px;
+      }
+
+      .menu-item-card {
+        padding: 20px;
       }
 
       .player-slots-layout {
