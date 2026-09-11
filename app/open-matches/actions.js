@@ -1,6 +1,6 @@
 "use server";
 
-import { getDb } from "../../lib/firebase";
+import { getDb, isFirebaseConfigured } from "../../lib/firebase";
 import { toISODate } from "../../lib/booking";
 
 const DEFAULT_MATCHES = [
@@ -39,19 +39,21 @@ const DEFAULT_MATCHES = [
 ];
 
 export async function getOpenMatches() {
-  try {
-    const db = getDb();
-    const snap = await db.ref("openMatches").get();
-    if (snap.exists()) {
-      const data = snap.val();
-      const list = Object.entries(data).map(([id, val]) => ({
-        id,
-        ...val,
-      }));
-      return { ok: true, matches: list };
+  if (isFirebaseConfigured()) {
+    try {
+      const db = getDb();
+      const snap = await db.ref("openMatches").get();
+      if (snap.exists()) {
+        const data = snap.val();
+        const list = Object.entries(data).map(([id, val]) => ({
+          id,
+          ...val,
+        }));
+        return { ok: true, matches: list };
+      }
+    } catch (error) {
+      console.warn("Aviso Firebase Open Matches:", error.message);
     }
-  } catch (error) {
-    console.error("Error al obtener Canchas Abiertas de Firebase", error);
   }
 
   // Fallback a los partidos predeterminados si aún no hay en Firebase

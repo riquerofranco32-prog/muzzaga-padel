@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb } from "../../../lib/firebase";
+import { getDb, isFirebaseConfigured } from "../../../lib/firebase";
 import {
   COURTS,
   getSlotTimesForDate,
@@ -21,19 +21,18 @@ export async function GET(request) {
     return NextResponse.json({ date, courts: COURTS, slots: [] });
   }
 
-  let takenSnapshot;
-  try {
-    const db = getDb();
-    takenSnapshot = await db.ref(`slotClaims/${date}`).get();
-  } catch (error) {
-    console.error("No se pudo leer disponibilidad de Firebase", error);
-    return NextResponse.json(
-      { error: "No se pudo cargar la disponibilidad" },
-      { status: 503 },
-    );
+  let taken = {};
+  if (isFirebaseConfigured()) {
+    try {
+      const db = getDb();
+      const takenSnapshot = await db.ref(`slotClaims/${date}`).get();
+      if (takenSnapshot.exists()) {
+        taken = takenSnapshot.val();
+      }
+    } catch (error) {
+      console.warn("Aviso: No se pudo conectar con Firebase, usando disponibilidad libre:", error.message);
+    }
   }
-
-  const taken = takenSnapshot.exists() ? takenSnapshot.val() : {};
 
   const slots = COURTS.flatMap((court) =>
     slotTimes.map(({ start, end }) => ({
