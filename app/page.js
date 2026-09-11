@@ -1,8 +1,10 @@
 import Header from "../components/Header";
 import HeroMarquee from "../components/HeroMarquee";
+import LiveWeatherRadar from "../components/LiveWeatherRadar";
 import BookingCalendar from "../components/BookingCalendar";
 import AmenitiesSection from "../components/AmenitiesSection";
 import SplitCostCalculator from "../components/SplitCostCalculator";
+import CommunityMatchesSection from "../components/CommunityMatchesSection";
 import TacticalCourtSimulator from "../components/TacticalCourtSimulator";
 import AmericanoGenerator from "../components/AmericanoGenerator";
 import RatingCalculator from "../components/RatingCalculator";
@@ -29,10 +31,7 @@ export default function Home() {
           <img src="/img/match_action_led.jpg" alt="" />
         </div>
         <div className="hero-inner-content">
-          <div className="tagline-pill">
-            <span className="pulse-dot" style={{ color: "#10b981" }} />
-            Catriel, Río Negro · 2 Canchas de Cristal Profesionales
-          </div>
+          <LiveWeatherRadar />
 
           <h1 className="hero-display-title">
             Reservá tu cancha.
@@ -96,219 +95,8 @@ export default function Home() {
       {/* CALCULADORA SPLIT COST & 3ER TIEMPO */}
       <SplitCostCalculator />
 
-      {/* CANCHAS ABIERTAS */}
-      <section id="canchas-abiertas" className="section-community">
-        <div className="container">
-          <div className="section-header-row">
-            <div>
-              <span
-                className="badge-linear badge-amber"
-                style={{ marginBottom: 8 }}
-              >
-                Ejemplo · Matchmaking &amp; Comunidad
-              </span>
-              <h2 className="section-title">Canchas Abiertas en Catriel</h2>
-              <p className="section-desc">
-                Así funciona: sumate a partidos que están buscando jugador o
-                publicá tu propia convocatoria si te falta gente. Los partidos
-                reales del día se coordinan por WhatsApp.
-              </p>
-            </div>
-            <a
-              href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-                "¡Hola Muzzaga! 👋 Quiero armar una Cancha Abierta para jugar hoy/mañana. ¿Me ayudan a publicar la convocatoria en el grupo del club?",
-              )}`}
-              target="_blank"
-              rel="noopener"
-              className="btn btn-secondary"
-            >
-              + Publicar Partido Abierto
-            </a>
-          </div>
-
-          <div className="open-cards-grid">
-            <div className="open-card">
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <span className="badge-linear badge-amber">
-                    Ejemplo · 6ta Categoría · Nivel 3.0 - 3.5
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "var(--text-primary)",
-                    }}
-                  >
-                    Día y horario a coordinar
-                  </span>
-                </div>
-
-                <h3
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                    margin: "12px 0 4px",
-                  }}
-                >
-                  Cancha 1 · Cristal
-                </h3>
-                <p style={{ fontSize: 14, color: "var(--text-secondary)" }}>
-                  Partido parejo para subir nivel y ranking. Consultá quiénes
-                  juegan hoy por WhatsApp.
-                </p>
-
-                <div className="player-slots-layout">
-                  <div className="player-slot-item taken">Jugador 1</div>
-                  <div className="player-slot-item taken">Jugador 2</div>
-                  <div className="player-slot-item taken">Jugador 3</div>
-                  <div className="player-slot-item free">+1 ¡Libre!</div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  borderTop: "1px solid var(--border-subtle)",
-                  paddingTop: 14,
-                }}
-              >
-                <div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: "var(--text-muted)",
-                      display: "block",
-                    }}
-                  >
-                    Tu plaza:
-                  </span>
-                  <strong
-                    style={{
-                      color: "var(--text-primary)",
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 16,
-                    }}
-                  >
-                    $15.000
-                  </strong>
-                </div>
-                <a
-                  href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-                    "Hola Muzzaga! Quiero sumarme a una cancha abierta de 6ta. ¿Hay algún partido con lugar?",
-                  )}`}
-                  target="_blank"
-                  rel="noopener"
-                  className="btn btn-whatsapp"
-                  style={{ height: 36, padding: "6px 14px" }}
-                >
-                  Sumarme al partido →
-                </a>
-              </div>
-            </div>
-
-            <div className="open-card">
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <span className="badge-linear badge-emerald">
-                    Ejemplo · 7ma / Inicial · Nivel 1.5 - 2.5
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "var(--text-primary)",
-                    }}
-                  >
-                    Día y horario a coordinar
-                  </span>
-                </div>
-
-                <h3
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                    margin: "12px 0 4px",
-                  }}
-                >
-                  Cancha 2
-                </h3>
-                <p style={{ fontSize: 14, color: "var(--text-secondary)" }}>
-                  Partido distendido con tercer tiempo en la cantina. Consultá
-                  quiénes juegan hoy por WhatsApp.
-                </p>
-
-                <div className="player-slots-layout">
-                  <div className="player-slot-item taken">Jugador 1</div>
-                  <div className="player-slot-item taken">Jugador 2</div>
-                  <div className="player-slot-item free">+1 ¡Libre!</div>
-                  <div className="player-slot-item free">+2 ¡Libre!</div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  borderTop: "1px solid var(--border-subtle)",
-                  paddingTop: 14,
-                }}
-              >
-                <div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: "var(--text-muted)",
-                      display: "block",
-                    }}
-                  >
-                    Tu plaza:
-                  </span>
-                  <strong
-                    style={{
-                      color: "var(--text-primary)",
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 16,
-                    }}
-                  >
-                    $15.000
-                  </strong>
-                </div>
-                <a
-                  href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-                    "Hola Muzzaga! Quiero sumarme a una cancha abierta de 7ma. ¿Hay algún partido con lugar?",
-                  )}`}
-                  target="_blank"
-                  rel="noopener"
-                  className="btn btn-whatsapp"
-                  style={{ height: 36, padding: "6px 14px" }}
-                >
-                  Sumarme al partido →
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* CANCHAS ABIERTAS INTERACTIVAS */}
+      <CommunityMatchesSection />
 
       {/* RATING */}
       <section id="rating" className="section-rating">

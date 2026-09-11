@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createBooking } from "../app/actions";
+import BookingPassModal from "./BookingPassModal";
 import {
   COURTS,
   PRICE_FULL,
@@ -118,7 +119,11 @@ export default function BookingCalendar() {
     }
     markSlotTaken(selected.courtId, selected.start);
     const whatsappUrl = buildWhatsappUrl(result.bookingCode, result.booking);
-    setConfirmed({ bookingCode: result.bookingCode, whatsappUrl });
+    setConfirmed({
+      bookingCode: result.bookingCode,
+      booking: result.booking,
+      whatsappUrl,
+    });
     window.open(whatsappUrl, "_blank", "noopener");
   }
 
@@ -199,9 +204,7 @@ export default function BookingCalendar() {
                 <span className="slot-meta">
                   {court?.name} · {court?.type}
                 </span>
-                <span
-                  className={`badge-linear ${slot.available ? "badge-emerald" : ""}`}
-                >
+                <span className="slot-badge">
                   {slot.available ? "Disponible" : "Ocupado"}
                 </span>
               </button>
@@ -210,12 +213,57 @@ export default function BookingCalendar() {
         </div>
       )}
 
-      {selected && !confirmed && (
-        <form className="booking-confirm-form" onSubmit={handleConfirm}>
-          <p className="booking-confirm-summary">
-            {COURTS.find((c) => c.id === selected.courtId)?.name} ·{" "}
-            {selected.start} a {selected.end} hs · {activeDay?.fullLabel}
-          </p>
+      {selected && (
+        <form className="booking-form" onSubmit={handleConfirm}>
+          <div className="booking-form-header">
+            <h3>Confirmar reserva</h3>
+            <p>
+              {selected.start} hs ·{" "}
+              {COURTS.find((c) => c.id === selected.courtId)?.name}
+            </p>
+          </div>
+
+          <label>
+            <span>Tu nombre y apellido</span>
+            <input
+              type="text"
+              required
+              placeholder="Ej. Lucas Rossi"
+              value={form.playerName}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, playerName: e.target.value }))
+              }
+            />
+          </label>
+
+          <label>
+            <span>Teléfono de contacto (WhatsApp)</span>
+            <input
+              type="tel"
+              required
+              placeholder="Ej. 299 597 4176"
+              value={form.playerPhone}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, playerPhone: e.target.value }))
+              }
+            />
+          </label>
+
+          <label>
+            <span>Cantidad de jugadores</span>
+            <select
+              value={form.playersCount}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, playersCount: Number(e.target.value) }))
+              }
+            >
+              {[1, 2, 3, 4].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <div className="type-switcher">
             <button
@@ -238,46 +286,6 @@ export default function BookingCalendar() {
             </button>
           </div>
 
-          <label className="booking-field">
-            Tu nombre
-            <input
-              type="text"
-              required
-              value={form.playerName}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, playerName: e.target.value }))
-              }
-            />
-          </label>
-
-          <label className="booking-field">
-            Teléfono de contacto
-            <input
-              type="tel"
-              required
-              value={form.playerPhone}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, playerPhone: e.target.value }))
-              }
-            />
-          </label>
-
-          <label className="booking-field">
-            Cantidad de jugadores
-            <select
-              value={form.playersCount}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, playersCount: Number(e.target.value) }))
-              }
-            >
-              {[1, 2, 3, 4].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </label>
-
           {submitError && <p className="booking-error">{submitError}</p>}
 
           <button
@@ -292,21 +300,38 @@ export default function BookingCalendar() {
       )}
 
       {confirmed && (
-        <div className="booking-confirm-form">
-          <p className="booking-confirm-summary">
-            ¡Turno reservado! Código <strong>{confirmed.bookingCode}</strong>.
-            Si no se abrió WhatsApp automáticamente:
-          </p>
-          <a
-            href={confirmed.whatsappUrl}
-            target="_blank"
-            rel="noopener"
-            className="btn btn-whatsapp"
-            style={{ width: "100%" }}
-          >
-            Abrir WhatsApp →
-          </a>
-        </div>
+        <>
+          <div className="booking-confirm-form">
+            <p className="booking-confirm-summary">
+              ¡Turno reservado! Código <strong>{confirmed.bookingCode}</strong>.
+            </p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 10 }}>
+              <a
+                href={confirmed.whatsappUrl}
+                target="_blank"
+                rel="noopener"
+                className="btn btn-whatsapp"
+                style={{ flex: 1, justifyContent: "center" }}
+              >
+                Abrir WhatsApp →
+              </a>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setConfirmed({ ...confirmed, showModal: true })}
+              >
+                💳 Ver Pase Digital &amp; Seña
+              </button>
+            </div>
+          </div>
+
+          <BookingPassModal
+            bookingCode={confirmed.bookingCode}
+            booking={confirmed.booking}
+            whatsappUrl={confirmed.whatsappUrl}
+            onClose={() => setConfirmed(null)}
+          />
+        </>
       )}
     </div>
   );
