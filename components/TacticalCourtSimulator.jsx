@@ -1,93 +1,355 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const TACTICS = [
+const PRESET_TACTICS = [
   {
     id: "vibora",
     title: "Víbora con peso a la reja",
+    category: "Ataque",
+    difficulty: "★★★★☆",
+    effectiveness: "88%",
     badge: "Ataque · Nivel 3.5+",
     badgeColor: "badge-amber",
-    desc: "Impacto lateral a la altura de la cabeza con efecto cortado agresivo. La bola busca picar profundo y morir en la reja lateral con rebote impredecible.",
-    tip: "Girá los hombros rápido y no busques potencia pura, sino efecto lateral cortado.",
-    playerPos: { x: 130, y: 190 },
-    targetPos: { x: 265, y: 80 },
-    bouncePos: { x: 250, y: 110 },
-    trajectory: "M 130 190 Q 200 130, 250 110 Q 260 95, 270 70",
-  },
-  {
-    id: "salida_pared",
-    title: "Salida de pared defensiva cruzada",
-    badge: "Defensa · Todos los niveles",
-    badgeColor: "badge-emerald",
-    desc: "Acompañá la bola cuando sale del cristal de fondo de 10mm. Ganá tiempo con un tiro cruzado profundo para que tu pareja pueda reorganizarse.",
-    tip: "Flexioná las rodillas y pegale delante del cuerpo una vez que la pelota superó el rebote en el cristal.",
-    playerPos: { x: 80, y: 440 },
-    targetPos: { x: 230, y: 90 },
-    bouncePos: { x: 230, y: 140 },
-    trajectory: "M 80 440 Q 150 280, 230 140 Q 235 110, 235 80",
-  },
-  {
-    id: "chiquita",
-    title: "Chiquita al centro a los pies",
-    badge: "Táctica · Transición",
-    badgeColor: "badge-indigo",
-    desc: "Tiro suave y sin fuerza que cae justo por debajo de la cinta de la red, obligando a los rivales a levantar la pelota para que vos entres a definir.",
-    tip: "Mantené la pala firme y no aceleres el brazo. La precisión y la baja altura mandan.",
-    playerPos: { x: 80, y: 380 },
-    targetPos: { x: 150, y: 220 },
-    bouncePos: { x: 150, y: 230 },
-    trajectory: "M 80 380 Q 110 290, 150 230",
+    desc: "Impacto lateral a la altura de la cabeza con efecto cortado agresivo. La bola busca picar profundo y morir en la malla lateral con rebote impredecible.",
+    tip: "Girá los hombros rápido, no busques potencia pura sino fricción lateral con la pala a 45°.",
+    players: {
+      p1: { x: 130, y: 195, label: "J1 (Vos)" },      // Atacante que pega la víbora
+      p2: { x: 190, y: 220, label: "J2 (Pareja)" },   // Pareja cubriendo el medio
+      r1: { x: 90, y: 440, label: "R1" },             // Rival defendiendo fondo
+      r2: { x: 210, y: 430, label: "R2" },            // Rival en esquina
+    },
+    bouncePos: { x: 245, y: 430 },
+    wallPos: { x: 275, y: 410 },
+    trajectory: "M 130 195 Q 185 300, 245 430 Q 265 425, 278 405",
+    phases: [
+      { phase: "1. Armado", desc: "Perfilado lateral rápido, pala alta detrás de la nuca." },
+      { phase: "2. Impacto", desc: "Corte lateral raspando la pelota por el costado derecho." },
+      { phase: "3. Pique", desc: "Pique rasante a 1 metro de la pared de fondo." },
+      { phase: "4. Malla", desc: "Impacto en la reja metálica: rebote aleatorio hacia el piso." },
+    ],
   },
   {
     id: "smash_x3",
     title: "Smash por 3 (Definición)",
-    badge: "Potencia & Efecto · Avanzado",
+    category: "Definición",
+    difficulty: "★★★★★",
+    effectiveness: "94%",
+    badge: "Potencia & Topspin · Avanzado",
     badgeColor: "badge-amber",
     desc: "Remate con efecto liftado (topspin) buscando que la pelota pique antes de la línea de saque, impacte alto en el cristal de fondo y salga por el lateral de 3 metros.",
-    tip: "Ubicá el cuerpo bien de costado y pegale en el punto más alto arqueando la espalda.",
-    playerPos: { x: 170, y: 220 },
-    targetPos: { x: 285, y: 30 },
-    bouncePos: { x: 130, y: 70 },
-    trajectory: "M 170 220 L 130 70 Q 130 30, 285 30",
+    tip: "Ubicá el cuerpo debajo de la bola, arqueá la espalda e impactá en el punto más alto con aceleración de muñeca.",
+    players: {
+      p1: { x: 165, y: 210, label: "J1 (Vos)" },
+      p2: { x: 95, y: 230, label: "J2 (Pareja)" },
+      r1: { x: 100, y: 450, label: "R1" },
+      r2: { x: 200, y: 450, label: "R2" },
+    },
+    bouncePos: { x: 130, y: 400 },
+    wallPos: { x: 110, y: 470 },
+    trajectory: "M 165 210 L 130 400 L 110 472 Q 100 480, 290 485",
+    phases: [
+      { phase: "1. Salto", desc: "Ajuste de pasos cortos y flexión profunda para ganar altura." },
+      { phase: "2. Aceleración", desc: "Impacto a las 12 en punto con 'muñecazo' hacia afuera." },
+      { phase: "3. Rebote Cristal", desc: "Impacto en el cristal de 10mm a más de 2.5m de altura." },
+      { phase: "4. Salida x3", desc: "La pelota supera la pared lateral y sale de la pista." },
+    ],
+  },
+  {
+    id: "salida_pared",
+    title: "Salida de pared con globo milimétrico",
+    category: "Defensa",
+    difficulty: "★★★☆☆",
+    effectiveness: "82%",
+    badge: "Defensa · Todos los niveles",
+    badgeColor: "badge-emerald",
+    desc: "Acompañá la bola cuando sale del cristal de fondo. Ganá tiempo con un globo alto y profundo para que tu pareja y vos puedan tomar la red.",
+    tip: "Flexioná las rodillas, pala por debajo de la pelota y terminá el gesto apuntando al techo.",
+    players: {
+      p1: { x: 75, y: 455, label: "J1 (Vos)" },
+      p2: { x: 175, y: 440, label: "J2 (Pareja)" },
+      r1: { x: 100, y: 190, label: "R1 (Red)" },
+      r2: { x: 200, y: 190, label: "R2 (Red)" },
+    },
+    bouncePos: { x: 60, y: 475 },
+    wallPos: null,
+    trajectory: "M 60 475 Q 90 280, 225 90",
+    phases: [
+      { phase: "1. Espera", desc: "Lectura del rebote en el cristal sin precipitarse." },
+      { phase: "2. Cuchara", desc: "Entrada de pala por abajo con trayectoria parabólica." },
+      { phase: "3. Altura", desc: "Globo alto (6-8 metros) superando a los rivales en la red." },
+      { phase: "4. Contraataque", desc: "Subida inmediata de la pareja a ganar la posición ofensiva." },
+    ],
+  },
+  {
+    id: "chiquita",
+    title: "Chiquita al centro a los pies",
+    category: "Transición",
+    difficulty: "★★★★☆",
+    effectiveness: "86%",
+    badge: "Táctica · Transición",
+    badgeColor: "badge-indigo",
+    desc: "Tiro suave y rasante que cae justo por debajo de la cinta de la red, obligando a los rivales a volear por debajo de la cintura y levantar la pelota para que vos entres a definir.",
+    tip: "Mantené la pala firme y no aceleres el brazo. La suavidad y el control de muñeca son la clave.",
+    players: {
+      p1: { x: 80, y: 390, label: "J1 (Vos)" },
+      p2: { x: 180, y: 390, label: "J2 (Pareja)" },
+      r1: { x: 105, y: 220, label: "R1 (Red)" },
+      r2: { x: 195, y: 220, label: "R2 (Red)" },
+    },
+    bouncePos: { x: 150, y: 235 },
+    wallPos: null,
+    trajectory: "M 80 390 Q 115 285, 150 235",
+    phases: [
+      { phase: "1. Lectura", desc: "Detección del hueco entre ambos voleadores rivales." },
+      { phase: "2. Toque", desc: "Impacto sin fuerza, acariciando la bola por encima de la red." },
+      { phase: "3. Caída", desc: "La pelota cae a los pies del rival obligándolo a levantar." },
+      { phase: "4. Volea Firme", desc: "Paso adelante de tu pareja para liquidar en la red." },
+    ],
+  },
+  {
+    id: "bandeja_doble",
+    title: "Bandeja a la doble pared (Esquina)",
+    category: "Construcción",
+    difficulty: "★★★★☆",
+    effectiveness: "90%",
+    badge: "Control Táctico · Medio/Avanzado",
+    badgeColor: "badge-indigo",
+    desc: "Bandeja flotada y profunda dirigida a la esquina rival para que pegue en el cristal lateral y luego en el de fondo (o viceversa), descolocando completamente la defensa.",
+    tip: "Entrá de costado, punto de impacto adelantado a la altura de los ojos con empuje continuo.",
+    players: {
+      p1: { x: 175, y: 190, label: "J1 (Vos)" },
+      p2: { x: 85, y: 215, label: "J2 (Pareja)" },
+      r1: { x: 90, y: 440, label: "R1" },
+      r2: { x: 220, y: 440, label: "R2" },
+    },
+    bouncePos: { x: 240, y: 410 },
+    wallPos: { x: 275, y: 435 },
+    trajectory: "M 175 190 Q 215 300, 240 410 Q 260 425, 275 435 Q 265 470, 230 465",
+    phases: [
+      { phase: "1. Retroceso", desc: "Pasos laterales hacia atrás sin perder la red de vista." },
+      { phase: "2. Impacto Plano/Cortado", desc: "Golpe a media altura sin arriesgar la red." },
+      { phase: "3. Doble Rebote", desc: "Cristal lateral -> Cristal de fondo: la bola gira hacia adentro." },
+      { phase: "4. Mantenimiento", desc: "Se mantiene a los rivales encerrados en el fondo." },
+    ],
+  },
+  {
+    id: "dormilona",
+    title: "Dormilona tras smash rival",
+    category: "Fantasía",
+    difficulty: "★★★★★",
+    effectiveness: "96%",
+    badge: "Recurso Pro · Definición",
+    badgeColor: "badge-amber",
+    desc: "Cuando el smash del rival rebota en tu cristal de fondo y cruza la red despacio, amortiguás la bola con toque ultra cortado para dejarla pegada a la red de su lado.",
+    tip: "Aflojá la muñeca en el último instante y retrocedé la pala ligeramente al impactar para quitar toda la inercia.",
+    players: {
+      p1: { x: 140, y: 240, label: "J1 (Vos)" },
+      p2: { x: 80, y: 350, label: "J2" },
+      r1: { x: 130, y: 150, label: "R1 (Pegador)" },
+      r2: { x: 220, y: 180, label: "R2" },
+    },
+    bouncePos: { x: 140, y: 245 },
+    wallPos: null,
+    trajectory: "M 130 150 Q 140 400, 140 460 Q 140 350, 140 240 Q 145 235, 145 230",
+    phases: [
+      { phase: "1. Anticipación", desc: "Correr pegado a la red siguiendo la trayectoria del smash." },
+      { phase: "2. Amortiguación", desc: "Mano de seda: absorber la energía de la pelota." },
+      { phase: "3. Caída Muerta", desc: "La bola cae a 10 cm de la red del campo rival." },
+      { phase: "4. Punto Ganado", desc: "Inalcanzable para cualquier rival fuera de posición." },
+    ],
+  },
+];
+
+const ROPE_THEORY_PHASES = [
+  {
+    id: "saque",
+    name: "1. Saque & Subida",
+    desc: "El sacador avanza a la red en línea recta mientras el compañero ya está afirmado esperando la devolución.",
+    p1: { x: 175, y: 260, label: "Sacador" },
+    p2: { x: 85, y: 210, label: "Compañero" },
+    dangerZone: { x: 130, y: 300, w: 100, h: 60, label: "Zona de transición" },
+  },
+  {
+    id: "bloqueo",
+    name: "2. Bloqueo en Red (Ataque)",
+    desc: "Ambos pegados a 2 metros de la red. La 'cuerda' imaginaria los mantiene a 3 metros de distancia mutua cubriendo el centro y esquinas.",
+    p1: { x: 180, y: 200, label: "Drive Red" },
+    p2: { x: 90, y: 200, label: "Revés Red" },
+    dangerZone: { x: 20, y: 350, w: 260, h: 100, label: "Espalda libre (cuidado con globos)" },
+  },
+  {
+    id: "defensa",
+    name: "3. Defensa en Fondo",
+    desc: "Ambos detrás de la línea de saque para defender con cristales. Si uno sale a la esquina, el otro cubre el centro.",
+    p1: { x: 210, y: 440, label: "Drive Fondo" },
+    p2: { x: 120, y: 425, label: "Revés Cobertura" },
+    dangerZone: { x: 20, y: 150, w: 260, h: 100, label: "Red cedida al rival" },
+  },
+  {
+    id: "cobertura_globo",
+    name: "4. Basculación por Globo",
+    desc: "El rival tira globo cruzado: el jugador de revés retrocede en diagonal y su compañero bascula al centro para defender juntos.",
+    p1: { x: 140, y: 380, label: "Apoyo Central" },
+    p2: { x: 80, y: 450, label: "Recupera Globo" },
+    dangerZone: { x: 180, y: 340, w: 90, h: 80, label: "Espacio a cubrir" },
   },
 ];
 
 export default function TacticalCourtSimulator() {
+  const [boardMode, setBoardMode] = useState("presets"); // "presets" | "rope" | "free"
   const [activeTacticId, setActiveTacticId] = useState("vibora");
-  const tactic = TACTICS.find((t) => t.id === activeTacticId) || TACTICS[0];
+  const [activeRopeId, setActiveRopeId] = useState("saque");
+  const [isPlayingAnim, setIsPlayingAnim] = useState(true);
+  const [animKey, setAnimKey] = useState(0);
+
+  // Free Mode Custom Players
+  const [freePlayers, setFreePlayers] = useState({
+    p1: { x: 90, y: 390, label: "J1" },
+    p2: { x: 190, y: 390, label: "J2" },
+    r1: { x: 90, y: 190, label: "R1" },
+    r2: { x: 190, y: 190, label: "R2" },
+  });
+  const [selectedFreePlayer, setSelectedFreePlayer] = useState("p1");
+
+  const tactic = PRESET_TACTICS.find((t) => t.id === activeTacticId) || PRESET_TACTICS[0];
+  const rope = ROPE_THEORY_PHASES.find((r) => r.id === activeRopeId) || ROPE_THEORY_PHASES[0];
+
+  const replayAnimation = () => {
+    setIsPlayingAnim(false);
+    setTimeout(() => {
+      setAnimKey((prev) => prev + 1);
+      setIsPlayingAnim(true);
+    }, 50);
+  };
+
+  const handleCourtClick = (e) => {
+    if (boardMode !== "free") return;
+    const svg = e.currentTarget.getBoundingClientRect();
+    const x = Math.round(((e.clientX - svg.left) / svg.width) * 300);
+    const y = Math.round(((e.clientY - svg.top) / svg.height) * 500);
+
+    // Keep within court bounds
+    const boundedX = Math.max(30, Math.min(270, x));
+    const boundedY = Math.max(30, Math.min(470, y));
+
+    setFreePlayers((prev) => ({
+      ...prev,
+      [selectedFreePlayer]: { ...prev[selectedFreePlayer], x: boundedX, y: boundedY },
+    }));
+  };
+
+  const resetFreeCourt = () => {
+    setFreePlayers({
+      p1: { x: 90, y: 390, label: "J1" },
+      p2: { x: 190, y: 390, label: "J2" },
+      r1: { x: 90, y: 190, label: "R1" },
+      r2: { x: 190, y: 190, label: "R2" },
+    });
+  };
+
+  const currentPlayers =
+    boardMode === "presets"
+      ? tactic.players
+      : boardMode === "rope"
+      ? {
+          p1: rope.p1,
+          p2: rope.p2,
+          r1: { x: 90, y: 180, label: "R1" },
+          r2: { x: 190, y: 180, label: "R2" },
+        }
+      : freePlayers;
 
   return (
-    <section id="pizarra-tactica" className="section-turnos" style={{ background: "var(--bg-surface)" }}>
+    <section id="pizarra-tactica" className="section-turnos" style={{ background: "#ffffff", borderTop: "1px solid var(--color-hairline)" }}>
       <div className="container">
+        {/* HEADER */}
         <div className="section-header-row">
           <div>
             <span className="badge-linear badge-indigo" style={{ marginBottom: 8 }}>
-              Innovación &amp; Entrenamiento
+              Simulador 3D / 2D Oficial · Muzzaga Pádel
             </span>
             <h2 className="section-title">Pizarra Táctica Interactiva</h2>
             <p className="section-desc">
-              Visualizá trayectorias, zonas de impacto y secretos tácticos sobre el césped y cristal de Muzzaga.
+              Analizá jugadas maestras, entendé la sincronización de pareja y posicioná a tus jugadores sobre el césped y cristal de Muzzaga.
             </p>
+          </div>
+
+          {/* SELECTOR DE MODOS */}
+          <div className="rating-mode-switch" style={{ margin: 0, minWidth: 320 }}>
+            <button
+              type="button"
+              className={`rating-tab-btn${boardMode === "presets" ? " active" : ""}`}
+              onClick={() => {
+                setBoardMode("presets");
+                replayAnimation();
+              }}
+            >
+              🎾 Jugadas Pro
+            </button>
+            <button
+              type="button"
+              className={`rating-tab-btn${boardMode === "rope" ? " active" : ""}`}
+              onClick={() => setBoardMode("rope")}
+            >
+              🔄 Basculación
+            </button>
+            <button
+              type="button"
+              className={`rating-tab-btn${boardMode === "free" ? " active" : ""}`}
+              onClick={() => setBoardMode("free")}
+            >
+              ✏️ Pizarra Libre
+            </button>
           </div>
         </div>
 
+        {/* LAYOUT GRID */}
         <div className="tactical-board-grid">
-          {/* CANCHA SVG INTERACTIVA */}
+          {/* COLUMNA 1: CANCHA SVG */}
           <div className="tactical-court-wrap">
+            <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span className="live-dot" style={{ background: "#22c55e" }} />
+                <span style={{ fontSize: 12, color: "#93c5fd", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
+                  {boardMode === "presets" ? "Animación en Vivo" : boardMode === "rope" ? "Sincronía de Pareja" : "Modo Libre"}
+                </span>
+              </div>
+
+              {boardMode === "presets" && (
+                <button
+                  type="button"
+                  onClick={replayAnimation}
+                  className="btn btn-secondary"
+                  style={{ height: 28, padding: "2px 10px", fontSize: 11, background: "rgba(255,255,255,0.1)", color: "#ffffff", borderColor: "rgba(255,255,255,0.2)" }}
+                >
+                  ↺ Repetir Tiro
+                </button>
+              )}
+            </div>
+
             <svg
               className="tactical-court-svg"
               viewBox="0 0 300 500"
               preserveAspectRatio="xMidYMid meet"
               aria-label="Cancha de pádel interactiva de cristal"
+              onClick={handleCourtClick}
+              style={{ cursor: boardMode === "free" ? "crosshair" : "default" }}
             >
               <defs>
-                <linearGradient id="courtGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#0b1b33" />
-                  <stop offset="100%" stopColor="#040c1a" />
+                <linearGradient id="wptTurf" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#0a2540" />
+                  <stop offset="50%" stopColor="#0d3156" />
+                  <stop offset="100%" stopColor="#081d33" />
                 </linearGradient>
-                <filter id="neonGlow" x1="-20%" y1="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="glow" />
+
+                <linearGradient id="neonOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ff7a1a" />
+                  <stop offset="100%" stopColor="#ff3300" />
+                </linearGradient>
+
+                <filter id="neonGlowPro" x1="-30%" y1="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="4" result="glow" />
                   <feMerge>
                     <feMergeNode in="glow" />
                     <feMergeNode in="SourceGraphic" />
@@ -95,119 +357,346 @@ export default function TacticalCourtSimulator() {
                 </filter>
               </defs>
 
-              {/* Court Surface */}
-              <rect x="20" y="20" width="260" height="460" rx="6" fill="url(#courtGlow)" stroke="#38bdf8" strokeWidth="2" />
+              {/* Court Surface (Textura Azul WPT Oficial) */}
+              <rect x="20" y="20" width="260" height="460" rx="8" fill="url(#wptTurf)" stroke="#38bdf8" strokeWidth="2.5" />
 
-              {/* Glass Wall Indicators */}
-              <rect x="18" y="16" width="264" height="6" fill="#38bdf8" opacity="0.8" rx="2" />
-              <rect x="18" y="478" width="264" height="6" fill="#38bdf8" opacity="0.8" rx="2" />
-              <rect x="14" y="18" width="6" height="100" fill="#38bdf8" opacity="0.8" rx="2" />
-              <rect x="280" y="18" width="6" height="100" fill="#38bdf8" opacity="0.8" rx="2" />
-              <rect x="14" y="382" width="6" height="100" fill="#38bdf8" opacity="0.8" rx="2" />
-              <rect x="280" y="382" width="6" height="100" fill="#38bdf8" opacity="0.8" rx="2" />
+              {/* Padel Glass Walls (Cristal Templado 10mm Muzzaga) */}
+              <rect x="18" y="16" width="264" height="6" fill="#38bdf8" opacity="0.85" rx="2" />
+              <rect x="18" y="478" width="264" height="6" fill="#38bdf8" opacity="0.85" rx="2" />
+              <rect x="14" y="18" width="6" height="110" fill="#38bdf8" opacity="0.85" rx="2" />
+              <rect x="280" y="18" width="6" height="110" fill="#38bdf8" opacity="0.85" rx="2" />
+              <rect x="14" y="372" width="6" height="110" fill="#38bdf8" opacity="0.85" rx="2" />
+              <rect x="280" y="372" width="6" height="110" fill="#38bdf8" opacity="0.85" rx="2" />
 
-              {/* Net Line (Center) */}
-              <line x1="16" y1="250" x2="284" y2="250" stroke="#ffffff" strokeWidth="3" strokeDasharray="4 2" opacity="0.9" />
-              <circle cx="150" cy="250" r="4" fill="#ffffff" />
+              {/* Reja metálica lateral (Malla electro-soldada) */}
+              <line x1="17" y1="130" x2="17" y2="370" stroke="#64748b" strokeWidth="3" strokeDasharray="3 3" opacity="0.7" />
+              <line x1="283" y1="130" x2="283" y2="370" stroke="#64748b" strokeWidth="3" strokeDasharray="3 3" opacity="0.7" />
 
-              {/* Service Boxes Lines Top */}
-              <line x1="20" y1="130" x2="280" y2="130" stroke="#38bdf8" strokeWidth="1.5" opacity="0.6" />
-              <line x1="150" y1="130" x2="150" y2="250" stroke="#38bdf8" strokeWidth="1.5" opacity="0.6" />
+              {/* Service Box Lines Top */}
+              <line x1="20" y1="140" x2="280" y2="140" stroke="#ffffff" strokeWidth="2" opacity="0.75" />
+              <line x1="150" y1="140" x2="150" y2="250" stroke="#ffffff" strokeWidth="2" opacity="0.75" />
 
-              {/* Service Boxes Lines Bottom */}
-              <line x1="20" y1="370" x2="280" y2="370" stroke="#38bdf8" strokeWidth="1.5" opacity="0.6" />
-              <line x1="150" y1="250" x2="150" y2="370" stroke="#38bdf8" strokeWidth="1.5" opacity="0.6" />
+              {/* Service Box Lines Bottom */}
+              <line x1="20" y1="360" x2="280" y2="360" stroke="#ffffff" strokeWidth="2" opacity="0.75" />
+              <line x1="150" y1="250" x2="150" y2="360" stroke="#ffffff" strokeWidth="2" opacity="0.75" />
 
-              {/* Trajectory Path */}
-              <path
-                d={tactic.trajectory}
-                fill="none"
-                stroke="#ff5e00"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                filter="url(#neonGlow)"
-                className="animated-ball-trajectory"
-              />
+              {/* Net Line & Posts */}
+              <line x1="12" y1="250" x2="288" y2="250" stroke="#ffffff" strokeWidth="3.5" strokeDasharray="5 3" opacity="0.95" />
+              <circle cx="15" cy="250" r="4" fill="#ff5e00" />
+              <circle cx="285" cy="250" r="4" fill="#ff5e00" />
+              <text x="150" y="246" fill="#ffffff" fontSize="9" textAnchor="middle" opacity="0.8" fontFamily="var(--font-mono)">
+                RED CENTRAL
+              </text>
 
-              {/* Player Spot */}
-              <g transform={`translate(${tactic.playerPos.x}, ${tactic.playerPos.y})`}>
-                <circle r="12" fill="rgba(255, 94, 0, 0.2)" stroke="#ff5e00" strokeWidth="2" />
-                <circle r="6" fill="#ff5e00" />
-                <text x="0" y="20" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold">
-                  Jugador
+              {/* MODO ROPE: Danger Zone & Rope Line */}
+              {boardMode === "rope" && (
+                <>
+                  <line
+                    x1={currentPlayers.p1.x}
+                    y1={currentPlayers.p1.y}
+                    x2={currentPlayers.p2.x}
+                    y2={currentPlayers.p2.y}
+                    stroke="#22c55e"
+                    strokeWidth="2.5"
+                    strokeDasharray="4 4"
+                    opacity="0.9"
+                  />
+                  <rect
+                    x={rope.dangerZone.x}
+                    y={rope.dangerZone.y}
+                    width={rope.dangerZone.w}
+                    height={rope.dangerZone.h}
+                    fill="rgba(239, 68, 68, 0.2)"
+                    stroke="#ef4444"
+                    strokeWidth="1.5"
+                    strokeDasharray="4 2"
+                    rx="6"
+                  />
+                  <text
+                    x={rope.dangerZone.x + rope.dangerZone.w / 2}
+                    y={rope.dangerZone.y + rope.dangerZone.h / 2 + 4}
+                    fill="#fca5a5"
+                    fontSize="9.5"
+                    textAnchor="middle"
+                    fontWeight="bold"
+                  >
+                    ⚠️ {rope.dangerZone.label}
+                  </text>
+                </>
+              )}
+
+              {/* MODO PRESETS: Animated Trajectory & Ball */}
+              {boardMode === "presets" && isPlayingAnim && (
+                <>
+                  {/* Trajectory glow path */}
+                  <path
+                    key={`traj-${animKey}`}
+                    d={tactic.trajectory}
+                    fill="none"
+                    stroke="url(#neonOrange)"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    filter="url(#neonGlowPro)"
+                    className="animated-ball-trajectory"
+                  />
+
+                  {/* Animated Ball Traversing the Path */}
+                  <circle r="6" fill="#eab308" stroke="#ffffff" strokeWidth="1.5" filter="url(#neonGlowPro)">
+                    <animateMotion
+                      key={`ball-${animKey}`}
+                      path={tactic.trajectory}
+                      dur="2.5s"
+                      repeatCount="indefinite"
+                      rotate="auto"
+                    />
+                  </circle>
+
+                  {/* Bounce Indicator */}
+                  {tactic.bouncePos && (
+                    <g transform={`translate(${tactic.bouncePos.x}, ${tactic.bouncePos.y})`}>
+                      <circle r="10" fill="rgba(255, 94, 0, 0.2)" stroke="#ff5e00" strokeWidth="1.5" strokeDasharray="3 2" />
+                      <circle r="3.5" fill="#ff5e00" />
+                      <text x="0" y="-12" fill="#ff5e00" fontSize="9.5" textAnchor="middle" fontWeight="bold">
+                        1° Pique
+                      </text>
+                    </g>
+                  )}
+
+                  {/* Wall Impact Indicator */}
+                  {tactic.wallPos && (
+                    <g transform={`translate(${tactic.wallPos.x}, ${tactic.wallPos.y})`}>
+                      <circle r="8" fill="rgba(56, 189, 248, 0.3)" stroke="#38bdf8" strokeWidth="1.5" />
+                      <text x="0" y="18" fill="#38bdf8" fontSize="8.5" textAnchor="middle" fontWeight="bold">
+                        Rebote
+                      </text>
+                    </g>
+                  )}
+                </>
+              )}
+
+              {/* PLAYERS (Equipo Naranja / Muzzaga) */}
+              <g transform={`translate(${currentPlayers.p1.x}, ${currentPlayers.p1.y})`}>
+                <circle r="13" fill="rgba(255, 94, 0, 0.25)" stroke="#ff5e00" strokeWidth="2.5" />
+                <circle r="7" fill="#ff5e00" />
+                <text x="0" y="22" fill="#ffffff" fontSize="9.5" textAnchor="middle" fontWeight="bold">
+                  {currentPlayers.p1.label}
                 </text>
               </g>
 
-              {/* Target / Bounce Spot */}
-              {tactic.bouncePos && (
-                <g transform={`translate(${tactic.bouncePos.x}, ${tactic.bouncePos.y})`}>
-                  <circle r="8" fill="rgba(255, 94, 0, 0.25)" stroke="#ff5e00" strokeWidth="1.5" strokeDasharray="2 2" />
-                  <circle r="3" fill="#ff5e00" />
-                  <text x="0" y="-12" fill="#ff5e00" fontSize="9" textAnchor="middle" fontWeight="bold">
-                    Pique
-                  </text>
-                </g>
-              )}
+              <g transform={`translate(${currentPlayers.p2.x}, ${currentPlayers.p2.y})`}>
+                <circle r="13" fill="rgba(255, 94, 0, 0.25)" stroke="#ff5e00" strokeWidth="2.5" />
+                <circle r="7" fill="#ff5e00" />
+                <text x="0" y="22" fill="#ffffff" fontSize="9.5" textAnchor="middle" fontWeight="bold">
+                  {currentPlayers.p2.label}
+                </text>
+              </g>
+
+              {/* RIVALS (Equipo Cyan) */}
+              <g transform={`translate(${currentPlayers.r1.x}, ${currentPlayers.r1.y})`}>
+                <circle r="12" fill="rgba(56, 189, 248, 0.25)" stroke="#38bdf8" strokeWidth="2" />
+                <circle r="6" fill="#38bdf8" />
+                <text x="0" y="-14" fill="#93c5fd" fontSize="9" textAnchor="middle" fontWeight="bold">
+                  {currentPlayers.r1.label}
+                </text>
+              </g>
+
+              <g transform={`translate(${currentPlayers.r2.x}, ${currentPlayers.r2.y})`}>
+                <circle r="12" fill="rgba(56, 189, 248, 0.25)" stroke="#38bdf8" strokeWidth="2" />
+                <circle r="6" fill="#38bdf8" />
+                <text x="0" y="-14" fill="#93c5fd" fontSize="9" textAnchor="middle" fontWeight="bold">
+                  {currentPlayers.r2.label}
+                </text>
+              </g>
             </svg>
-            <div className="court-glass-indicator">Cristal Templado 10mm Muzzaga</div>
+
+            <div className="court-glass-indicator">
+              Césped Monofilamento WPT · Cristales 10mm Muzzaga
+            </div>
           </div>
 
-          {/* CONTROLES Y TIPS DE ENTRENADORES */}
+          {/* COLUMNA 2: CONTROLES & DETALLES TÁCTICOS */}
           <div className="tactical-info-card">
-            <h3 style={{ fontSize: 13, color: "var(--color-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
-              Elegí la jugada a analizar:
-            </h3>
-
-            <div className="tactic-buttons-list">
-              {TACTICS.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`tactic-select-btn${item.id === activeTacticId ? " active" : ""}`}
-                  onClick={() => setActiveTacticId(item.id)}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <strong style={{ fontSize: 14 }}>{item.title}</strong>
-                    <span className={`badge-linear ${item.badgeColor}`} style={{ fontSize: 10 }}>
-                      {item.badge.split(" · ")[0]}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            <div className="tactic-detail-box">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <span className={`badge-linear ${tactic.badgeColor}`}>{tactic.badge}</span>
-                <span style={{ fontSize: 12, color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
-                  Catriel Padel Pro
-                </span>
-              </div>
-              <h4 style={{ fontSize: 18, color: "var(--color-ink)", margin: "6px 0 10px" }}>
-                {tactic.title}
-              </h4>
-              <p style={{ fontSize: 14, color: "var(--color-body)", lineHeight: 1.6, marginBottom: 16 }}>
-                {tactic.desc}
-              </p>
-
-              <div className="pro-tip-box">
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-accent-orange)", fontWeight: 600, fontSize: 13, marginBottom: 4 }}>
-                  <span>💡 Tip del Pro de Muzzaga:</span>
+            {/* MODO 1: JUGADAS PRO */}
+            {boardMode === "presets" && (
+              <>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <h3 style={{ fontSize: 13, color: "var(--color-muted)", textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>
+                    Elegí la jugada profesional:
+                  </h3>
+                  <span className="badge-linear badge-amber">{tactic.category}</span>
                 </div>
-                <p style={{ fontSize: 13, color: "var(--color-ink)", margin: 0, lineHeight: 1.5 }}>
-                  {tactic.tip}
-                </p>
-              </div>
-            </div>
 
+                {/* SELECTOR DE JUGADAS */}
+                <div className="tactic-buttons-list" style={{ maxHeight: 220, overflowY: "auto", paddingRight: 4 }}>
+                  {PRESET_TACTICS.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={`tactic-select-btn${item.id === activeTacticId ? " active" : ""}`}
+                      onClick={() => {
+                        setActiveTacticId(item.id);
+                        replayAnimation();
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <strong style={{ fontSize: 13.5 }}>{item.title}</strong>
+                        <span className={`badge-linear ${item.badgeColor}`} style={{ fontSize: 10 }}>
+                          {item.difficulty}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* DETALLE Y SPECS */}
+                <div className="tactic-detail-box">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <h4 style={{ fontSize: 17, color: "var(--color-ink)", margin: 0, fontWeight: 700 }}>
+                      {tactic.title}
+                    </h4>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <span className="badge-linear badge-emerald" title="Efectividad estimada">
+                        🎯 {tactic.effectiveness} Éxito
+                      </span>
+                    </div>
+                  </div>
+
+                  <p style={{ fontSize: 13.5, color: "var(--color-body)", lineHeight: 1.55, margin: "6px 0 12px" }}>
+                    {tactic.desc}
+                  </p>
+
+                  {/* FASES DE EJECUCIÓN */}
+                  <div style={{ background: "#ffffff", border: "1px solid var(--color-hairline)", borderRadius: "var(--radius-md)", padding: "10px 12px", marginBottom: 12 }}>
+                    <span style={{ fontSize: 11, textTransform: "uppercase", fontWeight: 700, color: "var(--color-muted)", display: "block", marginBottom: 6 }}>
+                      Secuencia de Golpe Paso a Paso:
+                    </span>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {tactic.phases.map((ph, idx) => (
+                        <div key={idx} style={{ fontSize: 12 }}>
+                          <strong style={{ color: "var(--color-ink)", display: "block" }}>{ph.phase}</strong>
+                          <span style={{ color: "var(--color-muted)", fontSize: 11.5 }}>{ph.desc}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pro-tip-box">
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-accent-orange)", fontWeight: 600, fontSize: 12.5, marginBottom: 2 }}>
+                      <span>💡 Consejo de los Profesores de Muzzaga:</span>
+                    </div>
+                    <p style={{ fontSize: 12.5, color: "var(--color-ink)", margin: 0, lineHeight: 1.45 }}>
+                      {tactic.tip}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* MODO 2: BASCULACIÓN & TEORÍA DE LA CUERDA */}
+            {boardMode === "rope" && (
+              <>
+                <div style={{ marginBottom: 14 }}>
+                  <span className="badge-linear badge-emerald" style={{ marginBottom: 6 }}>
+                    Sincronización Táctica de Pareja
+                  </span>
+                  <h4 style={{ fontSize: 18, color: "var(--color-ink)", margin: "4px 0 6px" }}>
+                    La Teoría de la Cuerda en Pádel
+                  </h4>
+                  <p style={{ fontSize: 13.5, color: "var(--color-body)", lineHeight: 1.5 }}>
+                    En el pádel moderno, una pareja exitosa se mueve unida por una cuerda imaginaria de 3 metros. Si tu compañero bascula al centro o retrocede, vos debés acompañar para no dejar huecos libres.
+                  </p>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+                  {ROPE_THEORY_PHASES.map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      className={`tactic-select-btn${r.id === activeRopeId ? " active" : ""}`}
+                      onClick={() => setActiveRopeId(r.id)}
+                    >
+                      <strong style={{ fontSize: 14, display: "block", marginBottom: 2 }}>{r.name}</strong>
+                      <span style={{ fontSize: 12.5, color: "var(--color-muted)" }}>{r.desc}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="pro-tip-box" style={{ background: "#ecfdf5", borderColor: "#059669" }}>
+                  <strong style={{ color: "#059669", fontSize: 13, display: "block", marginBottom: 4 }}>
+                    ✓ Regla de Oro del Doble en Muzzaga:
+                  </strong>
+                  <span style={{ fontSize: 12.5, color: "var(--color-ink)" }}>
+                    "Nunca te quedes mirando el golpe de tu compañero: ajustá tu posición en cada tiro para cerrar la volea al centro o cubrir la pared descubierta."
+                  </span>
+                </div>
+              </>
+            )}
+
+            {/* MODO 3: PIZARRA LIBRE */}
+            {boardMode === "free" && (
+              <>
+                <div style={{ marginBottom: 14 }}>
+                  <span className="badge-linear badge-amber" style={{ marginBottom: 6 }}>
+                    Entrenador Táctico Interactivo
+                  </span>
+                  <h4 style={{ fontSize: 18, color: "var(--color-ink)", margin: "4px 0 6px" }}>
+                    Diseñá tu Propia Estrategia
+                  </h4>
+                  <p style={{ fontSize: 13.5, color: "var(--color-body)", lineHeight: 1.5 }}>
+                    Seleccioná qué jugador querés mover y hacé clic en cualquier punto de la cancha para ubicarlo tácticamente.
+                  </p>
+                </div>
+
+                {/* SELECTOR DE JUGADOR A MOVER */}
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-muted)", textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+                    Seleccioná el jugador a mover:
+                  </label>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
+                    {[
+                      { id: "p1", name: "J1 (Tu Jugador)", color: "#ff5e00" },
+                      { id: "p2", name: "J2 (Tu Pareja)", color: "#ff5e00" },
+                      { id: "r1", name: "R1 (Rival Drive)", color: "#38bdf8" },
+                      { id: "r2", name: "R2 (Rival Revés)", color: "#38bdf8" },
+                    ].map((btn) => (
+                      <button
+                        key={btn.id}
+                        type="button"
+                        className={`quiz-opt-btn${selectedFreePlayer === btn.id ? " selected" : ""}`}
+                        onClick={() => setSelectedFreePlayer(btn.id)}
+                        style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center", padding: "10px" }}
+                      >
+                        <span style={{ width: 10, height: 10, borderRadius: "50%", background: btn.color }} />
+                        <strong>{btn.name}</strong>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={resetFreeCourt}
+                    style={{ flex: 1, justifyContent: "center" }}
+                  >
+                    ↺ Reiniciar Posiciones
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* BOTÓN WHATSAPP ENTRENAMIENTO */}
             <a
-              href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Quiero%20consultar%20por%20clases%20particulares%20o%20entrenamiento%20tactico."
+              href={`https://wa.me/5492995974176?text=${encodeURIComponent(
+                `¡Hola Muzzaga! Estuve usando la Pizarra Táctica en la web y me gustaría consultar por clases y clínicas de entrenamiento táctico (${tactic.title}).`,
+              )}`}
               target="_blank"
               rel="noopener"
-              className="btn btn-secondary"
-              style={{ width: "100%", justifyContent: "center", marginTop: 16 }}
+              className="btn btn-orange-primary"
+              style={{ width: "100%", justifyContent: "center", marginTop: 18 }}
             >
-              Consultar por Clases Tácticas en Pista →
+              🎾 Consultar por Clases Tácticas en Pista →
             </a>
           </div>
         </div>
