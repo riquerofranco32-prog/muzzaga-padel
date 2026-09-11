@@ -122,7 +122,7 @@ export default function TacticalCourtSimulator() {
               <path
                 d={tactic.trajectory}
                 fill="none"
-                stroke="#e8722a"
+                stroke="#ff5e00"
                 strokeWidth="3.5"
                 strokeLinecap="round"
                 filter="url(#neonGlow)"
@@ -131,8 +131,8 @@ export default function TacticalCourtSimulator() {
 
               {/* Player Spot */}
               <g transform={`translate(${tactic.playerPos.x}, ${tactic.playerPos.y})`}>
-                <circle r="12" fill="rgba(232, 114, 42, 0.2)" stroke="#e8722a" strokeWidth="2" />
-                <circle r="6" fill="#e8722a" />
+                <circle r="12" fill="rgba(255, 94, 0, 0.2)" stroke="#ff5e00" strokeWidth="2" />
+                <circle r="6" fill="#ff5e00" />
                 <text x="0" y="20" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold">
                   Jugador
                 </text>
@@ -141,9 +141,9 @@ export default function TacticalCourtSimulator() {
               {/* Target / Bounce Spot */}
               {tactic.bouncePos && (
                 <g transform={`translate(${tactic.bouncePos.x}, ${tactic.bouncePos.y})`}>
-                  <circle r="8" fill="rgba(56, 189, 248, 0.3)" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="2 2" />
-                  <circle r="3" fill="#38bdf8" />
-                  <text x="0" y="-12" fill="#38bdf8" fontSize="9" textAnchor="middle">
+                  <circle r="8" fill="rgba(255, 94, 0, 0.25)" stroke="#ff5e00" strokeWidth="1.5" strokeDasharray="2 2" />
+                  <circle r="3" fill="#ff5e00" />
+                  <text x="0" y="-12" fill="#ff5e00" fontSize="9" textAnchor="middle" fontWeight="bold">
                     Pique
                   </text>
                 </g>
@@ -154,7 +154,7 @@ export default function TacticalCourtSimulator() {
 
           {/* CONTROLES Y TIPS DE ENTRENADORES */}
           <div className="tactical-info-card">
-            <h3 style={{ fontSize: 16, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
+            <h3 style={{ fontSize: 13, color: "var(--color-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
               Elegí la jugada a analizar:
             </h3>
 
@@ -179,22 +179,22 @@ export default function TacticalCourtSimulator() {
             <div className="tactic-detail-box">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <span className={`badge-linear ${tactic.badgeColor}`}>{tactic.badge}</span>
-                <span style={{ fontSize: 12, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
+                <span style={{ fontSize: 12, color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
                   Catriel Padel Pro
                 </span>
               </div>
-              <h4 style={{ fontSize: 18, color: "var(--text-primary)", margin: "6px 0 10px" }}>
+              <h4 style={{ fontSize: 18, color: "var(--color-ink)", margin: "6px 0 10px" }}>
                 {tactic.title}
               </h4>
-              <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 16 }}>
+              <p style={{ fontSize: 14, color: "var(--color-body)", lineHeight: 1.6, marginBottom: 16 }}>
                 {tactic.desc}
               </p>
 
               <div className="pro-tip-box">
-                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#38bdf8", fontWeight: 600, fontSize: 13, marginBottom: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-accent-orange)", fontWeight: 600, fontSize: 13, marginBottom: 4 }}>
                   <span>💡 Tip del Pro de Muzzaga:</span>
                 </div>
-                <p style={{ fontSize: 13, color: "var(--text-primary)", margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: 13, color: "var(--color-ink)", margin: 0, lineHeight: 1.5 }}>
                   {tactic.tip}
                 </p>
               </div>

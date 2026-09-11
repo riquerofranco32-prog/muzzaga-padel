@@ -25,7 +25,7 @@ export const metadata = {
   keywords:
     "muzzaga padel, padel catriel, turnos padel catriel, canchas abiertas catriel, rio negro padel",
   icons: {
-    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2308090a'/%3E%3Ctext x='50%25' y='54%25' font-family='Arial,sans-serif' font-weight='700' font-size='22' fill='%23E8722A' text-anchor='middle' dominant-baseline='middle'%3EM%3C/text%3E%3C/svg%3E",
+    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23FF5E00'/%3E%3Ctext x='50%25' y='54%25' font-family='Arial,sans-serif' font-weight='700' font-size='22' fill='%23FFFFFF' text-anchor='middle' dominant-baseline='middle'%3EM%3C/text%3E%3C/svg%3E",
   },
   openGraph: {
     type: "website",
@@ -46,7 +46,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#08090a",
+  themeColor: "#ffffff",
 };
 
 const jsonLd = {

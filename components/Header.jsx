@@ -137,7 +137,7 @@ export default function Header() {
           href={WHATSAPP_URL}
           target="_blank"
           rel="noopener"
-          style={{ color: "#34d399" }}
+          style={{ color: "var(--color-accent-orange)", fontWeight: 600 }}
         >
           WhatsApp Club →
         </a>
