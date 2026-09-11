@@ -6,12 +6,15 @@ import AmenitiesSection from "../components/AmenitiesSection";
 import SplitCostCalculator from "../components/SplitCostCalculator";
 import CommunityMatchesSection from "../components/CommunityMatchesSection";
 import TacticalCourtSimulator from "../components/TacticalCourtSimulator";
+import PadelScoreboardLive from "../components/PadelScoreboardLive";
 import AmericanoGenerator from "../components/AmericanoGenerator";
+import RacketFinderQuiz from "../components/RacketFinderQuiz";
 import RatingCalculator from "../components/RatingCalculator";
 import CantinaSection from "../components/CantinaSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 import FaqSection from "../components/FaqSection";
 import { BentoPhotoCard } from "../components/PhotoCard";
+import FloatingLiveBar from "../components/FloatingLiveBar";
 import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
@@ -392,8 +395,14 @@ export default function Home() {
         </div>
       </section>
 
+      {/* MARCADOR DIGITAL & PUNTO DE ORO EN VIVO */}
+      <PadelScoreboardLive />
+
       {/* GENERADOR DE TORNEO AMERICANO EXPRESS */}
       <AmericanoGenerator />
+
+      {/* BUSCADOR INTERACTIVO DE PALAS PRO */}
+      <RacketFinderQuiz />
 
       {/* CANTINA */}
       <CantinaSection />
@@ -603,6 +612,7 @@ export default function Home() {
         </div>
       </section>
 
+      <FloatingLiveBar />
       <Footer />
       <BottomNav />
       <ScrollReveal />

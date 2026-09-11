@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
   { href: "#turnos", label: "Turnos" },
-  { href: "#split-cost", label: "Dividir Gastos" },
+  { href: "#canchas-abiertas", label: "Abiertas" },
+  { href: "#marcador-en-vivo", label: "Marcador" },
+  { href: "#buscador-palas", label: "Palas" },
   { href: "#pizarra-tactica", label: "Táctica" },
+  { href: "#split-cost", label: "Dividir Gastos" },
   { href: "#generador-americano", label: "Americano" },
-  { href: "#rating", label: "Tu Nivel" },
   { href: "#cantina", label: "Cantina" },
-  { href: "#faq", label: "FAQ" },
   { href: "#ubicacion", label: "Ubicación" },
 ];
 
