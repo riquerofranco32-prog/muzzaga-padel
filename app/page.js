@@ -6,11 +6,8 @@ import AmenitiesSection from "../components/AmenitiesSection";
 import SplitCostCalculator from "../components/SplitCostCalculator";
 import CommunityMatchesSection from "../components/CommunityMatchesSection";
 import TacticalCourtSimulator from "../components/TacticalCourtSimulator";
-import PadelScoreboardLive from "../components/PadelScoreboardLive";
 import AmericanoGenerator from "../components/AmericanoGenerator";
-import RacketFinderQuiz from "../components/RacketFinderQuiz";
 import RatingCalculator from "../components/RatingCalculator";
-import CategoriesExplorer from "../components/CategoriesExplorer";
 import CantinaSection from "../components/CantinaSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 import FaqSection from "../components/FaqSection";
@@ -101,9 +98,6 @@ export default function Home() {
 
       {/* CANCHAS ABIERTAS INTERACTIVAS */}
       <CommunityMatchesSection />
-
-      {/* EXPLORADOR DE TODAS LAS CATEGORÍAS */}
-      <CategoriesExplorer />
 
       {/* RATING */}
       <section id="rating" className="section-rating">
@@ -399,14 +393,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* MARCADOR DIGITAL & PUNTO DE ORO EN VIVO */}
-      <PadelScoreboardLive />
-
       {/* GENERADOR DE TORNEO AMERICANO EXPRESS */}
       <AmericanoGenerator />
-
-      {/* BUSCADOR INTERACTIVO DE PALAS PRO */}
-      <RacketFinderQuiz />
 
       {/* CANTINA */}
       <CantinaSection />
