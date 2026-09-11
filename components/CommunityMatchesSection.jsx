@@ -8,6 +8,7 @@ const WHATSAPP = "5492995974176";
 export default function CommunityMatchesSection() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCat, setSelectedCat] = useState("all");
 
   // Join Modal State
   const [joinModal, setJoinModal] = useState(null); // { matchId, slotIndex, match }
@@ -40,6 +41,11 @@ export default function CommunityMatchesSection() {
       setMatches(res.matches);
     }
   }
+
+  const filteredMatches = matches.filter((m) => {
+    if (selectedCat === "all") return true;
+    return m.category.toLowerCase().includes(selectedCat.toLowerCase());
+  });
 
   async function handleJoinSubmit(e) {
     e.preventDefault();
@@ -97,10 +103,36 @@ export default function CommunityMatchesSection() {
           </button>
         </div>
 
+        {/* CATEGORY FILTER PILLS */}
+        <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 8, marginBottom: 20 }}>
+          {[
+            { id: "all", label: "Todas las Categorías" },
+            { id: "7ma", label: "7ma (Iniciación)" },
+            { id: "6ta", label: "6ta (Intermedio)" },
+            { id: "5ta", label: "5ta (Avanzado)" },
+            { id: "Libre", label: "Libre / 4ta" },
+            { id: "Damas", label: "Damas" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={`booking-court-tab${selectedCat === tab.id ? " active" : ""}`}
+              onClick={() => setSelectedCat(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         <div className="open-cards-grid">
-          {matches.map((match) => {
-            const freeCount = match.players.filter((p) => !p.taken).length;
-            const isFull = freeCount === 0;
+          {filteredMatches.length === 0 ? (
+            <div className="booking-empty" style={{ gridColumn: "1 / -1" }}>
+              No hay partidos abiertos para esta categoría en este momento. ¡Sé el primero en publicar uno con el botón de arriba!
+            </div>
+          ) : (
+            filteredMatches.map((match) => {
+              const freeCount = match.players.filter((p) => !p.taken).length;
+              const isFull = freeCount === 0;
 
             return (
               <div className="open-card" key={match.id}>
@@ -181,7 +213,7 @@ export default function CommunityMatchesSection() {
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
       </div>
 

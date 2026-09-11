@@ -10,6 +10,7 @@ import PadelScoreboardLive from "../components/PadelScoreboardLive";
 import AmericanoGenerator from "../components/AmericanoGenerator";
 import RacketFinderQuiz from "../components/RacketFinderQuiz";
 import RatingCalculator from "../components/RatingCalculator";
+import CategoriesExplorer from "../components/CategoriesExplorer";
 import CantinaSection from "../components/CantinaSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 import FaqSection from "../components/FaqSection";
@@ -100,6 +101,9 @@ export default function Home() {
 
       {/* CANCHAS ABIERTAS INTERACTIVAS */}
       <CommunityMatchesSection />
+
+      {/* EXPLORADOR DE TODAS LAS CATEGORÍAS */}
+      <CategoriesExplorer />
 
       {/* RATING */}
       <section id="rating" className="section-rating">

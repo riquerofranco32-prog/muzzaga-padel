@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 const NAV_LINKS = [
   { href: "#turnos", label: "Turnos" },
   { href: "#canchas-abiertas", label: "Abiertas" },
+  { href: "#todas-las-categorias", label: "Categorías" },
   { href: "#marcador-en-vivo", label: "Marcador" },
   { href: "#buscador-palas", label: "Palas" },
   { href: "#pizarra-tactica", label: "Táctica" },
