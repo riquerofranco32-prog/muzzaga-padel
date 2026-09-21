@@ -1,23 +1,27 @@
 "use client";
 
+import { MarqueeCard } from "./PhotoCard";
 import { useLightbox } from "./LightboxProvider";
 
 const WHATSAPP = "5492995974176";
+
+function jugadorPhotos(folder, count, label) {
+  return Array.from({ length: count }, (_, i) => {
+    const n = String(i + 1).padStart(2, "0");
+    return {
+      src: `/img/torneos/${folder}/jugadores_${n}.jpg`,
+      alt: `Jugador del ${label} en la cancha de Muzzaga`,
+      label,
+      caption: `${label} · Muzzaga Pádel`,
+    };
+  });
+}
 
 const TOURNAMENTS = [
   {
     id: "agosto-2026",
     label: "Torneo Agosto 2026 · 7ma Damas y Caballeros",
-    jugadores: [
-      {
-        src: "/img/torneos/agosto/jugadores_01.jpg",
-        alt: "Jugadores del Torneo Agosto 2026 posando en la red de la cancha",
-      },
-      {
-        src: "/img/torneos/agosto/jugadores_02.jpg",
-        alt: "Pareja de jugadores del Torneo Agosto 2026 en Muzzaga",
-      },
-    ],
+    jugadores: jugadorPhotos("agosto", 26, "Torneo Agosto 2026"),
     ganadores: [
       {
         src: "/img/torneos/agosto/ganadores_1er_caballeros.jpg",
@@ -40,38 +44,14 @@ const TOURNAMENTS = [
   {
     id: "junio-2026",
     label: "Primer Torneo · Junio 2026",
-    jugadores: [
-      {
-        src: "/img/torneos/junio/jugadores_01.jpg",
-        alt: "Jugadores del Primer Torneo Muzzaga posando en la red de la cancha",
-      },
-      {
-        src: "/img/torneos/junio/jugadores_02.jpg",
-        alt: "Cuatro jugadores posando con sus paletas en la cancha de Muzzaga",
-      },
-    ],
-    ganadores: [
-      {
-        src: "/img/torneos/junio/ganadores_01.jpg",
-        alt: "Parejas ganadoras del Primer Torneo Muzzaga, junio 2026",
-      },
-      {
-        src: "/img/torneos/junio/ganadores_02.jpg",
-        alt: "Ganadores del Primer Torneo Muzzaga posando en la red",
-      },
-      {
-        src: "/img/torneos/junio/ganadores_03.jpg",
-        alt: "Pareja que llegó a la final y pareja ganadora del torneo",
-      },
-      {
-        src: "/img/torneos/junio/ganadores_04.jpg",
-        alt: "Primer puesto del Primer Torneo Muzzaga con medallas",
-      },
-      {
-        src: "/img/torneos/junio/ganadores_05.jpg",
-        alt: "Parejas ganadoras del torneo en la cancha de Muzzaga",
-      },
-    ],
+    jugadores: jugadorPhotos("junio", 25, "Primer Torneo Junio 2026"),
+    ganadores: Array.from({ length: 16 }, (_, i) => {
+      const n = String(i + 1).padStart(2, "0");
+      return {
+        src: `/img/torneos/junio/ganadores_${n}.jpg`,
+        alt: "Pareja ganadora del Primer Torneo Muzzaga, junio 2026",
+      };
+    }),
   },
 ];
 
@@ -108,6 +88,30 @@ function WhatsappIcon() {
   );
 }
 
+/** Continuous auto-scrolling strip of jugador photos, same visual language as the hero marquee. */
+function JugadoresMarquee({ photos }) {
+  const durationSec = Math.round(photos.length * 4.6);
+  return (
+    <div
+      className="marquee-container"
+      aria-label="Fotos de jugadores"
+      style={{ padding: "4px 0 20px" }}
+    >
+      <div
+        className="marquee-track"
+        style={{ animationDuration: `${durationSec}s` }}
+      >
+        {photos.map((photo, i) => (
+          <MarqueeCard key={photo.src} {...photo} priority={i < 4} />
+        ))}
+        {photos.map((photo) => (
+          <MarqueeCard key={`${photo.src}-dup`} {...photo} aria-hidden="true" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function TorneoThumb({ src, alt }) {
   const openLightbox = useLightbox();
   return (
@@ -119,41 +123,41 @@ function TorneoThumb({ src, alt }) {
 
 function TorneoBlock({ label, jugadores, ganadores }) {
   return (
-    <div style={{ marginBottom: 36 }}>
-      <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-        {label}
-      </span>
-
-      <h4
-        style={{
-          fontSize: 15,
-          fontWeight: 700,
-          margin: "14px 0 10px",
-          color: "var(--text-secondary)",
-        }}
-      >
-        Jugadores
-      </h4>
-      <div className="torneo-thumb-grid" style={{ marginBottom: 20 }}>
-        {jugadores.map((photo) => (
-          <TorneoThumb key={photo.src} src={photo.src} alt={photo.alt} />
-        ))}
+    <div style={{ marginBottom: 40 }}>
+      <div className="container">
+        <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
+          {label}
+        </span>
+        <h4
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            margin: "14px 0 4px",
+            color: "var(--text-secondary)",
+          }}
+        >
+          Jugadores
+        </h4>
       </div>
 
-      <h4
-        style={{
-          fontSize: 15,
-          fontWeight: 700,
-          margin: "0 0 10px",
-          color: "var(--text-secondary)",
-        }}
-      >
-        Ganadores
-      </h4>
-      <div className="torneo-thumb-grid">
-        {ganadores.map((photo) => (
-          <TorneoThumb key={photo.src} src={photo.src} alt={photo.alt} />
-        ))}
+      <JugadoresMarquee photos={jugadores} />
+
+      <div className="container">
+        <h4
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            margin: "8px 0 10px",
+            color: "var(--text-secondary)",
+          }}
+        >
+          Ganadores
+        </h4>
+        <div className="torneo-thumb-grid">
+          {ganadores.map((photo) => (
+            <TorneoThumb key={photo.src} src={photo.src} alt={photo.alt} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -185,22 +189,21 @@ export default function TorneosGallery() {
           </a>
         </div>
 
-        {/* TORNEOS YA JUGADOS */}
-        <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20 }}>
+        <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>
           Así se vivieron nuestros torneos
         </h3>
+      </div>
 
-        <p className="mobile-swipe-hint">← Deslizá para ver más fotos →</p>
+      {TOURNAMENTS.map((t) => (
+        <TorneoBlock
+          key={t.id}
+          label={t.label}
+          jugadores={t.jugadores}
+          ganadores={t.ganadores}
+        />
+      ))}
 
-        {TOURNAMENTS.map((t) => (
-          <TorneoBlock
-            key={t.id}
-            label={t.label}
-            jugadores={t.jugadores}
-            ganadores={t.ganadores}
-          />
-        ))}
-
+      <div className="container">
         {/* PRÓXIMOS TORNEOS */}
         <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>
           Próximos Torneos
