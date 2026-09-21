@@ -148,7 +148,7 @@ export default function RacketFinderQuiz() {
           <div className="racket-result-card">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
               <span className="badge-linear badge-amber">Recomendación Personalizada</span>
-              <span style={{ fontSize: 12, fontFamily: "var(--font-mono)", color: "var(--color-muted)" }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color: "var(--color-muted)" }}>
                 Specs Oficiales
               </span>
             </div>

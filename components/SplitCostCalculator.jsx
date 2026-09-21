@@ -130,7 +130,7 @@ export default function SplitCostCalculator() {
                   style={{ flex: 1, padding: "8px 6px", fontSize: 13 }}
                 >
                   <div style={{ fontWeight: 600 }}>{shift.id === "sabado" ? "Sábados" : shift.id === "tarde" ? "Tarde" : "Noche"}</div>
-                  <div style={{ fontSize: 12, fontFamily: "var(--font-mono)" }}>${shift.price.toLocaleString("es-AR")}</div>
+                  <div style={{ fontSize: 12, fontWeight: 500 }}>${shift.price.toLocaleString("es-AR")}</div>
                   <div style={{ fontSize: 10, opacity: 0.85 }}>${(shift.price / 4).toLocaleString("es-AR")} c/u</div>
                 </button>
               ))}

@@ -73,8 +73,8 @@
   --color-semantic-success: #16a34a;
 
   /* Typography Fonts */
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), "Fira Code", monospace;
+  --font-sans: var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Radii */
   --radius-none: 0px;
@@ -935,7 +935,6 @@ select:focus-visible,
 }
 
 .booking-slot .slot-time {
-  font-family: var(--font-mono);
   font-size: 18px;
   font-weight: 700;
   color: var(--color-ink);
@@ -1198,7 +1197,6 @@ select:focus-visible,
 }
 
 .rating-display-val {
-  font-family: var(--font-mono);
   font-size: 54px;
   font-weight: 700;
   color: var(--color-accent-orange);
@@ -1630,7 +1628,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .extra-price {
   font-size: 12px;
   color: var(--color-muted);
-  font-family: var(--font-mono);
 }
 
 .extra-counter-controls {
@@ -1661,7 +1658,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .counter-qty {
-  font-family: var(--font-mono);
   font-weight: 700;
   font-size: 14px;
   color: var(--color-ink);
@@ -1695,7 +1691,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .split-amount-big {
-  font-family: var(--font-mono);
   font-size: 42px;
   font-weight: 700;
   color: var(--color-accent-orange);
@@ -1726,13 +1721,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .ticket-row strong {
-  font-family: var(--font-mono);
   color: var(--color-ink);
 }
 
 .ticket-row.total {
   font-size: 15px;
   font-weight: 600;
+  border-top: 1px solid var(--color-hairline-strong);
+  padding-top: 12px;
+  margin-top: 6px;
   color: var(--color-ink);
 }
 
@@ -1747,11 +1744,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
   margin: 6px 0;
 }
 
-.split-alias-notice {
+.split-copy-success-box {
+  background: #ecfdf5;
+  border: 1px solid #10b981;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-top: 16px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  animation: fadeIn 0.25s ease;
+}
+
+.split-alias-notice {
+  text-align: center;
   font-size: 12px;
   color: var(--color-muted);
   margin-top: 14px;
@@ -1761,7 +1767,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   background: var(--color-accent-orange-subtle);
   padding: 3px 8px;
   border-radius: 4px;
-  font-family: var(--font-mono);
   color: var(--color-text-link);
   font-weight: 600;
   border: 1px solid var(--color-accent-orange-border);
@@ -1808,7 +1813,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .court-glass-indicator {
   font-size: 11px;
-  font-family: var(--font-mono);
+  font-weight: 600;
   color: #93c5fd;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -1994,7 +1999,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .fixture-vs {
-  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
   color: var(--color-muted);
@@ -2255,7 +2259,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   background: var(--color-accent-orange-subtle);
   border: 1px solid var(--color-accent-orange-border);
   color: var(--color-accent-orange);
-  font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 700;
   padding: 4px 10px;
@@ -2306,14 +2309,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .pass-price-val {
-  font-family: var(--font-mono);
   font-size: 18px;
   font-weight: 700;
   color: var(--color-ink);
 }
 
 .pass-sena-val {
-  font-family: var(--font-mono);
   font-size: 18px;
   font-weight: 700;
   color: #16a34a;
@@ -2348,14 +2349,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .pass-alias-code {
-  font-family: var(--font-mono);
   color: var(--color-accent-orange);
   font-size: 14px;
   font-weight: 700;
 }
 
 .pass-cbu-code {
-  font-family: var(--font-mono);
   color: var(--color-body);
   font-size: 11.5px;
 }
@@ -2670,7 +2669,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .admin-kpi-val {
-  font-family: var(--font-mono);
   font-size: 26px;
   font-weight: 700;
   color: var(--color-ink);
@@ -2745,13 +2743,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .admin-slot-time-col strong {
   font-size: 15px;
   color: var(--color-ink);
-  font-family: var(--font-mono);
+  font-weight: 700;
 }
 
 .admin-slot-time-col span {
   font-size: 11px;
   color: var(--color-muted);
-  font-family: var(--font-mono);
 }
 
 .admin-slot-info-col {
@@ -3033,8 +3030,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .racket-spec-row strong {
   color: var(--color-ink);
-  font-family: var(--font-mono);
   font-size: 12px;
+  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -3135,7 +3132,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .scoreboard-val-col {
-  font-family: var(--font-mono);
   font-weight: 700;
   text-align: center;
   font-size: 18px;

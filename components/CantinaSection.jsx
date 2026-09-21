@@ -199,7 +199,6 @@ export default function CantinaSection() {
               </div>
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
                   fontWeight: 600,
                   color: "var(--text-primary)",
                   fontSize: 16,

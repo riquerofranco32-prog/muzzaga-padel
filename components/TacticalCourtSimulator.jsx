@@ -311,7 +311,7 @@ export default function TacticalCourtSimulator() {
             <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span className="live-dot" style={{ background: "#22c55e" }} />
-                <span style={{ fontSize: 12, color: "#93c5fd", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
+                <span style={{ fontSize: 12, color: "#ffffff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
                   {boardMode === "presets" ? "Animación en Vivo" : boardMode === "rope" ? "Sincronía de Pareja" : "Modo Libre"}
                 </span>
               </div>
@@ -384,7 +384,7 @@ export default function TacticalCourtSimulator() {
               <line x1="12" y1="250" x2="288" y2="250" stroke="#ffffff" strokeWidth="3.5" strokeDasharray="5 3" opacity="0.95" />
               <circle cx="15" cy="250" r="4" fill="#ff5e00" />
               <circle cx="285" cy="250" r="4" fill="#ff5e00" />
-              <text x="150" y="246" fill="#ffffff" fontSize="9" textAnchor="middle" opacity="0.8" fontFamily="var(--font-mono)">
+              <text x="150" y="246" fill="#ffffff" fontSize="9" textAnchor="middle" opacity="0.8" fontWeight="600">
                 RED CENTRAL
               </text>
 

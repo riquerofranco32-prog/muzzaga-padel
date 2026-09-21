@@ -210,7 +210,7 @@ export default function BookingCalendar() {
                   {court?.name} · {court?.type}
                 </span>
                 <div style={{ marginTop: 2, textAlign: "left" }}>
-                  <div style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: 13, color: "var(--color-ink)" }}>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: "var(--color-ink)" }}>
                     ${pricing.total.toLocaleString("es-AR")}
                   </div>
                   <div style={{ fontSize: 11, color: "var(--color-body)" }}>
@@ -235,7 +235,7 @@ export default function BookingCalendar() {
               {COURTS.find((c) => c.id === selected.courtId)?.name}
             </p>
             <div style={{ marginTop: 6, padding: "8px 12px", background: "var(--color-surface-hover, rgba(255,255,255,0.05))", borderRadius: "var(--radius-md, 8px)", border: "1px solid var(--color-hairline, rgba(255,255,255,0.1))" }}>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: 16, fontWeight: 700, color: "var(--color-ink)" }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)" }}>
                 ${selectedPricing.total.toLocaleString("es-AR")}
               </div>
               <div style={{ fontSize: 12, color: "var(--color-body)" }}>

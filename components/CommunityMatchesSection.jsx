@@ -141,7 +141,7 @@ export default function CommunityMatchesSection() {
                     <span className={`badge-linear ${match.badgeColor}`}>
                       {match.category}
                     </span>
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
                       {match.time}
                     </span>
                   </div>
@@ -188,7 +188,7 @@ export default function CommunityMatchesSection() {
                     <span style={{ fontSize: 11, color: "var(--text-muted)", display: "block" }}>
                       Tu plaza:
                     </span>
-                    <strong style={{ color: "var(--text-primary)", fontFamily: "var(--font-mono)", fontSize: 16 }}>
+                    <strong style={{ color: "var(--text-primary)", fontSize: 16 }}>
                       ${match.pricePerPlayer.toLocaleString("es-AR")}
                     </strong>
                   </div>

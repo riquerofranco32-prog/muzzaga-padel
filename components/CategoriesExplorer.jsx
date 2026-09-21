@@ -160,7 +160,7 @@ export default function CategoriesExplorer() {
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
                 <span className={`badge-linear ${current.badge}`}>{current.rating}</span>
-                <span style={{ fontSize: 13, color: "var(--color-muted)", fontFamily: "var(--font-mono)" }}>
+                <span style={{ fontSize: 13, color: "var(--color-muted)", fontWeight: 500 }}>
                   Muzzaga Padel Ranking
                 </span>
               </div>

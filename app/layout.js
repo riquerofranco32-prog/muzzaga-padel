@@ -1,18 +1,11 @@
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import LightboxProvider from "../components/LightboxProvider";
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-jetbrains-mono",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -68,7 +61,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="es" className={poppins.variable}>
       <head>
         <script
           type="application/ld+json"

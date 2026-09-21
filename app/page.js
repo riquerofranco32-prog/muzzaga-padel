@@ -92,7 +92,6 @@ export default function Home() {
               return (
                 <div
                   style={{
-                    fontFamily: "var(--font-mono)",
                     fontSize: 13,
                     color: "var(--text-secondary)",
                     background: "var(--bg-card)",
