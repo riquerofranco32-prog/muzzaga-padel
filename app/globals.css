@@ -1497,6 +1497,18 @@ select:focus-visible,
   margin-bottom: 20px;
 }
 
+.rating-mode-switch--triple {
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 0;
+}
+
+@media (max-width: 480px) {
+  .rating-mode-switch--triple .rating-tab-btn {
+    padding: 0 6px;
+    font-size: 12px;
+  }
+}
+
 .rating-tab-btn {
   background: transparent;
   border: none;
