@@ -67,7 +67,7 @@ export default function SplitCostCalculator() {
     let msg = `*DESGLOSE PARTIDO - MUZZAGA PÁDEL*\n`;
     msg += `• Cancha (90 min): $${canchaPrice.toLocaleString("es-AR")}\n`;
     msg += `  ($${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro)\n`;
-    
+
     const extraEntries = Object.entries(selectedExtras);
     if (extraEntries.length > 0) {
       msg += `\n• Cantina & Extras:\n`;
@@ -93,12 +93,18 @@ export default function SplitCostCalculator() {
       <div className="container">
         <div className="section-header-row">
           <div>
-            <span className="badge-linear badge-emerald" style={{ marginBottom: 8 }}>
+            <span
+              className="badge-linear badge-emerald"
+              style={{ marginBottom: 8 }}
+            >
               Herramienta para Grupos
             </span>
-            <h2 className="section-title">Calculadora de Partido &amp; 3er Tiempo</h2>
+            <h2 className="section-title">
+              Calculadora de Partido &amp; 3er Tiempo
+            </h2>
             <p className="section-desc">
-              Dividí en segundos la cancha y lo que van a comer o tomar en la cantina. Copiá el desglose y pasalo al grupo.
+              Dividí en segundos la cancha y lo que van a comer o tomar en la
+              cantina. Copiá el desglose y pasalo al grupo.
             </p>
           </div>
         </div>
@@ -110,7 +116,9 @@ export default function SplitCostCalculator() {
               <span className="split-step-badge">1</span>
               <div>
                 <h3 className="split-step-title">Turno de Cancha (90 min)</h3>
-                <p className="split-step-desc">Tarifa fija para todos los días y horarios</p>
+                <p className="split-step-desc">
+                  Tarifa fija para todos los días y horarios
+                </p>
               </div>
             </div>
 
@@ -127,7 +135,13 @@ export default function SplitCostCalculator() {
               }}
             >
               <div>
-                <div style={{ fontWeight: 600, color: "var(--color-ink)", fontSize: 14 }}>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    color: "var(--color-ink)",
+                    fontSize: 14,
+                  }}
+                >
                   Cancha Oficial de Cristal
                 </div>
                 <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
@@ -135,10 +149,22 @@ export default function SplitCostCalculator() {
                 </div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontWeight: 700, fontSize: 16, color: "var(--color-ink)" }}>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 16,
+                    color: "var(--color-ink)",
+                  }}
+                >
                   ${canchaPrice.toLocaleString("es-AR")}
                 </div>
-                <div style={{ fontSize: 11.5, color: "var(--color-text-link)", fontWeight: 600 }}>
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    color: "var(--color-text-link)",
+                    fontWeight: 600,
+                  }}
+                >
                   $15.000 c/u (cuarteto)
                 </div>
               </div>
@@ -148,7 +174,9 @@ export default function SplitCostCalculator() {
               <span className="split-step-badge">2</span>
               <div>
                 <h3 className="split-step-title">Jugadores a dividir</h3>
-                <p className="split-step-desc">¿Entre cuántos dividen los gastos?</p>
+                <p className="split-step-desc">
+                  ¿Entre cuántos dividen los gastos?
+                </p>
               </div>
             </div>
 
@@ -169,10 +197,13 @@ export default function SplitCostCalculator() {
               <span className="split-step-badge">3</span>
               <div>
                 <h3 className="split-step-title">Sumar Cantina &amp; Extras</h3>
-                <p className="split-step-desc">Pizzas, birras, bebidas y minutas para el partido.</p>
+                <p className="split-step-desc">
+                  Pizzas, birras, bebidas y minutas para el partido.
+                </p>
               </div>
             </div>
 
+            <p className="mobile-swipe-hint">← Deslizá para ver más extras →</p>
             <div className="extras-selector-list">
               {EXTRAS.map((extra) => {
                 const qty = selectedExtras[extra.id] || 0;
@@ -181,7 +212,9 @@ export default function SplitCostCalculator() {
                     <div className="extra-info">
                       <div>
                         <strong className="extra-name">{extra.name}</strong>
-                        <span className="extra-price">${extra.price.toLocaleString("es-AR")}</span>
+                        <span className="extra-price">
+                          ${extra.price.toLocaleString("es-AR")}
+                        </span>
                       </div>
                     </div>
                     <div className="extra-counter-controls">
@@ -217,7 +250,9 @@ export default function SplitCostCalculator() {
               <span className="split-ticket-badge">Resumen del Partido</span>
               <div className="split-amount-big">
                 ${perPerson.toLocaleString("es-AR")}
-                <span className="split-amount-sub">por jugador ({players} pers.)</span>
+                <span className="split-amount-sub">
+                  por jugador ({players} pers.)
+                </span>
               </div>
             </div>
 
@@ -226,7 +261,8 @@ export default function SplitCostCalculator() {
                 <div>
                   <span>Cancha Oficial (90 min)</span>
                   <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                    ${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro
+                    ${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si
+                    son cuatro
                   </div>
                 </div>
                 <strong>${canchaPrice.toLocaleString("es-AR")}</strong>
@@ -240,7 +276,9 @@ export default function SplitCostCalculator() {
                     <span>
                       {qty}x {item.name}
                     </span>
-                    <strong>${(item.price * qty).toLocaleString("es-AR")}</strong>
+                    <strong>
+                      ${(item.price * qty).toLocaleString("es-AR")}
+                    </strong>
                   </div>
                 );
               })}
@@ -256,10 +294,17 @@ export default function SplitCostCalculator() {
             <button
               type="button"
               className="btn btn-whatsapp"
-              style={{ width: "100%", justifyContent: "center", minHeight: 46, fontSize: 15 }}
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                minHeight: 46,
+                fontSize: 15,
+              }}
               onClick={copyToWhatsapp}
             >
-              {copied ? "¡Desglose copiado al portapapeles!" : "Copiar desglose para WhatsApp"}
+              {copied
+                ? "¡Desglose copiado al portapapeles!"
+                : "Copiar desglose para WhatsApp"}
             </button>
 
             <div className="split-alias-notice">
