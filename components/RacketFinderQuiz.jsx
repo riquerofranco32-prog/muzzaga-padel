@@ -137,7 +137,7 @@ export default function RacketFinderQuiz() {
                 </span>
               </label>
               {injuryHistory && (
-                <p style={{ fontSize: 12, color: "var(--color-accent-orange)", marginTop: 6, background: "var(--color-accent-orange-subtle)", padding: "6px 10px", borderRadius: "var(--radius-sm)" }}>
+                <p style={{ fontSize: 12, color: "#A8501A", marginTop: 6, background: "var(--color-accent-orange-subtle)", padding: "6px 10px", borderRadius: "var(--radius-sm)" }}>
                   💡 Recomendamos balance bajo (Redonda) y goma EVA Soft con antivibradores ShockOut.
                 </p>
               )}
@@ -154,7 +154,7 @@ export default function RacketFinderQuiz() {
             </div>
 
             <h3 style={{ fontSize: 22, fontWeight: 700, color: "var(--color-ink)", marginBottom: 12 }}>
-              Formato: <span style={{ color: "var(--color-accent-orange)" }}>{current.name}</span>
+              Formato: <span style={{ color: "#A8501A" }}>{current.name}</span>
             </h3>
 
             {/* SVG Visualizer de la pala */}
@@ -168,32 +168,32 @@ export default function RacketFinderQuiz() {
                 </defs>
 
                 {/* Mango / Grip */}
-                <rect x="90" y="160" width="20" height="70" rx="4" fill="#171717" />
+                <rect x="90" y="160" width="20" height="70" rx="4" fill="#1B1B19" />
                 <line x1="90" y1="175" x2="110" y2="175" stroke="#40444c" strokeWidth="1.5" />
                 <line x1="90" y1="190" x2="110" y2="190" stroke="#40444c" strokeWidth="1.5" />
                 <line x1="90" y1="205" x2="110" y2="205" stroke="#40444c" strokeWidth="1.5" />
                 <line x1="90" y1="220" x2="110" y2="220" stroke="#40444c" strokeWidth="1.5" />
                 {/* Cuerda de seguridad */}
-                <path d="M 100 230 Q 100 240, 110 240" fill="none" stroke="#ff5e00" strokeWidth="2" />
+                <path d="M 100 230 Q 100 240, 110 240" fill="none" stroke="#E8722A" strokeWidth="2" />
 
                 {/* Puente corazón */}
                 <path d="M 85 160 L 100 135 L 115 160 Z" fill="#ffffff" stroke="#dcdee0" strokeWidth="2" />
 
                 {/* Cabeza según formato */}
                 {playStyle === "control" && (
-                  <circle cx="100" cy="85" r="55" fill="url(#racketGlow)" stroke="#ff5e00" strokeWidth="3" />
+                  <circle cx="100" cy="85" r="55" fill="url(#racketGlow)" stroke="#E8722A" strokeWidth="3" />
                 )}
                 {playStyle === "polivalente" && (
-                  <path d="M 100 25 C 145 25, 155 75, 135 135 C 120 150, 80 150, 65 135 C 45 75, 55 25, 100 25 Z" fill="url(#racketGlow)" stroke="#ff5e00" strokeWidth="3" />
+                  <path d="M 100 25 C 145 25, 155 75, 135 135 C 120 150, 80 150, 65 135 C 45 75, 55 25, 100 25 Z" fill="url(#racketGlow)" stroke="#E8722A" strokeWidth="3" />
                 )}
                 {playStyle === "potencia" && (
-                  <path d="M 100 20 L 155 45 C 160 85, 140 130, 125 145 L 75 145 C 60 130, 40 85, 45 45 Z" fill="url(#racketGlow)" stroke="#ff5e00" strokeWidth="3" />
+                  <path d="M 100 20 L 155 45 C 160 85, 140 130, 125 145 L 75 145 C 60 130, 40 85, 45 45 Z" fill="url(#racketGlow)" stroke="#E8722A" strokeWidth="3" />
                 )}
 
                 {/* Perforaciones aerodinámicas */}
                 {[-25, -12, 0, 12, 25].map((x) =>
                   [-20, -8, 4, 16].map((y) => (
-                    <circle key={`${x}-${y}`} cx={100 + x} cy={85 + y} r="2.5" fill="#171717" opacity="0.75" />
+                    <circle key={`${x}-${y}`} cx={100 + x} cy={85 + y} r="2.5" fill="#1B1B19" opacity="0.75" />
                   ))
                 )}
 
@@ -203,7 +203,7 @@ export default function RacketFinderQuiz() {
                   cy={playStyle === "potencia" ? 65 : playStyle === "control" ? 85 : 75}
                   r="18"
                   fill="none"
-                  stroke="#ff5e00"
+                  stroke="#E8722A"
                   strokeWidth="2"
                   strokeDasharray="4 2"
                 />

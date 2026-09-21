@@ -9,68 +9,68 @@
   --color-primary: #000000;
   --color-primary-active: #1a1a1a;
   --color-canvas: #ffffff;
-  --color-canvas-soft: #fafafa;
+  --color-canvas-soft: #F4F0E7;
   --color-surface-card: #ffffff;
   --color-surface-subtle: #f8f9fa;
   --color-surface-strong: #f0f0f3;
-  --color-surface-dark: #171717;
-  --color-surface-dark-elevated: #1a1a1a;
+  --color-surface-dark: #1B1B19;
+  --color-surface-dark-elevated: #242421;
 
   /* Aliases for legacy component bindings */
   --bg-floor: #ffffff;
-  --bg-surface: #fafafa;
+  --bg-surface: #F4F0E7;
   --bg-surface-subtle: #f8f9fa;
   --bg-card: #ffffff;
-  --bg-card-hover: #fafafa;
+  --bg-card-hover: #F4F0E7;
   --bg-elevated: #ffffff;
 
   /* Hairlines & Borders */
-  --color-hairline: #f0f0f3;
-  --color-hairline-soft: #f5f5f7;
-  --color-hairline-strong: #dcdee0;
-  --border-subtle: #f0f0f3;
-  --border-strong: #dcdee0;
-  --border-glow: rgba(255, 94, 0, 0.35);
+  --color-hairline: #e8e6df;
+  --color-hairline-soft: #f2efe8;
+  --color-hairline-strong: #d5d1c8;
+  --border-subtle: #e8e6df;
+  --border-strong: #d5d1c8;
+  --border-glow: rgba(232, 114, 42, 0.35);
 
   /* Expo Typography & Ink */
-  --color-ink: #171717;
-  --color-body: #60646c;
-  --color-body-strong: #171717;
-  --color-muted: #999999;
-  --color-muted-soft: #cccccc;
+  --color-ink: #1B1B19;
+  --color-body: #52524e;
+  --color-body-strong: #1B1B19;
+  --color-muted: #6B6B66;
+  --color-muted-soft: #9c9c96;
   --color-on-primary: #ffffff;
   --color-on-dark: #ffffff;
-  --color-on-dark-soft: #b0b4ba;
+  --color-on-dark-soft: #d0cec7;
 
-  --text-primary: #171717;
-  --text-secondary: #60646c;
-  --text-muted: #999999;
+  --text-primary: #1B1B19;
+  --text-secondary: #52524e;
+  --text-muted: #6B6B66;
   --text-on-accent: #ffffff;
 
-  /* Brand Accents — HIGH-ENERGY ORANGE VOLTAGE */
-  --color-accent-orange: #ff5e00;
-  --color-accent-orange-hover: #e05200;
-  --color-accent-orange-subtle: #fff7ed;
-  --color-accent-orange-border: #fed7aa;
-  --color-text-link: #ea580c;
-  --color-text-link-secondary: #ff5e00;
-  --color-gradient-sky-light: #fff5eb;
-  --color-gradient-sky-mid: #fed7aa;
+  /* Brand Accents — OFICIAL MUZZAGA */
+  --color-accent-orange: #E8722A;
+  --color-accent-orange-hover: #cf611e;
+  --color-accent-orange-subtle: #fdf6f0;
+  --color-accent-orange-border: #f2cbb4;
+  --color-text-link: #A8501A;
+  --color-text-link-secondary: #A8501A;
+  --color-gradient-sky-light: #fef8f4;
+  --color-gradient-sky-mid: #f2cbb4;
 
-  --accent-orange: #ff5e00;
-  --accent-orange-hover: #e05200;
-  --accent-orange-subtle: #fff7ed;
-  --accent-orange-border: #fed7aa;
-  --accent-linear: #ff5e00;
-  --accent-linear-hover: #e05200;
-  --accent-sky: #ff5e00;
-  --accent-blue-link: #ea580c;
-  --accent-emerald: #16a34a;
-  --accent-warning: #ea580c;
+  --accent-orange: #E8722A;
+  --accent-orange-hover: #cf611e;
+  --accent-orange-subtle: #fdf6f0;
+  --accent-orange-border: #f2cbb4;
+  --accent-linear: #E8722A;
+  --accent-linear-hover: #cf611e;
+  --accent-sky: #A8501A;
+  --accent-blue-link: #A8501A;
+  --accent-emerald: #0F7B4F;
+  --accent-warning: #A8501A;
 
   /* Semantic Colors */
   --color-semantic-error: #e11d48;
-  --color-semantic-success: #16a34a;
+  --color-semantic-success: #0F7B4F;
 
   /* Typography Fonts */
   --font-sans: var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -213,16 +213,16 @@ select:focus-visible,
 
 /* Shimmer & Gradient Typography */
 .gradient-text {
-  background: linear-gradient(135deg, #171717 20%, #40444c 75%, #60646c 100%);
+  background: linear-gradient(135deg, #1B1B19 20%, #40444c 75%, #60646c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-accent {
-  background: linear-gradient(135deg, #ff5e00 0%, #ea580c 60%, #c2410c 100%);
+  background: linear-gradient(135deg, #E8722A 0%, #cf611e 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(255, 94, 0, 0.2));
+  filter: drop-shadow(0 2px 10px rgba(232, 114, 42, 0.2));
 }
 
 /* ==========================================================================
@@ -323,17 +323,17 @@ select:focus-visible,
 
 /* WhatsApp Button */
 .btn-whatsapp {
-  background: #16a34a;
+  background: #0F7B4F;
   color: #ffffff;
-  border: 1px solid #16a34a;
-  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+  border: 1px solid #0F7B4F;
+  box-shadow: 0 2px 8px rgba(15, 123, 79, 0.25);
   font-weight: 600;
 }
 
 .btn-whatsapp:hover {
-  background: #15803d;
-  border-color: #15803d;
-  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+  background: #0c6340;
+  border-color: #0c6340;
+  box-shadow: 0 4px 14px rgba(15, 123, 79, 0.35);
   transform: translateY(-1px);
 }
 
@@ -355,21 +355,21 @@ select:focus-visible,
 }
 
 .badge-emerald {
-  background: #ecfdf5;
-  border-color: #a7f3d0;
-  color: #059669;
+  background: #e7f5ee;
+  border-color: #a8dfc8;
+  color: #0F7B4F;
 }
 
 .badge-amber {
   background: var(--color-accent-orange-subtle);
   border-color: var(--color-accent-orange-border);
-  color: var(--color-text-link);
+  color: #A8501A;
 }
 
 .badge-indigo {
-  background: #fff7ed;
-  border-color: #fed7aa;
-  color: #ea580c;
+  background: var(--color-accent-orange-subtle);
+  border-color: var(--color-accent-orange-border);
+  color: #A8501A;
 }
 
 .pulse-dot {
@@ -411,7 +411,7 @@ select:focus-visible,
 .brand-mark {
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #ff5e00 0%, #ea580c 100%);
+  background: linear-gradient(135deg, #E8722A 0%, #cf611e 100%);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -419,7 +419,7 @@ select:focus-visible,
   color: #ffffff;
   font-weight: 700;
   font-size: 14px;
-  box-shadow: 0 2px 8px rgba(255, 94, 0, 0.35);
+  box-shadow: 0 2px 8px rgba(232, 114, 42, 0.35);
 }
 
 .brand-text {
@@ -1783,7 +1783,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .tactical-court-wrap {
-  background: #091a2e;
+  background: #1B1B19;
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-xl);
   padding: 24px;
@@ -1814,7 +1814,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .court-glass-indicator {
   font-size: 11px;
   font-weight: 600;
-  color: #93c5fd;
+  color: rgba(255, 255, 255, 0.75);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-top: 14px;
@@ -2062,7 +2062,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff5e00 0%, #ea580c 100%);
+  background: linear-gradient(135deg, #E8722A 0%, #cf611e 100%);
   color: #ffffff;
   font-weight: 700;
   font-size: 15px;
@@ -2378,8 +2378,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .pass-copy-btn.copied {
-  background: #16a34a;
-  border-color: #16a34a;
+  background: #0F7B4F;
+  border-color: #0F7B4F;
   color: #ffffff;
 }
 
@@ -3046,7 +3046,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .golden-point-banner {
-  background: linear-gradient(90deg, #ea580c 0%, #ff5e00 100%);
+  background: linear-gradient(90deg, #A8501A 0%, #E8722A 100%);
   color: #ffffff;
   padding: 10px 16px;
   border-radius: var(--radius-md);

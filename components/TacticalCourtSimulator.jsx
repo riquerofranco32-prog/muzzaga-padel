@@ -310,7 +310,7 @@ export default function TacticalCourtSimulator() {
           <div className="tactical-court-wrap">
             <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span className="live-dot" style={{ background: "#22c55e" }} />
+                <span className="live-dot" style={{ background: "#0F7B4F" }} />
                 <span style={{ fontSize: 12, color: "#ffffff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
                   {boardMode === "presets" ? "Animación en Vivo" : boardMode === "rope" ? "Sincronía de Pareja" : "Modo Libre"}
                 </span>
@@ -382,8 +382,8 @@ export default function TacticalCourtSimulator() {
 
               {/* Net Line & Posts */}
               <line x1="12" y1="250" x2="288" y2="250" stroke="#ffffff" strokeWidth="3.5" strokeDasharray="5 3" opacity="0.95" />
-              <circle cx="15" cy="250" r="4" fill="#ff5e00" />
-              <circle cx="285" cy="250" r="4" fill="#ff5e00" />
+              <circle cx="15" cy="250" r="4" fill="#E8722A" />
+              <circle cx="285" cy="250" r="4" fill="#E8722A" />
               <text x="150" y="246" fill="#ffffff" fontSize="9" textAnchor="middle" opacity="0.8" fontWeight="600">
                 RED CENTRAL
               </text>
@@ -396,7 +396,7 @@ export default function TacticalCourtSimulator() {
                     y1={currentPlayers.p1.y}
                     x2={currentPlayers.p2.x}
                     y2={currentPlayers.p2.y}
-                    stroke="#22c55e"
+                    stroke="#0F7B4F"
                     strokeWidth="2.5"
                     strokeDasharray="4 4"
                     opacity="0.9"
@@ -454,9 +454,9 @@ export default function TacticalCourtSimulator() {
                   {/* Bounce Indicator */}
                   {tactic.bouncePos && (
                     <g transform={`translate(${tactic.bouncePos.x}, ${tactic.bouncePos.y})`}>
-                      <circle r="10" fill="rgba(255, 94, 0, 0.2)" stroke="#ff5e00" strokeWidth="1.5" strokeDasharray="3 2" />
-                      <circle r="3.5" fill="#ff5e00" />
-                      <text x="0" y="-12" fill="#ff5e00" fontSize="9.5" textAnchor="middle" fontWeight="bold">
+                      <circle r="10" fill="rgba(232, 114, 42, 0.2)" stroke="#E8722A" strokeWidth="1.5" strokeDasharray="3 2" />
+                      <circle r="3.5" fill="#E8722A" />
+                      <text x="0" y="-12" fill="#E8722A" fontSize="9.5" textAnchor="middle" fontWeight="bold">
                         1° Pique
                       </text>
                     </g>
@@ -476,16 +476,16 @@ export default function TacticalCourtSimulator() {
 
               {/* PLAYERS (Equipo Naranja / Muzzaga) */}
               <g transform={`translate(${currentPlayers.p1.x}, ${currentPlayers.p1.y})`}>
-                <circle r="13" fill="rgba(255, 94, 0, 0.25)" stroke="#ff5e00" strokeWidth="2.5" />
-                <circle r="7" fill="#ff5e00" />
+                <circle r="13" fill="rgba(232, 114, 42, 0.25)" stroke="#E8722A" strokeWidth="2.5" />
+                <circle r="7" fill="#E8722A" />
                 <text x="0" y="22" fill="#ffffff" fontSize="9.5" textAnchor="middle" fontWeight="bold">
                   {currentPlayers.p1.label}
                 </text>
               </g>
 
               <g transform={`translate(${currentPlayers.p2.x}, ${currentPlayers.p2.y})`}>
-                <circle r="13" fill="rgba(255, 94, 0, 0.25)" stroke="#ff5e00" strokeWidth="2.5" />
-                <circle r="7" fill="#ff5e00" />
+                <circle r="13" fill="rgba(232, 114, 42, 0.25)" stroke="#E8722A" strokeWidth="2.5" />
+                <circle r="7" fill="#E8722A" />
                 <text x="0" y="22" fill="#ffffff" fontSize="9.5" textAnchor="middle" fontWeight="bold">
                   {currentPlayers.p2.label}
                 </text>
@@ -495,7 +495,7 @@ export default function TacticalCourtSimulator() {
               <g transform={`translate(${currentPlayers.r1.x}, ${currentPlayers.r1.y})`}>
                 <circle r="12" fill="rgba(56, 189, 248, 0.25)" stroke="#38bdf8" strokeWidth="2" />
                 <circle r="6" fill="#38bdf8" />
-                <text x="0" y="-14" fill="#93c5fd" fontSize="9" textAnchor="middle" fontWeight="bold">
+                <text x="0" y="-14" fill="#ffffff" fontSize="9" textAnchor="middle" fontWeight="bold">
                   {currentPlayers.r1.label}
                 </text>
               </g>
@@ -503,7 +503,7 @@ export default function TacticalCourtSimulator() {
               <g transform={`translate(${currentPlayers.r2.x}, ${currentPlayers.r2.y})`}>
                 <circle r="12" fill="rgba(56, 189, 248, 0.25)" stroke="#38bdf8" strokeWidth="2" />
                 <circle r="6" fill="#38bdf8" />
-                <text x="0" y="-14" fill="#93c5fd" fontSize="9" textAnchor="middle" fontWeight="bold">
+                <text x="0" y="-14" fill="#ffffff" fontSize="9" textAnchor="middle" fontWeight="bold">
                   {currentPlayers.r2.label}
                 </text>
               </g>
@@ -621,8 +621,8 @@ export default function TacticalCourtSimulator() {
                   ))}
                 </div>
 
-                <div className="pro-tip-box" style={{ background: "#ecfdf5", borderColor: "#059669" }}>
-                  <strong style={{ color: "#059669", fontSize: 13, display: "block", marginBottom: 4 }}>
+                <div className="pro-tip-box" style={{ background: "#e7f5ee", borderColor: "#0F7B4F" }}>
+                  <strong style={{ color: "#0F7B4F", fontSize: 13, display: "block", marginBottom: 4 }}>
                     ✓ Regla de Oro del Doble en Muzzaga:
                   </strong>
                   <span style={{ fontSize: 12.5, color: "var(--color-ink)" }}>
@@ -654,8 +654,8 @@ export default function TacticalCourtSimulator() {
                   </label>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
                     {[
-                      { id: "p1", name: "J1 (Tu Jugador)", color: "#ff5e00" },
-                      { id: "p2", name: "J2 (Tu Pareja)", color: "#ff5e00" },
+                      { id: "p1", name: "J1 (Tu Jugador)", color: "#E8722A" },
+                      { id: "p2", name: "J2 (Tu Pareja)", color: "#E8722A" },
                       { id: "r1", name: "R1 (Rival Drive)", color: "#38bdf8" },
                       { id: "r2", name: "R2 (Rival Revés)", color: "#38bdf8" },
                     ].map((btn) => (

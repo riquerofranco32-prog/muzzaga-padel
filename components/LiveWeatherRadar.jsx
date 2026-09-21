@@ -24,7 +24,7 @@ export default function LiveWeatherRadar() {
   return (
     <div className="live-weather-radar-bar">
       <div className="radar-status-item">
-        <span className="pulse-dot" style={{ color: "#10b981" }} />
+        <span className="pulse-dot" style={{ color: "#0F7B4F" }} />
         <span>Club Abierto · {time || "20:00"} hs en Catriel</span>
       </div>
 

@@ -9,7 +9,7 @@ const ALL_CATEGORIES = [
     sub: "Iniciación & Principiantes",
     rating: "1.5 - 2.6",
     badge: "badge-emerald",
-    color: "#059669",
+    color: "#0F7B4F",
     tagline: "El punto de partida: diversión, ritmo y control de rebote.",
     skills: [
       { name: "Saque y Devolución", level: "Básico y consistente", pct: 70 },
@@ -27,7 +27,7 @@ const ALL_CATEGORIES = [
     sub: "Intermedio / En Crecimiento",
     rating: "2.7 - 3.8",
     badge: "badge-amber",
-    color: "#ea580c",
+    color: "#A8501A",
     tagline: "Partidos parejos y dinámicos: voleas firmes, bandejas y transiciones.",
     skills: [
       { name: "Saque y Devolución", level: "Profundo con efecto", pct: 85 },
@@ -45,7 +45,7 @@ const ALL_CATEGORIES = [
     sub: "Intermedio Alto / Avanzado",
     rating: "3.9 - 4.8",
     badge: "badge-indigo",
-    color: "#ff5e00",
+    color: "#A8501A",
     tagline: "Ritmo veloz, lectura táctica de rivales y variantes ofensivas en la red.",
     skills: [
       { name: "Saque y Devolución", level: "Agresivo buscando tomar la red", pct: 90 },
@@ -81,7 +81,7 @@ const ALL_CATEGORIES = [
     sub: "Circuito Femenino",
     rating: "2.0 - 5.0",
     badge: "badge-emerald",
-    color: "#059669",
+    color: "#0F7B4F",
     tagline: "Comunidad femenina activa: torneos por categorías, clínicas y tercer tiempo.",
     skills: [
       { name: "Estrategia de Pareja", level: "Constancia, juego cruzado y globos", pct: 90 },
@@ -99,7 +99,7 @@ const ALL_CATEGORIES = [
     sub: "Categorías Combinadas",
     rating: "Parejas Equilibradas",
     badge: "badge-indigo",
-    color: "#ff5e00",
+    color: "#A8501A",
     tagline: "La fórmula perfecta para jugar con amigos o pareja de distinto nivel.",
     skills: [
       { name: "Compensación Táctica", level: "Estrategia para potenciar a la pareja", pct: 92 },
@@ -165,7 +165,7 @@ export default function CategoriesExplorer() {
                 </span>
               </div>
               <h3 style={{ fontSize: 26, fontWeight: 700, color: "var(--color-ink)", margin: "4px 0" }}>
-                {current.name} · <span style={{ color: "var(--color-accent-orange)" }}>{current.sub}</span>
+                {current.name} · <span style={{ color: "#A8501A" }}>{current.sub}</span>
               </h3>
               <p style={{ fontSize: 15, color: "var(--color-body)", marginTop: 4 }}>
                 {current.tagline}

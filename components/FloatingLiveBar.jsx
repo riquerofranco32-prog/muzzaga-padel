@@ -23,7 +23,7 @@ export default function FloatingLiveBar() {
     <aside className="floating-live-pill" aria-label="Acceso rápido a reservas y estado de canchas">
       <div className="floating-live-inner">
         <div className="floating-live-status">
-          <span className="pulse-dot" style={{ color: "#16a34a" }} />
+          <span className="pulse-dot" style={{ color: "#0F7B4F" }} />
           <span className="floating-status-txt">
             <strong>Canchas 1 &amp; 2:</strong> Turnos Abiertos
           </span>
