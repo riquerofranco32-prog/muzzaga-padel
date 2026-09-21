@@ -5,7 +5,9 @@ import Link from "next/link";
 import {
   adminCancelBooking,
   adminCreateManualBooking,
+  adminLogout,
   adminUpdateStatus,
+  checkAdminSession,
   getAdminDayData,
   verifyAdminPassword,
 } from "./actions";
@@ -36,6 +38,7 @@ function statusClass(status) {
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
@@ -61,12 +64,18 @@ export default function AdminPage() {
   const [modalSubmitting, setModalSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Check saved session on mount
+  // La sesión vive en una cookie httpOnly firmada: el cliente no puede leerla
+  // ni falsearla, así que le preguntamos al servidor si sigue vigente.
   useEffect(() => {
-    const saved = sessionStorage.getItem("muzzaga_admin_auth");
-    if (saved === "true") {
-      setIsAuthenticated(true);
-    }
+    let cancelled = false;
+    checkAdminSession().then((res) => {
+      if (cancelled) return;
+      setIsAuthenticated(res.ok);
+      setSessionChecked(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Fetch day data when date or auth changes
@@ -75,13 +84,27 @@ export default function AdminPage() {
     loadDayData(activeDate);
   }, [isAuthenticated, activeDate]);
 
+  /**
+   * Si la cookie venció mientras el panel estaba abierto, los actions
+   * devuelven el error de sesión: en ese caso volvemos al login en vez de
+   * dejar la pantalla con datos viejos y botones que no hacen nada.
+   * @returns {boolean} true si la sesión se cayó y ya se manejó.
+   */
+  function handleExpiredSession(res) {
+    if (res?.ok || !res?.error?.startsWith("Sesión expirada")) return false;
+    setIsAuthenticated(false);
+    setDayData(null);
+    setAuthError(res.error);
+    return true;
+  }
+
   async function loadDayData(date) {
     setLoading(true);
     const res = await getAdminDayData(date);
     setLoading(false);
     if (res.ok) {
       setDayData(res);
-    } else {
+    } else if (!handleExpiredSession(res)) {
       setActionMessage("⚠️ " + (res.error || "Error al cargar datos"));
     }
   }
@@ -93,16 +116,18 @@ export default function AdminPage() {
     const res = await verifyAdminPassword(pinInput);
     setAuthLoading(false);
     if (res.ok) {
+      // La cookie de sesión ya vino en la respuesta del server action.
       setIsAuthenticated(true);
-      sessionStorage.setItem("muzzaga_admin_auth", "true");
+      setPinInput("");
     } else {
-      setAuthError(res.error || "PIN incorrecto");
+      setAuthError(res.error || "Contraseña incorrecta");
     }
   }
 
-  function handleLogout() {
-    sessionStorage.removeItem("muzzaga_admin_auth");
+  async function handleLogout() {
+    await adminLogout();
     setIsAuthenticated(false);
+    setDayData(null);
     setPinInput("");
   }
 
@@ -112,6 +137,8 @@ export default function AdminPage() {
       setActionMessage("✓ Estado actualizado");
       loadDayData(activeDate);
       setTimeout(() => setActionMessage(""), 2000);
+    } else if (!handleExpiredSession(res)) {
+      alert(res.error || "No se pudo actualizar el estado.");
     }
   }
 
@@ -122,7 +149,7 @@ export default function AdminPage() {
       setActionMessage("✓ Turno cancelado y horario liberado");
       loadDayData(activeDate);
       setTimeout(() => setActionMessage(""), 2500);
-    } else {
+    } else if (!handleExpiredSession(res)) {
       alert(res.error || "No se pudo cancelar el turno.");
     }
   }
@@ -157,7 +184,7 @@ export default function AdminPage() {
       setActionMessage("✓ Reserva creada exitosamente");
       loadDayData(activeDate);
       setTimeout(() => setActionMessage(""), 2500);
-    } else {
+    } else if (!handleExpiredSession(res)) {
       alert(res.error || "Error al crear la reserva");
     }
   }
@@ -186,6 +213,16 @@ export default function AdminPage() {
     navigator.clipboard.writeText(text);
     setActionMessage("✓ Planilla del día copiada para WhatsApp");
     setTimeout(() => setActionMessage(""), 2500);
+  }
+
+  // Mientras el servidor confirma la cookie no mostramos nada: si no, al
+  // admin ya logueado le parpadea el formulario en cada recarga.
+  if (!sessionChecked) {
+    return (
+      <div className="admin-login-wrapper">
+        <p style={{ color: "var(--color-muted)", fontSize: 14 }}>Verificando sesión…</p>
+      </div>
+    );
   }
 
   // LOGIN SCREEN

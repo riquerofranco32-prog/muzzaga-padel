@@ -9,20 +9,52 @@ import {
   slotKey,
   toISODate,
 } from "../../lib/booking";
+import {
+  createAdminSession,
+  destroyAdminSession,
+  isAdminAuthenticated,
+  passwordMatches,
+  requireAdmin,
+} from "../../lib/adminSession";
+import {
+  checkLoginAllowed,
+  clearLoginAttempts,
+  registerFailedLogin,
+} from "../../lib/adminRateLimit";
 
 export async function verifyAdminPassword(password) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) {
+  if (!process.env.ADMIN_PASSWORD) {
     return { ok: false, error: "El panel no está disponible (ADMIN_PASSWORD no configurada)." };
   }
-  const input = (password || "").trim();
-  if (input === adminPassword.trim()) {
-    return { ok: true };
+
+  const gate = await checkLoginAllowed();
+  if (!gate.allowed) {
+    return { ok: false, error: gate.error };
   }
-  return { ok: false, error: "Contraseña incorrecta." };
+
+  if (!passwordMatches(password)) {
+    return { ok: false, error: await registerFailedLogin(gate.key) };
+  }
+
+  await clearLoginAttempts(gate.key);
+  await createAdminSession();
+  return { ok: true };
+}
+
+/** El cliente pregunta al servidor si su cookie sigue siendo válida. */
+export async function checkAdminSession() {
+  return { ok: await isAdminAuthenticated() };
+}
+
+export async function adminLogout() {
+  await destroyAdminSession();
+  return { ok: true };
 }
 
 export async function getAdminDayData(isoDate) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const date = isoDate || toISODate(new Date());
   const slotTimes = getSlotTimesForDate(date);
 
@@ -106,6 +138,9 @@ export async function getAdminDayData(isoDate) {
 }
 
 export async function adminCreateManualBooking(input) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const { date, courtId, startTime, endTime, playerName, playerPhone, playersCount, fullCourt, status, notes } = input;
 
   const court = findCourt(courtId);
@@ -155,6 +190,9 @@ export async function adminCreateManualBooking(input) {
 }
 
 export async function adminUpdateStatus(bookingId, newStatus) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   if (!bookingId) return { ok: false, error: "ID de reserva inválido." };
   try {
     const db = getDb();
@@ -169,6 +207,9 @@ export async function adminUpdateStatus(bookingId, newStatus) {
 }
 
 export async function adminCancelBooking(bookingId, date, courtId, startTime) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   if (!bookingId || !date || !courtId || !startTime) {
     return { ok: false, error: "Faltan datos para cancelar el turno." };
   }
