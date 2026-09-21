@@ -24,7 +24,7 @@ const DEFAULT_MATCHES = [
     id: "match-demo-2",
     category: "7ma / Iniciación (1.5 - 2.5)",
     badgeColor: "badge-emerald",
-    courtName: "Cancha 2 · Estándar",
+    courtName: "Cancha 2 · Cristal",
     date: toISODate(new Date()),
     time: "21:30 hs",
     desc: "Partido distendido para divertirse y aprender a jugar con paredes. ¡Ideal para quienes recién arrancan!",

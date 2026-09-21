@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const ALIAS = "muzzaga.padel";
+const ALIAS = "Consultar alias en el mostrador";
 const CBU = "0000003100012345678901";
 const TITULAR = "Muzzaga Pádel SRL (Mercado Pago)";
 

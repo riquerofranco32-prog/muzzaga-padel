@@ -5,88 +5,108 @@ import { BentoPhotoCard } from "./PhotoCard";
 
 const MENU_ITEMS = [
   {
-    category: "pizzas",
-    name: "Pizza Muzzarella",
+    category: "compartir",
+    name: "Pizza muzza",
     desc: "Masa a la piedra casera con abundante muzzarella y orégano",
     price: "$18.000",
-    tag: "Clásico",
   },
   {
-    category: "pizzas",
-    name: "Pizza Napolitana",
-    desc: "Rodajas de tomate fresco, ajo picado y aceite de oliva",
+    category: "compartir",
+    name: "Pizza napo",
+    desc: "Rodajas de tomate fresco, ajo y muzzarella",
     price: "$20.000",
-    tag: "Recomendada",
   },
   {
-    category: "pizzas",
-    name: "Pizza Especial Jamón y Morrones",
-    desc: "Muzzarella, jamón cocido seleccionado y morrones asados",
+    category: "compartir",
+    name: "Pizza especial (jamón, huevo y muzzarella)",
+    desc: "Muzzarella, jamón cocido seleccionado y huevo",
     price: "$22.000",
   },
   {
-    category: "pizzas",
-    name: "Pizza Fugazzeta Rellena",
-    desc: "Cebolla caramelizada crocante con doble queso",
-    price: "$21.000",
+    category: "compartir",
+    name: "Tostados",
+    desc: "Tostado clásico de jamón y queso en pan de miga crocante",
+    price: "$14.000",
   },
   {
-    category: "minutas",
-    name: "Sándwich de Milanesa Completo",
-    desc: "Lechuga, tomate, jamón, queso y huevo frito en pan casero",
-    price: "$22.000",
-    tag: "Abundante",
-  },
-  {
-    category: "minutas",
-    name: "Empanadas de Carne (Docena)",
-    desc: "Carne cortada a cuchillo, masa casera dorada al horno",
+    category: "compartir",
+    name: "Empanadas",
+    desc: "Empanadas caseras de carne al horno",
     price: "$24.000",
   },
   {
-    category: "minutas",
-    name: "Tostado de Jamón y Queso",
-    desc: "Pan de miga crocante y mantecoso",
-    price: "$9.500",
+    category: "compartir",
+    name: "Sándwich de mila",
+    desc: "Sándwich de milanesa casero con lechuga y tomate",
+    price: "$22.000",
   },
   {
     category: "bebidas",
-    name: "Pinta Cerveza Tirada Artesanal",
-    desc: "IPA, Golden o Scottish bien helada al paso",
-    price: "$5.500",
-    tag: "Tirada",
+    name: "Agua 1.5L",
+    desc: "Agua mineral bien fría",
+    price: "$4.000",
   },
   {
     category: "bebidas",
-    name: "Heineken 975 ml",
+    name: "Coca-Cola 1.5L",
+    desc: "Botella grande de 1.5L helada",
+    price: "$6.000",
+  },
+  {
+    category: "bebidas",
+    name: "Heineken 975ml",
     desc: "Botella helada para compartir en el tercer tiempo",
     price: "$9.000",
   },
   {
     category: "bebidas",
-    name: "Fernet Branca con Coca-Cola",
-    desc: "Vaso trago largo con hielo frappe",
-    price: "$8.500",
+    name: "Stella Artois 975ml",
+    desc: "Botella helada para compartir",
+    price: "$9.000",
   },
   {
     category: "bebidas",
-    name: "Gatorade / Powerade 500 ml",
-    desc: "Hidratación isotónica para recuperar durante el partido",
+    name: "Corona 710ml",
+    desc: "Botella de 710ml bien fría",
+    price: "$9.000",
+  },
+  {
+    category: "bebidas",
+    name: "Patagonia 710ml",
+    desc: "Variedades Patagonia botella de 710ml",
+    price: "$9.000",
+  },
+  {
+    category: "bebidas",
+    name: "Fernet y coca",
+    desc: "Vaso de Fernet Branca con Coca-Cola y hielo",
+    price: "$10.000",
+  },
+  {
+    category: "cafeteria",
+    name: "Café grande",
+    desc: "Café en taza grande",
     price: "$4.000",
   },
   {
-    category: "bebidas",
-    name: "Agua Mineral / Saborizada 500 ml",
-    desc: "Con o sin gas bien fría",
-    price: "$2.500",
+    category: "cafeteria",
+    name: "Café chico",
+    desc: "Pocillo de café express",
+    price: "$3.000",
+  },
+  {
+    category: "cafeteria",
+    name: "Porción dulce",
+    desc: "Porción dulce artesanal para acompañar el café",
+    price: "$6.000",
   },
 ];
 
 const CATEGORIES = [
   { id: "all", label: "Todo el Menú" },
-  { id: "pizzas", label: "🍕 Pizzas a la Piedra" },
-  { id: "minutas", label: "🥪 Minutas & Sándwiches" },
-  { id: "bebidas", label: "🍺 Cervezas & Bebidas" },
+  { id: "compartir", label: "🍕 Para Compartir" },
+  { id: "bebidas", label: "🍺 Bebidas" },
+  { id: "cafeteria", label: "☕ Cafetería" },
 ];
 
 export default function CantinaSection() {
@@ -130,17 +150,17 @@ export default function CantinaSection() {
         >
           <BentoPhotoCard
             src="/img/cantina_beer_court.jpg"
-            alt="Cantina de Muzzaga con cerveza tirada"
-            caption="Barra y canillas de cerveza artesanal con vista a la cancha"
-            title="Cerveza Tirada y Vista a Canchas"
+            alt="Cantina de Muzzaga con vista a la cancha"
+            caption="Cantina con vista a las canchas"
+            title="Cantina y Vista a Canchas"
           >
-            Terminá de jugar y pedite una pinta helada mirando el siguiente partido.
+            Terminá de jugar y disfrutá del tercer tiempo con vista a los partidos.
           </BentoPhotoCard>
           <BentoPhotoCard
             src="/img/bar_coffee_snacks.jpg"
-            alt="Empanadas y pantalla grande en la cantina de Muzzaga"
-            caption="Empanadas y pantalla grande en la cantina"
-            title="Empanadas & Pantalla Grande"
+            alt="Empanadas, pizzas y cafetería en la cantina de Muzzaga"
+            caption="Empanadas caseras y cafetería en la cantina"
+            title="Empanadas &amp; Pantalla Grande"
           >
             Mirá los partidos y eventos deportivos en la pantalla de la cantina con algo rico para picar.
           </BentoPhotoCard>
@@ -192,6 +212,10 @@ export default function CantinaSection() {
             </div>
           ))}
         </div>
+
+        <p style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>
+          Consultanos por opciones sin TACC y veganas
+        </p>
       </div>
     </section>
   );

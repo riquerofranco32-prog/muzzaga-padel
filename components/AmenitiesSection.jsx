@@ -1,9 +1,9 @@
 export default function AmenitiesSection() {
   const amenities = [
     {
-      title: "2 Canchas de Cristal Oficiales",
-      desc: "Vidrio templado de 10mm y césped sintético texturado de alta densidad. Rebote homogéneo y velocidad controlada.",
-      tag: "WPT Spec",
+      title: "2 Canchas de Cristal",
+      desc: "Dos canchas de cristal preparadas para juego diurno y nocturno con rebote homogéneo.",
+      tag: "Canchas",
       colorBadge: "badge-emerald",
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -14,9 +14,9 @@ export default function AmenitiesSection() {
       ),
     },
     {
-      title: "Iluminación LED Pro Sin Sombras",
-      desc: "8 proyectores LED de 200W por pista calibrados para partidos nocturnos y transmisiones sin deslumbramiento.",
-      tag: "100% Visibilidad",
+      title: "Iluminación LED",
+      desc: "Iluminación LED en todas las canchas para jugar de noche con excelente visibilidad.",
+      tag: "Visibilidad",
       colorBadge: "badge-amber",
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -33,9 +33,9 @@ export default function AmenitiesSection() {
       ),
     },
     {
-      title: "Cantina & 3er Tiempo Climatizado",
-      desc: "Pizzas a la piedra, sándwiches de milanesa, canillas de cerveza tirada helada y pantalla para ver partidos.",
-      tag: "Social & Club",
+      title: "Cantina Propia",
+      desc: "Espacio gastronómico para el tercer tiempo con pizzas caseras, minutas y bebidas.",
+      tag: "Tercer Tiempo",
       colorBadge: "badge-indigo",
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -48,40 +48,14 @@ export default function AmenitiesSection() {
       ),
     },
     {
-      title: "Alquiler & Test de Paletas",
-      desc: "¿Venís sin equipo? Alquilá paletas de testeo de primeras marcas y tubos de pelotas presurizadas oficiales.",
+      title: "Alquiler de Paletas",
+      desc: "Alquiler de paletas y pelotas en el club para que juegues aunque no tengas tu propio equipo.",
       tag: "Equipamiento",
       colorBadge: "badge-emerald",
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-        </svg>
-      ),
-    },
-    {
-      title: "Vestuarios con Duchas",
-      desc: "Instalaciones cómodas y sanitarios limpios con agua caliente presurizada para cambiarte después del partido.",
-      tag: "Comodidad",
-      colorBadge: "badge-indigo",
-      icon: (
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-          <path d="M12 4v16" />
-        </svg>
-      ),
-    },
-    {
-      title: "Estacionamiento Propio en el Predio",
-      desc: "Espacio exclusivo para autos y motos dentro del club con acceso directo a las canchas.",
-      tag: "Seguridad",
-      colorBadge: "badge-amber",
-      icon: (
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="1" y="3" width="15" height="13" />
-          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-          <circle cx="5.5" cy="18.5" r="2.5" />
-          <circle cx="18.5" cy="18.5" r="2.5" />
         </svg>
       ),
     },

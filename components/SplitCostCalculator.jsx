@@ -10,22 +10,30 @@ const SHIFTS = [
 ];
 
 const EXTRAS = [
-  { id: "pizza_muzze", name: "Pizza Muzzarella", price: 18000, icon: "🍕" },
-  { id: "pizza_napo", name: "Pizza Napolitana", price: 20000, icon: "🍕" },
-  { id: "mila_sandwich", name: "Sándwich de Mila Completo", price: 22000, icon: "🥪" },
-  { id: "birra_heineken", name: "Heineken 975 ml", price: 9000, icon: "🍺" },
-  { id: "birra_tirada", name: "Pinta Cerveza Tirada", price: 5500, icon: "🍻" },
-  { id: "gatorade", name: "Gatorade 500 ml", price: 4000, icon: "⚡" },
-  { id: "tubo_pelotas", name: "Tubo Pelotas Oficiales (Venta)", price: 12000, icon: "🎾" },
-  { id: "paleta_alquiler", name: "Alquiler de Paleta Pro", price: 4000, icon: "🏸" },
+  { id: "pizza_muzza", name: "Pizza muzza", price: 18000, icon: "🍕" },
+  { id: "pizza_napo", name: "Pizza napo", price: 20000, icon: "🍕" },
+  { id: "pizza_especial", name: "Pizza especial", price: 22000, icon: "🍕" },
+  { id: "sandwich_mila", name: "Sándwich de mila", price: 22000, icon: "🥪" },
+  { id: "empanadas", name: "Empanadas", price: 24000, icon: "🥟" },
+  { id: "tostados", name: "Tostados", price: 14000, icon: "🥪" },
+  { id: "heineken", name: "Heineken 975ml", price: 9000, icon: "🍺" },
+  { id: "stella", name: "Stella Artois 975ml", price: 9000, icon: "🍺" },
+  { id: "corona", name: "Corona 710ml", price: 9000, icon: "🍺" },
+  { id: "patagonia", name: "Patagonia 710ml", price: 9000, icon: "🍺" },
+  { id: "fernet", name: "Fernet y coca", price: 10000, icon: "🥃" },
+  { id: "coca", name: "Coca-Cola 1.5L", price: 6000, icon: "🥤" },
+  { id: "agua", name: "Agua 1.5L", price: 4000, icon: "💧" },
+  { id: "cafe_grande", name: "Café grande", price: 4000, icon: "☕" },
+  { id: "cafe_chico", name: "Café chico", price: 3000, icon: "☕" },
+  { id: "porcion_dulce", name: "Porción dulce", price: 6000, icon: "🍰" },
 ];
 
 export default function SplitCostCalculator() {
   const [shiftId, setShiftId] = useState("noche");
   const [players, setPlayers] = useState(4);
   const [selectedExtras, setSelectedExtras] = useState({
-    birra_heineken: 2,
-    pizza_muzze: 1,
+    heineken: 2,
+    pizza_muzza: 1,
   });
   const [copied, setCopied] = useState(false);
 

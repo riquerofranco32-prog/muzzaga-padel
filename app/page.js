@@ -9,7 +9,6 @@ import TacticalCourtSimulator from "../components/TacticalCourtSimulator";
 import AmericanoGenerator from "../components/AmericanoGenerator";
 import RatingCalculator from "../components/RatingCalculator";
 import CantinaSection from "../components/CantinaSection";
-import TestimonialsSection from "../components/TestimonialsSection";
 import FaqSection from "../components/FaqSection";
 import { BentoPhotoCard } from "../components/PhotoCard";
 import FloatingLiveBar from "../components/FloatingLiveBar";
@@ -413,9 +412,6 @@ export default function Home() {
 
       {/* CANTINA */}
       <CantinaSection />
-
-      {/* TESTIMONIOS Y COMUNIDAD */}
-      <TestimonialsSection />
 
       {/* PREGUNTAS FRECUENTES */}
       <FaqSection />
