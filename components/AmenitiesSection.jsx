@@ -54,8 +54,12 @@ export default function AmenitiesSection() {
       colorBadge: "badge-emerald",
       icon: (
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+          <ellipse cx="12" cy="9" rx="7" ry="7.5" />
+          <path d="M10 16.5v4.5a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4.5" />
+          <circle cx="12" cy="7" r="1" fill="currentColor" />
+          <circle cx="9.5" cy="9.5" r="1" fill="currentColor" />
+          <circle cx="14.5" cy="9.5" r="1" fill="currentColor" />
+          <circle cx="12" cy="12" r="1" fill="currentColor" />
         </svg>
       ),
     },
