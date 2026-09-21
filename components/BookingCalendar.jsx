@@ -3,12 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createBooking } from "../app/actions";
 import BookingPassModal from "./BookingPassModal";
-import {
-  COURTS,
-  nextDays,
-  priceForSlot,
-  toISODate,
-} from "../lib/booking";
+import { COURTS, nextDays, priceForSlot, toISODate } from "../lib/booking";
 
 const DAYS = nextDays(7);
 const CLUB_WHATSAPP = "5492995974176";
@@ -190,40 +185,50 @@ export default function BookingCalendar() {
       )}
 
       {!activeDay?.closed && !loadError && visibleSlots && (
-        <div className="booking-slots-grid">
-          {visibleSlots.map((slot) => {
-            const court = COURTS.find((c) => c.id === slot.courtId);
-            const isSelected =
-              selected?.courtId === slot.courtId &&
-              selected?.start === slot.start;
-            const pricing = priceForSlot(activeDate, slot.start);
-            return (
-              <button
-                key={`${slot.courtId}-${slot.start}`}
-                type="button"
-                className={`booking-slot${slot.available ? "" : " taken"}${isSelected ? " selected" : ""}`}
-                disabled={!slot.available}
-                onClick={() => pickSlot(slot)}
-              >
-                <span className="slot-time">{slot.start} hs</span>
-                <span className="slot-meta">
-                  {court?.name} · {court?.type}
-                </span>
-                <div style={{ marginTop: 2, textAlign: "left" }}>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: "var(--color-ink)" }}>
-                    ${pricing.total.toLocaleString("es-AR")}
+        <>
+          <p className="mobile-swipe-hint">← Deslizá para ver más horarios →</p>
+          <div className="booking-slots-grid">
+            {visibleSlots.map((slot) => {
+              const court = COURTS.find((c) => c.id === slot.courtId);
+              const isSelected =
+                selected?.courtId === slot.courtId &&
+                selected?.start === slot.start;
+              const pricing = priceForSlot(activeDate, slot.start);
+              return (
+                <button
+                  key={`${slot.courtId}-${slot.start}`}
+                  type="button"
+                  className={`booking-slot${slot.available ? "" : " taken"}${isSelected ? " selected" : ""}`}
+                  disabled={!slot.available}
+                  onClick={() => pickSlot(slot)}
+                >
+                  <span className="slot-time">{slot.start} hs</span>
+                  <span className="slot-meta">
+                    {court?.name} · {court?.type}
+                  </span>
+                  <div style={{ marginTop: 2, textAlign: "left" }}>
+                    <div
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 13,
+                        color: "var(--color-ink)",
+                      }}
+                    >
+                      ${pricing.total.toLocaleString("es-AR")}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--color-body)" }}>
+                      ${pricing.perPlayer.toLocaleString("es-AR")} por jugador
+                      si son cuatro
+                    </div>
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--color-body)" }}>
-                    ${pricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
-                  </div>
-                </div>
-                <span className="slot-badge" style={{ marginTop: 2 }}>
-                  {slot.available ? "Disponible" : "Ocupado"}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                  <span className="slot-badge" style={{ marginTop: 2 }}>
+                    {slot.available ? "Disponible" : "Ocupado"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {selected && selectedPricing && (
@@ -234,12 +239,29 @@ export default function BookingCalendar() {
               {selected.start} hs ·{" "}
               {COURTS.find((c) => c.id === selected.courtId)?.name}
             </p>
-            <div style={{ marginTop: 6, padding: "8px 12px", background: "var(--color-surface-hover, rgba(255,255,255,0.05))", borderRadius: "var(--radius-md, 8px)", border: "1px solid var(--color-hairline, rgba(255,255,255,0.1))" }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)" }}>
+            <div
+              style={{
+                marginTop: 6,
+                padding: "8px 12px",
+                background:
+                  "var(--color-surface-hover, rgba(255,255,255,0.05))",
+                borderRadius: "var(--radius-md, 8px)",
+                border:
+                  "1px solid var(--color-hairline, rgba(255,255,255,0.1))",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: "var(--color-ink)",
+                }}
+              >
                 ${selectedPricing.total.toLocaleString("es-AR")}
               </div>
               <div style={{ fontSize: 12, color: "var(--color-body)" }}>
-                ${selectedPricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
+                ${selectedPricing.perPlayer.toLocaleString("es-AR")} por jugador
+                si son cuatro
               </div>
             </div>
           </div>
@@ -303,11 +325,21 @@ export default function BookingCalendar() {
               aria-pressed={!form.fullCourt}
             >
               <strong>Por jugador</strong>
-              <span>${selectedPricing.perPlayer.toLocaleString("es-AR")} c/u</span>
+              <span>
+                ${selectedPricing.perPlayer.toLocaleString("es-AR")} c/u
+              </span>
             </button>
           </div>
-          <div style={{ fontSize: 12, color: "var(--color-body)", marginTop: -6, marginBottom: 4 }}>
-            ${selectedPricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--color-body)",
+              marginTop: -6,
+              marginBottom: 4,
+            }}
+          >
+            ${selectedPricing.perPlayer.toLocaleString("es-AR")} por jugador si
+            son cuatro
           </div>
 
           {submitError && <p className="booking-error">{submitError}</p>}
@@ -329,7 +361,14 @@ export default function BookingCalendar() {
             <p className="booking-confirm-summary">
               ¡Turno reservado! Código <strong>{confirmed.bookingCode}</strong>.
             </p>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 10 }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                flexWrap: "wrap",
+                marginTop: 10,
+              }}
+            >
               <a
                 href={confirmed.whatsappUrl}
                 target="_blank"
@@ -337,8 +376,13 @@ export default function BookingCalendar() {
                 className="btn btn-whatsapp"
                 style={{ flex: 1, justifyContent: "center", gap: 8 }}
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                >
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z" />
                 </svg>
                 Abrir WhatsApp →
               </a>
