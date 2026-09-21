@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: "#canchas-abiertas", label: "Abiertas" },
   { href: "#pizarra-tactica", label: "Táctica" },
   { href: "#split-cost", label: "Dividir Gastos" },
+  { href: "#torneos", label: "Torneos" },
   { href: "#generador-americano", label: "Americano" },
   { href: "#cantina", label: "Cantina" },
   { href: "#ubicacion", label: "Ubicación" },

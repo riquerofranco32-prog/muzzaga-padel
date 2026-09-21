@@ -101,8 +101,8 @@ function JugadoresMarquee({ photos }) {
         className="marquee-track"
         style={{ animationDuration: `${durationSec}s` }}
       >
-        {photos.map((photo, i) => (
-          <MarqueeCard key={photo.src} {...photo} priority={i < 4} />
+        {photos.map((photo) => (
+          <MarqueeCard key={photo.src} {...photo} />
         ))}
         {photos.map((photo) => (
           <MarqueeCard key={`${photo.src}-dup`} {...photo} aria-hidden="true" />

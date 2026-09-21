@@ -27,6 +27,10 @@ const FAQS = [
     q: "¿Tienen escuelita o clases particulares?",
     a: "Sí, contamos con profesores matriculados para clases individuales y grupales de iniciación, técnica de pared, táctica de dobles y entrenamiento físico de pádel.",
   },
+  {
+    q: "¿Organizan torneos y cómo me inscribo?",
+    a: "Sí, organizamos torneos por categoría (Libre, Caballeros y Damas) durante todo el año. Podés ver fotos de los torneos ya jugados y consultar fecha, cupos y premios del próximo en la sección Torneos, o escribirnos directo por WhatsApp.",
+  },
 ];
 
 export default function FaqSection() {
