@@ -72,6 +72,19 @@ export default function Footer() {
                 <a href="#torneos" style={{ color: "var(--text-secondary)" }}>
                   Torneos 2026
                 </a>
+                <a
+                  href="/admin"
+                  style={{
+                    color: "var(--text-muted)",
+                    fontSize: 13,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    marginTop: 4,
+                  }}
+                >
+                  🔒 Panel de Control
+                </a>
               </div>
             </div>
 
@@ -130,7 +143,18 @@ export default function Footer() {
             © 2026 Muzzaga Pádel · Catriel, Río Negro. Todos los derechos
             reservados.
           </div>
-          <div>2 Canchas de Cristal · Cantina Propia · Torneos Oficiales</div>
+          <div>
+            2 Canchas de Cristal · Cantina Propia ·{" "}
+            <a
+              href="/admin"
+              style={{
+                color: "var(--text-muted)",
+                textDecoration: "underline",
+              }}
+            >
+              Acceso Administración
+            </a>
+          </div>
         </div>
       </div>
     </footer>

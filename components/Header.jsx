@@ -146,6 +146,20 @@ export default function Header() {
         >
           WhatsApp Club →
         </a>
+        <a
+          className="mobile-nav-link"
+          href="/admin"
+          onClick={() => setOpen(false)}
+          style={{
+            fontSize: 13,
+            color: "var(--color-muted)",
+            borderTop: "1px solid var(--color-hairline)",
+            paddingTop: 14,
+            marginTop: 8,
+          }}
+        >
+          🔒 Acceso Administración
+        </a>
       </div>
       <div
         id="mobile-nav-backdrop"
