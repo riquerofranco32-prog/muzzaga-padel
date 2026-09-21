@@ -4466,3 +4466,58 @@ input[type="range"]::-webkit-slider-thumb:hover {
     font-size: 16px;
   }
 }
+
+/* ==========================================================================
+   MOBILE: listas largas (turnos, extras de cantina, menú) pasan de apilarse
+   verticalmente a un carrusel horizontal con scroll-snap. Mismo contenido,
+   ocupan una sola fila en vez de arrastrar la página hacia abajo.
+   ========================================================================== */
+@media (max-width: 768px) {
+  .booking-slots-grid,
+  .menu-items-grid,
+  .extras-selector-list {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin-bottom: 24px;
+  }
+
+  .booking-slots-grid::-webkit-scrollbar,
+  .menu-items-grid::-webkit-scrollbar,
+  .extras-selector-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .booking-slot {
+    flex: 0 0 auto;
+    width: 168px;
+    scroll-snap-align: start;
+  }
+
+  .menu-item-card {
+    flex: 0 0 auto;
+    width: 240px;
+    scroll-snap-align: start;
+  }
+
+  .extras-selector-list {
+    gap: 10px;
+  }
+
+  .extra-item-row {
+    flex: 0 0 auto;
+    width: 180px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .extra-counter-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
