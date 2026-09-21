@@ -17,7 +17,10 @@ const WHATSAPP_URL = "https://wa.me/5492995974176";
 
 const GoogleMapsIcon = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335" />
+    <path
+      d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+      fill="#EA4335"
+    />
     <circle cx="12" cy="9" r="2.8" fill="#ffffff" />
   </svg>
 );
@@ -54,7 +57,12 @@ export default function Header() {
               alt="Muzzaga Pádel"
               width={34}
               height={34}
-              style={{ width: 34, height: 34, objectFit: "contain", display: "block" }}
+              style={{
+                width: 34,
+                height: 34,
+                objectFit: "contain",
+                display: "block",
+              }}
             />
             <div>
               <span className="brand-text">Muzzaga</span>
@@ -84,7 +92,7 @@ export default function Header() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener"
-              className="btn btn-secondary-whatsapp"
+              className="btn btn-secondary-whatsapp header-whatsapp-btn"
               style={{ height: 36, padding: "6px 14px", gap: 6 }}
             >
               <WhatsAppIcon /> WhatsApp Club
@@ -149,7 +157,12 @@ export default function Header() {
           href={WHATSAPP_URL}
           target="_blank"
           rel="noopener"
-          style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 600 }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontWeight: 600,
+          }}
         >
           <WhatsAppIcon /> WhatsApp Club →
         </a>

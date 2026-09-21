@@ -3444,6 +3444,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
     flex-direction: column;
     align-items: stretch;
   }
+  .admin-search-wrap {
+    min-width: 0;
+    width: 100%;
+  }
+
   .admin-search-input {
     min-width: 0;
     width: 100%;
@@ -4013,6 +4018,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 
   .header-admin-btn {
+    display: none;
+  }
+
+  .header-whatsapp-btn {
     display: none;
   }
 
