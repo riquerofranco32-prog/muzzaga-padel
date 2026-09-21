@@ -58,19 +58,17 @@ const PHOTOS = [
 ];
 
 export default function HeroMarquee() {
-  const loop = PHOTOS;
   return (
     <div
       className="marquee-container"
       aria-label="Fotos reales de Muzzaga Pádel"
     >
       <div className="marquee-track">
-        {loop.map((photo, i) => (
-          <MarqueeCard
-            key={photo.src}
-            {...photo}
-            priority={i < 4}
-          />
+        {PHOTOS.map((photo, i) => (
+          <MarqueeCard key={photo.src} {...photo} priority={i < 4} />
+        ))}
+        {PHOTOS.map((photo) => (
+          <MarqueeCard key={`${photo.src}-dup`} {...photo} aria-hidden="true" />
         ))}
       </div>
     </div>
