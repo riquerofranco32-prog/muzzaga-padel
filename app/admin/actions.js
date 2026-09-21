@@ -10,15 +10,16 @@ import {
   toISODate,
 } from "../../lib/booking";
 
-const ADMIN_PASS = process.env.ADMIN_PASSWORD || "muzzaga2025";
-const ADMIN_PIN = "1234";
-
-export async function verifyAdminPassword(passOrPin) {
-  const input = (passOrPin || "").trim();
-  if (input === ADMIN_PASS || input === ADMIN_PIN) {
+export async function verifyAdminPassword(password) {
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword) {
+    return { ok: false, error: "El panel no está disponible (ADMIN_PASSWORD no configurada)." };
+  }
+  const input = (password || "").trim();
+  if (input === adminPassword.trim()) {
     return { ok: true };
   }
-  return { ok: false, error: "Contraseña o PIN incorrecto." };
+  return { ok: false, error: "Contraseña incorrecta." };
 }
 
 export async function getAdminDayData(isoDate) {

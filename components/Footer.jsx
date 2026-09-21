@@ -127,10 +127,7 @@ export default function Footer() {
         <div className="footer-bottom">
           <div>
             © 2026 Muzzaga Pádel · Catriel, Río Negro. Todos los derechos
-            reservados. ·{" "}
-            <a href="/admin" style={{ color: "var(--text-muted)", textDecoration: "none" }}>
-              🔒 Panel de Administración
-            </a>
+            reservados.
           </div>
           <div>2 Canchas de Cristal · Cantina Propia · Torneos Oficiales</div>
         </div>

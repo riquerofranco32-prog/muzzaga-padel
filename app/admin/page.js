@@ -183,12 +183,12 @@ export default function AdminPage() {
 
           <form onSubmit={handleLogin}>
             <label style={{ fontSize: 13, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
-              Contraseña o PIN de Administrador:
+              Contraseña de Administrador:
             </label>
             <input
               type="password"
               className="admin-input-field"
-              placeholder="Ingresá PIN (ej. 1234)"
+              placeholder="Ingresá contraseña"
               value={pinInput}
               onChange={(e) => setPinInput(e.target.value)}
               autoFocus
