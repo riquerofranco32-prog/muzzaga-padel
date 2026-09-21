@@ -47,8 +47,9 @@ export async function createBooking(input) {
   if (players < 1 || players > 4)
     return { ok: false, error: "La cancha admite entre 1 y 4 jugadores." };
 
+  const courtName = `${court.name} (${court.type})`;
   let bookingKey = Math.random().toString(36).substring(2, 10);
-  
+
   if (isFirebaseConfigured()) {
     try {
       const db = getDb();
@@ -66,7 +67,7 @@ export async function createBooking(input) {
 
       const bookingData = {
         courtId,
-        courtName: `${court.name} (${court.type})`,
+        courtName,
         date,
         startTime,
         endTime,
@@ -94,7 +95,7 @@ export async function createBooking(input) {
     ok: true,
     bookingCode,
     booking: {
-      courtName: booking.courtName,
+      courtName,
       date,
       startTime,
       endTime,
