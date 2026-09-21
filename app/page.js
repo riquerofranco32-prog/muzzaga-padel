@@ -29,14 +29,14 @@ export default function Home() {
       {/* HERO */}
       <section id="top" className="animated-marquee-hero">
         <div className="hero-bg-photo" aria-hidden="true">
-          <img src="/img/match_action_led.jpg" alt="" />
+          <img src="/img/court_bench_players.jpg" alt="Canchas de pádel de cristal iluminadas de noche en Muzzaga" />
         </div>
         <div className="hero-inner-content">
           <LiveWeatherRadar />
 
           <div style={{ margin: "20px 0 12px", display: "flex", justifyContent: "center" }}>
             <img
-              src="/img/logo_full_dark.png"
+              src="/img/logo_full.png"
               alt="Muzzaga - más que pádel"
               style={{
                 height: 90,
