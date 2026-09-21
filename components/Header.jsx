@@ -90,6 +90,14 @@ export default function Header() {
             >
               WhatsApp Club
             </a>
+            <a
+              href="/admin"
+              className="btn btn-secondary header-admin-btn"
+              style={{ height: 36, padding: "6px 12px", gap: 6, fontSize: 13 }}
+              title="Panel de Administración"
+            >
+              🔒 Admin
+            </a>
             <button
               type="button"
               className="mobile-menu-btn"

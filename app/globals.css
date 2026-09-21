@@ -3514,6 +3514,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
     display: none;
   }
 
+  .header-admin-btn {
+    display: none;
+  }
+
   .mobile-menu-btn {
     display: flex;
   }
