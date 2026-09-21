@@ -3,11 +3,7 @@
 import { useMemo, useState } from "react";
 import { priceForSlot } from "../lib/booking";
 
-const SHIFTS = [
-  { id: "tarde", label: "Tarde (14:00 - 18:29)", price: priceForSlot("2026-09-21", "14:00").total },
-  { id: "noche", label: "Noche (18:30 - 01:00)", price: priceForSlot("2026-09-21", "18:30").total },
-  { id: "sabado", label: "Sábado (Todo el día)", price: priceForSlot("2026-09-26", "14:00").total },
-];
+const CANCHA_PRICE = priceForSlot().total;
 
 const EXTRAS = [
   { id: "pizza_muzza", name: "Pizza muzza", price: 18000, icon: "🍕" },
@@ -29,7 +25,6 @@ const EXTRAS = [
 ];
 
 export default function SplitCostCalculator() {
-  const [shiftId, setShiftId] = useState("noche");
   const [players, setPlayers] = useState(4);
   const [selectedExtras, setSelectedExtras] = useState({
     heineken: 2,
@@ -37,8 +32,7 @@ export default function SplitCostCalculator() {
   });
   const [copied, setCopied] = useState(false);
 
-  const currentShift = SHIFTS.find((s) => s.id === shiftId) || SHIFTS[1];
-  const canchaPrice = currentShift.price;
+  const canchaPrice = CANCHA_PRICE;
 
   const addExtra = (id) => {
     setSelectedExtras((prev) => ({
@@ -71,7 +65,7 @@ export default function SplitCostCalculator() {
 
   const copyToWhatsapp = () => {
     let msg = `🎾 *DESGLOSE PARTIDO MUZZAGA PÁDEL*\n`;
-    msg += `🏟️ *Cancha (90 min - ${currentShift.label.split(" ")[0]}):* $${canchaPrice.toLocaleString("es-AR")}\n`;
+    msg += `🏟️ *Cancha (90 min):* $${canchaPrice.toLocaleString("es-AR")}\n`;
     msg += `   ($${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro)\n`;
     
     const extraEntries = Object.entries(selectedExtras);
@@ -115,25 +109,39 @@ export default function SplitCostCalculator() {
             <div className="split-section-header">
               <span className="split-step-badge">1</span>
               <div>
-                <h3 className="split-step-title">Franja horaria del turno</h3>
-                <p className="split-step-desc">Seleccioná el horario de tu partido</p>
+                <h3 className="split-step-title">Turno de Cancha (90 min)</h3>
+                <p className="split-step-desc">Tarifa fija para todos los días y horarios</p>
               </div>
             </div>
 
-            <div className="players-selector-row" style={{ marginBottom: 20 }}>
-              {SHIFTS.map((shift) => (
-                <button
-                  key={shift.id}
-                  type="button"
-                  className={`player-count-btn${shiftId === shift.id ? " active" : ""}`}
-                  onClick={() => setShiftId(shift.id)}
-                  style={{ flex: 1, padding: "8px 6px", fontSize: 13 }}
-                >
-                  <div style={{ fontWeight: 600 }}>{shift.id === "sabado" ? "Sábados" : shift.id === "tarde" ? "Tarde" : "Noche"}</div>
-                  <div style={{ fontSize: 12, fontWeight: 500 }}>${shift.price.toLocaleString("es-AR")}</div>
-                  <div style={{ fontSize: 10, opacity: 0.85 }}>${(shift.price / 4).toLocaleString("es-AR")} c/u</div>
-                </button>
-              ))}
+            <div
+              style={{
+                marginBottom: 20,
+                padding: "12px 16px",
+                background: "var(--color-canvas-soft)",
+                border: "1px solid var(--color-hairline-strong)",
+                borderRadius: "var(--radius-md)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 600, color: "var(--color-ink)", fontSize: 14 }}>
+                  🏟️ Cancha Oficial de Cristal
+                </div>
+                <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
+                  Turno de 90 minutos
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontWeight: 700, fontSize: 16, color: "var(--color-ink)" }}>
+                  ${canchaPrice.toLocaleString("es-AR")}
+                </div>
+                <div style={{ fontSize: 11.5, color: "var(--color-text-link)", fontWeight: 600 }}>
+                  $15.000 c/u (cuarteto)
+                </div>
+              </div>
             </div>
 
             <div className="split-section-header">
@@ -217,7 +225,7 @@ export default function SplitCostCalculator() {
             <div className="split-ticket-breakdown">
               <div className="ticket-row">
                 <div>
-                  <span>Cancha (90 min · {currentShift.label.split(" ")[0]})</span>
+                  <span>Cancha Oficial (90 min)</span>
                   <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
                     ${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro
                   </div>

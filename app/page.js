@@ -85,9 +85,7 @@ export default function Home() {
               </p>
             </div>
             {(() => {
-              const tardePricing = priceForSlot("2026-09-21", "14:00");
-              const nochePricing = priceForSlot("2026-09-21", "18:30");
-              const sabadoPricing = priceForSlot("2026-09-26", "14:00");
+              const pricing = priceForSlot();
               return (
                 <div
                   style={{
@@ -95,16 +93,16 @@ export default function Home() {
                     color: "var(--text-secondary)",
                     background: "var(--bg-card)",
                     border: "1px solid var(--border-subtle)",
-                    padding: "6px 12px",
+                    padding: "6px 14px",
                     borderRadius: "var(--radius-sm)",
                     textAlign: "right",
                   }}
                 >
-                  <div>
-                    Tarde ${tardePricing.total.toLocaleString("es-AR")} · Noche ${nochePricing.total.toLocaleString("es-AR")} · Sáb ${sabadoPricing.total.toLocaleString("es-AR")}
+                  <div style={{ fontWeight: 600, color: "var(--color-ink)" }}>
+                    ${pricing.total.toLocaleString("es-AR")} por turno (90 min)
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                    ${tardePricing.perPlayer.toLocaleString("es-AR")} a ${sabadoPricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
+                  <div style={{ fontSize: 11.5, color: "var(--color-muted)" }}>
+                    ${pricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
                   </div>
                 </div>
               );
