@@ -50,7 +50,13 @@ export default function Header() {
             className="brand-group"
             aria-label="Muzzaga Pádel Catriel"
           >
-            <div className="brand-mark">M</div>
+            <img
+              src="/img/logo_badge.png"
+              alt="Muzzaga Pádel"
+              width={34}
+              height={34}
+              style={{ width: 34, height: 34, objectFit: "contain", display: "block" }}
+            />
             <div>
               <span className="brand-text">Muzzaga</span>
               <span className="brand-sub">Catriel</span>

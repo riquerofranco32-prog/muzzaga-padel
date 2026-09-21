@@ -35,6 +35,20 @@ export default function Home() {
         <div className="hero-inner-content">
           <LiveWeatherRadar />
 
+          <div style={{ margin: "20px 0 12px", display: "flex", justifyContent: "center" }}>
+            <img
+              src="/img/logo_full_dark.png"
+              alt="Muzzaga - más que pádel"
+              style={{
+                height: 90,
+                width: "auto",
+                maxWidth: "85vw",
+                objectFit: "contain",
+                display: "block",
+              }}
+            />
+          </div>
+
           <h1 className="hero-display-title">
             Reservá tu cancha.
             <br />

@@ -172,7 +172,13 @@ export default function AdminPage() {
       <div className="admin-login-wrapper">
         <div className="admin-login-card">
           <div className="admin-login-header">
-            <div className="brand-mark" style={{ width: 44, height: 44, margin: "0 auto 12px" }}>M</div>
+            <img
+              src="/img/logo_badge.png"
+              alt="Muzzaga Pádel"
+              width={56}
+              height={56}
+              style={{ width: 56, height: 56, margin: "0 auto 12px", display: "block", objectFit: "contain" }}
+            />
             <h1 style={{ fontSize: 22, color: "#ffffff", fontWeight: 700, margin: 0 }}>
               Muzzaga Pádel Admin
             </h1>
@@ -234,7 +240,13 @@ export default function AdminPage() {
       <header className="admin-top-bar">
         <div className="container admin-nav-inner">
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div className="brand-mark">M</div>
+            <img
+              src="/img/logo_badge.png"
+              alt="Muzzaga"
+              width={32}
+              height={32}
+              style={{ width: 32, height: 32, objectFit: "contain", display: "block" }}
+            />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <strong style={{ fontSize: 17, color: "#ffffff" }}>Muzzaga Admin</strong>
