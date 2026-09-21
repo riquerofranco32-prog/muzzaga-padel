@@ -3040,6 +3040,164 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-weight: 500;
 }
 
+/* Estados de reserva: badges propios del panel.
+   No reutilizamos badge-amber / badge-indigo porque en el sitio público
+   son ambos naranja de marca y acá los estados tienen que distinguirse. */
+.admin-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--radius-pill);
+  padding: 3px 9px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.admin-status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.admin-status-badge.is-confirmado {
+  background: #eef2f7;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.admin-status-badge.is-senado {
+  background: #fef6e7;
+  border-color: #f2ce8a;
+  color: #96620a;
+}
+
+.admin-status-badge.is-pagado {
+  background: #e7f5ee;
+  border-color: #a8dfc8;
+  color: #04674a;
+}
+
+.admin-status-badge.is-cancelado {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.admin-status-badge.is-bloqueado {
+  background: #f3f0ff;
+  border-color: #d3c8f2;
+  color: #5b3fa8;
+}
+
+.admin-section-title {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0 0 16px;
+}
+
+.admin-slot-price {
+  font-size: 11.5px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+}
+
+.admin-modal-hint {
+  font-size: 12px;
+  color: var(--color-muted);
+  background: var(--color-canvas-soft);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+}
+
+.admin-modal-hint strong {
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+}
+
+.admin-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-body);
+  cursor: pointer;
+  padding-top: 26px;
+}
+
+.admin-checkbox-row input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent-orange);
+  cursor: pointer;
+}
+
+/* El topbar tiene 5 acciones y a menos de ~1080px se apretaban unas contra
+   otras hasta romper la altura fija de 64px. */
+@media (max-width: 1080px) {
+  .admin-nav-inner {
+    height: auto;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Sticky + header apilado se comía media pantalla en el celu. */
+  .admin-top-bar {
+    position: static;
+  }
+  .admin-nav-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-nav-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .admin-nav-actions > * {
+    width: 100%;
+    justify-content: center;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 12.5px !important;
+  }
+  .admin-toast-badge {
+    grid-column: 1 / -1;
+    text-align: center;
+    justify-content: center;
+  }
+  .admin-date-picker-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-search-input {
+    min-width: 0;
+    width: 100%;
+  }
+  .admin-timeline-slot {
+    grid-template-columns: 64px 1fr;
+    padding: 10px;
+  }
+}
+
+/* Abajo de ~560px no entran dos botones por fila sin cortar el texto. */
+@media (max-width: 560px) {
+  .admin-nav-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ==========================================================================
    RACKET FINDER QUIZ STYLES
    ========================================================================== */
