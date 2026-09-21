@@ -85,7 +85,7 @@ export default function Header() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener"
-              className="btn btn-linear-primary"
+              className="btn btn-secondary"
               style={{ height: 36, padding: "6px 14px" }}
             >
               WhatsApp Club

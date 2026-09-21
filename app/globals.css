@@ -460,8 +460,10 @@ select:focus-visible,
   display: none;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-md);
@@ -470,8 +472,8 @@ select:focus-visible,
 }
 
 .mobile-menu-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 }
 
 .mobile-nav-panel {
@@ -627,20 +629,62 @@ select:focus-visible,
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 16px;
   flex-wrap: wrap;
   margin-top: 32px;
   margin-bottom: 44px;
 }
 
-.badge-count {
-  background: var(--color-accent-orange-subtle);
-  color: var(--color-accent-orange);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
+.hero-cta-main {
+  height: 56px;
+  min-height: 56px;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 14px;
+  background: #E8722A;
+  color: #ffffff;
+  padding: 0 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #E8722A;
+  box-shadow: 0 4px 18px rgba(232, 114, 42, 0.45);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-cta-main:hover {
+  background: #cf611e;
+  border-color: #cf611e;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(232, 114, 42, 0.55);
+}
+
+.hero-cta-main:active {
+  transform: translateY(0);
+}
+
+.hero-link-canchas {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px 18px;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--color-accent-orange-border);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.hero-link-canchas:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateX(3px);
 }
 
 /* Marquee Track (Expo Light Surface Cards) */
@@ -863,7 +907,11 @@ select:focus-visible,
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-pill);
-  padding: 6px 16px;
+  padding: 0 18px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 13px;
   font-weight: 500;
   color: var(--color-body);
@@ -1219,7 +1267,11 @@ select:focus-visible,
   background: transparent;
   border: none;
   color: var(--color-body);
-  padding: 8px 12px;
+  padding: 0 16px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: calc(var(--radius-md) - 2px);
   font-size: 13px;
   font-weight: 500;
@@ -1277,7 +1329,11 @@ select:focus-visible,
   background: var(--color-canvas-soft);
   border: 1px solid var(--color-hairline-strong);
   color: var(--color-body);
-  padding: 8px 6px;
+  padding: 8px 10px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--radius-sm);
   font-size: 12px;
   cursor: pointer;
@@ -1637,13 +1693,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .counter-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 8px;
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline-strong);
   color: var(--color-ink);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -1841,6 +1899,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-md);
   padding: 12px 16px;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   color: var(--color-body);
   cursor: pointer;
   text-align: left;
@@ -1870,6 +1932,25 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-left: 3px solid var(--color-accent-orange);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   padding: 12px 14px;
+}
+
+.tactical-clases-link {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-text-link);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  transition: all 0.15s ease;
+}
+
+.tactical-clases-link:hover {
+  text-decoration: underline;
+  transform: translateX(2px);
 }
 
 /* ==========================================================================
@@ -2926,8 +3007,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-md);
   padding: 12px 14px;
+  min-height: 44px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 3px;
   text-align: left;
   cursor: pointer;
@@ -2968,9 +3051,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-md);
   padding: 10px 8px;
+  min-height: 44px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -3383,9 +3468,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .floating-live-action {
   background: var(--color-accent-orange);
   color: #ffffff;
-  padding: 6px 14px;
+  padding: 0 18px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -3573,8 +3662,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 
   .counter-btn {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     font-size: 18px;
   }
 

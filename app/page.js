@@ -61,12 +61,11 @@ export default function Home() {
           </p>
 
           <div className="hero-cta-buttons">
-            <a href="#turnos" className="btn btn-linear-primary">
+            <a href="#turnos" className="hero-cta-main">
               Ver Turnos Disponibles ↓
             </a>
-            <a href="#canchas-abiertas" className="btn btn-secondary">
-              Canchas Abiertas{" "}
-              <span className="badge-count">sumate a un partido</span>
+            <a href="#canchas-abiertas" className="hero-link-canchas">
+              Canchas Abiertas →
             </a>
           </div>
         </div>

@@ -686,18 +686,19 @@ export default function TacticalCourtSimulator() {
               </>
             )}
 
-            {/* BOTÓN WHATSAPP ENTRENAMIENTO */}
-            <a
-              href={`https://wa.me/5492995974176?text=${encodeURIComponent(
-                `¡Hola Muzzaga! Estuve usando la Pizarra Táctica en la web y me gustaría consultar por clases y clínicas de entrenamiento táctico (${tactic.title}).`,
-              )}`}
-              target="_blank"
-              rel="noopener"
-              className="btn btn-orange-primary"
-              style={{ width: "100%", justifyContent: "center", marginTop: 18 }}
-            >
-              🎾 Consultar por Clases Tácticas en Pista →
-            </a>
+            {/* LINK CONSULTA ENTRENAMIENTO */}
+            <div style={{ marginTop: 20, textAlign: "center" }}>
+              <a
+                href={`https://wa.me/5492995974176?text=${encodeURIComponent(
+                  `¡Hola Muzzaga! Estuve usando la Pizarra Táctica en la web y me gustaría consultar por clases y clínicas de entrenamiento táctico (${tactic.title}).`,
+                )}`}
+                target="_blank"
+                rel="noopener"
+                className="tactical-clases-link"
+              >
+                🎾 Consultar por Clases Tácticas en Pista →
+              </a>
+            </div>
           </div>
         </div>
       </div>
