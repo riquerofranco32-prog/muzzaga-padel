@@ -4444,3 +4444,22 @@ input[type="range"]::-webkit-slider-thumb:hover {
   letter-spacing: 0.06em;
   color: var(--color-muted);
 }
+
+/* ==========================================================================
+   MOBILE: evita el auto-zoom de iOS Safari al tocar un campo de texto.
+   Safari hace zoom automático en cualquier input/select con font-size
+   menor a 16px al enfocarlo; en desktop estos tamaños compactos quedan
+   igual, esto solo aplica en pantallas chicas.
+   ========================================================================== */
+@media (max-width: 768px) {
+  .booking-form input,
+  .booking-form select,
+  .admin-input-field,
+  .admin-modal-select,
+  .admin-mini-select,
+  .admin-search-input,
+  .americano-input,
+  .scoreboard-name-input {
+    font-size: 16px;
+  }
+}
