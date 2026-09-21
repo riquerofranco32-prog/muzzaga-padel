@@ -24,7 +24,10 @@ import {
 
 export async function verifyAdminPassword(password) {
   if (!process.env.ADMIN_PASSWORD) {
-    return { ok: false, error: "El panel no está disponible (ADMIN_PASSWORD no configurada)." };
+    return {
+      ok: false,
+      error: "El panel no está disponible (ADMIN_PASSWORD no configurada).",
+    };
   }
 
   const gate = await checkLoginAllowed();
@@ -60,11 +63,12 @@ export async function getAdminDayData(isoDate) {
 
   let takenMap = {};
   let bookingsList = [];
+  let firebaseOk = false;
 
   if (isFirebaseConfigured()) {
     try {
       const db = getDb();
-      
+
       // Obtener locks de horarios para el día
       const claimsSnap = await db.ref(`slotClaims/${date}`).get();
       if (claimsSnap.exists()) {
@@ -85,6 +89,7 @@ export async function getAdminDayData(isoDate) {
           }
         });
       }
+      firebaseOk = true;
     } catch (error) {
       console.warn("Aviso Firebase en Admin:", error.message);
     }
@@ -95,7 +100,9 @@ export async function getAdminDayData(isoDate) {
     slotTimes.map(({ start, end }) => {
       const key = slotKey(court.id, start);
       const bookingId = takenMap[key] || null;
-      const booking = bookingId ? bookingsList.find((b) => b.id === bookingId) : null;
+      const booking = bookingId
+        ? bookingsList.find((b) => b.id === bookingId)
+        : null;
       return {
         courtId: court.id,
         courtName: court.name,
@@ -107,23 +114,30 @@ export async function getAdminDayData(isoDate) {
         bookingId,
         booking,
       };
-    })
+    }),
   );
 
   const totalSlotsCount = slots.length;
   const takenSlotsCount = slots.filter((s) => s.isTaken).length;
-  const ocupacionPct = totalSlotsCount > 0 ? Math.round((takenSlotsCount / totalSlotsCount) * 100) : 0;
-  
+  const ocupacionPct =
+    totalSlotsCount > 0
+      ? Math.round((takenSlotsCount / totalSlotsCount) * 100)
+      : 0;
+
   const ingresos = bookingsList.reduce((acc, b) => {
     if (b.status === "cancelado") return acc;
     if (typeof b.total === "number") return acc + b.total;
     const pricing = priceForSlot(b.date || date, b.startTime);
-    const amount = b.fullCourt !== false ? pricing.total : (b.playersCount || 4) * pricing.perPlayer;
+    const amount =
+      b.fullCourt !== false
+        ? pricing.total
+        : (b.playersCount || 4) * pricing.perPlayer;
     return acc + amount;
   }, 0);
 
   return {
     ok: true,
+    firebaseOk,
     date,
     slots,
     bookings: bookingsList.sort((a, b) => (a.startTime > b.startTime ? 1 : -1)),
@@ -141,18 +155,34 @@ export async function adminCreateManualBooking(input) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const { date, courtId, startTime, endTime, playerName, playerPhone, playersCount, fullCourt, status, notes } = input;
+  const {
+    date,
+    courtId,
+    startTime,
+    endTime,
+    playerName,
+    playerPhone,
+    playersCount,
+    fullCourt,
+    status,
+    notes,
+  } = input;
 
   const court = findCourt(courtId);
   if (!court) return { ok: false, error: "Cancha inválida." };
 
   if (!isFirebaseConfigured()) {
-    return { ok: false, error: "Firebase no está configurado en las variables de entorno." };
+    return {
+      ok: false,
+      error: "Firebase no está configurado en las variables de entorno.",
+    };
   }
 
   try {
     const db = getDb();
-    const claimRef = db.ref(`slotClaims/${date}/${slotKey(courtId, startTime)}`);
+    const claimRef = db.ref(
+      `slotClaims/${date}/${slotKey(courtId, startTime)}`,
+    );
     const bookingRef = db.ref("bookings").push();
 
     const claim = await claimRef.transaction((current) => {
@@ -175,7 +205,10 @@ export async function adminCreateManualBooking(input) {
       playerPhone: (playerPhone || "").trim(),
       playersCount: Number(playersCount) || 4,
       fullCourt: fullCourt !== false,
-      total: fullCourt !== false ? slotPricing.total : (Number(playersCount) || 4) * slotPricing.perPlayer,
+      total:
+        fullCourt !== false
+          ? slotPricing.total
+          : (Number(playersCount) || 4) * slotPricing.perPlayer,
       status: status || "confirmado", // 'confirmado' | 'señado' | 'pagado' | 'bloqueado'
       notes: (notes || "").trim(),
       createdFromAdmin: true,
@@ -185,7 +218,10 @@ export async function adminCreateManualBooking(input) {
     await bookingRef.set(booking);
     return { ok: true, bookingId: bookingRef.key };
   } catch (error) {
-    return { ok: false, error: "No se pudo guardar la reserva en la base de datos." };
+    return {
+      ok: false,
+      error: "No se pudo guardar la reserva en la base de datos.",
+    };
   }
 }
 

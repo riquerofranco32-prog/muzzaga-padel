@@ -21,7 +21,15 @@ import {
 } from "../../lib/booking";
 
 const DAYS = nextDays(14);
-const START_TIMES = ["14:00", "15:30", "17:00", "18:30", "20:00", "21:30", "23:00"];
+const START_TIMES = [
+  "14:00",
+  "15:30",
+  "17:00",
+  "18:30",
+  "20:00",
+  "21:30",
+  "23:00",
+];
 
 const STATUS_OPTIONS = [
   { value: "confirmado", label: "Confirmado" },
@@ -143,8 +151,18 @@ export default function AdminPage() {
   }
 
   async function handleCancel(bookingId, courtId, startTime) {
-    if (!confirm(`¿Estás seguro de cancelar este turno de las ${startTime} hs y liberar la cancha?`)) return;
-    const res = await adminCancelBooking(bookingId, activeDate, courtId, startTime);
+    if (
+      !confirm(
+        `¿Estás seguro de cancelar este turno de las ${startTime} hs y liberar la cancha?`,
+      )
+    )
+      return;
+    const res = await adminCancelBooking(
+      bookingId,
+      activeDate,
+      courtId,
+      startTime,
+    );
     if (res.ok) {
       setActionMessage("✓ Turno cancelado y horario liberado");
       loadDayData(activeDate);
@@ -201,7 +219,8 @@ export default function AdminPage() {
       courtSlots.forEach((slot) => {
         if (slot.isTaken && slot.booking) {
           const b = slot.booking;
-          const statusIcon = b.status === "pagado" ? "🟢" : b.status === "señado" ? "🟡" : "🔵";
+          const statusIcon =
+            b.status === "pagado" ? "🟢" : b.status === "señado" ? "🟡" : "🔵";
           text += `  ${slot.start} hs: ${statusIcon} ${b.playerName} (${b.playersCount}p) - Tel: ${b.playerPhone || "N/D"}\n`;
         } else {
           text += `  ${slot.start} hs: ⚪ LIBRE\n`;
@@ -220,7 +239,9 @@ export default function AdminPage() {
   if (!sessionChecked) {
     return (
       <div className="admin-login-wrapper">
-        <p style={{ color: "var(--color-muted)", fontSize: 14 }}>Verificando sesión…</p>
+        <p style={{ color: "var(--color-muted)", fontSize: 14 }}>
+          Verificando sesión…
+        </p>
       </div>
     );
   }
@@ -236,18 +257,44 @@ export default function AdminPage() {
               alt="Muzzaga Pádel"
               width={56}
               height={56}
-              style={{ width: 56, height: 56, margin: "0 auto 12px", display: "block", objectFit: "contain" }}
+              style={{
+                width: 56,
+                height: 56,
+                margin: "0 auto 12px",
+                display: "block",
+                objectFit: "contain",
+              }}
             />
-            <h1 style={{ fontSize: 22, color: "var(--color-ink)", fontWeight: 700, margin: 0 }}>
+            <h1
+              style={{
+                fontSize: 22,
+                color: "var(--color-ink)",
+                fontWeight: 700,
+                margin: 0,
+              }}
+            >
               Muzzaga Pádel Admin
             </h1>
-            <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4 }}>
+            <p
+              style={{
+                fontSize: 13,
+                color: "var(--text-secondary)",
+                marginTop: 4,
+              }}
+            >
               Panel de Control y Gestión Operativa de Canchas
             </p>
           </div>
 
           <form onSubmit={handleLogin}>
-            <label style={{ fontSize: 13, color: "var(--text-secondary)", display: "block", marginBottom: 6 }}>
+            <label
+              style={{
+                fontSize: 13,
+                color: "var(--text-secondary)",
+                display: "block",
+                marginBottom: 6,
+              }}
+            >
               Contraseña de Administrador:
             </label>
             <input
@@ -264,7 +311,12 @@ export default function AdminPage() {
             <button
               type="submit"
               className="btn btn-linear-primary"
-              style={{ width: "100%", height: 44, marginTop: 16, justifyContent: "center" }}
+              style={{
+                width: "100%",
+                height: 44,
+                marginTop: 16,
+                justifyContent: "center",
+              }}
               disabled={authLoading}
             >
               {authLoading ? "Verificando..." : "Ingresar al Panel →"}
@@ -272,7 +324,14 @@ export default function AdminPage() {
           </form>
 
           <div style={{ marginTop: 24, textAlign: "center" }}>
-            <Link href="/" style={{ fontSize: 13, color: "var(--accent-sky)", textDecoration: "none" }}>
+            <Link
+              href="/"
+              style={{
+                fontSize: 13,
+                color: "var(--accent-sky)",
+                textDecoration: "none",
+              }}
+            >
               ← Volver a la Landing Pública
             </Link>
           </div>
@@ -282,16 +341,17 @@ export default function AdminPage() {
   }
 
   // MAIN DASHBOARD
-  const filteredBookings = dayData?.bookings?.filter((b) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      b.playerName?.toLowerCase().includes(q) ||
-      b.playerPhone?.includes(q) ||
-      b.bookingCode?.toLowerCase().includes(q) ||
-      b.courtName?.toLowerCase().includes(q)
-    );
-  }) || [];
+  const filteredBookings =
+    dayData?.bookings?.filter((b) => {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        b.playerName?.toLowerCase().includes(q) ||
+        b.playerPhone?.includes(q) ||
+        b.bookingCode?.toLowerCase().includes(q) ||
+        b.courtName?.toLowerCase().includes(q)
+      );
+    }) || [];
 
   // Mismo cálculo que hace el server action, para que el modal muestre
   // exactamente el total que se va a guardar.
@@ -312,22 +372,51 @@ export default function AdminPage() {
               alt="Muzzaga"
               width={32}
               height={32}
-              style={{ width: 32, height: 32, objectFit: "contain", display: "block" }}
+              style={{
+                width: 32,
+                height: 32,
+                objectFit: "contain",
+                display: "block",
+              }}
             />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <strong style={{ fontSize: 17, color: "var(--color-ink)" }}>Muzzaga Admin</strong>
-                <span className="badge-linear badge-emerald" style={{ fontSize: 10, padding: "2px 6px" }}>
-                  ● Conectado Firebase
+                <strong style={{ fontSize: 17, color: "var(--color-ink)" }}>
+                  Muzzaga Admin
+                </strong>
+                <span
+                  className={`badge-linear ${dayData?.firebaseOk ? "badge-emerald" : "badge-amber"}`}
+                  style={{ fontSize: 10, padding: "2px 6px" }}
+                  title={
+                    dayData?.firebaseOk
+                      ? "Conectado a la base de datos"
+                      : "No se pudo confirmar la conexión a Firebase: los datos pueden no ser reales"
+                  }
+                >
+                  {dayData?.firebaseOk
+                    ? "● Conectado Firebase"
+                    : "⚠ Firebase sin confirmar"}
                 </span>
               </div>
-              <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Catriel, Río Negro</span>
+              <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                Catriel, Río Negro
+              </span>
             </div>
           </div>
 
-          <div className="admin-nav-actions" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {actionMessage && <span className="admin-toast-badge">{actionMessage}</span>}
-            <button type="button" onClick={copyDaySchedule} className="btn btn-secondary" style={{ height: 36, padding: "6px 12px", fontSize: 12.5 }}>
+          <div
+            className="admin-nav-actions"
+            style={{ display: "flex", alignItems: "center", gap: 10 }}
+          >
+            {actionMessage && (
+              <span className="admin-toast-badge">{actionMessage}</span>
+            )}
+            <button
+              type="button"
+              onClick={copyDaySchedule}
+              className="btn btn-secondary"
+              style={{ height: 36, padding: "6px 12px", fontSize: 12.5 }}
+            >
               📋 Copiar Planilla WhatsApp
             </button>
             <button
@@ -338,14 +427,24 @@ export default function AdminPage() {
             >
               + Nueva Reserva Manual
             </button>
-            <Link href="/" target="_blank" className="btn btn-secondary" style={{ height: 36, padding: "6px 12px", fontSize: 12.5 }}>
+            <Link
+              href="/"
+              target="_blank"
+              className="btn btn-secondary"
+              style={{ height: 36, padding: "6px 12px", fontSize: 12.5 }}
+            >
               ↗ Ver Web
             </Link>
             <button
               type="button"
               onClick={handleLogout}
               className="btn btn-secondary"
-              style={{ height: 36, padding: "6px 12px", fontSize: 12.5, color: "#b91c1c" }}
+              style={{
+                height: 36,
+                padding: "6px 12px",
+                fontSize: 12.5,
+                color: "#b91c1c",
+              }}
             >
               Salir
             </button>
@@ -364,11 +463,21 @@ export default function AdminPage() {
                 className={`admin-date-tab${activeDate === d.iso ? " active" : ""}`}
                 onClick={() => setActiveDate(d.iso)}
               >
-                <span style={{ fontSize: 11, display: "block", textTransform: "uppercase" }}>
+                <span
+                  style={{
+                    fontSize: 11,
+                    display: "block",
+                    textTransform: "uppercase",
+                  }}
+                >
                   {d.dayName}
                 </span>
-                <strong style={{ fontSize: 17, display: "block" }}>{d.dayNumber}</strong>
-                <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{d.monthName}</span>
+                <strong style={{ fontSize: 17, display: "block" }}>
+                  {d.dayNumber}
+                </strong>
+                <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
+                  {d.monthName}
+                </span>
               </button>
             ))}
           </div>
@@ -391,7 +500,9 @@ export default function AdminPage() {
               <span className="admin-kpi-label">Ocupación del Día</span>
               <div className="admin-kpi-val">
                 {dayData.stats.takenSlots} / {dayData.stats.totalSlots}
-                <span className="admin-kpi-sub">({dayData.stats.ocupacionPct}%)</span>
+                <span className="admin-kpi-sub">
+                  ({dayData.stats.ocupacionPct}%)
+                </span>
               </div>
             </div>
 
@@ -426,13 +537,24 @@ export default function AdminPage() {
 
           <div className="admin-courts-timeline-grid">
             {COURTS.map((court) => {
-              const courtSlots = dayData?.slots?.filter((s) => s.courtId === court.id) || [];
+              const courtSlots =
+                dayData?.slots?.filter((s) => s.courtId === court.id) || [];
               return (
                 <div key={court.id} className="admin-court-col">
                   <div className="admin-court-col-header">
                     <div>
-                      <strong style={{ fontSize: 16, color: "var(--color-ink)" }}>{court.name}</strong>
-                      <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 6 }}>
+                      <strong
+                        style={{ fontSize: 16, color: "var(--color-ink)" }}
+                      >
+                        {court.name}
+                      </strong>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          color: "var(--text-muted)",
+                          marginLeft: 6,
+                        }}
+                      >
                         ({court.type})
                       </span>
                     </div>
@@ -459,23 +581,49 @@ export default function AdminPage() {
                           <div className="admin-slot-info-col">
                             {isTaken && b ? (
                               <>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "flex-start",
+                                  }}
+                                >
                                   <div>
-                                    <strong style={{ fontSize: 14, color: "var(--color-ink)" }}>
+                                    <strong
+                                      style={{
+                                        fontSize: 14,
+                                        color: "var(--color-ink)",
+                                      }}
+                                    >
                                       {b.playerName}
                                     </strong>
                                     {b.playerPhone && (
-                                      <span style={{ fontSize: 12, color: "var(--text-secondary)", display: "block" }}>
+                                      <span
+                                        style={{
+                                          fontSize: 12,
+                                          color: "var(--text-secondary)",
+                                          display: "block",
+                                        }}
+                                      >
                                         📞 {b.playerPhone}
                                       </span>
                                     )}
                                   </div>
-                                  <span className={`admin-status-badge ${statusClass(b.status)}`}>
+                                  <span
+                                    className={`admin-status-badge ${statusClass(b.status)}`}
+                                  >
                                     {b.status.toUpperCase()}
                                   </span>
                                 </div>
 
-                                <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    gap: 8,
+                                    marginTop: 8,
+                                    alignItems: "center",
+                                  }}
+                                >
                                   {b.playerPhone && (
                                     <a
                                       href={`https://wa.me/${b.playerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(
@@ -493,7 +641,18 @@ export default function AdminPage() {
                                   <select
                                     className="admin-mini-select"
                                     value={b.status}
-                                    onChange={(e) => handleStatusChange(b.id, e.target.value)}
+                                    onChange={(e) =>
+                                      e.target.value === "cancelado"
+                                        ? handleCancel(
+                                            b.id,
+                                            court.id,
+                                            slot.start,
+                                          )
+                                        : handleStatusChange(
+                                            b.id,
+                                            e.target.value,
+                                          )
+                                    }
                                   >
                                     {STATUS_OPTIONS.map((o) => (
                                       <option key={o.value} value={o.value}>
@@ -505,7 +664,9 @@ export default function AdminPage() {
                                   <button
                                     type="button"
                                     className="admin-mini-btn cancel"
-                                    onClick={() => handleCancel(b.id, court.id, slot.start)}
+                                    onClick={() =>
+                                      handleCancel(b.id, court.id, slot.start)
+                                    }
                                     title="Cancelar turno y liberar horario"
                                   >
                                     ✕ Liberar
@@ -513,15 +674,32 @@ export default function AdminPage() {
                                 </div>
                               </>
                             ) : (
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <span style={{ fontSize: 13, color: "var(--text-muted)" }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontSize: 13,
+                                    color: "var(--text-muted)",
+                                  }}
+                                >
                                   ⚪ Horario Disponible
                                 </span>
                                 <button
                                   type="button"
                                   className="btn btn-secondary"
-                                  style={{ height: 28, padding: "2px 10px", fontSize: 11 }}
-                                  onClick={() => openCreateModal(court.id, slot.start)}
+                                  style={{
+                                    height: 28,
+                                    padding: "2px 10px",
+                                    fontSize: 11,
+                                  }}
+                                  onClick={() =>
+                                    openCreateModal(court.id, slot.start)
+                                  }
                                 >
                                   + Asignar
                                 </button>
@@ -540,7 +718,16 @@ export default function AdminPage() {
 
         {/* DETAILED BOOKINGS TABLE */}
         <div style={{ marginTop: 40 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16,
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
             <h2 className="admin-section-title" style={{ marginBottom: 0 }}>
               Listado de Reservas del Día ({filteredBookings.length})
             </h2>
@@ -573,7 +760,9 @@ export default function AdminPage() {
                   filteredBookings.map((b) => (
                     <tr key={b.id}>
                       <td>
-                        <code style={{ color: "#0369a1", fontWeight: 600 }}>{b.bookingCode}</code>
+                        <code style={{ color: "#0369a1", fontWeight: 600 }}>
+                          {b.bookingCode}
+                        </code>
                       </td>
                       <td>{b.courtName}</td>
                       <td>
@@ -583,17 +772,31 @@ export default function AdminPage() {
                         <strong>{b.playerName}</strong>
                       </td>
                       <td>
-                        <span style={{ color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>
+                        <span
+                          style={{
+                            color: "var(--text-secondary)",
+                            fontFamily: "var(--font-mono)",
+                          }}
+                        >
                           {b.playerPhone || "-"}
                         </span>
                       </td>
                       <td>
-                        <strong style={{ color: "#047857", fontFamily: "var(--font-mono)" }}>
-                          ${(typeof b.total === "number"
+                        <strong
+                          style={{
+                            color: "#047857",
+                            fontFamily: "var(--font-mono)",
+                          }}
+                        >
+                          $
+                          {(typeof b.total === "number"
                             ? b.total
-                            : (b.fullCourt !== false
-                              ? priceForSlot(b.date || activeDate, b.startTime).total
-                              : (b.playersCount || 4) * priceForSlot(b.date || activeDate, b.startTime).perPlayer)
+                            : b.fullCourt !== false
+                              ? priceForSlot(b.date || activeDate, b.startTime)
+                                  .total
+                              : (b.playersCount || 4) *
+                                priceForSlot(b.date || activeDate, b.startTime)
+                                  .perPlayer
                           ).toLocaleString("es-AR")}
                         </strong>
                       </td>
@@ -601,7 +804,11 @@ export default function AdminPage() {
                         <select
                           className="admin-mini-select"
                           value={b.status}
-                          onChange={(e) => handleStatusChange(b.id, e.target.value)}
+                          onChange={(e) =>
+                            e.target.value === "cancelado"
+                              ? handleCancel(b.id, b.courtId, b.startTime)
+                              : handleStatusChange(b.id, e.target.value)
+                          }
                         >
                           {STATUS_OPTIONS.map((o) => (
                             <option key={o.value} value={o.value}>
@@ -626,7 +833,9 @@ export default function AdminPage() {
                           <button
                             type="button"
                             className="admin-table-action-btn delete"
-                            onClick={() => handleCancel(b.id, b.courtId, b.startTime)}
+                            onClick={() =>
+                              handleCancel(b.id, b.courtId, b.startTime)
+                            }
                             title="Cancelar reserva"
                           >
                             🗑️
@@ -637,8 +846,16 @@ export default function AdminPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="8" style={{ textAlign: "center", padding: "32px", color: "var(--text-muted)" }}>
-                      No hay reservas registradas para esta fecha o criterio de búsqueda.
+                    <td
+                      colSpan="8"
+                      style={{
+                        textAlign: "center",
+                        padding: "32px",
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      No hay reservas registradas para esta fecha o criterio de
+                      búsqueda.
                     </td>
                   </tr>
                 )}
@@ -650,10 +867,25 @@ export default function AdminPage() {
 
       {/* MODAL PARA CREAR RESERVA MANUAL O BLOQUEO */}
       {isModalOpen && (
-        <div className="admin-modal-backdrop" onClick={() => setIsModalOpen(false)}>
-          <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-              <h3 style={{ fontSize: 18, color: "var(--color-ink)", margin: 0 }}>
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="admin-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 18,
+              }}
+            >
+              <h3
+                style={{ fontSize: 18, color: "var(--color-ink)", margin: 0 }}
+              >
                 ➕ Cargar Turno Manual / Bloquear
               </h3>
               <button
@@ -666,13 +898,22 @@ export default function AdminPage() {
             </div>
 
             <form onSubmit={handleCreateSubmit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 12,
+                  marginBottom: 12,
+                }}
+              >
                 <div>
                   <label className="admin-field-label">Cancha:</label>
                   <select
                     className="admin-modal-select"
                     value={modalForm.courtId}
-                    onChange={(e) => setModalForm({ ...modalForm, courtId: e.target.value })}
+                    onChange={(e) =>
+                      setModalForm({ ...modalForm, courtId: e.target.value })
+                    }
                   >
                     {COURTS.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -687,7 +928,9 @@ export default function AdminPage() {
                   <select
                     className="admin-modal-select"
                     value={modalForm.startTime}
-                    onChange={(e) => setModalForm({ ...modalForm, startTime: e.target.value })}
+                    onChange={(e) =>
+                      setModalForm({ ...modalForm, startTime: e.target.value })
+                    }
                   >
                     {START_TIMES.map((t) => (
                       <option key={t} value={t}>
@@ -699,26 +942,44 @@ export default function AdminPage() {
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <label className="admin-field-label">Nombre del Jugador o Motivo:</label>
+                <label className="admin-field-label">
+                  Nombre del Jugador o Motivo:
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="Ej. Juan Pérez (o 'Clase Profe Nico')"
                   className="admin-input-field"
                   value={modalForm.playerName}
-                  onChange={(e) => setModalForm({ ...modalForm, playerName: e.target.value })}
+                  onChange={(e) =>
+                    setModalForm({ ...modalForm, playerName: e.target.value })
+                  }
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 12,
+                  marginBottom: 12,
+                }}
+              >
                 <div>
-                  <label className="admin-field-label">Teléfono de Contacto:</label>
+                  <label className="admin-field-label">
+                    Teléfono de Contacto:
+                  </label>
                   <input
                     type="tel"
                     placeholder="Ej. 299 597 4176"
                     className="admin-input-field"
                     value={modalForm.playerPhone}
-                    onChange={(e) => setModalForm({ ...modalForm, playerPhone: e.target.value })}
+                    onChange={(e) =>
+                      setModalForm({
+                        ...modalForm,
+                        playerPhone: e.target.value,
+                      })
+                    }
                   />
                 </div>
 
@@ -727,25 +988,41 @@ export default function AdminPage() {
                   <select
                     className="admin-modal-select"
                     value={modalForm.status}
-                    onChange={(e) => setModalForm({ ...modalForm, status: e.target.value })}
+                    onChange={(e) =>
+                      setModalForm({ ...modalForm, status: e.target.value })
+                    }
                   >
-                    {STATUS_OPTIONS.filter((o) => o.value !== "cancelado").map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
+                    {STATUS_OPTIONS.filter((o) => o.value !== "cancelado").map(
+                      (o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ),
+                    )}
                   </select>
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 12,
+                  marginBottom: 12,
+                }}
+              >
                 <div>
-                  <label className="admin-field-label">Cantidad de Jugadores:</label>
+                  <label className="admin-field-label">
+                    Cantidad de Jugadores:
+                  </label>
                   <select
                     className="admin-modal-select"
                     value={modalForm.playersCount}
                     onChange={(e) =>
-                      setModalForm({ ...modalForm, playersCount: Number(e.target.value) })
+                      setModalForm({
+                        ...modalForm,
+                        playersCount: Number(e.target.value),
+                      })
                     }
                     disabled={modalForm.fullCourt}
                   >
@@ -761,7 +1038,12 @@ export default function AdminPage() {
                   <input
                     type="checkbox"
                     checked={modalForm.fullCourt}
-                    onChange={(e) => setModalForm({ ...modalForm, fullCourt: e.target.checked })}
+                    onChange={(e) =>
+                      setModalForm({
+                        ...modalForm,
+                        fullCourt: e.target.checked,
+                      })
+                    }
                   />
                   Cancha completa
                 </label>
@@ -769,19 +1051,27 @@ export default function AdminPage() {
 
               <div className="admin-modal-hint">
                 Se va a guardar de <strong>{modalForm.startTime}</strong> a{" "}
-                <strong>{addMinutes(modalForm.startTime, SLOT_DURATION_MIN)}</strong> hs · Total{" "}
+                <strong>
+                  {addMinutes(modalForm.startTime, SLOT_DURATION_MIN)}
+                </strong>{" "}
+                hs · Total{" "}
                 <strong>${modalPrice.toLocaleString("es-AR")}</strong>
-                {!modalForm.fullCourt && ` (${modalForm.playersCount} × $${perPlayerPrice.toLocaleString("es-AR")})`}
+                {!modalForm.fullCourt &&
+                  ` (${modalForm.playersCount} × $${perPlayerPrice.toLocaleString("es-AR")})`}
               </div>
 
               <div style={{ marginBottom: 18 }}>
-                <label className="admin-field-label">Notas u Observaciones (opcional):</label>
+                <label className="admin-field-label">
+                  Notas u Observaciones (opcional):
+                </label>
                 <input
                   type="text"
                   placeholder="Ej. Cumpleaños, clase con profe, cancha en mantenimiento"
                   className="admin-input-field"
                   value={modalForm.notes}
-                  onChange={(e) => setModalForm({ ...modalForm, notes: e.target.value })}
+                  onChange={(e) =>
+                    setModalForm({ ...modalForm, notes: e.target.value })
+                  }
                 />
               </div>
 
@@ -791,7 +1081,9 @@ export default function AdminPage() {
                 style={{ width: "100%", height: 44, justifyContent: "center" }}
                 disabled={modalSubmitting}
               >
-                {modalSubmitting ? "Guardando..." : "Confirmar y Guardar Turno →"}
+                {modalSubmitting
+                  ? "Guardando..."
+                  : "Confirmar y Guardar Turno →"}
               </button>
             </form>
           </div>
