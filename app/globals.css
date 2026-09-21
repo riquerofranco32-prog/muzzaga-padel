@@ -3988,7 +3988,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
    ========================================================================== */
 @media (max-width: 768px) {
   :root {
-    --spacing-section: 48px;
+    --spacing-section: 32px;
     --bottom-bar-h: 62px;
   }
 
@@ -4045,7 +4045,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 
   .animated-marquee-hero {
-    padding: 44px 14px 20px;
+    padding: 28px 14px 16px;
     min-height: auto;
   }
 
@@ -4281,12 +4281,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
   .split-calculator-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
   .tactical-board-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
   .americano-layout-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
   .americano-count-tabs {
     flex-wrap: wrap;
