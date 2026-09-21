@@ -4,109 +4,97 @@ import { useState } from "react";
 import { BentoPhotoCard } from "./PhotoCard";
 
 const MENU_ITEMS = [
+  // Cocina / Buffet
+  { category: "buffet", name: "Pizza muzza", price: "$18.000" },
+  { category: "buffet", name: "Pizza napo", price: "$20.000" },
+  { category: "buffet", name: "Pizza especial", price: "$22.000" },
   {
-    category: "compartir",
-    name: "Pizza muzza",
-    desc: "Masa a la piedra casera con abundante muzzarella y orégano",
+    category: "buffet",
+    name: "Pizza S/TACC",
     price: "$18.000",
+    tag: "Sin TACC",
   },
+  { category: "buffet", name: "Pizza vegana", price: "$25.000", tag: "Vegana" },
+  { category: "buffet", name: "Tostados", price: "$14.000" },
+  { category: "buffet", name: "Empanada (unidad)", price: "$2.000" },
+  { category: "buffet", name: "Mila", price: "$20.000" },
+  { category: "buffet", name: "Porción dulce", price: "$10.000" },
   {
-    category: "compartir",
-    name: "Pizza napo",
-    desc: "Rodajas de tomate fresco, ajo y muzzarella",
-    price: "$20.000",
+    category: "buffet",
+    name: "Brownie S/TACC",
+    price: "$8.000",
+    tag: "Sin TACC",
   },
+
+  // Bebidas sin alcohol
+  { category: "bebidas-sin", name: "Agua 500ml", price: "$2.000" },
+  { category: "bebidas-sin", name: "Agua 850ml", price: "$3.000" },
+  { category: "bebidas-sin", name: "Agua 1.5L", price: "$4.000" },
+  { category: "bebidas-sin", name: "Coca-Cola 500ml", price: "$4.000" },
+  { category: "bebidas-sin", name: "Coca-Cola 1.5L", price: "$7.000" },
+  { category: "bebidas-sin", name: "Sprite 500ml", price: "$3.000" },
+  { category: "bebidas-sin", name: "Sprite 1.5L", price: "$6.000" },
+  { category: "bebidas-sin", name: "Fanta 500ml", price: "$3.000" },
+  { category: "bebidas-sin", name: "Cepita 1L", price: "$4.000" },
+  { category: "bebidas-sin", name: "H2OH 500ml", price: "$2.000" },
+  { category: "bebidas-sin", name: "Levité 1.5L", price: "$4.000" },
+  { category: "bebidas-sin", name: "Gatorade 500ml", price: "$4.000" },
+  { category: "bebidas-sin", name: "Gatorade 750ml", price: "$5.000" },
+  { category: "bebidas-sin", name: "Suerox", price: "$4.000" },
+  { category: "bebidas-sin", name: "Monster 473ml", price: "$4.000" },
+  { category: "bebidas-sin", name: "Red Bull 250ml", price: "$4.000" },
   {
-    category: "compartir",
-    name: "Pizza especial (jamón, huevo y muzzarella)",
-    desc: "Muzzarella, jamón cocido seleccionado y huevo",
-    price: "$22.000",
-  },
-  {
-    category: "compartir",
-    name: "Tostados",
-    desc: "Tostado clásico de jamón y queso en pan de miga crocante",
-    price: "$14.000",
-  },
-  {
-    category: "compartir",
-    name: "Empanadas",
-    desc: "Empanadas caseras de carne al horno",
-    price: "$24.000",
-  },
-  {
-    category: "compartir",
-    name: "Sándwich de mila",
-    desc: "Sándwich de milanesa casero con lechuga y tomate",
-    price: "$22.000",
-  },
-  {
-    category: "bebidas",
-    name: "Agua 1.5L",
-    desc: "Agua mineral bien fría",
+    category: "bebidas-sin",
+    name: "Stella Artois 0% 330ml",
     price: "$4.000",
+    tag: "Sin alcohol",
   },
+
+  // Bebidas con alcohol
+  { category: "bebidas-con", name: "Quilmes 473ml", price: "$4.000" },
+  { category: "bebidas-con", name: "Stella Artois 473ml", price: "$4.000" },
   {
-    category: "bebidas",
-    name: "Coca-Cola 1.5L",
-    desc: "Botella grande de 1.5L helada",
-    price: "$6.000",
-  },
-  {
-    category: "bebidas",
-    name: "Heineken 975ml",
-    desc: "Botella helada para compartir en el tercer tiempo",
-    price: "$9.000",
-  },
-  {
-    category: "bebidas",
-    name: "Stella Artois 975ml",
-    desc: "Botella helada para compartir",
-    price: "$9.000",
-  },
-  {
-    category: "bebidas",
-    name: "Corona 710ml",
-    desc: "Botella de 710ml bien fría",
-    price: "$9.000",
-  },
-  {
-    category: "bebidas",
-    name: "Patagonia 710ml",
-    desc: "Variedades Patagonia botella de 710ml",
-    price: "$9.000",
-  },
-  {
-    category: "bebidas",
-    name: "Fernet y coca",
-    desc: "Vaso de Fernet Branca con Coca-Cola y hielo",
+    category: "bebidas-con",
+    name: "Stella Artois Retornable 975ml",
     price: "$10.000",
   },
-  {
-    category: "cafeteria",
-    name: "Café grande",
-    desc: "Café en taza grande",
-    price: "$4.000",
-  },
-  {
-    category: "cafeteria",
-    name: "Café chico",
-    desc: "Pocillo de café express",
-    price: "$3.000",
-  },
-  {
-    category: "cafeteria",
-    name: "Porción dulce",
-    desc: "Porción dulce artesanal para acompañar el café",
-    price: "$6.000",
-  },
+  { category: "bebidas-con", name: "Corona 330ml", price: "$4.000" },
+  { category: "bebidas-con", name: "Corona 710ml", price: "$10.000" },
+  { category: "bebidas-con", name: "Heineken litro", price: "$10.000" },
+  { category: "bebidas-con", name: "Patagonia IPA 710ml", price: "$9.000" },
+  { category: "bebidas-con", name: "Fernet y Coca", price: "$12.000" },
+
+  // Kiosco
+  { category: "kiosco", name: "Café chico", price: "$3.000" },
+  { category: "kiosco", name: "Café grande", price: "$4.000" },
+  { category: "kiosco", name: "Yerba", price: "$4.000" },
+  { category: "kiosco", name: "9 de Oro", price: "$3.000" },
+  { category: "kiosco", name: "Alfajor", price: "$3.000" },
+  { category: "kiosco", name: "Barrita Integral", price: "$2.000" },
+  { category: "kiosco", name: "Cintitas", price: "$3.000" },
+  { category: "kiosco", name: "Gomitas", price: "$1.000" },
+  { category: "kiosco", name: "Kit-Kat", price: "$3.000" },
+  { category: "kiosco", name: "Oreo", price: "$4.000" },
+  { category: "kiosco", name: "Paseo", price: "$3.000" },
+  { category: "kiosco", name: "Pepas", price: "$3.000" },
+  { category: "kiosco", name: "Pringles", price: "$5.000" },
+  { category: "kiosco", name: "Rhodesia", price: "$1.000" },
+  { category: "kiosco", name: "Saladix", price: "$3.000" },
+  { category: "kiosco", name: "Trío", price: "$3.000" },
+  { category: "kiosco", name: "Turrón", price: "$500" },
+  { category: "kiosco", name: "Tostex proteicas", price: "$4.000" },
+  { category: "kiosco", name: "Pelotas de pádel", price: "$12.000" },
+  { category: "kiosco", name: "Cubre grip liso", price: "$3.000" },
+  { category: "kiosco", name: "Cubre grip perforado", price: "$4.000" },
+  { category: "kiosco", name: "Cubre grip relieve", price: "$5.000" },
 ];
 
 const CATEGORIES = [
-  { id: "all", label: "Todo el Menú" },
-  { id: "compartir", label: "Para Compartir" },
-  { id: "bebidas", label: "Bebidas" },
-  { id: "cafeteria", label: "Cafetería" },
+  { id: "all", label: "Todo" },
+  { id: "buffet", label: "🍕 Cocina" },
+  { id: "bebidas-sin", label: "🥤 Bebidas sin alcohol" },
+  { id: "bebidas-con", label: "🍺 Bebidas con alcohol" },
+  { id: "kiosco", label: "🍫 Kiosco" },
 ];
 
 export default function CantinaSection() {
@@ -220,9 +208,6 @@ export default function CantinaSection() {
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-                  {item.desc}
-                </span>
               </div>
               <span
                 style={{

@@ -1,0 +1,171 @@
+"use client";
+
+import { BentoPhotoCard } from "./PhotoCard";
+import { useLightbox } from "./LightboxProvider";
+
+const WHATSAPP = "5492995974176";
+
+const GALLERY_PHOTOS = [
+  {
+    src: "/img/torneos/ganadores_01.jpg",
+    alt: "Parejas ganadoras del Primer Torneo Muzzaga, junio 2026",
+  },
+  {
+    src: "/img/torneos/ganadores_02.jpg",
+    alt: "Ganadores del Primer Torneo Muzzaga posando en la red",
+  },
+  {
+    src: "/img/torneos/ganadores_03.jpg",
+    alt: "Pareja que llegó a la final y pareja ganadora del torneo",
+  },
+  {
+    src: "/img/torneos/ganadores_04.jpg",
+    alt: "Primer puesto del Primer Torneo Muzzaga con medallas",
+  },
+  {
+    src: "/img/torneos/ganadores_05.jpg",
+    alt: "Parejas ganadoras del torneo en la cancha de Muzzaga",
+  },
+];
+
+const UPCOMING_TOURNAMENTS = [
+  {
+    badge: "Categoría Libre",
+    badgeClass: "badge-amber",
+    title: "Torneo Libre",
+    desc: "Para el nivel más competitivo del club.",
+    waMsg: "Hola Muzzaga! Quiero info del próximo torneo de libre.",
+    featured: true,
+  },
+  {
+    badge: "Sexta / Séptima",
+    badgeClass: "badge-emerald",
+    title: "Torneo Caballeros",
+    desc: "Categorías de iniciación e intermedias, todo el año.",
+    waMsg: "Hola Muzzaga! Quiero info del próximo torneo de caballeros.",
+  },
+  {
+    badge: "Damas",
+    badgeClass: "badge-emerald",
+    title: "Torneo Damas",
+    desc: "Categorías A y B, con cuadro de eliminación.",
+    waMsg: "Hola Muzzaga! Quiero info del próximo torneo de damas.",
+  },
+];
+
+function WhatsappIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+      <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z" />
+    </svg>
+  );
+}
+
+function TorneoThumb({ src, alt }) {
+  const openLightbox = useLightbox();
+  return (
+    <div className="torneo-thumb" onClick={() => openLightbox(src, alt)}>
+      <img src={src} alt={alt} loading="lazy" />
+    </div>
+  );
+}
+
+export default function TorneosGallery() {
+  return (
+    <section id="torneos" className="section-bento">
+      <div className="container">
+        <div className="section-header-row">
+          <div>
+            <h2 className="section-title">Torneos en Muzzaga</h2>
+            <p className="section-desc">
+              Torneos organizados durante todo el año, en todas las categorías.
+              Consultá fechas y premios por WhatsApp.
+            </p>
+          </div>
+          <a
+            href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+              "Hola Muzzaga! Quiero inscribir mi pareja al próximo torneo.",
+            )}`}
+            target="_blank"
+            rel="noopener"
+            className="btn btn-secondary-whatsapp"
+            style={{ gap: 8 }}
+          >
+            <WhatsappIcon />
+            Inscribir mi pareja por WhatsApp →
+          </a>
+        </div>
+
+        {/* TORNEOS YA JUGADOS */}
+        <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
+          Primer Torneo · Junio 2026
+        </span>
+        <h3 style={{ fontSize: 20, fontWeight: 700, margin: "8px 0 16px" }}>
+          Así se vivió nuestro primer torneo
+        </h3>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: 20,
+            marginBottom: 20,
+          }}
+        >
+          <BentoPhotoCard
+            src="/img/torneos/equipo_01.jpg"
+            alt="Jugadores del Primer Torneo Muzzaga posando en la red de la cancha"
+            caption="Primer Torneo Muzzaga · Junio 2026"
+            title="Primer Torneo Muzzaga"
+          >
+            Jugadores de todos los niveles se sumaron a la primera edición del
+            torneo en nuestras canchas.
+          </BentoPhotoCard>
+          <BentoPhotoCard
+            src="/img/torneos/equipo_02.jpg"
+            alt="Cuatro jugadores posando con sus paletas en la cancha de Muzzaga"
+            caption="Jugadores del Primer Torneo Muzzaga"
+            title="Buen Ambiente & Competencia"
+          >
+            Partidos parejos, buena onda y mucha competencia en cada cancha.
+          </BentoPhotoCard>
+        </div>
+
+        <p className="mobile-swipe-hint">← Deslizá para ver más fotos →</p>
+        <div className="torneo-thumb-grid" style={{ marginBottom: 36 }}>
+          {GALLERY_PHOTOS.map((photo) => (
+            <TorneoThumb key={photo.src} src={photo.src} alt={photo.alt} />
+          ))}
+        </div>
+
+        {/* PRÓXIMOS TORNEOS */}
+        <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>
+          Próximos Torneos
+        </h3>
+        <div className="info-card-grid">
+          {UPCOMING_TOURNAMENTS.map((t) => (
+            <div
+              className={`info-card${t.featured ? " info-card--featured" : ""}`}
+              key={t.title}
+            >
+              <span className={`badge-linear ${t.badgeClass}`}>{t.badge}</span>
+              <h3 className="info-card-title">{t.title}</h3>
+              <p className="info-card-desc">{t.desc}</p>
+              <a
+                href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(t.waMsg)}`}
+                target="_blank"
+                rel="noopener"
+                style={{ fontSize: 13, fontWeight: 600, color: "#25D366" }}
+              >
+                Consultar fecha y cupos →
+              </a>
+            </div>
+          ))}
+        </div>
+        <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 16 }}>
+          Fechas, cupos y premios de cada torneo se confirman por WhatsApp.
+        </p>
+      </div>
+    </section>
+  );
+}
