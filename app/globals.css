@@ -3060,6 +3060,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-style: dashed;
 }
 
+.admin-timeline-slot.dimmed {
+  opacity: 0.35;
+  filter: grayscale(0.4);
+}
+
 .admin-slot-time-col {
   display: flex;
   flex-direction: column;
@@ -3095,6 +3100,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid transparent;
   display: inline-flex;
   align-items: center;
+  gap: 4px;
 }
 
 .admin-mini-btn.whatsapp {
@@ -3114,20 +3120,93 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid var(--color-hairline-strong);
   color: var(--color-ink);
   font-size: 11px;
+  font-weight: 600;
   border-radius: 4px;
   padding: 3px 6px;
   outline: none;
+  transition: all 0.15s ease;
+}
+
+.admin-mini-select[data-status="is-confirmado"] {
+  background: #eef2f7;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.admin-mini-select[data-status="is-senado"] {
+  background: #fef6e7;
+  border-color: #f2ce8a;
+  color: #96620a;
+}
+
+.admin-mini-select[data-status="is-pagado"] {
+  background: #e7f5ee;
+  border-color: #a8dfc8;
+  color: #04674a;
+}
+
+.admin-mini-select[data-status="is-cancelado"] {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.admin-mini-select[data-status="is-bloqueado"] {
+  background: #f3f0ff;
+  border-color: #d3c8f2;
+  color: #5b3fa8;
+}
+
+.admin-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+}
+
+.admin-search-wrap svg {
+  position: absolute;
+  left: 12px;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.admin-search-clear {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--color-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.admin-search-clear:hover {
+  background: var(--color-surface-strong);
+  color: var(--color-ink);
 }
 
 .admin-search-input {
   background: var(--color-canvas-soft);
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-md);
-  padding: 8px 14px;
+  padding: 8px 14px 8px 36px;
   color: var(--color-ink);
   font-size: 13.5px;
-  min-width: 280px;
+  width: 100%;
   outline: none;
+}
+
+.admin-content-loading {
+  opacity: 0.45;
+  pointer-events: none;
+  filter: saturate(0.6);
+  transition: opacity 0.2s ease;
 }
 
 .admin-table-wrapper {
