@@ -9,7 +9,7 @@ import {
   getAdminDayData,
   verifyAdminPassword,
 } from "./actions";
-import { COURTS, nextDays, PRICE_FULL, toISODate } from "../../lib/booking";
+import { COURTS, nextDays, priceForSlot, toISODate } from "../../lib/booking";
 
 const DAYS = nextDays(14);
 
@@ -517,7 +517,12 @@ export default function AdminPage() {
                       </td>
                       <td>
                         <strong style={{ color: "#34d399", fontFamily: "var(--font-mono)" }}>
-                          ${(b.fullCourt ? PRICE_FULL : (b.playersCount || 4) * 15000).toLocaleString("es-AR")}
+                          ${(typeof b.total === "number"
+                            ? b.total
+                            : (b.fullCourt !== false
+                              ? priceForSlot(b.date || activeDate, b.startTime).total
+                              : (b.playersCount || 4) * priceForSlot(b.date || activeDate, b.startTime).perPlayer)
+                          ).toLocaleString("es-AR")}
                         </strong>
                       </td>
                       <td>

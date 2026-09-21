@@ -5,9 +5,8 @@ import { createBooking } from "../app/actions";
 import BookingPassModal from "./BookingPassModal";
 import {
   COURTS,
-  PRICE_FULL,
-  PRICE_PER_PLAYER,
   nextDays,
+  priceForSlot,
   toISODate,
 } from "../lib/booking";
 
@@ -74,6 +73,11 @@ export default function BookingCalendar() {
       ? slots
       : slots.filter((s) => s.courtId === courtFilter);
   }, [slots, courtFilter]);
+
+  const selectedPricing = useMemo(() => {
+    if (!selected) return null;
+    return priceForSlot(activeDate, selected.start);
+  }, [activeDate, selected]);
 
   function pickSlot(slot) {
     setSelected(slot);
@@ -192,6 +196,7 @@ export default function BookingCalendar() {
             const isSelected =
               selected?.courtId === slot.courtId &&
               selected?.start === slot.start;
+            const pricing = priceForSlot(activeDate, slot.start);
             return (
               <button
                 key={`${slot.courtId}-${slot.start}`}
@@ -204,7 +209,15 @@ export default function BookingCalendar() {
                 <span className="slot-meta">
                   {court?.name} · {court?.type}
                 </span>
-                <span className="slot-badge">
+                <div style={{ marginTop: 2, textAlign: "left" }}>
+                  <div style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: 13, color: "var(--color-ink)" }}>
+                    ${pricing.total.toLocaleString("es-AR")}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--color-body)" }}>
+                    ${pricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
+                  </div>
+                </div>
+                <span className="slot-badge" style={{ marginTop: 2 }}>
                   {slot.available ? "Disponible" : "Ocupado"}
                 </span>
               </button>
@@ -213,7 +226,7 @@ export default function BookingCalendar() {
         </div>
       )}
 
-      {selected && (
+      {selected && selectedPricing && (
         <form className="booking-form" onSubmit={handleConfirm}>
           <div className="booking-form-header">
             <h3>Confirmar reserva</h3>
@@ -221,6 +234,14 @@ export default function BookingCalendar() {
               {selected.start} hs ·{" "}
               {COURTS.find((c) => c.id === selected.courtId)?.name}
             </p>
+            <div style={{ marginTop: 6, padding: "8px 12px", background: "var(--color-surface-hover, rgba(255,255,255,0.05))", borderRadius: "var(--radius-md, 8px)", border: "1px solid var(--color-hairline, rgba(255,255,255,0.1))" }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 16, fontWeight: 700, color: "var(--color-ink)" }}>
+                ${selectedPricing.total.toLocaleString("es-AR")}
+              </div>
+              <div style={{ fontSize: 12, color: "var(--color-body)" }}>
+                ${selectedPricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
+              </div>
+            </div>
           </div>
 
           <label>
@@ -273,7 +294,7 @@ export default function BookingCalendar() {
               aria-pressed={form.fullCourt}
             >
               <strong>Cancha completa</strong>
-              <span>${PRICE_FULL.toLocaleString("es-AR")}</span>
+              <span>${selectedPricing.total.toLocaleString("es-AR")}</span>
             </button>
             <button
               type="button"
@@ -282,8 +303,11 @@ export default function BookingCalendar() {
               aria-pressed={!form.fullCourt}
             >
               <strong>Por jugador</strong>
-              <span>${PRICE_PER_PLAYER.toLocaleString("es-AR")} c/u</span>
+              <span>${selectedPricing.perPlayer.toLocaleString("es-AR")} c/u</span>
             </button>
+          </div>
+          <div style={{ fontSize: 12, color: "var(--color-body)", marginTop: -6, marginBottom: 4 }}>
+            ${selectedPricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
           </div>
 
           {submitError && <p className="booking-error">{submitError}</p>}

@@ -17,6 +17,8 @@ import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
 
+import { priceForSlot } from "../lib/booking";
+
 const WHATSAPP = "5492995974176";
 
 export default function Home() {
@@ -71,19 +73,32 @@ export default function Home() {
                 turno.
               </p>
             </div>
-            <div
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 13,
-                color: "var(--text-secondary)",
-                background: "var(--bg-card)",
-                border: "1px solid var(--border-subtle)",
-                padding: "6px 12px",
-                borderRadius: "var(--radius-sm)",
-              }}
-            >
-              $15.000 por jugador · $60.000 cancha completa
-            </div>
+            {(() => {
+              const tardePricing = priceForSlot("2026-09-21", "14:00");
+              const nochePricing = priceForSlot("2026-09-21", "18:30");
+              const sabadoPricing = priceForSlot("2026-09-26", "14:00");
+              return (
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 13,
+                    color: "var(--text-secondary)",
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-subtle)",
+                    padding: "6px 12px",
+                    borderRadius: "var(--radius-sm)",
+                    textAlign: "right",
+                  }}
+                >
+                  <div>
+                    Tarde ${tardePricing.total.toLocaleString("es-AR")} · Noche ${nochePricing.total.toLocaleString("es-AR")} · Sáb ${sabadoPricing.total.toLocaleString("es-AR")}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                    ${tardePricing.perPlayer.toLocaleString("es-AR")} a ${sabadoPricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           <BookingCalendar />

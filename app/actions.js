@@ -4,8 +4,7 @@ import { getDb, isFirebaseConfigured } from "../lib/firebase";
 import {
   findCourt,
   isValidSlot,
-  PRICE_FULL,
-  PRICE_PER_PLAYER,
+  priceForSlot,
   slotKey,
 } from "../lib/booking";
 
@@ -87,7 +86,8 @@ export async function createBooking(input) {
   }
 
   const bookingCode = `MUZZ-${bookingKey.slice(-5).toUpperCase()}`;
-  const total = fullCourt ? PRICE_FULL : PRICE_PER_PLAYER * players;
+  const slotPricing = priceForSlot(date, startTime);
+  const total = fullCourt ? slotPricing.total : slotPricing.perPlayer * players;
 
   // The WhatsApp message is built client-side in BookingCalendar, not here:
   // this action only returns plain data.

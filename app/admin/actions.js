@@ -5,8 +5,7 @@ import {
   COURTS,
   findCourt,
   getSlotTimesForDate,
-  PRICE_FULL,
-  PRICE_PER_PLAYER,
+  priceForSlot,
   slotKey,
   toISODate,
 } from "../../lib/booking";
@@ -84,7 +83,9 @@ export async function getAdminDayData(isoDate) {
   
   const ingresos = bookingsList.reduce((acc, b) => {
     if (b.status === "cancelado") return acc;
-    const amount = b.fullCourt ? PRICE_FULL : (b.playersCount || 4) * PRICE_PER_PLAYER;
+    if (typeof b.total === "number") return acc + b.total;
+    const pricing = priceForSlot(b.date || date, b.startTime);
+    const amount = b.fullCourt !== false ? pricing.total : (b.playersCount || 4) * pricing.perPlayer;
     return acc + amount;
   }, 0);
 
@@ -127,6 +128,7 @@ export async function adminCreateManualBooking(input) {
       return { ok: false, error: "Ese horario ya se encuentra ocupado." };
     }
 
+    const slotPricing = priceForSlot(date, startTime);
     const booking = {
       courtId,
       courtName: `${court.name} (${court.type})`,
@@ -137,6 +139,7 @@ export async function adminCreateManualBooking(input) {
       playerPhone: (playerPhone || "").trim(),
       playersCount: Number(playersCount) || 4,
       fullCourt: fullCourt !== false,
+      total: fullCourt !== false ? slotPricing.total : (Number(playersCount) || 4) * slotPricing.perPlayer,
       status: status || "confirmado", // 'confirmado' | 'señado' | 'pagado' | 'bloqueado'
       notes: (notes || "").trim(),
       createdFromAdmin: true,

@@ -74,10 +74,13 @@ export default function BookingPassModal({ bookingCode, booking, whatsappUrl, on
             <div>
               <span className="pass-label">Total Cancha (90 min)</span>
               <div className="pass-price-val">${booking.total.toLocaleString("es-AR")}</div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
+                ${Math.round(booking.total / 4).toLocaleString("es-AR")} por jugador si son cuatro
+              </div>
             </div>
             <div style={{ textAlign: "right" }}>
               <span className="pass-label">Seña para Confirmar</span>
-              <div className="pass-sena-val">$30.000</div>
+              <div className="pass-sena-val">${Math.round(booking.total / 2).toLocaleString("es-AR")}</div>
             </div>
           </div>
 

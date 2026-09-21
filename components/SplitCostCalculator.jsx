@@ -1,8 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { priceForSlot } from "../lib/booking";
 
-const CANCHA_PRICE = 60000;
+const SHIFTS = [
+  { id: "tarde", label: "Tarde (14:00 - 18:29)", price: priceForSlot("2026-09-21", "14:00").total },
+  { id: "noche", label: "Noche (18:30 - 01:00)", price: priceForSlot("2026-09-21", "18:30").total },
+  { id: "sabado", label: "Sábado (Todo el día)", price: priceForSlot("2026-09-26", "14:00").total },
+];
 
 const EXTRAS = [
   { id: "pizza_muzze", name: "Pizza Muzzarella", price: 18000, icon: "🍕" },
@@ -16,12 +21,16 @@ const EXTRAS = [
 ];
 
 export default function SplitCostCalculator() {
+  const [shiftId, setShiftId] = useState("noche");
   const [players, setPlayers] = useState(4);
   const [selectedExtras, setSelectedExtras] = useState({
     birra_heineken: 2,
     pizza_muzze: 1,
   });
   const [copied, setCopied] = useState(false);
+
+  const currentShift = SHIFTS.find((s) => s.id === shiftId) || SHIFTS[1];
+  const canchaPrice = currentShift.price;
 
   const addExtra = (id) => {
     setSelectedExtras((prev) => ({
@@ -49,12 +58,13 @@ export default function SplitCostCalculator() {
     }, 0);
   }, [selectedExtras]);
 
-  const grandTotal = CANCHA_PRICE + extrasTotal;
+  const grandTotal = canchaPrice + extrasTotal;
   const perPerson = Math.round(grandTotal / (players || 1));
 
   const copyToWhatsapp = () => {
     let msg = `🎾 *DESGLOSE PARTIDO MUZZAGA PÁDEL*\n`;
-    msg += `🏟️ *Cancha (90 min):* $${CANCHA_PRICE.toLocaleString("es-AR")}\n`;
+    msg += `🏟️ *Cancha (90 min - ${currentShift.label.split(" ")[0]}):* $${canchaPrice.toLocaleString("es-AR")}\n`;
+    msg += `   ($${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro)\n`;
     
     const extraEntries = Object.entries(selectedExtras);
     if (extraEntries.length > 0) {
@@ -69,7 +79,7 @@ export default function SplitCostCalculator() {
 
     msg += `\n💰 *Total General:* $${grandTotal.toLocaleString("es-AR")}\n`;
     msg += `👥 *Total por jugador (${players} personas):* 👉 *$${perPerson.toLocaleString("es-AR")}*\n\n`;
-    msg += `📱 *Alias de pago:* muzzaga.padel`;
+    msg += `📱 *Alias de pago:* Consultar alias en el mostrador`;
 
     navigator.clipboard.writeText(msg);
     setCopied(true);
@@ -97,6 +107,30 @@ export default function SplitCostCalculator() {
             <div className="split-section-header">
               <span className="split-step-badge">1</span>
               <div>
+                <h3 className="split-step-title">Franja horaria del turno</h3>
+                <p className="split-step-desc">Seleccioná el horario de tu partido</p>
+              </div>
+            </div>
+
+            <div className="players-selector-row" style={{ marginBottom: 20 }}>
+              {SHIFTS.map((shift) => (
+                <button
+                  key={shift.id}
+                  type="button"
+                  className={`player-count-btn${shiftId === shift.id ? " active" : ""}`}
+                  onClick={() => setShiftId(shift.id)}
+                  style={{ flex: 1, padding: "8px 6px", fontSize: 13 }}
+                >
+                  <div style={{ fontWeight: 600 }}>{shift.id === "sabado" ? "Sábados" : shift.id === "tarde" ? "Tarde" : "Noche"}</div>
+                  <div style={{ fontSize: 12, fontFamily: "var(--font-mono)" }}>${shift.price.toLocaleString("es-AR")}</div>
+                  <div style={{ fontSize: 10, opacity: 0.85 }}>${(shift.price / 4).toLocaleString("es-AR")} c/u</div>
+                </button>
+              ))}
+            </div>
+
+            <div className="split-section-header">
+              <span className="split-step-badge">2</span>
+              <div>
                 <h3 className="split-step-title">Jugadores a dividir</h3>
                 <p className="split-step-desc">¿Entre cuántos dividen los gastos?</p>
               </div>
@@ -116,10 +150,10 @@ export default function SplitCostCalculator() {
             </div>
 
             <div className="split-section-header" style={{ marginTop: 24 }}>
-              <span className="split-step-badge">2</span>
+              <span className="split-step-badge">3</span>
               <div>
                 <h3 className="split-step-title">Sumar Cantina &amp; Extras</h3>
-                <p className="split-step-desc">Pizzas, birras, bebidas y pelotas para el partido.</p>
+                <p className="split-step-desc">Pizzas, birras, bebidas y minutas para el partido.</p>
               </div>
             </div>
 
@@ -174,8 +208,13 @@ export default function SplitCostCalculator() {
 
             <div className="split-ticket-breakdown">
               <div className="ticket-row">
-                <span>Cancha de Cristal (90 min)</span>
-                <strong>${CANCHA_PRICE.toLocaleString("es-AR")}</strong>
+                <div>
+                  <span>Cancha (90 min · {currentShift.label.split(" ")[0]})</span>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                    ${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro
+                  </div>
+                </div>
+                <strong>${canchaPrice.toLocaleString("es-AR")}</strong>
               </div>
 
               {Object.entries(selectedExtras).map(([id, qty]) => {
@@ -210,7 +249,7 @@ export default function SplitCostCalculator() {
 
             <div className="split-alias-notice">
               <span>💳 Alias para transferencias:</span>
-              <code>muzzaga.padel</code>
+              <code>Consultar alias en el mostrador</code>
             </div>
           </div>
         </div>
