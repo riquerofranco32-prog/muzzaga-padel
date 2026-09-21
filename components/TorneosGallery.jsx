@@ -1,30 +1,77 @@
 "use client";
 
-import { BentoPhotoCard } from "./PhotoCard";
 import { useLightbox } from "./LightboxProvider";
 
 const WHATSAPP = "5492995974176";
 
-const GALLERY_PHOTOS = [
+const TOURNAMENTS = [
   {
-    src: "/img/torneos/ganadores_01.jpg",
-    alt: "Parejas ganadoras del Primer Torneo Muzzaga, junio 2026",
+    id: "agosto-2026",
+    label: "Torneo Agosto 2026 · 7ma Damas y Caballeros",
+    jugadores: [
+      {
+        src: "/img/torneos/agosto/jugadores_01.jpg",
+        alt: "Jugadores del Torneo Agosto 2026 posando en la red de la cancha",
+      },
+      {
+        src: "/img/torneos/agosto/jugadores_02.jpg",
+        alt: "Pareja de jugadores del Torneo Agosto 2026 en Muzzaga",
+      },
+    ],
+    ganadores: [
+      {
+        src: "/img/torneos/agosto/ganadores_1er_caballeros.jpg",
+        alt: "1er puesto categoría 7ma Caballeros, Torneo Agosto 2026",
+      },
+      {
+        src: "/img/torneos/agosto/ganadores_2do_caballeros.jpg",
+        alt: "2do puesto categoría 7ma Caballeros, Torneo Agosto 2026",
+      },
+      {
+        src: "/img/torneos/agosto/ganadores_1er_damas.jpg",
+        alt: "1er puesto categoría 7ma Damas, Torneo Agosto 2026",
+      },
+      {
+        src: "/img/torneos/agosto/ganadores_2do_damas.jpg",
+        alt: "2do puesto categoría 7ma Damas, Torneo Agosto 2026",
+      },
+    ],
   },
   {
-    src: "/img/torneos/ganadores_02.jpg",
-    alt: "Ganadores del Primer Torneo Muzzaga posando en la red",
-  },
-  {
-    src: "/img/torneos/ganadores_03.jpg",
-    alt: "Pareja que llegó a la final y pareja ganadora del torneo",
-  },
-  {
-    src: "/img/torneos/ganadores_04.jpg",
-    alt: "Primer puesto del Primer Torneo Muzzaga con medallas",
-  },
-  {
-    src: "/img/torneos/ganadores_05.jpg",
-    alt: "Parejas ganadoras del torneo en la cancha de Muzzaga",
+    id: "junio-2026",
+    label: "Primer Torneo · Junio 2026",
+    jugadores: [
+      {
+        src: "/img/torneos/junio/jugadores_01.jpg",
+        alt: "Jugadores del Primer Torneo Muzzaga posando en la red de la cancha",
+      },
+      {
+        src: "/img/torneos/junio/jugadores_02.jpg",
+        alt: "Cuatro jugadores posando con sus paletas en la cancha de Muzzaga",
+      },
+    ],
+    ganadores: [
+      {
+        src: "/img/torneos/junio/ganadores_01.jpg",
+        alt: "Parejas ganadoras del Primer Torneo Muzzaga, junio 2026",
+      },
+      {
+        src: "/img/torneos/junio/ganadores_02.jpg",
+        alt: "Ganadores del Primer Torneo Muzzaga posando en la red",
+      },
+      {
+        src: "/img/torneos/junio/ganadores_03.jpg",
+        alt: "Pareja que llegó a la final y pareja ganadora del torneo",
+      },
+      {
+        src: "/img/torneos/junio/ganadores_04.jpg",
+        alt: "Primer puesto del Primer Torneo Muzzaga con medallas",
+      },
+      {
+        src: "/img/torneos/junio/ganadores_05.jpg",
+        alt: "Parejas ganadoras del torneo en la cancha de Muzzaga",
+      },
+    ],
   },
 ];
 
@@ -70,6 +117,48 @@ function TorneoThumb({ src, alt }) {
   );
 }
 
+function TorneoBlock({ label, jugadores, ganadores }) {
+  return (
+    <div style={{ marginBottom: 36 }}>
+      <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
+        {label}
+      </span>
+
+      <h4
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          margin: "14px 0 10px",
+          color: "var(--text-secondary)",
+        }}
+      >
+        Jugadores
+      </h4>
+      <div className="torneo-thumb-grid" style={{ marginBottom: 20 }}>
+        {jugadores.map((photo) => (
+          <TorneoThumb key={photo.src} src={photo.src} alt={photo.alt} />
+        ))}
+      </div>
+
+      <h4
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          margin: "0 0 10px",
+          color: "var(--text-secondary)",
+        }}
+      >
+        Ganadores
+      </h4>
+      <div className="torneo-thumb-grid">
+        {ganadores.map((photo) => (
+          <TorneoThumb key={photo.src} src={photo.src} alt={photo.alt} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function TorneosGallery() {
   return (
     <section id="torneos" className="section-bento">
@@ -97,46 +186,20 @@ export default function TorneosGallery() {
         </div>
 
         {/* TORNEOS YA JUGADOS */}
-        <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-          Primer Torneo · Junio 2026
-        </span>
-        <h3 style={{ fontSize: 20, fontWeight: 700, margin: "8px 0 16px" }}>
-          Así se vivió nuestro primer torneo
+        <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20 }}>
+          Así se vivieron nuestros torneos
         </h3>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: 20,
-            marginBottom: 20,
-          }}
-        >
-          <BentoPhotoCard
-            src="/img/torneos/equipo_01.jpg"
-            alt="Jugadores del Primer Torneo Muzzaga posando en la red de la cancha"
-            caption="Primer Torneo Muzzaga · Junio 2026"
-            title="Primer Torneo Muzzaga"
-          >
-            Jugadores de todos los niveles se sumaron a la primera edición del
-            torneo en nuestras canchas.
-          </BentoPhotoCard>
-          <BentoPhotoCard
-            src="/img/torneos/equipo_02.jpg"
-            alt="Cuatro jugadores posando con sus paletas en la cancha de Muzzaga"
-            caption="Jugadores del Primer Torneo Muzzaga"
-            title="Buen Ambiente & Competencia"
-          >
-            Partidos parejos, buena onda y mucha competencia en cada cancha.
-          </BentoPhotoCard>
-        </div>
-
         <p className="mobile-swipe-hint">← Deslizá para ver más fotos →</p>
-        <div className="torneo-thumb-grid" style={{ marginBottom: 36 }}>
-          {GALLERY_PHOTOS.map((photo) => (
-            <TorneoThumb key={photo.src} src={photo.src} alt={photo.alt} />
-          ))}
-        </div>
+
+        {TOURNAMENTS.map((t) => (
+          <TorneoBlock
+            key={t.id}
+            label={t.label}
+            jugadores={t.jugadores}
+            ganadores={t.ganadores}
+          />
+        ))}
 
         {/* PRÓXIMOS TORNEOS */}
         <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>
