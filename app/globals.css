@@ -661,7 +661,7 @@ select:focus-visible,
   display: flex;
   gap: 18px;
   width: max-content;
-  animation: marqueeContinuous 42s linear infinite;
+  animation: marqueeContinuous 38s ease-in-out infinite alternate;
   will-change: transform;
 }
 
@@ -671,7 +671,7 @@ select:focus-visible,
 
 @keyframes marqueeContinuous {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  100% { transform: translateX(min(0px, calc(-100% + 100vw - 32px))); }
 }
 
 .marquee-card {

@@ -9,27 +9,27 @@ const PHOTOS = [
   },
   {
     src: "/img/match_action_led.jpg",
-    alt: "Partido de noche con luces LED en Muzzaga",
-    label: "Juego Nocturno · LED",
-    caption: "Juego Nocturno · Iluminación LED Nocturna",
+    alt: "Café de especialidad y porción de torta en la cantina de Muzzaga",
+    label: "Café & Torta",
+    caption: "Cantina · Café y Algo Dulce con Vista a la Pista",
   },
   {
     src: "/img/cantina_beer_court.jpg",
     alt: "Cantina Muzzaga con vista a las canchas",
     label: "Cantina & 3er Tiempo",
-    caption: "Cantina Muzzaga · Cerveza Tirada y Vista a las Canchas",
+    caption: "Cantina Muzzaga · Cerveza Helada y Vista a las Canchas",
   },
   {
     src: "/img/court_arena_wide.jpg",
     alt: "Cartel de entrada de Muzzaga Pádel",
     label: "Entrada del Club",
-    caption: "Entrada del Club Muzzaga",
+    caption: "Cartel Iluminado en la Entrada del Club",
   },
   {
     src: "/img/bar_coffee_snacks.jpg",
     alt: "Empanadas y pantalla en la cantina de Muzzaga",
     label: "Empanadas & Pantalla",
-    caption: "Empanadas y Pantalla para el Tercer Tiempo",
+    caption: "Cantina · Empanadas y Pantalla para el Tercer Tiempo",
   },
   {
     src: "/img/court_spectators.jpg",
@@ -41,25 +41,24 @@ const PHOTOS = [
     src: "/img/lounge_tv_table.jpg",
     alt: "Pasillo junto a las canchas de Muzzaga",
     label: "Pasillo de Canchas",
-    caption: "Pasillo de Canchas",
+    caption: "Pasillo de Canchas de Cristal",
   },
   {
     src: "/img/court_bench_players.jpg",
-    alt: "Zona de bancos de jugadores en pista",
-    label: "Bancos de Pista",
-    caption: "Zona de Jugadores y Bancos de Pista",
+    alt: "Zona de bancos y jugadores en pista de cristal",
+    label: "Cancha de Cristal",
+    caption: "Cancha de Cristal con Iluminación LED",
   },
   {
     src: "/img/panoramic_courts.jpg",
     alt: "Espectadores mirando un partido en Muzzaga",
-    label: "Mirando el Partido",
-    caption: "Mirando el Partido desde Adentro",
+    label: "Bancos de Pista",
+    caption: "Siguiendo el Partido desde los Bancos de Pista",
   },
 ];
 
 export default function HeroMarquee() {
-  // Duplicated once so the CSS marquee animation (-50%) loops seamlessly.
-  const loop = [...PHOTOS, ...PHOTOS];
+  const loop = PHOTOS;
   return (
     <div
       className="marquee-container"
@@ -68,9 +67,9 @@ export default function HeroMarquee() {
       <div className="marquee-track">
         {loop.map((photo, i) => (
           <MarqueeCard
-            key={`${photo.src}-${i}`}
+            key={photo.src}
             {...photo}
-            priority={i < PHOTOS.length}
+            priority={i < 4}
           />
         ))}
       </div>

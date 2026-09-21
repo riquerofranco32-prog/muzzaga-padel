@@ -10,7 +10,6 @@ import AmericanoGenerator from "../components/AmericanoGenerator";
 import RatingCalculator from "../components/RatingCalculator";
 import CantinaSection from "../components/CantinaSection";
 import FaqSection from "../components/FaqSection";
-import { BentoPhotoCard } from "../components/PhotoCard";
 import FloatingLiveBar from "../components/FloatingLiveBar";
 import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
@@ -236,37 +235,6 @@ export default function Home() {
             >
               Inscribir mi pareja →
             </a>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-              gap: 20,
-              marginBottom: 20,
-            }}
-          >
-            <BentoPhotoCard
-              src="/img/court_spectators.jpg"
-              alt="Ambiente de partido en Muzzaga Pádel"
-              caption="Ambiente de partido en Muzzaga Pádel"
-              badge="Ambiente de Club"
-              title="Se juega y se mira en Muzzaga"
-            >
-              Compañeros y amigos siguiendo el partido desde los bancos de la
-              pista.
-            </BentoPhotoCard>
-
-            <BentoPhotoCard
-              src="/img/match_action_led.jpg"
-              alt="Final de torneo nocturno en Muzzaga"
-              caption="Final de torneo nocturno con iluminación LED"
-              badge="Finales Nocturnas"
-              badgeClassName="badge-amber"
-              title="Partidos definitorios con luz LED"
-            >
-              Juego nocturno en las dos canchas de cristal.
-            </BentoPhotoCard>
           </div>
 
           <div
