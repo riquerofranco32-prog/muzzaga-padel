@@ -61,15 +61,15 @@ export default function AmericanoGenerator() {
   const fixtures = useMemo(() => generateFixtures(names), [names]);
 
   const copyFixture = () => {
-    let msg = `🏆 *TORNEO AMERICANO EXPRESS - MUZZAGA PÁDEL*\n`;
-    msg += `👥 *Jugadores (${playerCount}):* ${names.join(", ")}\n\n`;
+    let msg = `*TORNEO AMERICANO EXPRESS - MUZZAGA PÁDEL*\n`;
+    msg += `Jugadores (${playerCount}): ${names.join(", ")}\n\n`;
     fixtures.forEach((f) => {
-      msg += `📍 *RONDA ${f.round}:*\n`;
-      msg += `   ${f.p1} & ${f.p2}  🆚  ${f.p3} & ${f.p4}\n`;
-      if (f.bye) msg += `   ⏸️ Libre: ${f.bye}\n`;
+      msg += `• RONDA ${f.round}:\n`;
+      msg += `   ${f.p1} & ${f.p2}  vs  ${f.p3} & ${f.p4}\n`;
+      if (f.bye) msg += `   Libre: ${f.bye}\n`;
       msg += `\n`;
     });
-    msg += `🍻 *Al finalizar:* ¡Tercer tiempo en la cantina de Muzzaga!`;
+    msg += `Al finalizar: Tercer tiempo en la cantina de Muzzaga`;
 
     navigator.clipboard.writeText(msg);
     setCopied(true);
@@ -142,11 +142,14 @@ export default function AmericanoGenerator() {
               </div>
               <button
                 type="button"
-                className={`btn ${copied ? "btn-whatsapp" : "btn-linear-primary"}`}
-                style={{ height: 36, padding: "6px 14px", fontSize: 13 }}
+                className="btn btn-whatsapp"
+                style={{ height: 36, padding: "6px 14px", fontSize: 13, gap: 6 }}
                 onClick={copyFixture}
               >
-                {copied ? "✓ ¡Copiado!" : "📋 Compartir en WhatsApp"}
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z"/>
+                </svg>
+                {copied ? "Copiado" : "Compartir en WhatsApp"}
               </button>
             </div>
 
@@ -165,7 +168,7 @@ export default function AmericanoGenerator() {
                   </div>
                   {fix.bye && (
                     <div className="fixture-bye">
-                      ⏸️ Descansa: <span>{fix.bye}</span>
+                      Descansa: <span>{fix.bye}</span>
                     </div>
                   )}
                 </div>
@@ -173,7 +176,7 @@ export default function AmericanoGenerator() {
             </div>
 
             <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 14, textAlign: "center" }}>
-              💡 Formato recomendado: Partidos a 4 o 6 games corridos con punto de oro en el 40-40.
+              Formato recomendado: Partidos a 4 o 6 games corridos con punto de oro en el 40-40.
             </p>
           </div>
         </div>

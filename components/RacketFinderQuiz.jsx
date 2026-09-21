@@ -77,7 +77,12 @@ export default function RacketFinderQuiz() {
                 className={`racket-opt-btn${playStyle === "control" ? " active" : ""}`}
                 onClick={() => setPlayStyle("control")}
               >
-                <span className="racket-opt-emoji">🛡️</span>
+                <span className="racket-opt-emoji">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="4"></circle>
+                  </svg>
+                </span>
                 <strong>Control &amp; Defensa</strong>
                 <small>Priorizo no errar y colocar la bola</small>
               </button>
@@ -87,7 +92,14 @@ export default function RacketFinderQuiz() {
                 className={`racket-opt-btn${playStyle === "polivalente" ? " active" : ""}`}
                 onClick={() => setPlayStyle("polivalente")}
               >
-                <span className="racket-opt-emoji">⚡</span>
+                <span className="racket-opt-emoji">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="m16 3 4 4-4 4"></path>
+                    <path d="M20 7H4"></path>
+                    <path d="m8 21-4-4 4-4"></path>
+                    <path d="M4 17h16"></path>
+                  </svg>
+                </span>
                 <strong>Polivalente / Híbrido</strong>
                 <small>Defiendo y ataco con fluidez</small>
               </button>
@@ -97,7 +109,11 @@ export default function RacketFinderQuiz() {
                 className={`racket-opt-btn${playStyle === "potencia" ? " active" : ""}`}
                 onClick={() => setPlayStyle("potencia")}
               >
-                <span className="racket-opt-emoji">💥</span>
+                <span className="racket-opt-emoji">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </span>
                 <strong>Potencia &amp; Smash</strong>
                 <small>Busco definir y sacar la bola por 3</small>
               </button>
@@ -138,7 +154,7 @@ export default function RacketFinderQuiz() {
               </label>
               {injuryHistory && (
                 <p style={{ fontSize: 12, color: "#A8501A", marginTop: 6, background: "var(--color-accent-orange-subtle)", padding: "6px 10px", borderRadius: "var(--radius-sm)" }}>
-                  💡 Recomendamos balance bajo (Redonda) y goma EVA Soft con antivibradores ShockOut.
+                  Recomendamos balance bajo (Redonda) y goma EVA Soft con antivibradores ShockOut.
                 </p>
               )}
             </div>
@@ -235,11 +251,11 @@ export default function RacketFinderQuiz() {
 
             <button
               type="button"
-              className="btn btn-linear-primary"
+              className="btn btn-whatsapp"
               onClick={shareWhatsApp}
-              style={{ width: "100%", justifyContent: "center" }}
+              style={{ width: "100%", justifyContent: "center", minHeight: 44 }}
             >
-              🎾 Consultar palas test en Muzzaga →
+              Consultar palas de test por WhatsApp →
             </button>
           </div>
         </div>

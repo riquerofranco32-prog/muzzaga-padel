@@ -285,21 +285,21 @@ export default function TacticalCourtSimulator() {
                 replayAnimation();
               }}
             >
-              🎾 Jugadas Pro
+              Jugadas Pro
             </button>
             <button
               type="button"
               className={`rating-tab-btn${boardMode === "rope" ? " active" : ""}`}
               onClick={() => setBoardMode("rope")}
             >
-              🔄 Basculación
+              Basculación
             </button>
             <button
               type="button"
               className={`rating-tab-btn${boardMode === "free" ? " active" : ""}`}
               onClick={() => setBoardMode("free")}
             >
-              ✏️ Pizarra Libre
+              Pizarra Libre
             </button>
           </div>
         </div>
@@ -323,7 +323,7 @@ export default function TacticalCourtSimulator() {
                   className="btn btn-secondary"
                   style={{ height: 28, padding: "2px 10px", fontSize: 11, background: "rgba(255,255,255,0.1)", color: "#ffffff", borderColor: "rgba(255,255,255,0.2)" }}
                 >
-                  ↺ Repetir Tiro
+                  Repetir Tiro
                 </button>
               )}
             </div>
@@ -556,7 +556,7 @@ export default function TacticalCourtSimulator() {
                     </h4>
                     <div style={{ display: "flex", gap: 6 }}>
                       <span className="badge-linear badge-emerald" title="Efectividad estimada">
-                        🎯 {tactic.effectiveness} Éxito
+                        {tactic.effectiveness} Éxito
                       </span>
                     </div>
                   </div>
@@ -582,7 +582,7 @@ export default function TacticalCourtSimulator() {
 
                   <div className="pro-tip-box">
                     <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-accent-orange)", fontWeight: 600, fontSize: 12.5, marginBottom: 2 }}>
-                      <span>💡 Consejo de los Profesores de Muzzaga:</span>
+                      <span>Consejo de los Profesores:</span>
                     </div>
                     <p style={{ fontSize: 12.5, color: "var(--color-ink)", margin: 0, lineHeight: 1.45 }}>
                       {tactic.tip}
@@ -623,7 +623,7 @@ export default function TacticalCourtSimulator() {
 
                 <div className="pro-tip-box" style={{ background: "#e7f5ee", borderColor: "#0F7B4F" }}>
                   <strong style={{ color: "#0F7B4F", fontSize: 13, display: "block", marginBottom: 4 }}>
-                    ✓ Regla de Oro del Doble en Muzzaga:
+                    Regla de Oro del Doble:
                   </strong>
                   <span style={{ fontSize: 12.5, color: "var(--color-ink)" }}>
                     "Nunca te quedes mirando el golpe de tu compañero: ajustá tu posición en cada tiro para cerrar la volea al centro o cubrir la pared descubierta."
@@ -680,7 +680,7 @@ export default function TacticalCourtSimulator() {
                     onClick={resetFreeCourt}
                     style={{ flex: 1, justifyContent: "center" }}
                   >
-                    ↺ Reiniciar Posiciones
+                    Reiniciar Posiciones
                   </button>
                 </div>
               </>
@@ -694,9 +694,9 @@ export default function TacticalCourtSimulator() {
                 )}`}
                 target="_blank"
                 rel="noopener"
-                className="tactical-clases-link"
+                className="tactical-clases-link whatsapp-text"
               >
-                🎾 Consultar por Clases Tácticas en Pista →
+                Consultar por Clases Tácticas por WhatsApp →
               </a>
             </div>
           </div>

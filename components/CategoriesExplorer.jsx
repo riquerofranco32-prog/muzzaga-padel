@@ -174,10 +174,10 @@ export default function CategoriesExplorer() {
 
             <button
               type="button"
-              className="btn btn-orange-primary cat-join-btn"
+              className="btn btn-whatsapp cat-join-btn"
               onClick={handleWhatsApp}
             >
-              📱 Sumarme a Partidos de {current.name} →
+              Sumarme a Partidos de {current.name} por WhatsApp →
             </button>
           </div>
 
@@ -185,7 +185,7 @@ export default function CategoriesExplorer() {
             {/* HABILIDADES Y GOLPES */}
             <div className="cat-skills-box">
               <h4 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)", marginBottom: 14 }}>
-                🎾 Nivel técnico de golpes en pista:
+                Nivel técnico de golpes en pista:
               </h4>
 
               <div className="cat-skills-list">
@@ -218,7 +218,7 @@ export default function CategoriesExplorer() {
               <div className="cat-info-block">
                 <span className="cat-info-tag">Torneos y Competencias Activas</span>
                 <p style={{ fontSize: 13.5, color: "var(--color-ink)", margin: "4px 0 0", lineHeight: 1.5 }}>
-                  🏆 {current.tournaments}
+                  {current.tournaments}
                 </p>
               </div>
 

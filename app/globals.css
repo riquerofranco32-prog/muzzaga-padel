@@ -321,20 +321,83 @@ select:focus-visible,
   transform: translateY(0);
 }
 
-/* WhatsApp Button */
+/* WhatsApp Styles */
 .btn-whatsapp {
-  background: #0F7B4F;
+  background: #25D366;
   color: #ffffff;
-  border: 1px solid #0F7B4F;
-  box-shadow: 0 2px 8px rgba(15, 123, 79, 0.25);
+  border: 1px solid #25D366;
+  box-shadow: 0 2px 10px rgba(37, 211, 102, 0.3);
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-whatsapp:hover {
-  background: #0c6340;
-  border-color: #0c6340;
-  box-shadow: 0 4px 14px rgba(15, 123, 79, 0.35);
+  background: #20ba5a;
+  border-color: #20ba5a;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.45);
   transform: translateY(-1px);
+}
+
+.btn-secondary-whatsapp {
+  background: rgba(37, 211, 102, 0.08);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  color: #0F7B4F;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-secondary-whatsapp:hover {
+  background: rgba(37, 211, 102, 0.16);
+  border-color: #25D366;
+  color: #0c6340;
+  transform: translateY(-1px);
+}
+
+.whatsapp-text {
+  color: #0F7B4F;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.whatsapp-text:hover {
+  color: #0c6340;
+}
+
+/* Google Maps Styles */
+.btn-secondary-maps {
+  background: rgba(234, 67, 53, 0.06);
+  border: 1px solid rgba(234, 67, 53, 0.25);
+  color: #c5221f;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-secondary-maps:hover {
+  background: rgba(234, 67, 53, 0.12);
+  border-color: #EA4335;
+  color: #b31412;
+  transform: translateY(-1px);
+}
+
+.maps-text {
+  color: #EA4335;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maps-text:hover {
+  color: #c5221f;
 }
 
 /* Expo Pill Badges */

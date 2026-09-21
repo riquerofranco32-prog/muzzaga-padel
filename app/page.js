@@ -227,9 +227,13 @@ export default function Home() {
               )}`}
               target="_blank"
               rel="noopener"
-              className="btn btn-linear-primary"
+              className="btn btn-secondary-whatsapp"
+              style={{ gap: 8 }}
             >
-              Inscribir mi pareja →
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z"/>
+              </svg>
+              Inscribir mi pareja por WhatsApp →
             </a>
           </div>
 
@@ -280,7 +284,7 @@ export default function Home() {
                 style={{
                   fontSize: 13,
                   fontWeight: 600,
-                  color: "var(--accent-sky)",
+                  color: "#25D366",
                 }}
               >
                 Consultar fecha y cupos →
@@ -325,7 +329,7 @@ export default function Home() {
                 style={{
                   fontSize: 13,
                   fontWeight: 600,
-                  color: "var(--accent-sky)",
+                  color: "#25D366",
                 }}
               >
                 Consultar fecha y cupos →
@@ -370,7 +374,7 @@ export default function Home() {
                 style={{
                   fontSize: 13,
                   fontWeight: 600,
-                  color: "var(--accent-sky)",
+                  color: "#25D366",
                 }}
               >
                 Consultar fecha y cupos →
@@ -408,21 +412,14 @@ export default function Home() {
               href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7"
               target="_blank"
               rel="noopener"
-              className="btn btn-secondary"
-              style={{ gap: 6 }}
+              className="btn btn-secondary-maps"
+              style={{ gap: 8 }}
             >
-              <svg
-                viewBox="0 0 24 24"
-                width="15"
-                height="15"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335" />
+                <circle cx="12" cy="9" r="2.8" fill="#ffffff" />
               </svg>
-              Abrir en Google Maps →
+              <span className="maps-text">Abrir en Google Maps →</span>
             </a>
           </div>
 
@@ -453,21 +450,14 @@ export default function Home() {
                 href="https://maps.app.goo.gl/kR1h9mhdLqGLKatV7"
                 target="_blank"
                 rel="noopener"
-                className="btn btn-linear-primary"
-                style={{ pointerEvents: "auto", height: 38, gap: 6 }}
+                className="btn btn-secondary-maps"
+                style={{ pointerEvents: "auto", height: 38, gap: 8 }}
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="15"
-                  height="15"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335" />
+                  <circle cx="12" cy="9" r="2.8" fill="#ffffff" />
                 </svg>
-                Abrir en Google Maps
+                <span className="maps-text">Abrir en Google Maps</span>
               </a>
               <a
                 href="https://waze.com/ul?ll=-37.8832905,-67.8005469&navigate=yes"
@@ -522,9 +512,16 @@ export default function Home() {
                     textTransform: "uppercase",
                     fontWeight: 600,
                     color: "var(--text-muted)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
                   }}
                 >
-                  Ubicación Oficial
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335" />
+                    <circle cx="12" cy="9" r="2.8" fill="#ffffff" />
+                  </svg>
+                  <span style={{ color: "#EA4335" }}>Google Maps</span> · Ubicación Oficial
                 </span>
                 <div
                   style={{
@@ -540,7 +537,7 @@ export default function Home() {
                   Catriel, Río Negro
                 </span>
               </div>
-              <span style={{ fontSize: 18, color: "var(--text-secondary)" }}>
+              <span style={{ fontSize: 18, color: "#EA4335" }}>
                 ↗
               </span>
             </a>
@@ -567,9 +564,15 @@ export default function Home() {
                     textTransform: "uppercase",
                     fontWeight: 600,
                     color: "var(--text-muted)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
                   }}
                 >
-                  Atención Directa
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366">
+                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z"/>
+                  </svg>
+                  <span style={{ color: "#25D366" }}>WhatsApp</span> · Atención Directa
                 </span>
                 <div
                   style={{
@@ -581,11 +584,11 @@ export default function Home() {
                 >
                   WhatsApp del Club
                 </div>
-                <span style={{ fontSize: 13, color: "#34d399" }}>
+                <span style={{ fontSize: 13, color: "#25D366", fontWeight: 600 }}>
                   +54 9 299 597-4176
                 </span>
               </div>
-              <span style={{ fontSize: 18, color: "var(--text-secondary)" }}>
+              <span style={{ fontSize: 18, color: "#25D366" }}>
                 ↗
               </span>
             </a>

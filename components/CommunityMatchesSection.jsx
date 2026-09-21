@@ -223,7 +223,7 @@ export default function CommunityMatchesSection() {
           <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <h3 style={{ fontSize: 18, color: "#ffffff", margin: 0 }}>
-                🎾 Sumarme a Cancha Abierta
+                Sumarme a Cancha Abierta
               </h3>
               <button
                 type="button"
@@ -283,7 +283,7 @@ export default function CommunityMatchesSection() {
           <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <h3 style={{ fontSize: 18, color: "#ffffff", margin: 0 }}>
-                📢 Publicar Convocatoria Abierta
+                Publicar Convocatoria Abierta
               </h3>
               <button
                 type="button"

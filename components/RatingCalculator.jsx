@@ -60,14 +60,14 @@ export default function RatingCalculator() {
           className={`rating-tab-btn${mode === "quiz" ? " active" : ""}`}
           onClick={() => setMode("quiz")}
         >
-          ⚡ Test Guiado (3 Preguntas)
+          Test Guiado (3 Preguntas)
         </button>
         <button
           type="button"
           className={`rating-tab-btn${mode === "slider" ? " active" : ""}`}
           onClick={() => setMode("slider")}
         >
-          🎚️ Ajuste Manual
+          Ajuste Manual
         </button>
       </div>
 
@@ -149,14 +149,16 @@ export default function RatingCalculator() {
               color: "var(--text-secondary)",
               display: "block",
               marginBottom: 8,
+              fontWeight: 500,
             }}
           >
-            Ajustá con precisión tu nivel en pista (1.5 a 5.5+):
+            Ajustá con la barra deslizante tu nivel estimado:
           </label>
           <input
             type="range"
-            min="15"
+            min="18"
             max="55"
+            step="1"
             value={raw}
             onChange={(e) => setRaw(Number(e.target.value))}
             aria-label="Nivel de juego estimado"
@@ -175,12 +177,11 @@ export default function RatingCalculator() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener"
-        className="btn btn-linear-primary"
-        style={{ width: "100%", justifyContent: "center" }}
+        className="btn btn-whatsapp"
+        style={{ width: "100%", justifyContent: "center", minHeight: 44 }}
       >
         Sumarme a partidos de mi nivel por WhatsApp →
       </a>
     </div>
   );
 }
-

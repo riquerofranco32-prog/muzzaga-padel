@@ -6,22 +6,22 @@ import { priceForSlot } from "../lib/booking";
 const CANCHA_PRICE = priceForSlot().total;
 
 const EXTRAS = [
-  { id: "pizza_muzza", name: "Pizza muzza", price: 18000, icon: "🍕" },
-  { id: "pizza_napo", name: "Pizza napo", price: 20000, icon: "🍕" },
-  { id: "pizza_especial", name: "Pizza especial", price: 22000, icon: "🍕" },
-  { id: "sandwich_mila", name: "Sándwich de mila", price: 22000, icon: "🥪" },
-  { id: "empanadas", name: "Empanadas", price: 24000, icon: "🥟" },
-  { id: "tostados", name: "Tostados", price: 14000, icon: "🥪" },
-  { id: "heineken", name: "Heineken 975ml", price: 9000, icon: "🍺" },
-  { id: "stella", name: "Stella Artois 975ml", price: 9000, icon: "🍺" },
-  { id: "corona", name: "Corona 710ml", price: 9000, icon: "🍺" },
-  { id: "patagonia", name: "Patagonia 710ml", price: 9000, icon: "🍺" },
-  { id: "fernet", name: "Fernet y coca", price: 10000, icon: "🥃" },
-  { id: "coca", name: "Coca-Cola 1.5L", price: 6000, icon: "🥤" },
-  { id: "agua", name: "Agua 1.5L", price: 4000, icon: "💧" },
-  { id: "cafe_grande", name: "Café grande", price: 4000, icon: "☕" },
-  { id: "cafe_chico", name: "Café chico", price: 3000, icon: "☕" },
-  { id: "porcion_dulce", name: "Porción dulce", price: 6000, icon: "🍰" },
+  { id: "pizza_muzza", name: "Pizza muzza", price: 18000 },
+  { id: "pizza_napo", name: "Pizza napo", price: 20000 },
+  { id: "pizza_especial", name: "Pizza especial", price: 22000 },
+  { id: "sandwich_mila", name: "Sándwich de mila", price: 22000 },
+  { id: "empanadas", name: "Empanadas", price: 24000 },
+  { id: "tostados", name: "Tostados", price: 14000 },
+  { id: "heineken", name: "Heineken 975ml", price: 9000 },
+  { id: "stella", name: "Stella Artois 975ml", price: 9000 },
+  { id: "corona", name: "Corona 710ml", price: 9000 },
+  { id: "patagonia", name: "Patagonia 710ml", price: 9000 },
+  { id: "fernet", name: "Fernet y coca", price: 10000 },
+  { id: "coca", name: "Coca-Cola 1.5L", price: 6000 },
+  { id: "agua", name: "Agua 1.5L", price: 4000 },
+  { id: "cafe_grande", name: "Café grande", price: 4000 },
+  { id: "cafe_chico", name: "Café chico", price: 3000 },
+  { id: "porcion_dulce", name: "Porción dulce", price: 6000 },
 ];
 
 export default function SplitCostCalculator() {
@@ -64,24 +64,24 @@ export default function SplitCostCalculator() {
   const perPerson = Math.round(grandTotal / (players || 1));
 
   const copyToWhatsapp = () => {
-    let msg = `🎾 *DESGLOSE PARTIDO MUZZAGA PÁDEL*\n`;
-    msg += `🏟️ *Cancha (90 min):* $${canchaPrice.toLocaleString("es-AR")}\n`;
-    msg += `   ($${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro)\n`;
+    let msg = `*DESGLOSE PARTIDO - MUZZAGA PÁDEL*\n`;
+    msg += `• Cancha (90 min): $${canchaPrice.toLocaleString("es-AR")}\n`;
+    msg += `  ($${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro)\n`;
     
     const extraEntries = Object.entries(selectedExtras);
     if (extraEntries.length > 0) {
-      msg += `\n🍕 *Cantina & Extras:*\n`;
+      msg += `\n• Cantina & Extras:\n`;
       extraEntries.forEach(([id, qty]) => {
         const item = EXTRAS.find((e) => e.id === id);
         if (item) {
-          msg += `• ${qty}x ${item.name}: $${(item.price * qty).toLocaleString("es-AR")}\n`;
+          msg += `  - ${qty}x ${item.name}: $${(item.price * qty).toLocaleString("es-AR")}\n`;
         }
       });
     }
 
-    msg += `\n💰 *Total General:* $${grandTotal.toLocaleString("es-AR")}\n`;
-    msg += `👥 *Total por jugador (${players} personas):* 👉 *$${perPerson.toLocaleString("es-AR")}*\n\n`;
-    msg += `📱 *Alias de pago:* Consultar alias en el mostrador`;
+    msg += `\nTotal General: $${grandTotal.toLocaleString("es-AR")}\n`;
+    msg += `Total por jugador (${players} personas): *$${perPerson.toLocaleString("es-AR")}*\n\n`;
+    msg += `Alias de pago: Consultar alias en el mostrador`;
 
     navigator.clipboard.writeText(msg);
     setCopied(true);
@@ -128,7 +128,7 @@ export default function SplitCostCalculator() {
             >
               <div>
                 <div style={{ fontWeight: 600, color: "var(--color-ink)", fontSize: 14 }}>
-                  🏟️ Cancha Oficial de Cristal
+                  Cancha Oficial de Cristal
                 </div>
                 <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
                   Turno de 90 minutos
@@ -160,7 +160,7 @@ export default function SplitCostCalculator() {
                   className={`player-count-btn${players === num ? " active" : ""}`}
                   onClick={() => setPlayers(num)}
                 >
-                  {num} {num === 4 ? "🎾 (Estándar)" : "jugadores"}
+                  {num === 4 ? "4 (Estándar)" : `${num} jugadores`}
                 </button>
               ))}
             </div>
@@ -179,7 +179,6 @@ export default function SplitCostCalculator() {
                 return (
                   <div key={extra.id} className="extra-item-row">
                     <div className="extra-info">
-                      <span className="extra-icon">{extra.icon}</span>
                       <div>
                         <strong className="extra-name">{extra.name}</strong>
                         <span className="extra-price">${extra.price.toLocaleString("es-AR")}</span>
@@ -256,15 +255,15 @@ export default function SplitCostCalculator() {
 
             <button
               type="button"
-              className={`btn ${copied ? "btn-whatsapp" : "btn-linear-primary"}`}
-              style={{ width: "100%", justifyContent: "center", height: 46, fontSize: 15 }}
+              className="btn btn-whatsapp"
+              style={{ width: "100%", justifyContent: "center", minHeight: 46, fontSize: 15 }}
               onClick={copyToWhatsapp}
             >
-              {copied ? "✓ ¡Desglose copiado al portapapeles!" : "📋 Copiar desglose para WhatsApp"}
+              {copied ? "¡Desglose copiado al portapapeles!" : "Copiar desglose para WhatsApp"}
             </button>
 
             <div className="split-alias-notice">
-              <span>💳 Alias para transferencias:</span>
+              <span>Alias para transferencias:</span>
               <code>Consultar alias en el mostrador</code>
             </div>
           </div>
