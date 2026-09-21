@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createOpenMatch, getOpenMatches, joinOpenMatch } from "../app/open-matches/actions";
+import {
+  createOpenMatch,
+  getOpenMatches,
+  joinOpenMatch,
+} from "../app/open-matches/actions";
 
 const WHATSAPP = "5492995974176";
 
@@ -51,7 +55,12 @@ export default function CommunityMatchesSection() {
     e.preventDefault();
     if (!joinModal) return;
     setJoinSubmitting(true);
-    const res = await joinOpenMatch(joinModal.matchId, joinModal.slotIndex, joinName, joinPhone);
+    const res = await joinOpenMatch(
+      joinModal.matchId,
+      joinModal.slotIndex,
+      joinName,
+      joinPhone,
+    );
     setJoinSubmitting(false);
     if (res.ok) {
       setJoinModal(null);
@@ -60,7 +69,10 @@ export default function CommunityMatchesSection() {
       loadMatches();
       // Abrir WhatsApp con mensaje de confirmación
       const msg = `¡Hola Muzzaga! Me sumé como jugador a la Cancha Abierta de ${joinModal.match.category} para el ${joinModal.match.date} a las ${joinModal.match.time} a nombre de ${joinName}.`;
-      window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank");
+      window.open(
+        `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,
+        "_blank",
+      );
     } else {
       alert(res.error || "Error al unirse");
     }
@@ -75,7 +87,10 @@ export default function CommunityMatchesSection() {
       setCreateModal(false);
       loadMatches();
       const msg = `¡Hola Muzzaga! Publiqué una nueva Cancha Abierta (${createForm.category}) para el ${createForm.date || "hoy"} a las ${createForm.time}. ¿Me ayudan a difundirla en el grupo del club?`;
-      window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank");
+      window.open(
+        `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,
+        "_blank",
+      );
     } else {
       alert(res.error || "Error al publicar");
     }
@@ -86,12 +101,16 @@ export default function CommunityMatchesSection() {
       <div className="container">
         <div className="section-header-row">
           <div>
-            <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
+            <span
+              className="badge-linear badge-amber"
+              style={{ marginBottom: 8 }}
+            >
               En Vivo · Matchmaking &amp; Comunidad
             </span>
             <h2 className="section-title">Canchas Abiertas en Catriel</h2>
             <p className="section-desc">
-              Sumate a partidos con lugares libres o publicá tu propia convocatoria. Jugá con rivales de tu mismo nivel.
+              Sumate a partidos con lugares libres o publicá tu propia
+              convocatoria. Jugá con rivales de tu mismo nivel.
             </p>
           </div>
           <button
@@ -104,7 +123,15 @@ export default function CommunityMatchesSection() {
         </div>
 
         {/* CATEGORY FILTER PILLS */}
-        <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 8, marginBottom: 20 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            overflowX: "auto",
+            paddingBottom: 8,
+            marginBottom: 20,
+          }}
+        >
           {[
             { id: "all", label: "Todas las Categorías" },
             { id: "7ma", label: "7ma (Iniciación)" },
@@ -127,102 +154,181 @@ export default function CommunityMatchesSection() {
         <div className="open-cards-grid">
           {filteredMatches.length === 0 ? (
             <div className="booking-empty" style={{ gridColumn: "1 / -1" }}>
-              No hay partidos abiertos para esta categoría en este momento. ¡Sé el primero en publicar uno con el botón de arriba!
+              No hay partidos abiertos para esta categoría en este momento. ¡Sé
+              el primero en publicar uno con el botón de arriba!
             </div>
           ) : (
             filteredMatches.map((match) => {
               const freeCount = match.players.filter((p) => !p.taken).length;
               const isFull = freeCount === 0;
 
-            return (
-              <div className="open-card" key={match.id}>
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
-                    <span className={`badge-linear ${match.badgeColor}`}>
-                      {match.category}
-                    </span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
-                      {match.time}
-                    </span>
-                  </div>
-
-                  <h3 style={{ fontSize: 17, fontWeight: 600, color: "var(--text-primary)", margin: "12px 0 4px" }}>
-                    {match.courtName}
-                  </h3>
-                  <p style={{ fontSize: 14, color: "var(--text-secondary)", minHeight: 40 }}>
-                    {match.desc}
-                  </p>
-
-                  <div className="player-slots-layout">
-                    {match.players.map((player, idx) => (
-                      player.taken ? (
-                        <div key={idx} className="player-slot-item taken" title={player.name}>
-                          ✓ {player.name.split(" ")[0]}
-                        </div>
-                      ) : (
-                        <button
-                          key={idx}
-                          type="button"
-                          className="player-slot-item free-clickable"
-                          onClick={() => setJoinModal({ matchId: match.id, slotIndex: idx, match })}
-                          title="Hacé clic para sumarte a este lugar"
-                        >
-                          +1 ¡Sumarme!
-                        </button>
-                      )
-                    ))}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    borderTop: "1px solid var(--border-subtle)",
-                    paddingTop: 14,
-                    marginTop: 16,
-                  }}
-                >
+              return (
+                <div className="open-card" key={match.id}>
                   <div>
-                    <span style={{ fontSize: 11, color: "var(--text-muted)", display: "block" }}>
-                      Tu plaza:
-                    </span>
-                    <strong style={{ color: "var(--text-primary)", fontSize: 16 }}>
-                      ${match.pricePerPlayer.toLocaleString("es-AR")}
-                    </strong>
-                  </div>
-
-                  {isFull ? (
-                    <span className="badge-linear badge-emerald" style={{ fontSize: 12 }}>
-                      ✓ Partido Completo
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      className="btn btn-whatsapp"
-                      style={{ height: 36, padding: "6px 14px", fontSize: 13 }}
-                      onClick={() => {
-                        const firstFreeIdx = match.players.findIndex((p) => !p.taken);
-                        setJoinModal({ matchId: match.id, slotIndex: firstFreeIdx, match });
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: 6,
                       }}
                     >
-                      Sumarme ({freeCount} libre{freeCount > 1 ? "s" : ""}) →
-                    </button>
-                  )}
+                      <span className={`badge-linear ${match.badgeColor}`}>
+                        {match.category}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: "var(--text-primary)",
+                        }}
+                      >
+                        {match.time}
+                      </span>
+                    </div>
+
+                    <h3
+                      style={{
+                        fontSize: 17,
+                        fontWeight: 600,
+                        color: "var(--text-primary)",
+                        margin: "12px 0 4px",
+                      }}
+                    >
+                      {match.courtName}
+                    </h3>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        color: "var(--text-secondary)",
+                        minHeight: 40,
+                      }}
+                    >
+                      {match.desc}
+                    </p>
+
+                    <div className="player-slots-layout">
+                      {match.players.map((player, idx) =>
+                        player.taken ? (
+                          <div
+                            key={idx}
+                            className="player-slot-item taken"
+                            title={player.name}
+                          >
+                            ✓ {player.name.split(" ")[0]}
+                          </div>
+                        ) : (
+                          <button
+                            key={idx}
+                            type="button"
+                            className="player-slot-item free-clickable"
+                            onClick={() =>
+                              setJoinModal({
+                                matchId: match.id,
+                                slotIndex: idx,
+                                match,
+                              })
+                            }
+                            title="Hacé clic para sumarte a este lugar"
+                          >
+                            +1 ¡Sumarme!
+                          </button>
+                        ),
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      borderTop: "1px solid var(--border-subtle)",
+                      paddingTop: 14,
+                      marginTop: 16,
+                    }}
+                  >
+                    <div>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: "var(--text-muted)",
+                          display: "block",
+                        }}
+                      >
+                        Tu plaza:
+                      </span>
+                      <strong
+                        style={{ color: "var(--text-primary)", fontSize: 16 }}
+                      >
+                        ${match.pricePerPlayer.toLocaleString("es-AR")}
+                      </strong>
+                    </div>
+
+                    {isFull ? (
+                      <span
+                        className="badge-linear badge-emerald"
+                        style={{ fontSize: 12 }}
+                      >
+                        ✓ Partido Completo
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-whatsapp"
+                        style={{
+                          height: 36,
+                          padding: "6px 14px",
+                          fontSize: 13,
+                        }}
+                        onClick={() => {
+                          const firstFreeIdx = match.players.findIndex(
+                            (p) => !p.taken,
+                          );
+                          setJoinModal({
+                            matchId: match.id,
+                            slotIndex: firstFreeIdx,
+                            match,
+                          });
+                        }}
+                      >
+                        Sumarme ({freeCount} libre{freeCount > 1 ? "s" : ""}) →
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          }))}
+              );
+            })
+          )}
         </div>
       </div>
 
       {/* MODAL PARA SUMARSE A UN SLOT */}
       {joinModal && (
-        <div className="admin-modal-backdrop" onClick={() => setJoinModal(null)}>
-          <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ fontSize: 18, color: "#ffffff", margin: 0 }}>
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setJoinModal(null)}
+        >
+          <div
+            className="admin-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 18,
+                  color: "var(--text-primary)",
+                  margin: 0,
+                }}
+              >
                 Sumarme a Cancha Abierta
               </h3>
               <button
@@ -234,13 +340,22 @@ export default function CommunityMatchesSection() {
               </button>
             </div>
 
-            <p style={{ fontSize: 13.5, color: "var(--text-secondary)", marginBottom: 16 }}>
-              Partido: <strong>{joinModal.match.category}</strong> en {joinModal.match.courtName} ({joinModal.match.time}).
+            <p
+              style={{
+                fontSize: 13.5,
+                color: "var(--text-secondary)",
+                marginBottom: 16,
+              }}
+            >
+              Partido: <strong>{joinModal.match.category}</strong> en{" "}
+              {joinModal.match.courtName} ({joinModal.match.time}).
             </p>
 
             <form onSubmit={handleJoinSubmit}>
               <div style={{ marginBottom: 12 }}>
-                <label className="admin-field-label">Tu Nombre y Apellido:</label>
+                <label className="admin-field-label">
+                  Tu Nombre y Apellido:
+                </label>
                 <input
                   type="text"
                   required
@@ -253,7 +368,9 @@ export default function CommunityMatchesSection() {
               </div>
 
               <div style={{ marginBottom: 18 }}>
-                <label className="admin-field-label">Tu Teléfono (WhatsApp):</label>
+                <label className="admin-field-label">
+                  Tu Teléfono (WhatsApp):
+                </label>
                 <input
                   type="tel"
                   required
@@ -270,7 +387,9 @@ export default function CommunityMatchesSection() {
                 style={{ width: "100%", height: 44, justifyContent: "center" }}
                 disabled={joinSubmitting}
               >
-                {joinSubmitting ? "Registrando plaza..." : "Confirmar mi lugar ($15.000) →"}
+                {joinSubmitting
+                  ? "Registrando plaza..."
+                  : "Confirmar mi lugar ($15.000) →"}
               </button>
             </form>
           </div>
@@ -279,10 +398,29 @@ export default function CommunityMatchesSection() {
 
       {/* MODAL PARA CREAR CONVOCATORIA */}
       {createModal && (
-        <div className="admin-modal-backdrop" onClick={() => setCreateModal(false)}>
-          <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ fontSize: 18, color: "#ffffff", margin: 0 }}>
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setCreateModal(false)}
+        >
+          <div
+            className="admin-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 18,
+                  color: "var(--text-primary)",
+                  margin: 0,
+                }}
+              >
                 Publicar Convocatoria Abierta
               </h3>
               <button
@@ -300,25 +438,49 @@ export default function CommunityMatchesSection() {
                 <select
                   className="admin-modal-select"
                   value={createForm.category}
-                  onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, category: e.target.value })
+                  }
                 >
-                  <option value="7ma / Iniciación (1.5 - 2.5)">7ma / Iniciación (1.5 - 2.5)</option>
-                  <option value="6ta Categoría (3.0 - 3.8)">6ta Categoría (3.0 - 3.8)</option>
-                  <option value="5ta / Libre (4.0 - 5.5+)">5ta / Libre (4.0 - 5.5+)</option>
+                  <option value="7ma / Iniciación (1.5 - 2.5)">
+                    7ma / Iniciación (1.5 - 2.5)
+                  </option>
+                  <option value="6ta Categoría (3.0 - 3.8)">
+                    6ta Categoría (3.0 - 3.8)
+                  </option>
+                  <option value="5ta / Libre (4.0 - 5.5+)">
+                    5ta / Libre (4.0 - 5.5+)
+                  </option>
                   <option value="Torneo Damas A/B">Torneo Damas A/B</option>
                 </select>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 12,
+                  marginBottom: 12,
+                }}
+              >
                 <div>
                   <label className="admin-field-label">Cancha:</label>
                   <select
                     className="admin-modal-select"
                     value={createForm.courtName}
-                    onChange={(e) => setCreateForm({ ...createForm, courtName: e.target.value })}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        courtName: e.target.value,
+                      })
+                    }
                   >
-                    <option value="Cancha 1 · Cristal">Cancha 1 · Cristal</option>
-                    <option value="Cancha 2 · Estándar">Cancha 2 · Estándar</option>
+                    <option value="Cancha 1 · Cristal">
+                      Cancha 1 · Cristal
+                    </option>
+                    <option value="Cancha 2 · Estándar">
+                      Cancha 2 · Estándar
+                    </option>
                   </select>
                 </div>
 
@@ -330,21 +492,37 @@ export default function CommunityMatchesSection() {
                     placeholder="Ej. 20:00 hs"
                     className="admin-input-field"
                     value={createForm.time}
-                    onChange={(e) => setCreateForm({ ...createForm, time: e.target.value })}
+                    onChange={(e) =>
+                      setCreateForm({ ...createForm, time: e.target.value })
+                    }
                   />
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 12,
+                  marginBottom: 12,
+                }}
+              >
                 <div>
-                  <label className="admin-field-label">Tu Nombre (Organizador):</label>
+                  <label className="admin-field-label">
+                    Tu Nombre (Organizador):
+                  </label>
                   <input
                     type="text"
                     required
                     placeholder="Tu nombre"
                     className="admin-input-field"
                     value={createForm.creatorName}
-                    onChange={(e) => setCreateForm({ ...createForm, creatorName: e.target.value })}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        creatorName: e.target.value,
+                      })
+                    }
                   />
                 </div>
 
@@ -355,19 +533,28 @@ export default function CommunityMatchesSection() {
                     placeholder="Tu teléfono"
                     className="admin-input-field"
                     value={createForm.creatorPhone}
-                    onChange={(e) => setCreateForm({ ...createForm, creatorPhone: e.target.value })}
+                    onChange={(e) =>
+                      setCreateForm({
+                        ...createForm,
+                        creatorPhone: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>
 
               <div style={{ marginBottom: 18 }}>
-                <label className="admin-field-label">Descripción del partido:</label>
+                <label className="admin-field-label">
+                  Descripción del partido:
+                </label>
                 <input
                   type="text"
                   placeholder="Ej. Buscamos 2 jugadores con buen revés para partido parejo"
                   className="admin-input-field"
                   value={createForm.desc}
-                  onChange={(e) => setCreateForm({ ...createForm, desc: e.target.value })}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, desc: e.target.value })
+                  }
                 />
               </div>
 
