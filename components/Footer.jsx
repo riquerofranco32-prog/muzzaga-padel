@@ -12,12 +12,13 @@ export default function Footer() {
                 marginBottom: 8,
               }}
             >
-              <div
-                className="brand-mark"
-                style={{ width: 24, height: 24, fontSize: 12 }}
-              >
-                M
-              </div>
+              <img
+                src="/img/logo_badge.png"
+                alt="Muzzaga Pádel"
+                width={32}
+                height={32}
+                style={{ width: 32, height: 32, objectFit: "contain", display: "block" }}
+              />
               <strong style={{ fontSize: 16, color: "var(--text-primary)" }}>
                 Muzzaga Pádel
               </strong>

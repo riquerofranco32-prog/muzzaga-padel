@@ -30,8 +30,14 @@ export default function BookingPassModal({ bookingCode, booking, whatsappUrl, on
         {/* TOP PASS BAR */}
         <div className="digital-pass-card">
           <div className="pass-header-row">
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div className="brand-mark" style={{ width: 28, height: 28, fontSize: 13 }}>M</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <img
+                src="/img/logo_badge.png"
+                alt="Muzzaga"
+                width={30}
+                height={30}
+                style={{ width: 30, height: 30, objectFit: "contain", display: "block" }}
+              />
               <div>
                 <strong style={{ fontSize: 14, color: "#ffffff", display: "block", lineHeight: 1.2 }}>
                   MUZZAGA PÁDEL
