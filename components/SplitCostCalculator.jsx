@@ -3,6 +3,10 @@
 import { useMemo, useState } from "react";
 import { PRECIO_TURNO, PRECIO_POR_JUGADOR } from "../data/pricing";
 import { CALCULATOR_ITEMS as EXTRAS } from "../data/menu";
+import {
+  buildSplitCostMessage,
+  buildSplitCostWhatsAppUrl,
+} from "../lib/splitCost";
 
 const CANCHA_PRICE = PRECIO_TURNO;
 
@@ -12,6 +16,7 @@ export default function SplitCostCalculator() {
     heineken_litro: 2,
     pizza_muzza: 1,
   });
+  const [alias, setAlias] = useState("");
   const [copied, setCopied] = useState(false);
 
   const canchaPrice = CANCHA_PRICE;
@@ -45,30 +50,28 @@ export default function SplitCostCalculator() {
   const grandTotal = canchaPrice + extrasTotal;
   const perPerson = Math.round(grandTotal / (players || 1));
 
-  const copyToWhatsapp = () => {
-    let msg = `*DESGLOSE PARTIDO - MUZZAGA PÁDEL*\n`;
-    msg += `• Cancha (90 min): $${canchaPrice.toLocaleString("es-AR")}\n`;
-    msg += `  ($${PRECIO_POR_JUGADOR.toLocaleString("es-AR")} por jugador si son cuatro)\n`;
-
-    const extraEntries = Object.entries(selectedExtras);
-    if (extraEntries.length > 0) {
-      msg += `\n• Cantina & Extras:\n`;
-      extraEntries.forEach(([id, qty]) => {
-        const item = EXTRAS.find((e) => e.id === id);
-        if (item) {
-          msg += `  - ${qty}x ${item.name}: $${(item.price * qty).toLocaleString("es-AR")}\n`;
-        }
-      });
-    }
-
-    msg += `\nTotal General: $${grandTotal.toLocaleString("es-AR")}\n`;
-    msg += `Total por jugador (${players} personas): *$${perPerson.toLocaleString("es-AR")}*\n\n`;
-    msg += `Coordinación y seña vía WhatsApp al 299 597-4176`;
-
+  const handleCopySummary = () => {
+    const msg = buildSplitCostMessage({
+      canchaPrice,
+      players,
+      selectedExtras,
+      menuItems: EXTRAS,
+      alias,
+    });
     navigator.clipboard.writeText(msg);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
+
+  const whatsappUrl = useMemo(() => {
+    return buildSplitCostWhatsAppUrl({
+      canchaPrice,
+      players,
+      selectedExtras,
+      menuItems: EXTRAS,
+      alias,
+    });
+  }, [canchaPrice, players, selectedExtras, alias]);
 
   return (
     <section id="split-cost" className="section-turnos">
@@ -273,21 +276,70 @@ export default function SplitCostCalculator() {
               </div>
             </div>
 
-            <button
-              type="button"
-              className="btn btn-whatsapp"
-              style={{
-                width: "100%",
-                justifyContent: "center",
-                minHeight: 46,
-                fontSize: 15,
-              }}
-              onClick={copyToWhatsapp}
-            >
-              {copied
-                ? "¡Desglose copiado al portapapeles!"
-                : "Copiar desglose para WhatsApp"}
-            </button>
+            <div style={{ margin: "14px 0 16px" }}>
+              <label
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "var(--text-secondary)",
+                  display: "block",
+                  marginBottom: 4,
+                }}
+              >
+                💳 Tu Alias o CBU para cobrar (opcional):
+              </label>
+              <input
+                type="text"
+                value={alias}
+                onChange={(e) => setAlias(e.target.value)}
+                placeholder="Ej. lucas.padel.mp o 00000031..."
+                style={{
+                  width: "100%",
+                  height: 38,
+                  fontSize: 13,
+                  padding: "6px 12px",
+                  borderRadius: "var(--radius-sm, 6px)",
+                  border: "1px solid var(--border)",
+                  background: "var(--surface)",
+                  color: "var(--text-primary)",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-whatsapp"
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  minHeight: 46,
+                  fontSize: 14.5,
+                  textDecoration: "none",
+                }}
+              >
+                <span>📲</span> Enviar al Grupo de WhatsApp
+              </a>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  minHeight: 38,
+                  fontSize: 13,
+                }}
+                onClick={handleCopySummary}
+              >
+                {copied
+                  ? "✓ ¡Desglose copiado al portapapeles!"
+                  : "📋 Copiar texto del desglose"}
+              </button>
+            </div>
 
             <div className="split-alias-notice">
               <span>Coordinación de pago:</span>

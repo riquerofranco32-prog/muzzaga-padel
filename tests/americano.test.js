@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { generateFixtures } from "../lib/americano.js";
+import {
+  generateFixtures,
+  buildAmericanoShareMessage,
+  buildAmericanoWhatsAppUrl,
+} from "../lib/americano.js";
 
 test("americano with 4 players: all players play 3 matches", () => {
   const players = ["Ana", "Beto", "Carlos", "Diana"];
@@ -80,3 +84,21 @@ test("americano with 7 players: all players play exactly 4 matches and rest 3", 
     assert.equal(byeCount[p], 3, `Player ${p} must rest exactly 3 matches in 7-player americano`);
   }
 });
+
+test("buildAmericanoShareMessage formats fixture and scores for WhatsApp", () => {
+  const names = ["Ana", "Beto", "Carlos", "Diana"];
+  const fixtures = generateFixtures(names);
+  const msg = buildAmericanoShareMessage({
+    names,
+    fixtures,
+    scores: { 1: { t1: 4, t2: 2 } },
+  });
+
+  assert.ok(msg.includes("TORNEO AMERICANO EXPRESS"));
+  assert.ok(msg.includes("Participantes (4): Ana, Beto, Carlos, Diana"));
+  assert.ok(msg.includes("[4 - 2]"));
+
+  const url = buildAmericanoWhatsAppUrl({ names, fixtures });
+  assert.ok(url.startsWith("https://wa.me/?text="));
+});
+
