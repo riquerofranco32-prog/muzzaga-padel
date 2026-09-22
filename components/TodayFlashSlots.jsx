@@ -101,20 +101,40 @@ export default function TodayFlashSlots() {
           background: "linear-gradient(135deg, rgba(232, 114, 42, 0.07) 0%, rgba(245, 158, 11, 0.04) 100%)",
           border: "1.5px solid rgba(232, 114, 42, 0.25)",
           borderRadius: "var(--radius-xl, 16px)",
-          padding: "18px 22px",
+          padding: "16px 20px",
           boxShadow: "0 4px 20px -2px rgba(232, 114, 42, 0.08)",
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 10,
-            marginBottom: 14,
-          }}
-        >
+        <div style={{ flexShrink: 0 }}>
+          <img
+            src="/img/mascota.png"
+            alt="Muzzaguito - Mascota Muzzaga"
+            width={64}
+            height={64}
+            style={{
+              width: 64,
+              height: "auto",
+              objectFit: "contain",
+              filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.15))",
+              display: "block",
+            }}
+          />
+        </div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 10,
+              marginBottom: 12,
+            }}
+          >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
               style={{
@@ -209,6 +229,7 @@ export default function TodayFlashSlots() {
               </button>
             );
           })}
+        </div>
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import ClubToolsSection from "../components/ClubToolsSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 import FaqSection from "../components/FaqSection";
 import FloatingLiveBar from "../components/FloatingLiveBar";
+import MascotFloatHelper from "../components/MascotFloatHelper";
 import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
@@ -88,10 +89,43 @@ export default function Home() {
             <span className="gradient-accent">Pádel de verdad.</span>
           </h1>
 
-          <p className="hero-description-text" style={{ maxWidth: 580, margin: "0 auto 18px", fontSize: "15px" }}>
+          <p className="hero-description-text" style={{ maxWidth: 580, margin: "0 auto 16px", fontSize: "15px" }}>
             2 canchas oficiales de cristal con iluminación LED, turnos de 90 minutos,
             Canchas Abiertas comunitarias y cantina para el mejor tercer tiempo.
           </p>
+
+          {/* MASCOTA HERO BADGE */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 18,
+              background: "rgba(24, 24, 27, 0.5)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 255, 255, 0.15)",
+              borderRadius: 30,
+              padding: "6px 16px 6px 8px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+            }}
+          >
+            <img
+              src="/img/mascota.png"
+              alt="Muzzaguito - Mascota Oficial"
+              width={42}
+              height={42}
+              style={{
+                width: 42,
+                height: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.3))",
+                display: "block",
+              }}
+            />
+            <span style={{ fontSize: 13, color: "#fff", fontWeight: 500 }}>
+              ¡Hola! Soy <strong>Muzzaguito</strong> · Elegí tu cancha y vení a jugar 🎾
+            </span>
+          </div>
 
           <div className="hero-cta-buttons" style={{ marginBottom: 12 }}>
             <a href="#turnos" className="hero-cta-main" style={{ padding: "12px 28px" }}>
@@ -430,6 +464,7 @@ export default function Home() {
       </section>
 
       <FloatingLiveBar />
+      <MascotFloatHelper />
       <Footer />
       <BottomNav />
       <ScrollReveal />

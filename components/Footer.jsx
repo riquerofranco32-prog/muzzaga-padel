@@ -46,6 +46,31 @@ export default function Footer() {
               Club de pádel en Catriel, Río Negro. Canchas de cristal
               profesionales, torneos y cantina propia.
             </p>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                marginTop: 12,
+                padding: "8px 12px",
+                background: "var(--color-surface-2, rgba(255,255,255,0.05))",
+                borderRadius: 12,
+                border: "1px solid var(--color-hairline, rgba(255,255,255,0.1))",
+                maxWidth: 320,
+              }}
+            >
+              <img
+                src="/img/mascota.png"
+                alt="Muzzaguito"
+                width={38}
+                height={38}
+                style={{ width: 38, height: "auto", objectFit: "contain", flexShrink: 0 }}
+              />
+              <span style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.3 }}>
+                ¡Nos vemos en la pista! 🎾 Muzzaguito te acompaña en cada partido.
+              </span>
+            </div>
           </div>
 
           <div style={{ display: "flex", gap: 48, flexWrap: "wrap" }}>
