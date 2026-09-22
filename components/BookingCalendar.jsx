@@ -206,20 +206,22 @@ export default function BookingCalendar() {
                   <span className="slot-meta">
                     {court?.name} · {court?.type}
                   </span>
-                  <div style={{ marginTop: 2, textAlign: "left" }}>
-                    <div
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 13,
-                        color: "var(--color-ink)",
-                      }}
-                    >
+                  {/* El precio es fijo para todos los turnos (ver el pill de
+                      arriba de la grilla): repetir "$15.000 por jugador si
+                      son cuatro" en cada una de las ~14 cards era puro ruido,
+                      no info nueva. Queda solo el total + el valor por
+                      jugador en una sola línea chica. */}
+                  <div
+                    style={{
+                      marginTop: 2,
+                      fontSize: 12.5,
+                      color: "var(--color-body)",
+                    }}
+                  >
+                    <strong style={{ fontSize: 14, color: "var(--color-ink)" }}>
                       ${pricing.total.toLocaleString("es-AR")}
-                    </div>
-                    <div style={{ fontSize: 11, color: "var(--color-body)" }}>
-                      ${pricing.perPlayer.toLocaleString("es-AR")} por jugador
-                      si son cuatro
-                    </div>
+                    </strong>{" "}
+                    · ${pricing.perPlayer.toLocaleString("es-AR")} c/u
                   </div>
                   <span className="slot-badge" style={{ marginTop: 2 }}>
                     {slot.available ? "Disponible" : "Ocupado"}
@@ -358,6 +360,26 @@ export default function BookingCalendar() {
       {confirmed && (
         <>
           <div className="booking-confirm-form">
+            <svg
+              className="confirm-check-icon"
+              viewBox="0 0 52 52"
+              width="40"
+              height="40"
+              aria-hidden="true"
+            >
+              <circle
+                className="confirm-check-circle"
+                cx="26"
+                cy="26"
+                r="24"
+                fill="none"
+              />
+              <path
+                className="confirm-check-mark"
+                fill="none"
+                d="M14 27l7 7 16-16"
+              />
+            </svg>
             <p className="booking-confirm-summary">
               ¡Turno reservado! Código <strong>{confirmed.bookingCode}</strong>.
             </p>

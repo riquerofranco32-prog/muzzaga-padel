@@ -1,4 +1,4 @@
-import { Poppins } from "next/font/google";
+import { Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import LightboxProvider from "../components/LightboxProvider";
 
@@ -6,6 +6,17 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-poppins",
+  display: "swap",
+});
+
+// --font-mono apuntaba a Poppins (no es monoespaciada): los precios de la
+// grilla de turnos/admin y los códigos de reserva (<code>) usan esa variable
+// esperando dígitos alineados tipo ticket, y con una tipografía proporcional
+// nunca lo consiguen.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
@@ -65,7 +76,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className={poppins.variable}>
+    <html lang="es" className={`${poppins.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script
           type="application/ld+json"

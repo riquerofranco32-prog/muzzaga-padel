@@ -692,9 +692,20 @@ export default function TacticalCourtSimulator() {
                 </>
               )}
 
-              {/* MODO PRESETS: Animated Trajectory & Ball */}
-              {boardMode === "presets" && isPlayingAnim && (
-                <>
+              {/* MODO PRESETS: Animated Trajectory & Ball.
+                  El cambio entre jugadas remonta el <path>/<animateMotion>
+                  (necesitan la key nueva para reiniciar el trayecto), lo que
+                  antes se veía como un corte seco. Envolviendo en un <g> con
+                  opacity ligada a isPlayingAnim (en vez de desmontar el
+                  bloque entero) el swap ocurre mientras está invisible, así
+                  se ve como un fundido en vez de un salto. */}
+              {boardMode === "presets" && (
+                <g
+                  style={{
+                    opacity: isPlayingAnim ? 1 : 0,
+                    transition: "opacity 0.18s ease",
+                  }}
+                >
                   {/* Trajectory glow path */}
                   <path
                     key={`traj-${animKey}`}
@@ -773,7 +784,7 @@ export default function TacticalCourtSimulator() {
                       </text>
                     </g>
                   )}
-                </>
+                </g>
               )}
 
               {/* PLAYERS (Equipo Naranja / Muzzaga) */}

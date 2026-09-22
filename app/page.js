@@ -16,6 +16,7 @@ import FloatingLiveBar from "../components/FloatingLiveBar";
 import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
+import ScrollProgress from "../components/ScrollProgress";
 
 import { priceForSlot } from "../lib/booking";
 
@@ -24,6 +25,7 @@ const WHATSAPP = "5492995974176";
 export default function Home() {
   return (
     <>
+      <ScrollProgress />
       <Header />
 
       <div className="glow-ambient glow-hero-top" />
