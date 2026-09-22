@@ -143,7 +143,8 @@ export default function CantinaSection() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
             gap: 20,
             marginBottom: 28,
           }}
@@ -233,7 +234,7 @@ export default function CantinaSection() {
             fontStyle: "italic",
           }}
         >
-          Consultanos por opciones sin TACC y veganas
+          Las opciones sin TACC y veganas están marcadas en el menú ↑
         </p>
       </div>
     </section>
