@@ -265,3 +265,84 @@ export async function adminCancelBooking(bookingId, date, courtId, startTime) {
     return { ok: false, error: "No se pudo cancelar el turno." };
   }
 }
+
+/** Registra un cobro parcial o total sobre una reserva (seña, efectivo, etc). */
+export async function adminAddPayment(bookingId, method, amount) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const amt = Number(amount);
+  if (!bookingId || !amt || amt <= 0) {
+    return { ok: false, error: "Ingresá un monto válido." };
+  }
+
+  try {
+    const db = getDb();
+    const paymentRef = db.ref(`bookings/${bookingId}/payments`).push();
+    await paymentRef.set({
+      method: method || "efectivo",
+      amount: amt,
+      createdAt: Date.now(),
+    });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo registrar el cobro." };
+  }
+}
+
+export async function adminRemovePayment(bookingId, paymentId) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!bookingId || !paymentId) {
+    return { ok: false, error: "Datos inválidos." };
+  }
+  try {
+    const db = getDb();
+    await db.ref(`bookings/${bookingId}/payments/${paymentId}`).remove();
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo eliminar el cobro." };
+  }
+}
+
+/**
+ * Listado de clientes derivado de las reservas ya guardadas (agrupadas por
+ * teléfono). No agrega una colección nueva: reutiliza `bookings`, que es la
+ * única fuente de verdad que ya existe.
+ */
+export async function adminGetClients() {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) return { ok: true, clients: [] };
+
+  try {
+    const db = getDb();
+    const snap = await db.ref("bookings").get();
+    const byKey = new Map();
+
+    if (snap.exists()) {
+      Object.values(snap.val()).forEach((b) => {
+        if (b.status === "cancelado") return;
+        const phone = (b.playerPhone || "").trim();
+        const name = (b.playerName || "Sin nombre").trim();
+        const key = phone || `sin-tel:${name.toLowerCase()}`;
+        const existing = byKey.get(key);
+        if (existing) {
+          existing.count += 1;
+          if ((b.date || "") > existing.lastDate) existing.lastDate = b.date;
+        } else {
+          byKey.set(key, { name, phone, count: 1, lastDate: b.date || "" });
+        }
+      });
+    }
+
+    const clients = Array.from(byKey.values()).sort(
+      (a, b) => b.count - a.count || a.name.localeCompare(b.name),
+    );
+    return { ok: true, clients };
+  } catch (error) {
+    return { ok: false, error: "No se pudo cargar el listado de clientes." };
+  }
+}

@@ -239,15 +239,23 @@ select:focus-visible,
   );
 }
 
-/* Shimmer & Gradient Typography */
+/* Shimmer & Gradient Typography.
+   Fallback `color` es obligatorio: sin él, si el navegador no soporta
+   background-clip:text (o falla el compositing sobre una foto con
+   animación), el texto queda con -webkit-text-fill-color:transparent y
+   ningún otro color de respaldo → letras invisibles/"traslúcidas". */
 .gradient-text {
+  color: #1b1b19;
   background: linear-gradient(135deg, #1b1b19 20%, #40444c 75%, #60646c 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .gradient-accent {
-  background: linear-gradient(135deg, #e8722a 0%, #cf611e 100%);
+  color: var(--color-accent-orange);
+  background: linear-gradient(135deg, #ff9152 0%, #ff5e00 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 2px 10px rgba(232, 114, 42, 0.2));
@@ -3249,11 +3257,41 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .admin-kpi-card {
+  position: relative;
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-lg);
-  padding: 20px 22px;
+  padding: 20px 22px 20px 26px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.admin-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.admin-kpi-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-accent-orange);
+}
+
+.admin-kpi-card[data-tone="emerald"]::before {
+  background: #059669;
+}
+
+.admin-kpi-card[data-tone="sky"]::before {
+  background: #0369a1;
+}
+
+.admin-kpi-card[data-tone="ink"]::before {
+  background: #1b1b19;
 }
 
 .admin-kpi-label {
@@ -3316,6 +3354,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: var(--radius-md);
   padding: 12px 14px;
   border: 1px solid var(--color-hairline-strong);
+  border-left-width: 3px;
   transition: all 0.15s ease;
   background: var(--color-canvas-soft);
 }
@@ -3323,11 +3362,32 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .admin-timeline-slot.occupied {
   background: #fff7ed;
   border-color: var(--color-accent-orange-border);
+  border-left-color: var(--color-accent-orange);
+}
+
+.admin-timeline-slot.occupied[data-status="is-pagado"] {
+  border-left-color: #059669;
+  background: #f0fbf6;
+}
+
+.admin-timeline-slot.occupied[data-status="is-senado"] {
+  border-left-color: #d97706;
+}
+
+.admin-timeline-slot.occupied[data-status="is-bloqueado"] {
+  border-left-color: #7c5cd4;
+  background: #f7f5ff;
 }
 
 .admin-timeline-slot.free {
   background: #ffffff;
   border-style: dashed;
+  border-left-style: dashed;
+}
+
+.admin-timeline-slot.free:hover {
+  border-color: var(--color-accent-orange-border);
+  background: var(--color-accent-orange-subtle);
 }
 
 .admin-timeline-slot.dimmed {
@@ -3500,6 +3560,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: var(--color-muted);
   border-bottom: 1px solid var(--color-hairline);
   background: var(--color-canvas-soft);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .admin-table td {
@@ -3513,6 +3576,18 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-bottom: none;
 }
 
+.admin-table tbody tr {
+  transition: background-color 0.12s ease;
+}
+
+.admin-table tbody tr:nth-child(even) {
+  background: var(--color-canvas-soft);
+}
+
+.admin-table tbody tr:hover {
+  background: var(--color-accent-orange-subtle);
+}
+
 .admin-table-action-btn {
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline-strong);
@@ -3522,6 +3597,27 @@ input[type="range"]::-webkit-slider-thumb:hover {
   cursor: pointer;
   text-decoration: none;
   color: var(--color-ink);
+  transition: all 0.12s ease;
+}
+
+.admin-table-action-btn:hover {
+  border-color: var(--color-accent-orange);
+  color: var(--color-accent-orange);
+}
+
+/* Existía en el JSX (className="admin-table-action-btn delete") pero nunca
+   tuvo estilo propio: cancelar/eliminar se veía igual que cualquier acción
+   neutra, sin la señal visual de "esto es destructivo". */
+.admin-table-action-btn.delete {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.admin-table-action-btn.delete:hover {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #ffffff;
 }
 
 .admin-modal-backdrop {
@@ -3672,6 +3768,29 @@ input[type="range"]::-webkit-slider-thumb:hover {
   height: 16px;
   accent-color: var(--color-accent-orange);
   cursor: pointer;
+}
+
+.admin-nav-toggle.active {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+}
+
+/* Barra de progreso cobrado/total en el detalle de turno. */
+.admin-saldo-bar-track {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-hairline);
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.admin-saldo-bar-fill {
+  height: 100%;
+  background: #059669;
+  border-radius: var(--radius-pill);
+  transition: width 0.25s ease;
 }
 
 /* El topbar tiene 5 acciones y a menos de ~1080px se apretaban unas contra
