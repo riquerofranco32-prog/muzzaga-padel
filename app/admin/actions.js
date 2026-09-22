@@ -307,6 +307,57 @@ export async function adminRemovePayment(bookingId, paymentId) {
 }
 
 /**
+ * Recaudación y turnos de los últimos 7 días (hoy incluido), para el
+ * gráfico de la semana y las flechas de tendencia hoy-vs-ayer del
+ * dashboard. Una sola lectura de `bookings` en vez de 7 llamadas a
+ * getAdminDayData.
+ */
+export async function adminGetWeekStats() {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const today = new Date();
+  const days = [];
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    days.push({
+      date: toISODate(d),
+      dayLabel: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()],
+      ingresos: 0,
+      turnos: 0,
+    });
+  }
+  const byDate = new Map(days.map((d) => [d.date, d]));
+
+  if (!isFirebaseConfigured()) return { ok: true, days };
+
+  try {
+    const db = getDb();
+    const snap = await db.ref("bookings").get();
+    if (snap.exists()) {
+      Object.values(snap.val()).forEach((b) => {
+        if (b.status === "cancelado") return;
+        const bucket = byDate.get(b.date);
+        if (!bucket) return;
+        const pricing = priceForSlot(b.date, b.startTime);
+        const amount =
+          typeof b.total === "number"
+            ? b.total
+            : b.fullCourt !== false
+              ? pricing.total
+              : (b.playersCount || 4) * pricing.perPlayer;
+        bucket.ingresos += amount;
+        bucket.turnos += 1;
+      });
+    }
+    return { ok: true, days };
+  } catch (error) {
+    return { ok: false, error: "No se pudo cargar la tendencia semanal." };
+  }
+}
+
+/**
  * Listado de clientes derivado de las reservas ya guardadas (agrupadas por
  * teléfono). No agrega una colección nueva: reutiliza `bookings`, que es la
  * única fuente de verdad que ya existe.

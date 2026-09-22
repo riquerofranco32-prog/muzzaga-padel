@@ -3374,24 +3374,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   background: var(--color-canvas-soft);
 }
 
-.admin-top-bar {
-  background: #ffffff;
-  border-bottom: 1px solid var(--color-hairline);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(12px);
-}
-
-.admin-nav-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 64px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
 .admin-toast-badge {
   background: #ecfdf5;
   border: 1px solid #a7f3d0;
@@ -3400,6 +3382,255 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-weight: 600;
   padding: 4px 10px;
   border-radius: var(--radius-pill);
+}
+
+/* ==========================================================================
+   ADMIN SHELL: sidebar oscuro + contenido, mismo lenguaje visual que un
+   dashboard SaaS (inspirado en el admin de Takefyy) en vez del topbar
+   claro que tenía antes. Sidebar siempre oscuro: no sigue prefers-color-
+   scheme (misma decisión que .admin-dashboard-layout, que ya está
+   light-locked más abajo).
+   ========================================================================== */
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #14140f;
+  color: #e8e6df;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.admin-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar-brand strong {
+  font-size: 15px;
+  color: #ffffff;
+  display: block;
+}
+
+.admin-sidebar-brand span {
+  font-size: 11px;
+  color: #9c9886;
+}
+
+.admin-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 12px;
+  flex: 1;
+}
+
+.admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  color: #c7c3b4;
+  font-size: 13.5px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.admin-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.admin-sidebar-link.active {
+  background: var(--color-accent-orange);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.admin-sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-canvas-soft);
+}
+
+.admin-main-inner {
+  max-width: 1280px;
+  padding: 28px 28px 80px;
+}
+
+.admin-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-greeting-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 4px;
+}
+
+.admin-greeting-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.admin-live-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.admin-live-pill.is-open {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.admin-live-pill.is-closed {
+  background: var(--color-surface-strong);
+  color: var(--text-muted);
+}
+
+.admin-quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 8px;
+}
+
+.admin-kpi-trend.up {
+  color: #059669;
+}
+
+.admin-kpi-trend.down {
+  color: #b45309;
+}
+
+.admin-cashclose-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 12px;
+}
+
+.admin-cashclose-card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+
+.admin-cashclose-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-cashclose-val {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-top: 4px;
+  font-family: var(--font-mono);
+}
+
+.admin-week-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 140px;
+  padding-top: 10px;
+}
+
+.admin-week-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.admin-week-bar-val {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.admin-week-bar {
+  width: 100%;
+  max-width: 34px;
+  border-radius: 5px 5px 0 0;
+  background: var(--color-accent-orange-border);
+  transition: height 0.3s ease;
+  min-height: 3px;
+}
+
+.admin-week-bar.is-today {
+  background: var(--color-accent-orange);
+}
+
+.admin-week-bar-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .admin-date-picker-row {
@@ -3967,12 +4198,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   cursor: pointer;
 }
 
-.admin-nav-toggle.active {
-  background: #000000;
-  border-color: #000000;
-  color: #ffffff;
-}
-
 /* Barra de progreso cobrado/total en el detalle de turno. */
 .admin-saldo-bar-track {
   width: 100%;
@@ -3990,40 +4215,54 @@ input[type="range"]::-webkit-slider-thumb:hover {
   transition: width 0.25s ease;
 }
 
-/* El topbar tiene 5 acciones y a menos de ~1080px se apretaban unas contra
-   otras hasta romper la altura fija de 64px. */
-@media (max-width: 1080px) {
-  .admin-nav-inner {
+/* Sidebar fija de 240px no entra cómoda por debajo de ~900px: pasa a barra
+   horizontal arriba, como ya hacía el topbar viejo. */
+@media (max-width: 900px) {
+  .admin-shell {
+    flex-direction: column;
+  }
+  .admin-sidebar {
+    width: 100%;
     height: auto;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .admin-sidebar-brand {
+    border-bottom: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .admin-sidebar-nav {
+    flex-direction: row;
+    flex: 1;
+    padding: 10px 8px;
+    overflow-x: auto;
+  }
+  .admin-sidebar-footer {
+    border-top: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    flex-direction: row;
+  }
+  .admin-main-inner {
+    padding: 20px 16px 80px;
   }
 }
 
 @media (max-width: 720px) {
-  /* Sticky + header apilado se comía media pantalla en el celu. */
-  .admin-top-bar {
-    position: static;
-  }
-  .admin-nav-inner {
+  .admin-main-header {
     flex-direction: column;
     align-items: stretch;
   }
-  .admin-nav-actions {
-    display: grid !important;
+  .admin-cashweek-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-quick-actions {
+    display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
   }
-  .admin-nav-actions > * {
+  .admin-quick-actions > * {
     width: 100%;
-    justify-content: center;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    font-size: 12.5px !important;
-  }
-  .admin-toast-badge {
-    grid-column: 1 / -1;
-    text-align: center;
     justify-content: center;
   }
   .admin-date-picker-row {
@@ -4047,7 +4286,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* Abajo de ~560px no entran dos botones por fila sin cortar el texto. */
 @media (max-width: 560px) {
-  .admin-nav-actions {
+  .admin-quick-actions {
     grid-template-columns: 1fr;
   }
 }
