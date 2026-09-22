@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  buildTacticWhatsAppUrl,
+  buildRopeWhatsAppUrl,
+} from "../lib/tacticalShare";
 
 const PRESET_TACTICS = [
   {
@@ -1063,6 +1067,32 @@ export default function TacticalCourtSimulator() {
                       {tactic.tip}
                     </p>
                   </div>
+
+                  <a
+                    href={buildTacticWhatsAppUrl(tactic)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary"
+                    style={{
+                      width: "100%",
+                      marginTop: 12,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      fontSize: 13,
+                      padding: "10px 14px",
+                      borderColor: "rgba(37, 211, 102, 0.4)",
+                      color: "#166534",
+                      background: "rgba(37, 211, 102, 0.08)",
+                      fontWeight: 600,
+                      textDecoration: "none",
+                    }}
+                    title="Enviar esta jugada táctica a tu compañero por WhatsApp"
+                  >
+                    <span style={{ fontSize: 16 }}>📲</span>
+                    <span>Compartir Jugada con mi Pareja</span>
+                  </a>
                 </div>
               </>
             )}
@@ -1153,6 +1183,32 @@ export default function TacticalCourtSimulator() {
                     cubrir la pared descubierta."
                   </span>
                 </div>
+
+                <a
+                  href={buildRopeWhatsAppUrl(rope)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  style={{
+                    width: "100%",
+                    marginTop: 12,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    fontSize: 13,
+                    padding: "10px 14px",
+                    borderColor: "rgba(15, 123, 79, 0.4)",
+                    color: "#0F7B4F",
+                    background: "rgba(15, 123, 79, 0.08)",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                  }}
+                  title="Enviar este movimiento táctico de pareja a tu compañero por WhatsApp"
+                >
+                  <span style={{ fontSize: 16 }}>🤝</span>
+                  <span>Compartir Sincronización con mi Pareja</span>
+                </a>
               </>
             )}
 

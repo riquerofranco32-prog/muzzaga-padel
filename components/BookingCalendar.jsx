@@ -38,7 +38,36 @@ export default function BookingCalendar() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [confirmed, setConfirmed] = useState(null); // { bookingCode, whatsappUrl }
+  const [isRemembered, setIsRemembered] = useState(false);
   const formRef = useRef(null);
+
+  // Autocompletar datos del jugador frecuente guardados localmente
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("muzzaga_player_profile");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.playerName || parsed?.playerPhone) {
+          setForm((f) => ({
+            ...f,
+            playerName: parsed.playerName || f.playerName,
+            playerPhone: parsed.playerPhone || f.playerPhone,
+          }));
+          setIsRemembered(true);
+        }
+      }
+    } catch {
+      // Ignorar restricciones de almacenamiento local
+    }
+  }, []);
+
+  function handleForgetProfile() {
+    try {
+      localStorage.removeItem("muzzaga_player_profile");
+    } catch {}
+    setIsRemembered(false);
+    setForm((f) => ({ ...f, playerName: "", playerPhone: "" }));
+  }
 
   // Antes el formulario aparecía al final de la lista de horarios, fuera de
   // pantalla: elegir un slot no daba ninguna señal de que había que
@@ -140,6 +169,16 @@ export default function BookingCalendar() {
       return;
     }
     markSlotTaken(selected.courtId, selected.start);
+    try {
+      localStorage.setItem(
+        "muzzaga_player_profile",
+        JSON.stringify({
+          playerName: form.playerName.trim(),
+          playerPhone: form.playerPhone.trim(),
+        }),
+      );
+      setIsRemembered(true);
+    } catch {}
     trackEvent("booking_submitted", {
       courtId: selected.courtId,
       start: selected.start,
@@ -393,6 +432,43 @@ export default function BookingCalendar() {
               }
             />
           </label>
+
+          {isRemembered && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                background: "rgba(16, 185, 129, 0.08)",
+                border: "1px solid rgba(16, 185, 129, 0.25)",
+                borderRadius: 6,
+                padding: "6px 10px",
+                fontSize: 12,
+                color: "#059669",
+                marginTop: -4,
+                marginBottom: 6,
+              }}
+            >
+              <span>✓ Datos autocompletados para reservar más rápido</span>
+              <button
+                type="button"
+                onClick={handleForgetProfile}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--color-muted)",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                  fontSize: 11,
+                  padding: 0,
+                  marginLeft: 8,
+                }}
+                title="Borrar datos guardados en este dispositivo"
+              >
+                Cambiar
+              </button>
+            </div>
+          )}
 
           <label>
             <span>Cantidad de jugadores</span>
