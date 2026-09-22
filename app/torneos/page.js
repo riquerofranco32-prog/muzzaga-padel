@@ -3,6 +3,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import BottomNav from "../../components/BottomNav";
 import TorneosGallery from "../../components/TorneosGallery";
+import TournamentBracket from "../../components/TournamentBracket";
 import { CLUB_INFO } from "../../data/club";
 
 export const metadata = {
@@ -27,7 +28,7 @@ export default function TorneosPage() {
         </div>
 
         {/* PRÓXIMO TORNEO DESTACADO */}
-        <div className="container" style={{ marginBottom: 32 }}>
+        <div className="container" style={{ marginBottom: 20 }}>
           <div
             style={{
               background: "linear-gradient(135deg, rgba(232, 114, 42, 0.08) 0%, rgba(255, 255, 255, 0.8) 100%)",
@@ -62,6 +63,9 @@ export default function TorneosPage() {
               Consultar Inscripción por WhatsApp →
             </a>
           </div>
+
+          {/* CUADROS Y LLAVES EN VIVO */}
+          <TournamentBracket />
         </div>
 
         <TorneosGallery />

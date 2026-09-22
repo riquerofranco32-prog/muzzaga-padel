@@ -92,7 +92,10 @@ export async function createBooking(input) {
       };
     }
 
+    const code = `MUZZ-${bookingRef.key.slice(-5).toUpperCase()}`;
+
     const bookingData = {
+      bookingCode: code,
       courtId,
       courtName,
       date,
@@ -103,6 +106,7 @@ export async function createBooking(input) {
       playersCount: players,
       fullCourt: Boolean(fullCourt),
       status: "confirmado",
+      paymentStatus: "pending",
       createdAt: Date.now(),
     };
 

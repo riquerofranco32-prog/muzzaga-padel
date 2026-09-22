@@ -1,6 +1,7 @@
 import { Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import LightboxProvider from "../components/LightboxProvider";
+import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
 import { Analytics } from "@vercel/analytics/react";
 
 const poppins = Poppins({
@@ -110,6 +111,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <LightboxProvider>{children}</LightboxProvider>
+        <ServiceWorkerRegister />
         <Analytics />
       </body>
     </html>

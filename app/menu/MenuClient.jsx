@@ -1,13 +1,37 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MENU_ITEMS, MENU_CATEGORIES } from "../../data/menu";
 import { CLUB_INFO } from "../../data/club";
 
+const LOCATION_NAMES = {
+  "cancha-1": "Cancha 1 (Pista de Cristal)",
+  "cancha-2": "Cancha 2 (Pista de Cristal)",
+  "cancha1": "Cancha 1 (Pista de Cristal)",
+  "cancha2": "Cancha 2 (Pista de Cristal)",
+  "mesa-1": "Mesa 1 (Cantina)",
+  "mesa-2": "Mesa 2 (Cantina)",
+  "mesa-3": "Mesa 3 (Cantina)",
+  "mesa-4": "Mesa 4 (Cantina)",
+  "mesa-5": "Mesa 5 (Cantina)",
+  "mesa-6": "Mesa 6 (Cantina)",
+};
+
 export default function MenuClient() {
+  const searchParams = useSearchParams();
   const [selectedCat, setSelectedCat] = useState("all");
   const [search, setSearch] = useState("");
+
+  const rawLocation =
+    searchParams.get("ubicacion") ||
+    searchParams.get("cancha") ||
+    searchParams.get("mesa");
+
+  const [activeLocation, setActiveLocation] = useState(
+    rawLocation ? LOCATION_NAMES[rawLocation.toLowerCase()] || rawLocation : null
+  );
 
   const filteredItems = useMemo(() => {
     return MENU_ITEMS.filter((item) => {
@@ -21,7 +45,21 @@ export default function MenuClient() {
   }, [selectedCat, search]);
 
   const handleOrderWhatsapp = (itemName, itemPrice) => {
-    const msg = `¡Hola Muzzaga! Quiero pedir ${itemName} ($${itemPrice.toLocaleString("es-AR")}) de la cantina para cuando termine mi partido.`;
+    const locationPrefix = activeLocation
+      ? `*PEDIDO PARA ${activeLocation.toUpperCase()}*\n\n`
+      : "";
+    const msg = `${locationPrefix}¡Hola Muzzaga! Quiero pedir ${itemName} ($${itemPrice.toLocaleString("es-AR")}) de la cantina.`;
+    window.open(
+      `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(msg)}`,
+      "_blank",
+    );
+  };
+
+  const handleGeneralOrder = () => {
+    const locationPrefix = activeLocation
+      ? `*PEDIDO PARA ${activeLocation.toUpperCase()}*\n\n`
+      : "";
+    const msg = `${locationPrefix}¡Hola Muzzaga! Quiero hacer un pedido a la cantina.`;
     window.open(
       `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(msg)}`,
       "_blank",
@@ -30,6 +68,50 @@ export default function MenuClient() {
 
   return (
     <div className="container" style={{ paddingBottom: 60 }}>
+      {/* BANNER DE ENTREGA EN CANCHA / MESA SI VIENE POR QR */}
+      {activeLocation && (
+        <div
+          style={{
+            background: "linear-gradient(90deg, rgba(232, 114, 42, 0.15) 0%, rgba(232, 114, 42, 0.05) 100%)",
+            border: "1px solid var(--color-accent-orange-border, #f2cbb4)",
+            borderRadius: "var(--radius-lg, 12px)",
+            padding: "12px 18px",
+            marginBottom: 20,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 10,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 22 }}>📍</span>
+            <div>
+              <div style={{ fontSize: 11, textTransform: "uppercase", fontWeight: 700, color: "var(--color-accent-orange)" }}>
+                Entrega Directa Activada
+              </div>
+              <strong style={{ fontSize: 15, color: "var(--color-ink)" }}>
+                {activeLocation}
+              </strong>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActiveLocation(null)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--color-muted)",
+              fontSize: 12,
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            Quitar ubicación
+          </button>
+        </div>
+      )}
+
       {/* HEADER DE LA CARTA */}
       <div className="section-header-row" style={{ marginBottom: 24 }}>
         <div>
@@ -42,15 +124,14 @@ export default function MenuClient() {
             y kiosco con vista directa a las canchas.
           </p>
         </div>
-        <a
-          href={`https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent("¡Hola Muzzaga! Quiero hacer un pedido a la cantina para después del partido.")}`}
-          target="_blank"
-          rel="noopener"
+        <button
+          type="button"
+          onClick={handleGeneralOrder}
           className="btn btn-secondary-whatsapp"
-          style={{ gap: 8, height: 42 }}
+          style={{ gap: 8, height: 42, cursor: "pointer" }}
         >
           Pedir por adelantado vía WhatsApp →
-        </a>
+        </button>
       </div>
 
       {/* BUSCADOR Y FILTROS */}

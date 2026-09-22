@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -25,7 +26,9 @@ export default function MenuPage() {
           </div>
         </div>
 
-        <MenuClient />
+        <Suspense fallback={<div className="container" style={{ padding: 40, textAlign: "center" }}>Cargando carta de cantina…</div>}>
+          <MenuClient />
+        </Suspense>
       </main>
       <Footer />
       <BottomNav />
