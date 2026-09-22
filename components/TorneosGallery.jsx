@@ -45,13 +45,16 @@ const TOURNAMENTS = [
     id: "junio-2026",
     label: "Primer Torneo · Junio 2026",
     jugadores: jugadorPhotos("junio", 25, "Primer Torneo Junio 2026"),
-    ganadores: Array.from({ length: 16 }, (_, i) => {
-      const n = String(i + 1).padStart(2, "0");
-      return {
-        src: `/img/torneos/junio/ganadores_${n}.jpg`,
-        alt: "Pareja ganadora del Primer Torneo Muzzaga, junio 2026",
-      };
-    }),
+    ganadores: [
+      {
+        src: "/img/torneos/junio/ganadores_1er_puesto.jpg",
+        alt: "1er puesto categoría Sexta Libre, Gabriel Salinas y Franco Alcalá, Primer Torneo Junio 2026",
+      },
+      {
+        src: "/img/torneos/junio/ganadores_2do_puesto.jpg",
+        alt: "2do puesto categoría Sexta Libre, Sebastián Riquero y Lucas Ponce, Primer Torneo Junio 2026",
+      },
+    ],
   },
 ];
 
