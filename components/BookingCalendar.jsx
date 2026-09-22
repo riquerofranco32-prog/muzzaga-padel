@@ -158,7 +158,12 @@ export default function BookingCalendar() {
             }}
             aria-pressed={day.iso === activeDate}
           >
-            <span className="booking-date-day">{day.dayName}</span>
+            <span className="booking-date-day">
+              {day.dayName}
+              {day.isWeekend && (
+                <span className="booking-date-weekend-badge">Finde</span>
+              )}
+            </span>
             <span className="booking-date-num">{day.dayNumber}</span>
             <span className="booking-date-month">{day.monthName}</span>
           </button>
@@ -172,7 +177,7 @@ export default function BookingCalendar() {
           onClick={() => setCourtFilter("all")}
           aria-pressed={courtFilter === "all"}
         >
-          Todas
+          Todas las Canchas
         </button>
         {COURTS.map((court) => (
           <button
@@ -202,39 +207,92 @@ export default function BookingCalendar() {
       )}
 
       {!activeDay?.closed && !loadError && visibleSlots && (
-        <>
-          <p className="mobile-swipe-hint">← Deslizá para ver más horarios →</p>
-          <div className="booking-slots-grid">
-            {visibleSlots.map((slot) => {
-              const court = COURTS.find((c) => c.id === slot.courtId);
-              const isSelected =
-                selected?.courtId === slot.courtId &&
-                selected?.start === slot.start;
-              const pricing = priceForSlot(activeDate, slot.start);
-              return (
-                <button
-                  key={`${slot.courtId}-${slot.start}`}
-                  type="button"
-                  className={`booking-slot${slot.available ? "" : " taken"}${slot.past ? " past" : ""}${isSelected ? " selected" : ""}`}
-                  disabled={!slot.available}
-                  onClick={() => pickSlot(slot)}
-                >
-                  <span className="slot-time">{slot.start} hs</span>
-                  <span className="slot-meta">
-                    {court?.name} · {court?.type}
-                  </span>
-                  <span className="slot-badge" style={{ marginTop: 6 }}>
-                    {slot.available
-                      ? "Disponible"
-                      : slot.past
-                        ? "Finalizado"
-                        : "Ocupado"}
-                  </span>
-                </button>
-              );
-            })}
+        <div
+          className="booking-matrix-container"
+          style={{
+            "--court-columns": courtFilter === "all" ? COURTS.length : 1,
+          }}
+        >
+          {/* Encabezado de columnas de canchas */}
+          <div className="booking-matrix-header">
+            <div>Horario</div>
+            {(courtFilter === "all"
+              ? COURTS
+              : COURTS.filter((c) => c.id === courtFilter)
+            ).map((c) => (
+              <div key={c.id}>
+                {c.name} ({c.type})
+              </div>
+            ))}
           </div>
-        </>
+
+          {/* Filas de la matriz por horario */}
+          {[...new Set(visibleSlots.map((s) => s.start))].sort().map((time) => {
+            const courts =
+              courtFilter === "all"
+                ? COURTS
+                : COURTS.filter((c) => c.id === courtFilter);
+
+            return (
+              <div key={time} className="booking-matrix-row">
+                <div className="booking-matrix-time-col">
+                  <strong>{time}</strong>
+                  <span>hs</span>
+                </div>
+
+                {courts.map((court) => {
+                  const slot = visibleSlots.find(
+                    (s) => s.courtId === court.id && s.start === time,
+                  );
+                  if (!slot) {
+                    return (
+                      <div
+                        key={court.id}
+                        className="booking-slot taken"
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span style={{ fontSize: 12, color: "var(--color-muted)" }}>
+                          No disponible
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  const isSelected =
+                    selected?.courtId === slot.courtId &&
+                    selected?.start === slot.start;
+
+                  return (
+                    <button
+                      key={`${slot.courtId}-${slot.start}`}
+                      type="button"
+                      className={`booking-slot${slot.available ? "" : " taken"}${slot.past ? " past" : ""}${isSelected ? " selected" : ""}`}
+                      disabled={!slot.available}
+                      onClick={() => pickSlot(slot)}
+                      aria-label={`${court.name}, ${slot.start} hs, ${isSelected ? "Seleccionado" : slot.available ? "Disponible" : slot.past ? "Finalizado" : "Ocupado"}`}
+                    >
+                      <span className="slot-meta" style={{ fontWeight: 600 }}>
+                        {court.name}
+                      </span>
+                      <span className="slot-badge">
+                        {isSelected
+                          ? "Tu selección ✓"
+                          : slot.available
+                            ? "Disponible"
+                            : slot.past
+                              ? "Finalizado"
+                              : "Ocupado"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {selected && selectedPricing && (

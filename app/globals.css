@@ -49,6 +49,7 @@
 
   /* Brand Accents — OFICIAL MUZZAGA */
   --color-accent-orange: #e8722a;
+  --color-accent-orange-text: #c2410c;
   --color-accent-orange-hover: #cf611e;
   --color-accent-orange-subtle: #fdf6f0;
   --color-accent-orange-border: #f2cbb4;
@@ -1173,6 +1174,91 @@ select:focus-visible,
   background: var(--color-canvas-soft);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-hairline);
+}
+
+/* Booking Matrix Layout: hora x cancha */
+.booking-matrix-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.booking-matrix-header {
+  display: grid;
+  grid-template-columns: 90px repeat(var(--court-columns, 2), 1fr);
+  gap: 12px;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.booking-matrix-row {
+  display: grid;
+  grid-template-columns: 90px repeat(var(--court-columns, 2), 1fr);
+  align-items: stretch;
+  gap: 12px;
+}
+
+.booking-matrix-time-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-lg);
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.booking-matrix-time-col strong {
+  font-size: 16px;
+  color: var(--color-ink);
+  font-family: var(--font-jetbrains-mono), monospace;
+}
+
+.booking-matrix-time-col span {
+  font-size: 10.5px;
+  color: var(--color-muted);
+}
+
+.booking-date-weekend-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(232, 114, 42, 0.15);
+  color: var(--color-accent-orange);
+  padding: 1px 5px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+@media (max-width: 640px) {
+  .booking-matrix-header {
+    grid-template-columns: 68px repeat(var(--court-columns, 2), 1fr);
+    gap: 8px;
+    padding: 4px;
+    font-size: 10px;
+  }
+  .booking-matrix-row {
+    grid-template-columns: 68px repeat(var(--court-columns, 2), 1fr);
+    gap: 8px;
+  }
+  .booking-matrix-time-col {
+    padding: 6px 2px;
+  }
+  .booking-matrix-time-col strong {
+    font-size: 13.5px;
+  }
+  .booking-slot {
+    padding: 10px 8px;
+    gap: 4px;
+  }
 }
 
 .booking-slots-grid {
@@ -5840,3 +5926,32 @@ input[type="range"]::-webkit-slider-thumb:hover {
     border-color: #1a1a1a;
   }
 }
+
+/* ==========================================================================
+   ACCESSIBILITY & FOCUS VISIBLE (WCAG 2.1 AA)
+   ========================================================================== */
+:focus-visible {
+  outline: 2px solid var(--color-accent-orange);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-accent-orange);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
