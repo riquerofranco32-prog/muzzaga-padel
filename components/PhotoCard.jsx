@@ -1,17 +1,28 @@
 "use client";
 
+import Image from "next/image";
 import { useLightbox } from "./LightboxProvider";
+
+// Estas fotos venían con <img> plano: siempre el JPEG a resolución completa,
+// sin AVIF/WebP ni tamaños por dispositivo. Con next/image el navegador pide
+// el tamaño que realmente necesita el card (via `sizes`) en un formato
+// moderno, que es la mayor parte del peso de la home. `fill` funciona porque
+// los contenedores (.marquee-card, .photo-bento-card) ya son position:relative
+// con overflow:hidden.
 
 /** Marquee card used in the hero gallery strip. */
 export function MarqueeCard({ src, alt, label, caption, priority }) {
   const openLightbox = useLightbox();
   return (
     <div className="marquee-card" onClick={() => openLightbox(src, caption)}>
-      <img
+      <Image
         src={src}
         alt={alt}
+        fill
+        sizes="(max-width: 640px) 120px, 190px"
         className="marquee-img"
-        loading={priority ? "eager" : "lazy"}
+        priority={Boolean(priority)}
+        loading={priority ? undefined : "lazy"}
       />
       <div className="marquee-card-label">
         <span>{label}</span>
@@ -37,7 +48,13 @@ export function BentoPhotoCard({
       className="photo-bento-card"
       onClick={() => openLightbox(src, caption)}
     >
-      <img src={src} alt={alt} className="photo-bento-img" />
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw"
+        className="photo-bento-img"
+      />
       <div className="photo-bento-overlay" />
       <div className="photo-bento-body">
         {badge && (

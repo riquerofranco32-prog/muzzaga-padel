@@ -478,8 +478,8 @@ export default function CommunityMatchesSection() {
                     <option value="Cancha 1 · Cristal">
                       Cancha 1 · Cristal
                     </option>
-                    <option value="Cancha 2 · Estándar">
-                      Cancha 2 · Estándar
+                    <option value="Cancha 2 · Cristal">
+                      Cancha 2 · Cristal
                     </option>
                   </select>
                 </div>

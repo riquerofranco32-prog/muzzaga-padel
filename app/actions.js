@@ -1,12 +1,7 @@
 "use server";
 
 import { getDb, isFirebaseConfigured } from "../lib/firebase";
-import {
-  findCourt,
-  isValidSlot,
-  priceForSlot,
-  slotKey,
-} from "../lib/booking";
+import { findCourt, isValidSlot, priceForSlot, slotKey } from "../lib/booking";
 
 /**
  * @param {{date: string, courtId: string, startTime: string, endTime: string, playerName: string, playerPhone: string, playersCount: number, fullCourt: boolean}} input
@@ -47,42 +42,71 @@ export async function createBooking(input) {
     return { ok: false, error: "La cancha admite entre 1 y 4 jugadores." };
 
   const courtName = `${court.name} (${court.type})`;
-  let bookingKey = Math.random().toString(36).substring(2, 10);
 
-  if (isFirebaseConfigured()) {
-    try {
-      const db = getDb();
-      const claimRef = db.ref(`slotClaims/${date}/${slotKey(courtId, startTime)}`);
-      const bookingRef = db.ref("bookings").push();
+  // Sin esto, un corte de Firebase (env vars mal puestas, cuota, red) generaba
+  // un código de reserva falso: el cliente veía "¡Turno reservado!" pero nunca
+  // se guardaba nada, así que el horario seguía apareciendo libre para el
+  // próximo visitante y el club no tenía registro de la seña. Si no podemos
+  // confirmar el lock en la base, avisamos en vez de fingir éxito: el turno
+  // sigue pudiéndose coordinar a mano por WhatsApp, pero el usuario y el club
+  // saben que hace falta ese paso manual.
+  if (!isFirebaseConfigured()) {
+    console.error(
+      "createBooking: Firebase no está configurado (faltan FIREBASE_* en el entorno). No se puede garantizar que el horario siga libre.",
+    );
+    return {
+      ok: false,
+      error:
+        "No pudimos confirmar la disponibilidad en este momento. Escribinos por WhatsApp para coordinar el turno a mano.",
+    };
+  }
 
-      const claim = await claimRef.transaction((current) => {
-        if (current) return; // ya reservado: aborta la transacción
-        return bookingRef.key;
-      });
+  let bookingKey;
+  try {
+    const db = getDb();
+    const claimRef = db.ref(
+      `slotClaims/${date}/${slotKey(courtId, startTime)}`,
+    );
+    const bookingRef = db.ref("bookings").push();
 
-      if (!claim.committed) {
-        return { ok: false, error: "Ese horario se acaba de ocupar. Elegí otro." };
-      }
+    const claim = await claimRef.transaction((current) => {
+      if (current) return; // ya reservado: aborta la transacción
+      return bookingRef.key;
+    });
 
-      const bookingData = {
-        courtId,
-        courtName,
-        date,
-        startTime,
-        endTime,
-        playerName: name,
-        playerPhone: phone,
-        playersCount: players,
-        fullCourt: Boolean(fullCourt),
-        status: "confirmado",
-        createdAt: Date.now(),
+    if (!claim.committed) {
+      return {
+        ok: false,
+        error: "Ese horario se acaba de ocupar. Elegí otro.",
       };
-
-      await bookingRef.set(bookingData);
-      bookingKey = bookingRef.key;
-    } catch (error) {
-      console.warn("Aviso: Firebase no disponible al guardar reserva, generando pase directo:", error.message);
     }
+
+    const bookingData = {
+      courtId,
+      courtName,
+      date,
+      startTime,
+      endTime,
+      playerName: name,
+      playerPhone: phone,
+      playersCount: players,
+      fullCourt: Boolean(fullCourt),
+      status: "confirmado",
+      createdAt: Date.now(),
+    };
+
+    await bookingRef.set(bookingData);
+    bookingKey = bookingRef.key;
+  } catch (error) {
+    console.error(
+      "createBooking: fallo al guardar la reserva en Firebase:",
+      error.message,
+    );
+    return {
+      ok: false,
+      error:
+        "No pudimos guardar tu turno en el sistema. Escribinos por WhatsApp para coordinarlo a mano antes de que se lo lleve otro grupo.",
+    };
   }
 
   const bookingCode = `MUZZ-${bookingKey.slice(-5).toUpperCase()}`;

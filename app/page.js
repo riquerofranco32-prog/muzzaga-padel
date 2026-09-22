@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Header from "../components/Header";
 import HeroMarquee from "../components/HeroMarquee";
 import LiveWeatherRadar from "../components/LiveWeatherRadar";
@@ -30,9 +31,12 @@ export default function Home() {
       {/* HERO */}
       <section id="top" className="animated-marquee-hero">
         <div className="hero-bg-photo" aria-hidden="true">
-          <img
+          <Image
             src="/img/court_glass_night_match.jpg"
             alt="Partido de pádel nocturno en cancha de cristal con iluminación LED en Muzzaga"
+            fill
+            priority
+            sizes="100vw"
           />
         </div>
         <div className="hero-inner-content">
@@ -328,7 +332,8 @@ export default function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
               gap: 16,
             }}
           >

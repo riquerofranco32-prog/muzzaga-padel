@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 
-const ALIAS = "Consultar alias en el mostrador";
-const CBU = "0000003100012345678901";
-const TITULAR = "Muzzaga Pádel SRL (Mercado Pago)";
+// Antes esta pantalla mostraba un CBU y un alias inventados (placeholder de
+// ejemplo) como si fueran los datos reales del club, con botón "Copiar" y
+// todo. Un cliente que confiara en eso podía transferir la seña a una cuenta
+// que no existe. Mientras no haya un dato real para mostrar (vía env var),
+// mandamos a confirmarlo por WhatsApp en vez de fingir un número de cuenta.
+const REAL_ALIAS = process.env.NEXT_PUBLIC_PAYMENT_ALIAS || null;
+const REAL_CBU = process.env.NEXT_PUBLIC_PAYMENT_CBU || null;
+const TITULAR = process.env.NEXT_PUBLIC_PAYMENT_TITULAR || "Muzzaga Pádel";
 
 export default function BookingPassModal({
   bookingCode,
@@ -12,19 +17,12 @@ export default function BookingPassModal({
   whatsappUrl,
   onClose,
 }) {
-  const [aliasCopied, setAliasCopied] = useState(false);
-  const [cbuCopied, setCbuCopied] = useState(false);
+  const [copiedField, setCopiedField] = useState(null);
 
-  const copyAlias = () => {
-    navigator.clipboard.writeText(ALIAS);
-    setAliasCopied(true);
-    setTimeout(() => setAliasCopied(false), 2000);
-  };
-
-  const copyCbu = () => {
-    navigator.clipboard.writeText(CBU);
-    setCbuCopied(true);
-    setTimeout(() => setCbuCopied(false), 2000);
+  const copyValue = (field, value) => {
+    navigator.clipboard.writeText(value);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField((f) => (f === field ? null : f)), 2000);
   };
 
   if (!booking) return null;
@@ -135,41 +133,65 @@ export default function BookingPassModal({
               <span>Datos para transferir la seña:</span>
             </div>
 
-            <div className="pass-bank-row">
-              <div>
-                <span className="pass-bank-sub">
-                  Alias (Mercado Pago / Banco):
-                </span>
-                <code className="pass-alias-code">{ALIAS}</code>
-              </div>
-              <button
-                type="button"
-                className={`pass-copy-btn${aliasCopied ? " copied" : ""}`}
-                onClick={copyAlias}
-              >
-                {aliasCopied ? "Copiado" : "Copiar Alias"}
-              </button>
-            </div>
+            {REAL_ALIAS || REAL_CBU ? (
+              <>
+                {REAL_ALIAS && (
+                  <div className="pass-bank-row">
+                    <div>
+                      <span className="pass-bank-sub">
+                        Alias (Mercado Pago / Banco):
+                      </span>
+                      <code className="pass-alias-code">{REAL_ALIAS}</code>
+                    </div>
+                    <button
+                      type="button"
+                      className={`pass-copy-btn${copiedField === "alias" ? " copied" : ""}`}
+                      onClick={() => copyValue("alias", REAL_ALIAS)}
+                    >
+                      {copiedField === "alias" ? "Copiado" : "Copiar Alias"}
+                    </button>
+                  </div>
+                )}
 
-            <div className="pass-bank-row" style={{ marginTop: 8 }}>
-              <div>
-                <span className="pass-bank-sub">CBU / CVU:</span>
-                <code className="pass-cbu-code">{CBU}</code>
-              </div>
-              <button
-                type="button"
-                className={`pass-copy-btn${cbuCopied ? " copied" : ""}`}
-                onClick={copyCbu}
-              >
-                {cbuCopied ? "Copiado" : "Copiar CBU"}
-              </button>
-            </div>
+                {REAL_CBU && (
+                  <div className="pass-bank-row" style={{ marginTop: 8 }}>
+                    <div>
+                      <span className="pass-bank-sub">CBU / CVU:</span>
+                      <code className="pass-cbu-code">{REAL_CBU}</code>
+                    </div>
+                    <button
+                      type="button"
+                      className={`pass-copy-btn${copiedField === "cbu" ? " copied" : ""}`}
+                      onClick={() => copyValue("cbu", REAL_CBU)}
+                    >
+                      {copiedField === "cbu" ? "Copiado" : "Copiar CBU"}
+                    </button>
+                  </div>
+                )}
 
-            <div
-              style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6 }}
-            >
-              Titular: {TITULAR}
-            </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "var(--text-muted)",
+                    marginTop: 6,
+                  }}
+                >
+                  Titular: {TITULAR}
+                </div>
+              </>
+            ) : (
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "var(--text-secondary)",
+                  margin: 0,
+                }}
+              >
+                Te confirmamos el alias o CBU para la seña por WhatsApp al
+                coordinar el turno — así evitamos pasarte un dato de pago
+                desactualizado.
+              </p>
+            )}
           </div>
 
           {/* ACTION BUTTONS */}

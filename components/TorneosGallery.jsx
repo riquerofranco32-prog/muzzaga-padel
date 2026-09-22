@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { MarqueeCard } from "./PhotoCard";
 import { useLightbox } from "./LightboxProvider";
 
@@ -94,7 +95,13 @@ function TorneoThumb({ src, alt }) {
   const openLightbox = useLightbox();
   return (
     <div className="torneo-thumb" onClick={() => openLightbox(src, alt)}>
-      <img src={src} alt={alt} loading="lazy" />
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        loading="lazy"
+        sizes="(max-width: 640px) 40vw, 130px"
+      />
     </div>
   );
 }
