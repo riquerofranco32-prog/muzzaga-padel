@@ -29,6 +29,8 @@ import CalendarioView from "./views/CalendarioView";
 import ReportesView from "./views/ReportesView";
 import CantinaView from "./views/CantinaView";
 import TorneosView from "./views/TorneosView";
+import CajaView from "./views/CajaView";
+import ConfiguracionView from "./views/ConfiguracionView";
 import CreateBookingModal from "./CreateBookingModal";
 import BookingDetailModal from "./BookingDetailModal";
 
@@ -36,9 +38,11 @@ const NAV_ITEMS = [
   { id: "agenda", label: "📅 Agenda" },
   { id: "calendario", label: "🗓️ Calendario" },
   { id: "clientes", label: "👥 Clientes" },
+  { id: "caja", label: "💵 Caja & Cierre Z" },
   { id: "cantina", label: "🍕 Cantina" },
   { id: "torneos", label: "🏆 Torneos" },
   { id: "reportes", label: "📊 Reportes" },
+  { id: "configuracion", label: "⚙️ Configuración" },
 ];
 
 /** El club abre 14:00-00:30, lunes a sábado (ver DAILY_START_TIMES en lib/booking). */
@@ -502,6 +506,9 @@ export default function AdminPage() {
           </nav>
 
           <div className="admin-sidebar-footer">
+            <Link href="/admin/monitor" target="_blank" className="admin-sidebar-link">
+              📺 Monitor TV Pistas
+            </Link>
             <Link href="/" target="_blank" className="admin-sidebar-link">
               ↗ Ver Web
             </Link>
@@ -598,6 +605,9 @@ export default function AdminPage() {
               />
             )}
             {view === "clientes" && <ClientesView clients={clients} />}
+            {view === "caja" && (
+              <CajaView onExpiredSession={handleExpiredSession} />
+            )}
             {view === "cantina" && (
               <CantinaView onExpiredSession={handleExpiredSession} />
             )}
@@ -606,6 +616,9 @@ export default function AdminPage() {
             )}
             {view === "reportes" && (
               <ReportesView onExpiredSession={handleExpiredSession} />
+            )}
+            {view === "configuracion" && (
+              <ConfiguracionView onExpiredSession={handleExpiredSession} />
             )}
           </div>
         </main>
@@ -636,6 +649,10 @@ export default function AdminPage() {
           onAddPayment={handleAddPayment}
           onRemovePayment={handleRemovePayment}
           onCancel={handleCancel}
+          onMoved={() => {
+            loadDayData(activeDate);
+            setDetailBooking(null);
+          }}
         />
       )}
     </div>

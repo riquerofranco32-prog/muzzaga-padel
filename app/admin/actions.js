@@ -674,3 +674,309 @@ export async function adminRemoveTournamentPlayer(tournamentId, playerId) {
     return { ok: false, error: "No se pudo quitar el jugador." };
   }
 }
+
+/* ==========================================================================
+   CONFIGURACIÓN DINÁMICA DEL CLUB (FASE 1)
+   ========================================================================== */
+
+export async function adminGetClubConfig() {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const fallback = {
+    fullCourtPrice: 60000,
+    perPlayerPrice: 15000,
+    slotDurationMin: 90,
+    paymentAlias: "muzzaga.padel.mp",
+    paymentCbu: "0000003100010002000304",
+    paymentTitular: "Muzzaga Pádel",
+    clubPhone: "5492995974176",
+    blockedDates: [],
+  };
+
+  if (!isFirebaseConfigured()) {
+    return { ok: true, config: fallback };
+  }
+
+  try {
+    const db = getDb();
+    const snap = await db.ref("clubConfig").once("value");
+    if (!snap.exists()) {
+      return { ok: true, config: fallback };
+    }
+    return { ok: true, config: { ...fallback, ...snap.val() } };
+  } catch (err) {
+    return { ok: true, config: fallback };
+  }
+}
+
+export async function adminSaveClubConfig(config) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
+  }
+
+  try {
+    const db = getDb();
+    await db.ref("clubConfig").set({
+      fullCourtPrice: Number(config.fullCourtPrice) || 60000,
+      perPlayerPrice: Number(config.perPlayerPrice) || 15000,
+      slotDurationMin: Number(config.slotDurationMin) || 90,
+      paymentAlias: (config.paymentAlias || "").trim(),
+      paymentCbu: (config.paymentCbu || "").trim(),
+      paymentTitular: (config.paymentTitular || "").trim(),
+      clubPhone: (config.clubPhone || "").trim(),
+      blockedDates: Array.isArray(config.blockedDates) ? config.blockedDates : [],
+      updatedAt: Date.now(),
+    });
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: "No se pudo guardar la configuración." };
+  }
+}
+
+/* ==========================================================================
+   CAJA DIARIA, EGRESOS Y ARQUEO / CIERRE Z (FASE 2)
+   ========================================================================== */
+
+export async function adminAddCashExpense({ date, concept, amount, notes }) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const numericAmount = Number(amount);
+  if (!concept?.trim() || !numericAmount || numericAmount <= 0) {
+    return { ok: false, error: "Ingresá un concepto y un monto válido." };
+  }
+
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
+  }
+
+  try {
+    const db = getDb();
+    const ref = db.ref(`cashExpenses/${date}`).push();
+    await ref.set({
+      concept: concept.trim(),
+      amount: numericAmount,
+      notes: (notes || "").trim(),
+      createdAt: Date.now(),
+    });
+    return { ok: true, expenseId: ref.key };
+  } catch (err) {
+    return { ok: false, error: "No se pudo registrar el egreso." };
+  }
+}
+
+export async function adminGetDailyCashSummary(isoDate) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) {
+    return {
+      ok: true,
+      summary: {
+        date: isoDate,
+        cashTurnos: 0,
+        cashCantina: 0,
+        totalExpenses: 0,
+        transferTurnos: 0,
+        transferCantina: 0,
+        mpTurnos: 0,
+        mpCantina: 0,
+        expectedCash: 0,
+        expensesList: [],
+        closed: false,
+      },
+    };
+  }
+
+  try {
+    const db = getDb();
+    // 1. Obtener egresos del día
+    const expSnap = await db.ref(`cashExpenses/${isoDate}`).once("value");
+    const expensesList = [];
+    let totalExpenses = 0;
+    if (expSnap.exists()) {
+      expSnap.forEach((child) => {
+        const val = child.val();
+        totalExpenses += val.amount || 0;
+        expensesList.push({ id: child.key, ...val });
+      });
+    }
+
+    // 2. Obtener reservas del día y sumar cobros según método
+    const bookingsSnap = await db
+      .ref("bookings")
+      .orderByChild("date")
+      .equalTo(isoDate)
+      .once("value");
+
+    let cashTurnos = 0;
+    let transferTurnos = 0;
+    let mpTurnos = 0;
+
+    if (bookingsSnap.exists()) {
+      bookingsSnap.forEach((b) => {
+        const data = b.val();
+        if (data.status === "cancelado") return;
+        const payments = data.payments || [];
+        payments.forEach((p) => {
+          const amt = Number(p.amount) || 0;
+          if (p.method === "efectivo") cashTurnos += amt;
+          else if (p.method === "mercadopago") mpTurnos += amt;
+          else transferTurnos += amt;
+        });
+      });
+    }
+
+    // 3. Obtener ventas de cantina del día
+    const cantinaSnap = await db
+      .ref("cantinaSales")
+      .orderByChild("date")
+      .equalTo(isoDate)
+      .once("value");
+
+    let cashCantina = 0;
+    let transferCantina = 0;
+    let mpCantina = 0;
+
+    if (cantinaSnap.exists()) {
+      cantinaSnap.forEach((s) => {
+        const val = s.val();
+        const amt = Number(val.total) || 0;
+        if (val.method === "efectivo") cashCantina += amt;
+        else if (val.method === "mercadopago") mpCantina += amt;
+        else transferCantina += amt;
+      });
+    }
+
+    // 4. Estado de cierre de caja
+    const sessionSnap = await db.ref(`dailyCashSessions/${isoDate}`).once("value");
+    const session = sessionSnap.exists() ? sessionSnap.val() : null;
+
+    const expectedCash = cashTurnos + cashCantina - totalExpenses;
+
+    return {
+      ok: true,
+      summary: {
+        date: isoDate,
+        cashTurnos,
+        cashCantina,
+        totalExpenses,
+        transferTurnos,
+        transferCantina,
+        mpTurnos,
+        mpCantina,
+        expectedCash,
+        expensesList,
+        closed: Boolean(session?.closed),
+        closedAt: session?.closedAt || null,
+        actualCash: session?.actualCash || null,
+        difference: session?.difference || null,
+        notes: session?.notes || null,
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+}
+
+export async function adminCloseDailyCash({ date, actualCash, notes }) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
+  }
+
+  try {
+    const summaryRes = await adminGetDailyCashSummary(date);
+    if (!summaryRes.ok) return summaryRes;
+
+    const expectedCash = summaryRes.summary.expectedCash;
+    const actual = Number(actualCash) || 0;
+    const difference = actual - expectedCash;
+
+    const db = getDb();
+    await db.ref(`dailyCashSessions/${date}`).set({
+      closed: true,
+      closedAt: Date.now(),
+      expectedCash,
+      actualCash: actual,
+      difference,
+      notes: (notes || "").trim(),
+    });
+
+    return { ok: true, difference };
+  } catch (err) {
+    return { ok: false, error: "No se pudo cerrar la caja." };
+  }
+}
+
+/* ==========================================================================
+   REPROGRAMACIÓN Y CAMBIO RÁPIDO DE CANCHA (FASE 3)
+   ========================================================================== */
+
+export async function adminMoveBooking({
+  bookingId,
+  oldDate,
+  oldCourtId,
+  oldStartTime,
+  newDate,
+  newCourtId,
+  newStartTime,
+  newEndTime,
+}) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!bookingId || !newDate || !newCourtId || !newStartTime) {
+    return { ok: false, error: "Faltan datos del nuevo turno." };
+  }
+
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
+  }
+
+  const court = findCourt(newCourtId);
+  if (!court) return { ok: false, error: "Cancha destino inválida." };
+
+  try {
+    const db = getDb();
+    const newClaimRef = db.ref(
+      `slotClaims/${newDate}/${slotKey(newCourtId, newStartTime)}`
+    );
+
+    // 1. Intentar tomar el nuevo slot atómicamente
+    const claimResult = await newClaimRef.transaction((current) => {
+      if (current) return; // Ya ocupado
+      return bookingId;
+    });
+
+    if (!claimResult.committed) {
+      return { ok: false, error: "El horario y cancha de destino ya están ocupados." };
+    }
+
+    // 2. Liberar el slot anterior
+    await db
+      .ref(`slotClaims/${oldDate}/${slotKey(oldCourtId, oldStartTime)}`)
+      .remove();
+
+    // 3. Actualizar la reserva conservando pagos y cliente
+    await db.ref(`bookings/${bookingId}`).update({
+      courtId: newCourtId,
+      courtName: `${court.name} (${court.type})`,
+      date: newDate,
+      startTime: newStartTime,
+      endTime: newEndTime || addMinutes(newStartTime, 90),
+      reprogrammedAt: Date.now(),
+    });
+
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err.message || "Error al mover la reserva." };
+  }
+}
+

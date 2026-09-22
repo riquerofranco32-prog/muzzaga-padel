@@ -1,7 +1,9 @@
 "use client";
 
-import { PRICE_PER_PLAYER } from "../../lib/booking";
+import { useState } from "react";
+import { COURTS, PRICE_PER_PLAYER } from "../../lib/booking";
 import { toWhatsappNumber } from "../../lib/phone";
+import { adminMoveBooking } from "./actions";
 import {
   IconClose,
   IconTrash,
@@ -10,6 +12,16 @@ import {
   paidAmount,
   pendingAmount,
 } from "./adminHelpers";
+
+const AVAILABLE_TIMES = [
+  "14:00",
+  "15:30",
+  "17:00",
+  "18:30",
+  "20:00",
+  "21:30",
+  "23:00",
+];
 
 export default function BookingDetailModal({
   booking,
@@ -20,7 +32,49 @@ export default function BookingDetailModal({
   onAddPayment,
   onRemovePayment,
   onCancel,
+  onMoved,
 }) {
+  const [isMoving, setIsMoving] = useState(false);
+  const [moveCourtId, setMoveCourtId] = useState(booking.courtId || "cancha-1");
+  const [moveDate, setMoveDate] = useState(booking.date || "");
+  const [moveStartTime, setMoveStartTime] = useState(booking.startTime || "14:00");
+  const [moveSubmitting, setMoveSubmitting] = useState(false);
+  const [moveError, setMoveError] = useState("");
+
+  async function handleMoveSubmit(e) {
+    e.preventDefault();
+    setMoveSubmitting(true);
+    setMoveError("");
+
+    try {
+      const res = await adminMoveBooking({
+        bookingId: booking.id,
+        oldDate: booking.date,
+        oldCourtId: booking.courtId,
+        oldStartTime: booking.startTime,
+        newDate: moveDate,
+        newCourtId: moveCourtId,
+        newStartTime: moveStartTime,
+      });
+
+      if (!res.ok) {
+        setMoveError(res.error || "No se pudo mover el turno.");
+        setMoveSubmitting(false);
+        return;
+      }
+
+      if (onMoved) {
+        onMoved();
+      } else {
+        onClose();
+        window.location.reload();
+      }
+    } catch (err) {
+      setMoveError(err.message || "Error al procesar el traslado.");
+      setMoveSubmitting(false);
+    }
+  }
+
   return (
     <div className="admin-modal-backdrop" onClick={onClose}>
       <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -90,6 +144,114 @@ export default function BookingDetailModal({
             >
               Nota: {booking.notes}
             </div>
+          )}
+        </div>
+
+        {/* REPROGRAMAR / MOVER TURNO SECTION */}
+        <div
+          style={{
+            marginBottom: 16,
+            padding: 12,
+            background: isMoving ? "var(--color-surface-2, #f8fafc)" : "transparent",
+            border: "1px dashed var(--color-hairline, #e2e8f0)",
+            borderRadius: 8,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ fontSize: 13, fontWeight: 600 }}>
+              🔄 Reprogramar / Mover Cancha
+            </span>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              style={{ height: 28, padding: "0 8px", fontSize: 12 }}
+              onClick={() => {
+                setIsMoving(!isMoving);
+                setMoveError("");
+              }}
+            >
+              {isMoving ? "Cancelar" : "Cambiar Pista u Horario"}
+            </button>
+          </div>
+
+          {isMoving && (
+            <form onSubmit={handleMoveSubmit} style={{ marginTop: 12 }}>
+              <p style={{ fontSize: 12, color: "var(--text-secondary)", margin: "0 0 10px" }}>
+                Mové este turno a otra cancha o fecha conservando la seña y los cobros ya cargados.
+              </p>
+
+              {moveError && (
+                <div
+                  style={{
+                    padding: "6px 10px",
+                    background: "#fef2f2",
+                    color: "#dc2626",
+                    fontSize: 12,
+                    borderRadius: 6,
+                    marginBottom: 10,
+                  }}
+                >
+                  ⚠️ {moveError}
+                </div>
+              )}
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+                <div>
+                  <label className="admin-field-label">Nueva Cancha</label>
+                  <select
+                    className="admin-modal-select"
+                    value={moveCourtId}
+                    onChange={(e) => setMoveCourtId(e.target.value)}
+                  >
+                    {COURTS.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.type})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="admin-field-label">Nueva Fecha</label>
+                  <input
+                    type="date"
+                    className="admin-input-field"
+                    value={moveDate}
+                    onChange={(e) => setMoveDate(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <label className="admin-field-label">Nuevo Horario</label>
+                <select
+                  className="admin-modal-select"
+                  value={moveStartTime}
+                  onChange={(e) => setMoveStartTime(e.target.value)}
+                >
+                  {AVAILABLE_TIMES.map((t) => (
+                    <option key={t} value={t}>
+                      {t} hs
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="btn btn-linear-primary"
+                style={{ width: "100%", height: 36, fontSize: 13 }}
+                disabled={moveSubmitting}
+              >
+                {moveSubmitting ? "Moviendo..." : "Confirmar Traslado de Turno"}
+              </button>
+            </form>
           )}
         </div>
 

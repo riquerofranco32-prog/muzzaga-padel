@@ -6,7 +6,7 @@ import {
   adminDeleteCantinaSale,
   adminGetCantinaSales,
 } from "../actions";
-import { MENU_CATEGORIES, MENU_ITEMS } from "../../../lib/cantinaMenu";
+import { MENU_CATEGORIES, MENU_ITEMS } from "../../../data/menu";
 import { toISODate } from "../../../lib/booking";
 import { IconTrash, PAYMENT_METHODS } from "../adminHelpers";
 
