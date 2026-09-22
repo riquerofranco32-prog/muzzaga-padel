@@ -112,14 +112,14 @@ export default function TodayFlashSlots() {
           <img
             src="/img/mascota.png"
             alt="Muzzaguito - Mascota Muzzaga"
-            width={64}
-            height={64}
+            width={100}
+            height={100}
             className="mascot-hero-animated"
             style={{
-              width: 64,
+              width: "clamp(80px, 12vw, 105px)",
               height: "auto",
               objectFit: "contain",
-              filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.15))",
+              filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.2))",
               display: "block",
             }}
           />

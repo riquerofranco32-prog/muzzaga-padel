@@ -94,38 +94,56 @@ export default function Home() {
             Canchas Abiertas comunitarias y cantina para el mejor tercer tiempo.
           </p>
 
-          {/* MASCOTA HERO BADGE */}
+          {/* MASCOTA HERO SPOTLIGHT PROMINENTE */}
           <div
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
-              gap: 12,
-              marginBottom: 18,
-              background: "rgba(24, 24, 27, 0.5)",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255, 255, 255, 0.15)",
-              borderRadius: 30,
-              padding: "6px 16px 6px 8px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+              justifyContent: "center",
+              gap: 16,
+              margin: "14px auto 22px",
+              maxWidth: 540,
+              flexWrap: "wrap",
             }}
           >
-            <img
-              src="/img/mascota.png"
-              alt="Muzzaguito - Mascota Oficial"
-              width={42}
-              height={42}
-              className="mascot-hero-animated"
+            <div style={{ flexShrink: 0 }}>
+              <img
+                src="/img/mascota.png"
+                alt="Muzzaguito - Mascota Oficial"
+                width={150}
+                height={150}
+                className="mascot-hero-animated"
+                style={{
+                  width: "clamp(120px, 20vw, 160px)",
+                  height: "auto",
+                  objectFit: "contain",
+                  filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.45))",
+                  display: "block",
+                }}
+              />
+            </div>
+            <div
               style={{
-                width: 42,
-                height: "auto",
-                objectFit: "contain",
-                filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.3))",
-                display: "block",
+                background: "rgba(24, 24, 27, 0.75)",
+                backdropFilter: "blur(12px)",
+                border: "1.5px solid rgba(232, 114, 42, 0.4)",
+                borderRadius: "18px 18px 18px 4px",
+                padding: "12px 18px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                textAlign: "left",
+                maxWidth: 300,
               }}
-            />
-            <span style={{ fontSize: 13, color: "#fff", fontWeight: 500 }}>
-              ¡Hola! Soy <strong>Muzzaguito</strong> · Elegí tu cancha y vení a jugar 🎾
-            </span>
+            >
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#e8722a", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>
+                Mascota Oficial Muzzaga
+              </div>
+              <strong style={{ fontSize: 16, color: "#ffffff", display: "block", lineHeight: 1.25 }}>
+                ¡Vení a jugar a Catriel!
+              </strong>
+              <p style={{ fontSize: 12.5, color: "rgba(255,255,255,0.85)", margin: "4px 0 0", lineHeight: 1.35 }}>
+                Canchas de cristal de 10mm, luz LED y el mejor tercer tiempo. ¡Elegí tu turno abajo! 👇
+              </p>
+            </div>
           </div>
 
           <div className="hero-cta-buttons" style={{ marginBottom: 12 }}>

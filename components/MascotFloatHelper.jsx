@@ -166,14 +166,14 @@ export default function MascotFloatHelper() {
           <img
             src="/img/mascota.png"
             alt="Muzzaguito - Mascota Muzzaga Pádel"
-            width={68}
-            height={68}
+            width={92}
+            height={92}
             className="mascot-hero-animated"
             style={{
-              width: 68,
+              width: 92,
               height: "auto",
               objectFit: "contain",
-              filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.3))",
+              filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.35))",
               display: "block",
             }}
           />

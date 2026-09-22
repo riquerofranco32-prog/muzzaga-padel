@@ -63,9 +63,9 @@ export default function Footer() {
               <img
                 src="/img/mascota.png"
                 alt="Muzzaguito"
-                width={38}
-                height={38}
-                style={{ width: 38, height: "auto", objectFit: "contain", flexShrink: 0 }}
+                width={62}
+                height={62}
+                style={{ width: 62, height: "auto", objectFit: "contain", flexShrink: 0, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.2))" }}
               />
               <span style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.3 }}>
                 ¡Nos vemos en la pista! 🎾 Muzzaguito te acompaña en cada partido.
