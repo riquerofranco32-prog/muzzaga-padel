@@ -1,43 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { generateFixtures } from "../lib/americano";
 
 const DEFAULT_NAMES = ["Jugador 1", "Jugador 2", "Jugador 3", "Jugador 4"];
-
-function generateFixtures(names) {
-  const n = names.length;
-  if (n === 4) {
-    return [
-      { round: 1, p1: names[0], p2: names[1], p3: names[2], p4: names[3] },
-      { round: 2, p1: names[0], p2: names[2], p3: names[1], p4: names[4 - 1] },
-      { round: 3, p1: names[0], p2: names[3], p3: names[1], p4: names[2] },
-    ];
-  }
-  if (n === 5) {
-    return [
-      { round: 1, p1: names[0], p2: names[1], p3: names[2], p4: names[3], bye: names[4] },
-      { round: 2, p1: names[0], p2: names[2], p3: names[3], p4: names[4], bye: names[1] },
-      { round: 3, p1: names[0], p2: names[3], p3: names[1], p4: names[4], bye: names[2] },
-      { round: 4, p1: names[0], p2: names[4], p3: names[1], p4: names[2], bye: names[3] },
-      { round: 5, p1: names[1], p2: names[3], p3: names[2], p4: names[4], bye: names[0] },
-    ];
-  }
-  // Default general 4-round generator for 6-8
-  const rounds = [];
-  for (let r = 1; r <= Math.min(n, 5); r++) {
-    const shift = (r - 1) % n;
-    const shuffled = [...names.slice(shift), ...names.slice(0, shift)];
-    rounds.push({
-      round: r,
-      p1: shuffled[0],
-      p2: shuffled[1],
-      p3: shuffled[2],
-      p4: shuffled[3],
-      bye: n > 4 ? shuffled.slice(4).join(", ") : null,
-    });
-  }
-  return rounds;
-}
 
 export default function AmericanoGenerator() {
   const [playerCount, setPlayerCount] = useState(4);

@@ -28,6 +28,8 @@ export function getClubTimeString(date = new Date()) {
   return `${hour}:${minute} hs`;
 }
 
+export const formatClubTime = getClubTimeString;
+
 /**
  * Determina si el club está abierto en este momento
  */
@@ -58,4 +60,8 @@ export function getClubStatus(date = new Date()) {
     scheduleLabel: SCHEDULE[day]?.label || "14:00 a 00:30 hs",
     isNight: hour >= 19 || hour < 6, // Iluminación LED activa después de las 19:00 o madrugada
   };
+}
+
+export function isClubOpenNow(date = new Date()) {
+  return getClubStatus(date).isOpen;
 }

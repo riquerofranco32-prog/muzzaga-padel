@@ -82,3 +82,8 @@ export const MENU_CATEGORIES = [
 
 // Subconjunto curado de ítems para la calculadora de 3er tiempo / split cost
 export const CALCULATOR_ITEMS = MENU_ITEMS.filter((item) => item.featured);
+
+export function getMenuByCategory(catId) {
+  if (!catId || catId === "all") return MENU_ITEMS;
+  return MENU_ITEMS.filter((item) => item.category === catId);
+}
