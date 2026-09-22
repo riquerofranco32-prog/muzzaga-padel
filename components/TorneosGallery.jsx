@@ -55,31 +55,6 @@ const TOURNAMENTS = [
   },
 ];
 
-const UPCOMING_TOURNAMENTS = [
-  {
-    badge: "Categoría Libre",
-    badgeClass: "badge-amber",
-    title: "Torneo Libre",
-    desc: "Para el nivel más competitivo del club.",
-    waMsg: "Hola Muzzaga! Quiero info del próximo torneo de libre.",
-    featured: true,
-  },
-  {
-    badge: "Sexta / Séptima",
-    badgeClass: "badge-emerald",
-    title: "Torneo Caballeros",
-    desc: "Categorías de iniciación e intermedias, todo el año.",
-    waMsg: "Hola Muzzaga! Quiero info del próximo torneo de caballeros.",
-  },
-  {
-    badge: "Damas",
-    badgeClass: "badge-emerald",
-    title: "Torneo Damas",
-    desc: "Categorías A y B, con cuadro de eliminación.",
-    waMsg: "Hola Muzzaga! Quiero info del próximo torneo de damas.",
-  },
-];
-
 function WhatsappIcon() {
   return (
     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -202,36 +177,6 @@ export default function TorneosGallery() {
           ganadores={t.ganadores}
         />
       ))}
-
-      <div className="container">
-        {/* PRÓXIMOS TORNEOS */}
-        <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>
-          Próximos Torneos
-        </h3>
-        <div className="info-card-grid">
-          {UPCOMING_TOURNAMENTS.map((t) => (
-            <div
-              className={`info-card${t.featured ? " info-card--featured" : ""}`}
-              key={t.title}
-            >
-              <span className={`badge-linear ${t.badgeClass}`}>{t.badge}</span>
-              <h3 className="info-card-title">{t.title}</h3>
-              <p className="info-card-desc">{t.desc}</p>
-              <a
-                href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(t.waMsg)}`}
-                target="_blank"
-                rel="noopener"
-                style={{ fontSize: 13, fontWeight: 600, color: "#25D366" }}
-              >
-                Consultar fecha y cupos →
-              </a>
-            </div>
-          ))}
-        </div>
-        <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 16 }}>
-          Fechas, cupos y premios de cada torneo se confirman por WhatsApp.
-        </p>
-      </div>
     </section>
   );
 }
