@@ -5,6 +5,7 @@ import { createBooking } from "../app/actions";
 import BookingPassModal from "./BookingPassModal";
 import { COURTS, nextDays, priceForSlot, toISODate } from "../lib/booking";
 import { toWhatsappNumber } from "../lib/phone";
+import { trackEvent } from "../lib/analytics";
 
 const DAYS = nextDays(14);
 const CLUB_WHATSAPP = "5492995974176";
@@ -95,6 +96,11 @@ export default function BookingCalendar() {
     setSelected(slot);
     setSubmitError(null);
     setConfirmed(null);
+    trackEvent("slot_selected", {
+      courtId: slot.courtId,
+      start: slot.start,
+      date: activeDate,
+    });
   }
 
   function markSlotTaken(courtId, start) {
@@ -134,6 +140,12 @@ export default function BookingCalendar() {
       return;
     }
     markSlotTaken(selected.courtId, selected.start);
+    trackEvent("booking_submitted", {
+      courtId: selected.courtId,
+      start: selected.start,
+      date: activeDate,
+      bookingCode: result.bookingCode,
+    });
     const whatsappUrl = buildWhatsappUrl(result.bookingCode, result.booking);
     setConfirmed({
       bookingCode: result.bookingCode,

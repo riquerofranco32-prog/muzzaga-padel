@@ -17,12 +17,30 @@ import ScrollProgress from "../components/ScrollProgress";
 
 import { priceForSlot } from "../lib/booking";
 import { CLUB_INFO } from "../data/club";
+import { FAQS } from "../data/faq";
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((faq) => ({
+    "@type": "Question",
+    name: faq.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.a,
+    },
+  })),
+};
 
 export default function Home() {
   const pricing = priceForSlot();
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <ScrollProgress />
       <Header />
 
@@ -220,7 +238,7 @@ export default function Home() {
               </span>
               <h2 className="section-title">Ubicación y Horarios</h2>
               <p className="section-desc">
-                Muzzaga Pádel está ubicado en Catriel, Río Negro. Lunes a Sábado de 14:00 a 00:30 hs.
+                Av. Cacique Catriel y Córdoba, Catriel, Río Negro. Lunes a Sábado de 14:00 a 00:30 hs.
               </p>
             </div>
             <a
@@ -351,7 +369,7 @@ export default function Home() {
                   Muzzaga Pádel
                 </div>
                 <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-                  Catriel, Río Negro
+                  Av. Cacique Catriel y Córdoba · Catriel
                 </span>
               </div>
               <span style={{ fontSize: 18, color: "#EA4335" }}>↗</span>

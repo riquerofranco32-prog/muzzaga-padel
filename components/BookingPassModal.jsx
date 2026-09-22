@@ -11,6 +11,8 @@ const REAL_ALIAS = process.env.NEXT_PUBLIC_PAYMENT_ALIAS || null;
 const REAL_CBU = process.env.NEXT_PUBLIC_PAYMENT_CBU || null;
 const TITULAR = process.env.NEXT_PUBLIC_PAYMENT_TITULAR || "Muzzaga Pádel";
 
+import { trackEvent } from "../lib/analytics";
+
 export default function BookingPassModal({
   bookingCode,
   booking,
@@ -18,6 +20,7 @@ export default function BookingPassModal({
   onClose,
 }) {
   const [copiedField, setCopiedField] = useState(null);
+  const [shareSuccess, setShareSuccess] = useState(false);
 
   const copyValue = (field, value) => {
     navigator.clipboard.writeText(value);
@@ -25,11 +28,90 @@ export default function BookingPassModal({
     setTimeout(() => setCopiedField((f) => (f === field ? null : f)), 2000);
   };
 
+  const handleShareGroup = async () => {
+    const text = `🎾 ¡Turno reservado en Muzzaga Pádel!\n📅 Fecha: ${booking.date}\n⏰ Horario: ${booking.startTime} a ${booking.endTime} hs\n📍 Pista: ${booking.courtName}\n🔖 Código: ${bookingCode}\n💰 Total: $${booking.total?.toLocaleString("es-AR")} ($${Math.round((booking.total || 60000) / 4).toLocaleString("es-AR")} c/u)\nConfirmamos la seña por WhatsApp. ¡Nos vemos en la cancha!`;
+
+    trackEvent("booking_share_group", { bookingCode });
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Turno Muzzaga Pádel (${booking.date} ${booking.startTime} hs)`,
+          text,
+        });
+        return;
+      } catch (err) {
+        // User cancelled or unsupported, fallback to copy
+      }
+    }
+
+    navigator.clipboard.writeText(text);
+    setShareSuccess(true);
+    setTimeout(() => setShareSuccess(false), 2500);
+  };
+
+  const handleDownloadCalendar = () => {
+    trackEvent("booking_add_calendar", { bookingCode });
+
+    // Clean date string to YYYYMMDD
+    const dateClean = (booking.date || "").replace(/[^0-9]/g, "");
+    const startTimeClean = (booking.startTime || "18:00").replace(":", "") + "00";
+    const endTimeClean = (booking.endTime || "19:30").replace(":", "") + "00";
+
+    const dtStart = `${dateClean}T${startTimeClean}`;
+    const dtEnd = `${dateClean}T${endTimeClean}`;
+
+    const icsContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Muzzaga Padel//Sistema de Turnos//ES",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `SUMMARY:Pádel en Muzzaga (${booking.courtName})`,
+      `DESCRIPTION:Turno confirmado en ${booking.courtName}. Código: ${bookingCode}. Total: $${booking.total}.`,
+      "LOCATION:Muzzaga Pádel\\, Av. Cacique Catriel y Córdoba\\, Catriel\\, Río Negro",
+      `DTSTART:${dtStart}`,
+      `DTEND:${dtEnd}`,
+      "STATUS:CONFIRMED",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `turno-muzzaga-${bookingCode}.ics`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   if (!booking) return null;
 
   return (
     <div className="admin-modal-backdrop" onClick={onClose}>
       <div className="digital-pass-modal" onClick={(e) => e.stopPropagation()}>
+        {/* CONFIRMATION BANNER */}
+        <div
+          style={{
+            background: "rgba(232, 114, 42, 0.12)",
+            border: "1px solid rgba(232, 114, 42, 0.3)",
+            borderRadius: "var(--radius-md, 8px)",
+            padding: "10px 14px",
+            marginBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <span style={{ fontSize: 20 }}>🎉</span>
+          <div style={{ fontSize: 12.5, color: "var(--color-ink)", lineHeight: 1.35 }}>
+            <strong>¡Listo!</strong> Tu turno queda reservado. Para confirmarlo de forma definitiva, aboná la seña y envianos el comprobante.
+          </div>
+        </div>
+
         {/* TOP PASS BAR */}
         <div className="digital-pass-card">
           <div className="pass-header-row">
@@ -220,6 +302,25 @@ export default function BookingPassModal({
               Enviar comprobante por WhatsApp →
             </a>
 
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ justifyContent: "center", height: 38, fontSize: 12.5 }}
+                onClick={handleDownloadCalendar}
+              >
+                📅 Al calendario (.ics)
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ justifyContent: "center", height: 38, fontSize: 12.5 }}
+                onClick={handleShareGroup}
+              >
+                {shareSuccess ? "✓ ¡Copiado!" : "👥 Compartir al grupo"}
+              </button>
+            </div>
+
             <button
               type="button"
               className="btn btn-secondary"
@@ -228,6 +329,7 @@ export default function BookingPassModal({
                 justifyContent: "center",
                 height: 38,
                 fontSize: 13,
+                marginTop: 2,
               }}
               onClick={onClose}
             >
@@ -239,3 +341,4 @@ export default function BookingPassModal({
     </div>
   );
 }
+

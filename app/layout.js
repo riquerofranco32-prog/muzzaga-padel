@@ -1,6 +1,7 @@
 import { Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import LightboxProvider from "../components/LightboxProvider";
+import { Analytics } from "@vercel/analytics/react";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -21,17 +22,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  // "muzzaga-padel.vercel.app" devuelve 404: ese nombre de proyecto quedó
-  // tomado en otra cuenta de Vercel (ver memoria de sesión), así que el sitio
-  // real quedó en "muzzaga-padel-seven.vercel.app". Con la URL vieja acá, las
-  // previews de WhatsApp/redes y el sitemap apuntaban a un dominio muerto.
-  metadataBase: new URL("https://muzzaga-padel-seven.vercel.app"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://muzzagapadel.com.ar",
+  ),
   title:
-    "Muzzaga Pádel · Reservá tu Cancha, Canchas Abiertas y Torneos en Catriel",
+    "Canchas de Pádel en Catriel · Muzzaga Pádel · Reservá tu Cancha Online",
   description:
-    "Club de pádel en Catriel, Río Negro. Reservá tu cancha, sumate a Canchas Abiertas comunitarias y descubrí tu nivel de juego.",
-  keywords:
-    "muzzaga padel, padel catriel, turnos padel catriel, canchas abiertas catriel, rio negro padel",
+    "Club de pádel en Catriel, Río Negro. 2 canchas profesionales de cristal, iluminación LED, turnos de 90 min, Canchas Abiertas comunitarias y cantina.",
   icons: {
     icon: "/img/logo_badge.png",
     apple: "/img/logo_badge.png",
@@ -39,23 +36,21 @@ export const metadata = {
   openGraph: {
     type: "website",
     siteName: "Muzzaga Pádel",
-    title: "Muzzaga Pádel · Reservá tu Cancha en Catriel",
+    title: "Canchas de Pádel en Catriel · Muzzaga Pádel",
     description:
-      "2 canchas de cristal profesionales, iluminación LED, torneos y cantina propia para el tercer tiempo en Catriel.",
-    images: ["/img/logo_full.png"],
+      "2 canchas oficiales de cristal, iluminación LED, torneos y cantina propia para el mejor tercer tiempo en Catriel.",
     locale: "es_AR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Muzzaga Pádel · Reservá tu Cancha en Catriel",
+    title: "Canchas de Pádel en Catriel · Muzzaga Pádel",
     description:
-      "2 canchas de cristal profesionales, iluminación LED, torneos y cantina propia para el tercer tiempo en Catriel.",
-    images: ["/img/court_spectators.jpg"],
+      "2 canchas oficiales de cristal, iluminación LED, torneos y cantina propia para el mejor tercer tiempo en Catriel.",
   },
 };
 
 export const viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#e8722a",
 };
 
 const jsonLd = {
@@ -63,13 +58,43 @@ const jsonLd = {
   "@type": "SportsActivityLocation",
   name: "Muzzaga Pádel",
   description:
-    "Club de pádel en Catriel, Río Negro. 2 canchas, torneos todo el año y cantina propia.",
+    "Club de pádel en Catriel, Río Negro. 2 canchas profesionales de cristal, iluminación LED, torneos todo el año y cantina propia.",
+  url: "https://muzzagapadel.com.ar",
   telephone: "+5492995974176",
+  priceRange: "$$",
+  hasMap: "https://maps.google.com/maps?q=-37.8832905,-67.8005469",
+  image: [
+    "https://muzzagapadel.com.ar/img/court_glass_night_match.jpg",
+    "https://muzzagapadel.com.ar/img/panoramic_courts.jpg",
+    "https://muzzagapadel.com.ar/img/logo_full.png",
+  ],
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: -37.8832905,
+    longitude: -67.8005469,
+  },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ],
+      opens: "14:00",
+      closes: "00:30",
+    },
+  ],
   sameAs: ["https://instagram.com/muzzagapadel"],
   address: {
     "@type": "PostalAddress",
+    streetAddress: "Av. Cacique Catriel y Córdoba",
     addressLocality: "Catriel",
     addressRegion: "Río Negro",
+    postalCode: "R8307",
     addressCountry: "AR",
   },
 };
@@ -85,6 +110,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <LightboxProvider>{children}</LightboxProvider>
+        <Analytics />
       </body>
     </html>
   );
