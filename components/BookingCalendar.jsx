@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createBooking } from "../app/actions";
 import BookingPassModal from "./BookingPassModal";
 import { COURTS, nextDays, priceForSlot, toISODate } from "../lib/booking";
+import { toWhatsappNumber } from "../lib/phone";
 
-const DAYS = nextDays(7);
+const DAYS = nextDays(14);
 const CLUB_WHATSAPP = "5492995974176";
 
 function buildWhatsappUrl(bookingCode, booking) {
@@ -36,6 +37,17 @@ export default function BookingCalendar() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [confirmed, setConfirmed] = useState(null); // { bookingCode, whatsappUrl }
+  const formRef = useRef(null);
+
+  // Antes el formulario aparecía al final de la lista de horarios, fuera de
+  // pantalla: elegir un slot no daba ninguna señal de que había que
+  // scrollear a mano para verlo.
+  useEffect(() => {
+    if (!selected || !formRef.current) return;
+    formRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    const firstInput = formRef.current.querySelector("input");
+    firstInput?.focus({ preventScroll: true });
+  }, [selected]);
 
   useEffect(() => {
     let cancelled = false;
@@ -74,6 +86,11 @@ export default function BookingCalendar() {
     return priceForSlot(activeDate, selected.start);
   }, [activeDate, selected]);
 
+  // Normalización de teléfono argentino (mínimo 10 dígitos útiles)
+  const normalizedPhone = toWhatsappNumber(form.playerPhone);
+  const isFormValid =
+    form.playerName.trim().length >= 2 && normalizedPhone.length >= 10;
+
   function pickSlot(slot) {
     setSelected(slot);
     setSubmitError(null);
@@ -103,7 +120,7 @@ export default function BookingCalendar() {
       startTime: selected.start,
       endTime: selected.end,
       playerName: form.playerName,
-      playerPhone: form.playerPhone,
+      playerPhone: normalizedPhone,
       playersCount: form.playersCount,
       fullCourt: form.fullCourt,
     });
@@ -198,7 +215,7 @@ export default function BookingCalendar() {
                 <button
                   key={`${slot.courtId}-${slot.start}`}
                   type="button"
-                  className={`booking-slot${slot.available ? "" : " taken"}${isSelected ? " selected" : ""}`}
+                  className={`booking-slot${slot.available ? "" : " taken"}${slot.past ? " past" : ""}${isSelected ? " selected" : ""}`}
                   disabled={!slot.available}
                   onClick={() => pickSlot(slot)}
                 >
@@ -206,25 +223,12 @@ export default function BookingCalendar() {
                   <span className="slot-meta">
                     {court?.name} · {court?.type}
                   </span>
-                  {/* El precio es fijo para todos los turnos (ver el pill de
-                      arriba de la grilla): repetir "$15.000 por jugador si
-                      son cuatro" en cada una de las ~14 cards era puro ruido,
-                      no info nueva. Queda solo el total + el valor por
-                      jugador en una sola línea chica. */}
-                  <div
-                    style={{
-                      marginTop: 2,
-                      fontSize: 12.5,
-                      color: "var(--color-body)",
-                    }}
-                  >
-                    <strong style={{ fontSize: 14, color: "var(--color-ink)" }}>
-                      ${pricing.total.toLocaleString("es-AR")}
-                    </strong>{" "}
-                    · ${pricing.perPlayer.toLocaleString("es-AR")} c/u
-                  </div>
-                  <span className="slot-badge" style={{ marginTop: 2 }}>
-                    {slot.available ? "Disponible" : "Ocupado"}
+                  <span className="slot-badge" style={{ marginTop: 6 }}>
+                    {slot.available
+                      ? "Disponible"
+                      : slot.past
+                        ? "Finalizado"
+                        : "Ocupado"}
                   </span>
                 </button>
               );
@@ -234,13 +238,39 @@ export default function BookingCalendar() {
       )}
 
       {selected && selectedPricing && (
-        <form className="booking-form" onSubmit={handleConfirm}>
-          <div className="booking-form-header">
-            <h3>Confirmar reserva</h3>
-            <p>
-              {selected.start} hs ·{" "}
-              {COURTS.find((c) => c.id === selected.courtId)?.name}
-            </p>
+        <div
+          className="booking-drawer-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelected(null);
+          }}
+        >
+          <form className="booking-form" ref={formRef} onSubmit={handleConfirm}>
+            <div className="booking-form-header">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <h3 style={{ margin: 0 }}>Confirmar reserva</h3>
+                  <p style={{ margin: "4px 0 0" }}>
+                    {selected.start} hs ·{" "}
+                    {COURTS.find((c) => c.id === selected.courtId)?.name}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelected(null)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: 20,
+                    cursor: "pointer",
+                    color: "var(--color-muted)",
+                    padding: "0 4px",
+                    lineHeight: 1,
+                  }}
+                  aria-label="Cerrar formulario"
+                >
+                  ✕
+                </button>
+              </div>
             <div
               style={{
                 marginTop: 6,
@@ -346,15 +376,16 @@ export default function BookingCalendar() {
 
           {submitError && <p className="booking-error">{submitError}</p>}
 
-          <button
-            type="submit"
-            className="btn btn-linear-primary"
-            disabled={submitting}
-            style={{ width: "100%" }}
-          >
-            {submitting ? "Confirmando…" : "Confirmar y avisar por WhatsApp →"}
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="btn btn-linear-primary"
+              disabled={submitting || !isFormValid}
+              style={{ width: "100%" }}
+            >
+              {submitting ? "Confirmando…" : "Confirmar y avisar por WhatsApp →"}
+            </button>
+          </form>
+        </div>
       )}
 
       {confirmed && (

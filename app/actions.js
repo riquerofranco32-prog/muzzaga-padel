@@ -1,7 +1,13 @@
 "use server";
 
 import { getDb, isFirebaseConfigured } from "../lib/firebase";
-import { findCourt, isValidSlot, priceForSlot, slotKey } from "../lib/booking";
+import {
+  findCourt,
+  isValidSlot,
+  nowInClubTimezone,
+  priceForSlot,
+  slotKey,
+} from "../lib/booking";
 
 /**
  * @param {{date: string, courtId: string, startTime: string, endTime: string, playerName: string, playerPhone: string, playersCount: number, fullCourt: boolean}} input
@@ -27,10 +33,15 @@ export async function createBooking(input) {
       error: "Ese horario no existe o el club está cerrado ese día.",
     };
   }
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (new Date(`${date}T00:00:00`) < today) {
-    return { ok: false, error: "Elegí una fecha futura." };
+  // Chequeo del lado del servidor, no solo confiar en que la UI ya haya
+  // ocultado el slot: usa el horario del club (America/Argentina/Buenos_Aires),
+  // no la medianoche del servidor (Vercel corre en UTC).
+  const now = nowInClubTimezone();
+  if (date < now.isoDate || (date === now.isoDate && startTime <= now.hhmm)) {
+    return {
+      ok: false,
+      error: "Ese horario ya pasó. Elegí un turno futuro.",
+    };
   }
   const name = (playerName || "").trim();
   const phone = (playerPhone || "").trim();

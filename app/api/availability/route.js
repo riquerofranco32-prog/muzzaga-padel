@@ -3,14 +3,15 @@ import { getDb, isFirebaseConfigured } from "../../../lib/firebase";
 import {
   COURTS,
   getSlotTimesForDate,
+  nowInClubTimezone,
   slotKey,
-  toISODate,
 } from "../../../lib/booking";
 
 /** GET /api/availability?date=YYYY-MM-DD */
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const date = searchParams.get("date") || toISODate(new Date());
+  const now = nowInClubTimezone();
+  const date = searchParams.get("date") || now.isoDate;
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return NextResponse.json({ error: "Fecha inválida" }, { status: 400 });
@@ -30,17 +31,28 @@ export async function GET(request) {
         taken = takenSnapshot.val();
       }
     } catch (error) {
-      console.warn("Aviso: No se pudo conectar con Firebase, usando disponibilidad libre:", error.message);
+      console.warn(
+        "Aviso: No se pudo conectar con Firebase, usando disponibilidad libre:",
+        error.message,
+      );
     }
   }
 
+  // Un turno de hoy que ya arrancó no es una opción real: sin este chequeo
+  // se podían "reservar" las 14:00 estando ya a las 17:22.
+  const isToday = date === now.isoDate;
+
   const slots = COURTS.flatMap((court) =>
-    slotTimes.map(({ start, end }) => ({
-      courtId: court.id,
-      start,
-      end,
-      available: !taken[slotKey(court.id, start)],
-    })),
+    slotTimes.map(({ start, end }) => {
+      const isPast = isToday && start <= now.hhmm;
+      return {
+        courtId: court.id,
+        start,
+        end,
+        past: isPast,
+        available: !isPast && !taken[slotKey(court.id, start)],
+      };
+    }),
   );
 
   return NextResponse.json({ date, courts: COURTS, slots });
