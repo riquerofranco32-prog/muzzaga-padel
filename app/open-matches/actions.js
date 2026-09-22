@@ -2,41 +2,7 @@
 
 import { getDb, isFirebaseConfigured } from "../../lib/firebase";
 import { toISODate } from "../../lib/booking";
-
-const DEFAULT_MATCHES = [
-  {
-    id: "match-demo-1",
-    category: "6ta Categoría (3.0 - 3.8)",
-    badgeColor: "badge-amber",
-    courtName: "Cancha 1 · Cristal",
-    date: toISODate(new Date()),
-    time: "20:00 hs",
-    desc: "Partido parejo de 6ta para sumar ritmo y competencia. Tercer tiempo asegurado en la cantina.",
-    pricePerPlayer: 15000,
-    players: [
-      { name: "Agustín M. (Org.)", phone: "2995974176", taken: true },
-      { name: "Franco R.", phone: "", taken: true },
-      { name: "Matías L.", phone: "", taken: true },
-      { name: "", phone: "", taken: false }, // +1 libre
-    ],
-  },
-  {
-    id: "match-demo-2",
-    category: "7ma / Iniciación (1.5 - 2.5)",
-    badgeColor: "badge-emerald",
-    courtName: "Cancha 2 · Cristal",
-    date: toISODate(new Date()),
-    time: "21:30 hs",
-    desc: "Partido distendido para divertirse y aprender a jugar con paredes. ¡Ideal para quienes recién arrancan!",
-    pricePerPlayer: 15000,
-    players: [
-      { name: "Gonzalo V. (Org.)", phone: "2995974176", taken: true },
-      { name: "Nicolás P.", phone: "", taken: true },
-      { name: "", phone: "", taken: false }, // +1 libre
-      { name: "", phone: "", taken: false }, // +2 libre
-    ],
-  },
-];
+import { PRECIO_POR_JUGADOR } from "../../data/pricing";
 
 export async function getOpenMatches() {
   if (isFirebaseConfigured()) {
@@ -45,10 +11,13 @@ export async function getOpenMatches() {
       const snap = await db.ref("openMatches").get();
       if (snap.exists()) {
         const data = snap.val();
-        const list = Object.entries(data).map(([id, val]) => ({
-          id,
-          ...val,
-        }));
+        const list = Object.entries(data)
+          .map(([id, val]) => ({
+            id,
+            ...val,
+          }))
+          // Filtrar partidos que tengan fecha válida futura o de hoy
+          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         return { ok: true, matches: list };
       }
     } catch (error) {
@@ -56,8 +25,8 @@ export async function getOpenMatches() {
     }
   }
 
-  // Fallback a los partidos predeterminados si aún no hay en Firebase
-  return { ok: true, matches: DEFAULT_MATCHES };
+  // Si no hay partidos creados en Firebase, devolvemos lista vacía (sin jugadores ficticios)
+  return { ok: true, matches: [] };
 }
 
 export async function joinOpenMatch(matchId, slotIndex, playerName, playerPhone) {
@@ -70,15 +39,10 @@ export async function joinOpenMatch(matchId, slotIndex, playerName, playerPhone)
     const matchRef = db.ref(`openMatches/${matchId}`);
     const snap = await matchRef.get();
 
-    let currentMatch;
-    if (snap.exists()) {
-      currentMatch = snap.val();
-    } else {
-      // Si era de los demo, inicializarlo en Firebase
-      const defaultMatch = DEFAULT_MATCHES.find((m) => m.id === matchId);
-      if (!defaultMatch) return { ok: false, error: "Partido no encontrado." };
-      currentMatch = { ...defaultMatch };
+    if (!snap.exists()) {
+      return { ok: false, error: "Partido no encontrado." };
     }
+    const currentMatch = snap.val();
 
     if (!currentMatch.players[slotIndex] || currentMatch.players[slotIndex].taken) {
       return { ok: false, error: "Ese lugar ya fue ocupado." };
@@ -117,7 +81,7 @@ export async function createOpenMatch(data) {
     date: date || toISODate(new Date()),
     time: time || "20:00 hs",
     desc: (desc || "Convocatoria abierta para jugar al pádel.").trim(),
-    pricePerPlayer: 15000,
+    pricePerPlayer: PRECIO_POR_JUGADOR,
     createdAt: Date.now(),
     players: [
       { name: `${name} (Org.)`, phone: creatorPhone || "", taken: true },
@@ -128,10 +92,13 @@ export async function createOpenMatch(data) {
   };
 
   try {
-    const db = getDb();
-    const matchRef = db.ref("openMatches").push();
-    await matchRef.set(newMatch);
-    return { ok: true, matchId: matchRef.key };
+    if (isFirebaseConfigured()) {
+      const db = getDb();
+      const matchRef = db.ref("openMatches").push();
+      await matchRef.set(newMatch);
+      return { ok: true, matchId: matchRef.key };
+    }
+    return { ok: true, matchId: "local-" + Date.now() };
   } catch (error) {
     console.error("Error al crear Cancha Abierta en Firebase", error);
     return { ok: false, error: "No se pudo publicar la convocatoria." };

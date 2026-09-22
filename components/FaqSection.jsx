@@ -1,37 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-const FAQS = [
-  {
-    q: "¿Cómo confirmo mi reserva de turno?",
-    a: "Al seleccionar tu horario en el calendario de la web, completás tus datos y se genera tu código de reserva. Luego te redirige a WhatsApp con el mensaje listo para coordinar la seña y dejar el turno 100% confirmado en el sistema.",
-  },
-  {
-    q: "¿Qué medios de pago aceptan?",
-    a: "Aceptamos transferencias bancarias directas, Mercado Pago (alias/CVU) y efectivo en la cantina del club antes de ingresar a la pista.",
-  },
-  {
-    q: "¿Tienen alquiler de paletas y pelotas?",
-    a: "¡Sí! Contamos con paletas de testeo de primeras marcas en alquiler para que juegues cómodo aunque no tengas tu pala, y tubos de pelotas nuevas presurizadas a la venta.",
-  },
-  {
-    q: "¿Cómo funcionan las Canchas Abiertas?",
-    a: "¿Te falta uno para completar o querés jugar pero no tenés pareja? Publicamos convocatorias por nivel (7ma, 6ta, 5ta) en el grupo de WhatsApp del club. Te sumás, conocés nuevos rivales y jugás partidos parejos.",
-  },
-  {
-    q: "¿Con cuánta anticipación puedo cancelar o reprogramar?",
-    a: "Podés avisarnos por WhatsApp hasta con 4 horas de anticipación para reprogramar tu turno sin perder la seña para otro día u horario disponible.",
-  },
-  {
-    q: "¿Tienen escuelita o clases particulares?",
-    a: "Sí, contamos con profesores matriculados para clases individuales y grupales de iniciación, técnica de pared, táctica de dobles y entrenamiento físico de pádel.",
-  },
-  {
-    q: "¿Organizan torneos y cómo me inscribo?",
-    a: "Sí, organizamos torneos por categoría (Libre, Caballeros y Damas) durante todo el año. Podés ver fotos de los torneos ya jugados y consultar fecha, cupos y premios del próximo en la sección Torneos, o escribirnos directo por WhatsApp.",
-  },
-];
+import { FAQS } from "../data/faq";
 
 export default function FaqSection() {
   const [openIndex, setOpenIndex] = useState(0);

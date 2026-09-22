@@ -879,7 +879,7 @@ export default function TacticalCourtSimulator() {
             </svg>
 
             <div className="court-glass-indicator">
-              Césped Monofilamento WPT · Cristales 10mm Muzzaga
+              Césped de Alta Densidad · Cristales Templados 10mm Muzzaga
             </div>
           </div>
 
@@ -905,7 +905,7 @@ export default function TacticalCourtSimulator() {
                       margin: 0,
                     }}
                   >
-                    Elegí la jugada profesional:
+                    Elegí la jugada táctica:
                   </h3>
                   <span className="badge-linear badge-amber">
                     {tactic.category}
@@ -939,7 +939,7 @@ export default function TacticalCourtSimulator() {
                           className={`badge-linear ${item.badgeColor}`}
                           style={{ fontSize: 10 }}
                         >
-                          {item.difficulty}
+                          {item.category}
                         </span>
                       </div>
                     </button>
@@ -968,10 +968,9 @@ export default function TacticalCourtSimulator() {
                     </h4>
                     <div style={{ display: "flex", gap: 6 }}>
                       <span
-                        className="badge-linear badge-emerald"
-                        title="Efectividad estimada"
+                        className="badge-linear badge-amber"
                       >
-                        {tactic.effectiveness} Éxito
+                        {tactic.category}
                       </span>
                     </div>
                   </div>

@@ -1219,6 +1219,16 @@ select:focus-visible,
   border-color: var(--color-hairline);
 }
 
+/* Un slot que ya pasó no es "Ocupado" (alguien lo reservó): es un horario
+   que ya no existe. Más apagado para no confundirlo con un turno tomado. */
+.booking-slot.past {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: var(--color-hairline-soft);
+  border-color: var(--color-hairline);
+  filter: grayscale(0.5);
+}
+
 .booking-slot .slot-time {
   font-size: 18px;
   font-weight: 700;
@@ -1255,6 +1265,39 @@ select:focus-visible,
   flex-direction: column;
   gap: 14px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 768px) {
+  .booking-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    animation: fadeIn 0.2s ease;
+  }
+  .booking-drawer-backdrop .booking-form {
+    width: 100%;
+    max-width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    padding-bottom: max(28px, calc(env(safe-area-inset-bottom) + 16px));
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .booking-form-header h3 {
@@ -2243,8 +2286,24 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--color-hairline-strong);
+  background: var(--color-canvas-soft, #f3f4f6);
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.torneo-thumb-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 8px 6px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: none;
+  line-height: 1.25;
 }
 
 .torneo-thumb:hover {

@@ -1,33 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { priceForSlot } from "../lib/booking";
+import { PRECIO_TURNO, PRECIO_POR_JUGADOR } from "../data/pricing";
+import { CALCULATOR_ITEMS as EXTRAS } from "../data/menu";
 
-const CANCHA_PRICE = priceForSlot().total;
-
-const EXTRAS = [
-  { id: "pizza_muzza", name: "Pizza muzza", price: 18000 },
-  { id: "pizza_napo", name: "Pizza napo", price: 20000 },
-  { id: "pizza_especial", name: "Pizza especial", price: 22000 },
-  { id: "sandwich_mila", name: "Sándwich de mila", price: 22000 },
-  { id: "empanadas", name: "Empanadas", price: 24000 },
-  { id: "tostados", name: "Tostados", price: 14000 },
-  { id: "heineken", name: "Heineken 975ml", price: 9000 },
-  { id: "stella", name: "Stella Artois 975ml", price: 9000 },
-  { id: "corona", name: "Corona 710ml", price: 9000 },
-  { id: "patagonia", name: "Patagonia 710ml", price: 9000 },
-  { id: "fernet", name: "Fernet y coca", price: 10000 },
-  { id: "coca", name: "Coca-Cola 1.5L", price: 6000 },
-  { id: "agua", name: "Agua 1.5L", price: 4000 },
-  { id: "cafe_grande", name: "Café grande", price: 4000 },
-  { id: "cafe_chico", name: "Café chico", price: 3000 },
-  { id: "porcion_dulce", name: "Porción dulce", price: 6000 },
-];
+const CANCHA_PRICE = PRECIO_TURNO;
 
 export default function SplitCostCalculator() {
   const [players, setPlayers] = useState(4);
   const [selectedExtras, setSelectedExtras] = useState({
-    heineken: 2,
+    heineken_litro: 2,
     pizza_muzza: 1,
   });
   const [copied, setCopied] = useState(false);
@@ -66,7 +48,7 @@ export default function SplitCostCalculator() {
   const copyToWhatsapp = () => {
     let msg = `*DESGLOSE PARTIDO - MUZZAGA PÁDEL*\n`;
     msg += `• Cancha (90 min): $${canchaPrice.toLocaleString("es-AR")}\n`;
-    msg += `  ($${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si son cuatro)\n`;
+    msg += `  ($${PRECIO_POR_JUGADOR.toLocaleString("es-AR")} por jugador si son cuatro)\n`;
 
     const extraEntries = Object.entries(selectedExtras);
     if (extraEntries.length > 0) {
@@ -81,7 +63,7 @@ export default function SplitCostCalculator() {
 
     msg += `\nTotal General: $${grandTotal.toLocaleString("es-AR")}\n`;
     msg += `Total por jugador (${players} personas): *$${perPerson.toLocaleString("es-AR")}*\n\n`;
-    msg += `Alias de pago: Consultar alias en el mostrador`;
+    msg += `Coordinación y seña vía WhatsApp al 299 597-4176`;
 
     navigator.clipboard.writeText(msg);
     setCopied(true);
@@ -165,7 +147,7 @@ export default function SplitCostCalculator() {
                     fontWeight: 600,
                   }}
                 >
-                  $15.000 c/u (cuarteto)
+                  ${PRECIO_POR_JUGADOR.toLocaleString("es-AR")} c/u (cuarteto)
                 </div>
               </div>
             </div>
@@ -308,8 +290,10 @@ export default function SplitCostCalculator() {
             </button>
 
             <div className="split-alias-notice">
-              <span>Alias para transferencias:</span>
-              <code>Consultar alias en el mostrador</code>
+              <span>Coordinación de pago:</span>
+              <span style={{ fontSize: 12.5, fontWeight: 500 }}>
+                Avisá por WhatsApp al <strong>299 597-4176</strong> para señar tu turno
+              </span>
             </div>
           </div>
         </div>

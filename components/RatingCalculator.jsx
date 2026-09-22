@@ -1,31 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-function categoryFor(val) {
-  if (val < 2.8) {
-    return {
-      name: "7ma Categoría",
-      badge: "badge-emerald",
-      label: "7MA CATEGORÍA · Iniciación (1.5 - 2.7)",
-      desc: "Estás afianzando tus golpes de fondo, saque y aprendiendo a leer el rebote en paredes. ¡Los partidos de 7ma y Canchas Abiertas son ideales para vos!",
-    };
-  }
-  if (val >= 4.0) {
-    return {
-      name: "5ta / Libre",
-      badge: "badge-indigo",
-      label: "5TA / CATEGORÍA LIBRE · Avanzado (4.0 - 5.5+)",
-      desc: "Tenés lectura táctica veloz, variantes agresivas en la red y remate con salida por 3. Estás listo para el cuadro de torneos de primera y desafíos competitivos.",
-    };
-  }
-  return {
-    name: "6ta Categoría",
-    badge: "badge-amber",
-    label: "6TA CATEGORÍA · Intermedio (2.8 - 3.9)",
-    desc: "Voleas consistentes, manejo de bandeja y salida de pared firme. Tu nivel te permite competir en torneos de 6ta y partidos parejos todas las semanas.",
-  };
-}
+import { getCategoryForRating } from "../data/levels";
 
 export default function RatingCalculator() {
   const [mode, setMode] = useState("quiz"); // 'quiz' | 'slider'
@@ -46,7 +22,7 @@ export default function RatingCalculator() {
     return Math.min(5.5, Math.max(1.8, Number(score.toFixed(1))));
   }, [mode, raw, quizAnswers]);
 
-  const category = useMemo(() => categoryFor(Number(computedRating)), [computedRating]);
+  const category = useMemo(() => getCategoryForRating(Number(computedRating)), [computedRating]);
 
   const whatsappUrl = `https://wa.me/5492995974176?text=${encodeURIComponent(
     `¡Hola Muzzaga! Hice el test de nivel en la web y me dio ${computedRating} (${category.name}). Quiero sumarme a los partidos abiertos y torneos.`,

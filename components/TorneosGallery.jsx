@@ -27,18 +27,22 @@ const TOURNAMENTS = [
       {
         src: "/img/torneos/agosto/ganadores_1er_caballeros.jpg",
         alt: "1er puesto categoría 7ma Caballeros, Torneo Agosto 2026",
+        label: "1er Puesto Caballeros",
       },
       {
         src: "/img/torneos/agosto/ganadores_2do_caballeros.jpg",
         alt: "2do puesto categoría 7ma Caballeros, Torneo Agosto 2026",
+        label: "2do Puesto Caballeros",
       },
       {
         src: "/img/torneos/agosto/ganadores_1er_damas.jpg",
         alt: "1er puesto categoría 7ma Damas, Torneo Agosto 2026",
+        label: "1er Puesto Damas",
       },
       {
         src: "/img/torneos/agosto/ganadores_2do_damas.jpg",
         alt: "2do puesto categoría 7ma Damas, Torneo Agosto 2026",
+        label: "2do Puesto Damas",
       },
     ],
   },
@@ -50,10 +54,12 @@ const TOURNAMENTS = [
       {
         src: "/img/torneos/junio/ganadores_1er_puesto.jpg",
         alt: "1er puesto categoría Sexta Libre, Gabriel Salinas y Franco Alcalá, Primer Torneo Junio 2026",
+        label: "1er Puesto 6ta (G. Salinas - F. Alcalá)",
       },
       {
         src: "/img/torneos/junio/ganadores_2do_puesto.jpg",
         alt: "2do puesto categoría Sexta Libre, Sebastián Riquero y Lucas Ponce, Primer Torneo Junio 2026",
+        label: "2do Puesto 6ta (S. Riquero - L. Ponce)",
       },
     ],
   },
@@ -91,7 +97,7 @@ function JugadoresMarquee({ photos }) {
   );
 }
 
-function TorneoThumb({ src, alt }) {
+function TorneoThumb({ src, alt, label }) {
   const openLightbox = useLightbox();
   return (
     <div className="torneo-thumb" onClick={() => openLightbox(src, alt)}>
@@ -100,8 +106,13 @@ function TorneoThumb({ src, alt }) {
         alt={alt}
         fill
         loading="lazy"
-        sizes="(max-width: 640px) 40vw, 130px"
+        sizes="(max-width: 640px) 45vw, 160px"
       />
+      {label && (
+        <div className="torneo-thumb-badge">
+          <span>{label}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -140,7 +151,12 @@ function TorneoBlock({ label, jugadores, ganadores }) {
         </h4>
         <div className="torneo-thumb-grid">
           {ganadores.map((photo) => (
-            <TorneoThumb key={photo.src} src={photo.src} alt={photo.alt} />
+            <TorneoThumb
+              key={photo.src}
+              src={photo.src}
+              alt={photo.alt}
+              label={photo.label}
+            />
           ))}
         </div>
       </div>

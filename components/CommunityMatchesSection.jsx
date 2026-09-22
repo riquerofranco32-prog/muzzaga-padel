@@ -6,6 +6,7 @@ import {
   getOpenMatches,
   joinOpenMatch,
 } from "../app/open-matches/actions";
+import { PRECIO_POR_JUGADOR } from "../data/pricing";
 
 const WHATSAPP = "5492995974176";
 
@@ -23,7 +24,7 @@ export default function CommunityMatchesSection() {
   // Create Modal State
   const [createModal, setCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState({
-    category: "6ta Categoría (3.0 - 3.8)",
+    category: "6ta Categoría (3.0 - 3.9)",
     courtName: "Cancha 1 · Cristal",
     date: "",
     time: "20:00 hs",
@@ -153,9 +154,44 @@ export default function CommunityMatchesSection() {
 
         <div className="open-cards-grid">
           {filteredMatches.length === 0 ? (
-            <div className="booking-empty" style={{ gridColumn: "1 / -1" }}>
-              No hay partidos abiertos para esta categoría en este momento. ¡Sé
-              el primero en publicar uno con el botón de arriba!
+            <div
+              className="booking-empty"
+              style={{
+                gridColumn: "1 / -1",
+                padding: "36px 24px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 16,
+              }}
+            >
+              <div style={{ maxWidth: 460 }}>
+                <strong style={{ display: "block", fontSize: 16, marginBottom: 6, color: "var(--text-primary)" }}>
+                  No hay partidos abiertos programados hoy
+                </strong>
+                <p style={{ margin: 0, fontSize: 14, color: "var(--text-secondary)" }}>
+                  ¡Sé el primero en armar uno para tu nivel o sumate al grupo oficial de WhatsApp del club para enterarte al instante de nuevas convocatorias!
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+                <button
+                  type="button"
+                  className="btn btn-linear-primary"
+                  onClick={() => setCreateModal(true)}
+                  style={{ height: 40 }}
+                >
+                  + Publicar Partido Abierto
+                </button>
+                <a
+                  href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("¡Hola Muzzaga! Quiero sumarme al grupo de WhatsApp de Canchas Abiertas.")}`}
+                  target="_blank"
+                  rel="noopener"
+                  className="btn btn-secondary-whatsapp"
+                  style={{ height: 40, gap: 8 }}
+                >
+                  Sumarme al Grupo de WhatsApp →
+                </a>
+              </div>
             </div>
           ) : (
             filteredMatches.map((match) => {
@@ -389,7 +425,7 @@ export default function CommunityMatchesSection() {
               >
                 {joinSubmitting
                   ? "Registrando plaza..."
-                  : "Confirmar mi lugar ($15.000) →"}
+                  : `Confirmar mi lugar ($${PRECIO_POR_JUGADOR.toLocaleString("es-AR")}) →`}
               </button>
             </form>
           </div>
@@ -442,11 +478,11 @@ export default function CommunityMatchesSection() {
                     setCreateForm({ ...createForm, category: e.target.value })
                   }
                 >
-                  <option value="7ma / Iniciación (1.5 - 2.5)">
-                    7ma / Iniciación (1.5 - 2.5)
+                  <option value="7ma / Iniciación (1.5 - 2.9)">
+                    7ma / Iniciación (1.5 - 2.9)
                   </option>
-                  <option value="6ta Categoría (3.0 - 3.8)">
-                    6ta Categoría (3.0 - 3.8)
+                  <option value="6ta Categoría (3.0 - 3.9)">
+                    6ta Categoría (3.0 - 3.9)
                   </option>
                   <option value="5ta / Libre (4.0 - 5.5+)">
                     5ta / Libre (4.0 - 5.5+)

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { BentoPhotoCard } from "./PhotoCard";
-import { MENU_ITEMS, MENU_CATEGORIES as CATEGORIES } from "../lib/cantinaMenu";
+import { MENU_ITEMS, MENU_CATEGORIES as CATEGORIES } from "../data/menu";
 
 export default function CantinaSection() {
   const [selectedCat, setSelectedCat] = useState("all");

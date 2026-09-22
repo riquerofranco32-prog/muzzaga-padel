@@ -176,7 +176,7 @@ export default function Home() {
                     Golpes de fondo, aprendiendo rebote en paredes.
                   </span>
                 </div>
-                <span className="badge-linear badge-emerald">1.5 - 2.5</span>
+                <span className="badge-linear badge-emerald">1.5 - 2.9</span>
               </div>
 
               <div className="rating-category-card">
@@ -196,7 +196,7 @@ export default function Home() {
                     Voleas consistentes, salida de pared y bandeja.
                   </span>
                 </div>
-                <span className="badge-linear badge-amber">3.0 - 3.8</span>
+                <span className="badge-linear badge-amber">3.0 - 3.9</span>
               </div>
 
               <div className="rating-category-card">
