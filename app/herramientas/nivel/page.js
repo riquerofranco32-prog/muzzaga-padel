@@ -1,0 +1,105 @@
+import Link from "next/link";
+import Header from "../../../components/Header";
+import Footer from "../../../components/Footer";
+import BottomNav from "../../../components/BottomNav";
+import RatingCalculator from "../../../components/RatingCalculator";
+import { PADEL_LEVELS } from "../../../data/levels";
+
+export const metadata = {
+  title: "Test de nivel de pádel: ¿qué categoría sos? · Muzzaga Pádel",
+  description:
+    "Descubrí tu nivel de pádel en la escala internacional (1.0 a 7.0) y su equivalencia con las categorías argentinas (7ma a 1ra). Sumate a partidos parejos.",
+};
+
+export default function NivelPage() {
+  return (
+    <>
+      <Header />
+      <main style={{ paddingTop: 90, minHeight: "80vh" }}>
+        <div className="container" style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
+            <Link href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
+              ← Volver al Inicio
+            </Link>
+            <span>/</span>
+            <span>Herramientas</span>
+            <span>/</span>
+            <span style={{ color: "var(--text-primary)" }}>Test de Nivel</span>
+          </div>
+        </div>
+
+        <section className="section-turnos" style={{ paddingTop: 10 }}>
+          <div className="container">
+            <div className="section-header-row">
+              <div>
+                <span className="badge-linear badge-indigo" style={{ marginBottom: 8 }}>
+                  Evaluación Deportiva
+                </span>
+                <h1 className="section-title">Calculá tu Nivel de Juego</h1>
+                <p className="section-desc">
+                  Mapeamos la escala internacional de nivel (1.0 a 7.0) con las
+                  categorías del pádel argentino (7ma a 1ra) para que siempre
+                  compitas de igual a igual.
+                </p>
+              </div>
+            </div>
+
+            <div className="rating-grid-layout" style={{ marginTop: 24 }}>
+              <div>
+                <h2 style={{ fontSize: 18, color: "var(--color-ink)", marginBottom: 14 }}>
+                  Categorías en Argentina
+                </h2>
+
+                {PADEL_LEVELS.map((lvl) => (
+                  <div className="rating-category-card" key={lvl.id}>
+                    <div>
+                      <strong
+                        style={{
+                          color: "var(--text-primary)",
+                          display: "block",
+                          fontSize: 15,
+                        }}
+                      >
+                        {lvl.name} · {lvl.tag}
+                      </strong>
+                      <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
+                        {lvl.desc}
+                      </span>
+                    </div>
+                    <span className={`badge-linear ${lvl.badge}`}>{lvl.ratingRange}</span>
+                  </div>
+                ))}
+
+                <div
+                  style={{
+                    marginTop: 24,
+                    padding: "16px 20px",
+                    background: "var(--color-canvas-soft)",
+                    border: "1px solid var(--color-hairline-strong)",
+                    borderRadius: "var(--radius-lg)",
+                  }}
+                >
+                  <h3 style={{ fontSize: 14, color: "var(--color-ink)", margin: "0 0 6px" }}>
+                    ¿Querés jugar en tu nivel?
+                  </h3>
+                  <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: "0 0 12px" }}>
+                    En Canchas Abiertas armamos partidos parejos por categoría todas las semanas.
+                  </p>
+                  <Link href="/#canchas-abiertas" className="btn btn-secondary" style={{ fontSize: 13, padding: "6px 14px" }}>
+                    Ver Canchas Abiertas →
+                  </Link>
+                </div>
+              </div>
+
+              <div>
+                <RatingCalculator />
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+      <BottomNav />
+    </>
+  );
+}

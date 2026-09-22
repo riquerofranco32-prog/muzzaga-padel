@@ -1,9 +1,13 @@
+import Link from "next/link";
+
 export default function BottomNav() {
   return (
-    <nav className="mobile-bottom-bar" aria-label="Navegación móvil">
-      <a className="bottom-bar-item active" href="#turnos" aria-current="page">
+    <nav className="mobile-bottom-bar" aria-label="Navegación móvil inferior">
+      <a className="bottom-bar-item active" href="/#turnos" aria-label="Ir a Turnos">
         <svg
           viewBox="0 0 24 24"
+          width="20"
+          height="20"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -16,9 +20,11 @@ export default function BottomNav() {
         <span>Turnos</span>
       </a>
 
-      <a className="bottom-bar-item" href="#canchas-abiertas">
+      <a className="bottom-bar-item" href="/#canchas-abiertas" aria-label="Ir a Canchas Abiertas">
         <svg
           viewBox="0 0 24 24"
+          width="20"
+          height="20"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -31,38 +37,51 @@ export default function BottomNav() {
         <span>Abiertas</span>
       </a>
 
-      <a className="bottom-bar-item" href="#rating">
+      <Link className="bottom-bar-item" href="/torneos" aria-label="Ver Torneos">
         <svg
           viewBox="0 0 24 24"
+          width="20"
+          height="20"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
         >
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="m4.93 4.93 4.24 4.24"></path>
-          <path d="m14.83 9.17 4.24-4.24"></path>
-          <path d="m14.83 14.83 4.24 4.24"></path>
-          <path d="m9.17 14.83-4.24 4.24"></path>
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+          <path d="M4 22h16"></path>
+          <path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h10c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-2c-.55 0-1-.45-1-1v-2.34"></path>
+          <path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2z"></path>
         </svg>
-        <span>Rating</span>
-      </a>
+        <span>Torneos</span>
+      </Link>
 
-      <a className="bottom-bar-item" href="#ubicacion">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335" />
-          <circle cx="12" cy="9" r="2.8" fill="#ffffff" />
+      <Link className="bottom-bar-item" href="/menu" aria-label="Ver Menú de la Cantina">
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+          <line x1="6" y1="1" x2="6" y2="4"></line>
+          <line x1="10" y1="1" x2="10" y2="4"></line>
+          <line x1="14" y1="1" x2="14" y2="4"></line>
         </svg>
-        <span style={{ color: "#EA4335" }}>Mapa</span>
-      </a>
+        <span>Menú</span>
+      </Link>
 
       <a
         className="bottom-bar-item"
         href="https://wa.me/5492995974176"
         target="_blank"
         rel="noopener"
+        aria-label="Abrir WhatsApp del Club"
       >
         <svg viewBox="0 0 24 24" width="20" height="20" fill="#25D366">
-          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z"/>
+          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z" />
         </svg>
         <span style={{ color: "#25D366" }}>WhatsApp</span>
       </a>

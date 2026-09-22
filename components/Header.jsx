@@ -1,16 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const NAV_LINKS = [
-  { href: "#turnos", label: "Turnos" },
-  { href: "#canchas-abiertas", label: "Abiertas" },
-  { href: "#pizarra-tactica", label: "Táctica" },
-  { href: "#split-cost", label: "Dividir Gastos" },
-  { href: "#torneos", label: "Torneos" },
-  { href: "#generador-americano", label: "Americano" },
-  { href: "#cantina", label: "Cantina" },
-  { href: "#ubicacion", label: "Ubicación" },
+  { href: "/#turnos", label: "Turnos" },
+  { href: "/#canchas-abiertas", label: "Canchas Abiertas" },
+  { href: "/torneos", label: "Torneos" },
+  { href: "/menu", label: "Cantina" },
+  { href: "/#ubicacion", label: "Ubicación" },
+];
+
+const TOOLS_LINKS = [
+  { href: "/herramientas/dividir-gastos", label: "Calculadora de Gastos", desc: "Dividir cancha y cantina" },
+  { href: "/herramientas/nivel", label: "Test de Nivel", desc: "Calculá tu categoría de pádel" },
+  { href: "/herramientas/pizarra", label: "Pizarra Táctica", desc: "Simulador interactivo de jugadas" },
+  { href: "/herramientas/americano", label: "Torneo Americano", desc: "Generador de fixtures express" },
 ];
 
 const MAPS_URL = "https://maps.app.goo.gl/kR1h9mhdLqGLKatV7";
@@ -34,6 +39,7 @@ const WhatsAppIcon = () => (
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -48,8 +54,8 @@ export default function Header() {
     <>
       <header className="app-top-nav">
         <div className="container nav-inner">
-          <a
-            href="#top"
+          <Link
+            href="/#top"
             className="brand-group"
             aria-label="Muzzaga Pádel Catriel"
           >
@@ -69,25 +75,92 @@ export default function Header() {
               <span className="brand-text">Muzzaga</span>
               <span className="brand-sub">Catriel</span>
             </div>
-          </a>
+          </Link>
 
-          <nav className="nav-links-row" aria-label="Navegación">
+          <nav className="nav-links-row" aria-label="Navegación principal">
             {NAV_LINKS.map((link) => (
               <a key={link.href} className="nav-link" href={link.href}>
                 {link.label}
               </a>
             ))}
+
+            {/* Dropdown de Herramientas */}
+            <div
+              className="tools-dropdown-wrapper"
+              style={{ position: "relative" }}
+              onMouseEnter={() => setToolsOpen(true)}
+              onMouseLeave={() => setToolsOpen(false)}
+            >
+              <button
+                type="button"
+                className="nav-link tools-trigger"
+                onClick={() => setToolsOpen((v) => !v)}
+                aria-expanded={toolsOpen}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "6px 10px",
+                }}
+              >
+                <span>Herramientas</span>
+                <span style={{ fontSize: 10, transition: "transform 0.2s", transform: toolsOpen ? "rotate(180deg)" : "none" }}>
+                  ▼
+                </span>
+              </button>
+
+              {toolsOpen && (
+                <div
+                  className="tools-dropdown-menu"
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    width: 250,
+                    background: "var(--color-surface-card)",
+                    border: "1px solid var(--color-hairline-strong)",
+                    borderRadius: "var(--radius-md)",
+                    padding: 8,
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
+                    zIndex: 100,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                  }}
+                >
+                  {TOOLS_LINKS.map((tool) => (
+                    <Link
+                      key={tool.href}
+                      href={tool.href}
+                      className="tools-dropdown-item"
+                      onClick={() => setToolsOpen(false)}
+                      style={{
+                        padding: "8px 10px",
+                        borderRadius: "var(--radius-sm)",
+                        textDecoration: "none",
+                        color: "var(--text-primary)",
+                        transition: "background 0.15s ease",
+                      }}
+                    >
+                      <strong style={{ display: "block", fontSize: 13 }}>{tool.label}</strong>
+                      <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{tool.desc}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <a
-              href={MAPS_URL}
-              target="_blank"
-              rel="noopener"
-              className="btn btn-secondary-maps header-maps-btn"
-              style={{ height: 36, padding: "6px 14px", gap: 6 }}
+              href="/#turnos"
+              className="btn btn-linear-primary header-reserve-btn"
+              style={{ height: 36, padding: "6px 16px", fontWeight: 700 }}
             >
-              <GoogleMapsIcon /> Google Maps
+              Reservar
             </a>
             <a
               href={WHATSAPP_URL}
@@ -97,14 +170,6 @@ export default function Header() {
               style={{ height: 36, padding: "6px 14px", gap: 6 }}
             >
               <WhatsAppIcon /> WhatsApp Club
-            </a>
-            <a
-              href="/admin"
-              className="btn btn-secondary header-admin-btn"
-              style={{ height: 36, padding: "6px 12px", fontSize: 13 }}
-              title="Panel de Administración"
-            >
-              Admin
             </a>
             <button
               type="button"
@@ -134,6 +199,15 @@ export default function Header() {
         id="mobile-nav-panel"
         className={`mobile-nav-panel${open ? " open" : ""}`}
       >
+        <a
+          href="/#turnos"
+          className="btn btn-linear-primary"
+          onClick={() => setOpen(false)}
+          style={{ width: "100%", height: 42, justifyContent: "center", marginBottom: 12 }}
+        >
+          Reservar Cancha →
+        </a>
+
         {NAV_LINKS.map((link) => (
           <a
             key={link.href}
@@ -144,6 +218,24 @@ export default function Header() {
             {link.label}
           </a>
         ))}
+
+        <div style={{ borderTop: "1px solid var(--color-hairline)", margin: "10px 0", paddingTop: 10 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em", padding: "0 12px" }}>
+            Herramientas del Club
+          </span>
+          {TOOLS_LINKS.map((tool) => (
+            <Link
+              key={tool.href}
+              href={tool.href}
+              className="mobile-nav-link"
+              onClick={() => setOpen(false)}
+              style={{ fontSize: 14 }}
+            >
+              {tool.label}
+            </Link>
+          ))}
+        </div>
+
         <a
           className="mobile-nav-link maps-text"
           href={MAPS_URL}
@@ -166,20 +258,6 @@ export default function Header() {
           }}
         >
           <WhatsAppIcon /> WhatsApp Club →
-        </a>
-        <a
-          className="mobile-nav-link"
-          href="/admin"
-          onClick={() => setOpen(false)}
-          style={{
-            fontSize: 13,
-            color: "var(--color-muted)",
-            borderTop: "1px solid var(--color-hairline)",
-            paddingTop: 14,
-            marginTop: 8,
-          }}
-        >
-          Acceso Administración
         </a>
       </div>
       <div

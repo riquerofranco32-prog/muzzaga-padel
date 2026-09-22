@@ -70,33 +70,26 @@ export default function Footer() {
                   fontSize: 14,
                 }}
               >
-                <a href="#turnos" style={{ color: "var(--text-secondary)" }}>
+                <a href="/#turnos" style={{ color: "var(--text-secondary)" }}>
                   Elegí tu Turno
                 </a>
                 <a
-                  href="#canchas-abiertas"
+                  href="/#canchas-abiertas"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   Canchas Abiertas
                 </a>
-                <a href="#rating" style={{ color: "var(--text-secondary)" }}>
-                  Tu Nivel
+                <a href="/torneos" style={{ color: "var(--text-secondary)" }}>
+                  Torneos Oficiales
                 </a>
-                <a href="#torneos" style={{ color: "var(--text-secondary)" }}>
-                  Torneos 2026
+                <a href="/menu" style={{ color: "var(--text-secondary)" }}>
+                  Menú de Cantina
                 </a>
                 <a
-                  href="/admin"
-                  style={{
-                    color: "var(--text-muted)",
-                    fontSize: 13,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    marginTop: 4,
-                  }}
+                  href="/herramientas/dividir-gastos"
+                  style={{ color: "var(--text-secondary)" }}
                 >
-                  Panel de Control
+                  Herramientas para Jugadores
                 </a>
               </div>
             </div>
@@ -157,16 +150,7 @@ export default function Footer() {
             reservados.
           </div>
           <div>
-            2 Canchas de Cristal · Cantina Propia ·{" "}
-            <a
-              href="/admin"
-              style={{
-                color: "var(--text-muted)",
-                textDecoration: "underline",
-              }}
-            >
-              Acceso Administración
-            </a>
+            2 Canchas de Cristal · Cantina Propia · Iluminación LED
           </div>
         </div>
       </div>
