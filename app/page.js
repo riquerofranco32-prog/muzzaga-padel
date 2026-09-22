@@ -114,6 +114,7 @@ export default function Home() {
               alt="Muzzaguito - Mascota Oficial"
               width={42}
               height={42}
+              className="mascot-hero-animated"
               style={{
                 width: 42,
                 height: "auto",

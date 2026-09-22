@@ -255,18 +255,21 @@ export default function MonitorPage() {
             <div
               key={court.id}
               style={{
-                background: "#141517",
+                background: currentMatch
+                  ? "linear-gradient(180deg, #161c18 0%, #111412 100%)"
+                  : "linear-gradient(180deg, #161719 0%, #111214 100%)",
                 border: currentMatch
                   ? "2px solid #22c55e"
-                  : "1px solid rgba(255, 255, 255, 0.1)",
+                  : "1px solid rgba(255, 255, 255, 0.12)",
                 borderRadius: 20,
                 padding: 28,
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
                 boxShadow: currentMatch
-                  ? "0 0 30px rgba(34, 197, 94, 0.15)"
-                  : "none",
+                  ? "0 0 35px rgba(34, 197, 94, 0.2), inset 0 0 20px rgba(34, 197, 94, 0.05)"
+                  : "0 8px 30px rgba(0, 0, 0, 0.3)",
+                transition: "all 0.3s ease",
               }}
             >
               {/* ENCABEZADO DE CANCHA */}

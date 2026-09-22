@@ -127,11 +127,12 @@ export default function MascotFloatHelper() {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
+            className="pulse-badge-live"
             style={{
-              background: "rgba(24, 24, 27, 0.85)",
+              background: "rgba(24, 24, 27, 0.9)",
               backdropFilter: "blur(8px)",
               color: "#ffffff",
-              border: "1px solid rgba(255, 255, 255, 0.15)",
+              border: "1px solid rgba(232, 114, 42, 0.4)",
               padding: "6px 12px",
               borderRadius: 20,
               fontSize: 12,
@@ -167,6 +168,7 @@ export default function MascotFloatHelper() {
             alt="Muzzaguito - Mascota Muzzaga Pádel"
             width={68}
             height={68}
+            className="mascot-hero-animated"
             style={{
               width: 68,
               height: "auto",

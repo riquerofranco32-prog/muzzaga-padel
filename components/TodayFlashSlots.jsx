@@ -114,6 +114,7 @@ export default function TodayFlashSlots() {
             alt="Muzzaguito - Mascota Muzzaga"
             width={64}
             height={64}
+            className="mascot-hero-animated"
             style={{
               width: 64,
               height: "auto",
@@ -137,6 +138,7 @@ export default function TodayFlashSlots() {
           >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
+              className="pulse-badge-live"
               style={{
                 background: "var(--color-accent-orange, #e8722a)",
                 color: "#fff",
