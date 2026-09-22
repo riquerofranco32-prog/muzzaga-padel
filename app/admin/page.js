@@ -19,6 +19,7 @@ import {
   priceForSlot,
   toISODate,
 } from "../../lib/booking";
+import { toWhatsappNumber } from "../../lib/phone";
 
 const DAYS = nextDays(14);
 const START_TIMES = [
@@ -753,7 +754,7 @@ export default function AdminPage() {
                                   >
                                     {b.playerPhone && (
                                       <a
-                                        href={`https://wa.me/${b.playerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                                        href={`https://wa.me/${toWhatsappNumber(b.playerPhone)}?text=${encodeURIComponent(
                                           `Hola ${b.playerName}! Te escribimos de Muzzaga Pádel por tu turno del ${activeDate} a las ${slot.start} hs en ${court.name}. ¿Todo bien?`,
                                         )}`}
                                         target="_blank"
@@ -981,7 +982,7 @@ export default function AdminPage() {
                           <div style={{ display: "flex", gap: 6 }}>
                             {b.playerPhone && (
                               <a
-                                href={`https://wa.me/${b.playerPhone.replace(/\D/g, "")}`}
+                                href={`https://wa.me/${toWhatsappNumber(b.playerPhone)}`}
                                 target="_blank"
                                 rel="noopener"
                                 className="admin-table-action-btn"

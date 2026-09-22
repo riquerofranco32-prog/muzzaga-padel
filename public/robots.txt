@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://muzzaga-padel.vercel.app/sitemap.xml
+Sitemap: https://muzzaga-padel-seven.vercel.app/sitemap.xml

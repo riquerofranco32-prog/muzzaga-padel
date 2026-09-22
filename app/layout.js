@@ -10,7 +10,11 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://muzzaga-padel.vercel.app"),
+  // "muzzaga-padel.vercel.app" devuelve 404: ese nombre de proyecto quedó
+  // tomado en otra cuenta de Vercel (ver memoria de sesión), así que el sitio
+  // real quedó en "muzzaga-padel-seven.vercel.app". Con la URL vieja acá, las
+  // previews de WhatsApp/redes y el sitemap apuntaban a un dominio muerto.
+  metadataBase: new URL("https://muzzaga-padel-seven.vercel.app"),
   title:
     "Muzzaga Pádel · Reservá tu Cancha, Canchas Abiertas y Torneos en Catriel",
   description:
