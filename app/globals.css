@@ -3479,8 +3479,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .admin-main-inner {
-  max-width: 1280px;
-  padding: 28px 28px 80px;
+  /* Antes tenía max-width:1280px y quedaba una franja vacía enorme en
+     pantallas anchas: el admin es una herramienta de escritorio, se pidió
+     explícitamente que use todo el ancho disponible. */
+  width: 100%;
+  padding: 28px 32px 80px;
 }
 
 .admin-main-header {
@@ -4288,6 +4291,254 @@ input[type="range"]::-webkit-slider-thumb:hover {
 @media (max-width: 560px) {
   .admin-quick-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   ADMIN: CALENDARIO
+   ========================================================================== */
+.admin-calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-calendar-nav strong {
+  font-size: 16px;
+  color: var(--color-ink);
+  text-transform: capitalize;
+  min-width: 160px;
+  text-align: center;
+}
+
+.admin-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.admin-calendar-weekday {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  padding-bottom: 6px;
+}
+
+.admin-calendar-cell {
+  aspect-ratio: 1 / 0.85;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-hairline-strong);
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--color-surface-card);
+  transition: all 0.15s ease;
+}
+
+.admin-calendar-cell:hover {
+  border-color: var(--color-accent-orange);
+  transform: translateY(-2px);
+}
+
+.admin-calendar-cell.is-empty {
+  visibility: hidden;
+  cursor: default;
+}
+
+.admin-calendar-cell.is-today {
+  border-color: var(--color-accent-orange);
+  box-shadow: 0 0 0 1px var(--color-accent-orange);
+}
+
+.admin-calendar-cell.is-closed {
+  background: var(--color-canvas-soft);
+  cursor: default;
+}
+
+.admin-calendar-daynum {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.admin-calendar-stat {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   ADMIN: REPORTES
+   ========================================================================== */
+.admin-report-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.admin-report-summary-card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+
+/* ==========================================================================
+   ADMIN: CANTINA (punto de venta)
+   ========================================================================== */
+.admin-cantina-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.admin-cantina-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: 8px;
+}
+
+.admin-cantina-item-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-hairline-strong);
+  background: var(--color-surface-card);
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.admin-cantina-item-btn:hover {
+  border-color: var(--color-accent-orange);
+  background: var(--color-accent-orange-subtle);
+}
+
+.admin-cantina-item-price {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-accent-orange-hover);
+  white-space: nowrap;
+}
+
+.admin-cantina-cart {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  position: sticky;
+  top: 20px;
+}
+
+.admin-cantina-cart-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.admin-cantina-sales-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.admin-cantina-sale-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-hairline-strong);
+  background: var(--color-surface-card);
+  font-size: 12.5px;
+}
+
+/* ==========================================================================
+   ADMIN: TORNEOS
+   ========================================================================== */
+.admin-tournament-card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+
+.admin-tournament-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.admin-player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-canvas-soft);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.admin-player-paid-toggle {
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-player-paid-toggle.paid {
+  background: #e7f5ee;
+  color: #04674a;
+}
+
+.admin-player-paid-toggle.unpaid {
+  background: #fef6e7;
+  color: #96620a;
+}
+
+@media (max-width: 900px) {
+  .admin-cantina-layout {
+    grid-template-columns: 1fr;
+  }
+  .admin-cantina-cart {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-calendar-grid {
+    gap: 3px;
+  }
+  .admin-calendar-cell {
+    padding: 4px;
+  }
+  .admin-calendar-stat {
+    font-size: 9px;
   }
 }
 

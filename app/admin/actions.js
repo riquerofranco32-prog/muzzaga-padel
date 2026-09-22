@@ -397,3 +397,280 @@ export async function adminGetClients() {
     return { ok: false, error: "No se pudo cargar el listado de clientes." };
   }
 }
+
+/**
+ * Reservas e ingresos día por día de un mes calendario completo. Alimenta
+ * tanto la vista Calendario (heatmap de ocupación) como Reportes (totales +
+ * exportación). Una sola lectura de `bookings`, igual que adminGetWeekStats.
+ */
+export async function adminGetMonthStats(year, month) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const y = Number(year);
+  const m = Number(month); // 1-12
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const days = [];
+  for (let d = 1; d <= daysInMonth; d += 1) {
+    const date = toISODate(new Date(y, m - 1, d));
+    const totalSlots = getSlotTimesForDate(date).length * COURTS.length;
+    days.push({ date, day: d, turnos: 0, ingresos: 0, totalSlots });
+  }
+  const byDate = new Map(days.map((d) => [d.date, d]));
+
+  if (!isFirebaseConfigured()) {
+    return { ok: true, days, totals: { turnos: 0, ingresos: 0 } };
+  }
+
+  try {
+    const db = getDb();
+    const snap = await db.ref("bookings").get();
+    if (snap.exists()) {
+      Object.values(snap.val()).forEach((b) => {
+        if (b.status === "cancelado") return;
+        const bucket = byDate.get(b.date);
+        if (!bucket) return;
+        const pricing = priceForSlot(b.date, b.startTime);
+        const amount =
+          typeof b.total === "number"
+            ? b.total
+            : b.fullCourt !== false
+              ? pricing.total
+              : (b.playersCount || 4) * pricing.perPlayer;
+        bucket.ingresos += amount;
+        bucket.turnos += 1;
+      });
+    }
+    const totals = days.reduce(
+      (acc, d) => ({
+        turnos: acc.turnos + d.turnos,
+        ingresos: acc.ingresos + d.ingresos,
+      }),
+      { turnos: 0, ingresos: 0 },
+    );
+    return { ok: true, days, totals };
+  } catch (error) {
+    return { ok: false, error: "No se pudo cargar el reporte del mes." };
+  }
+}
+
+const CANTINA_PAYMENT_METHODS = ["efectivo", "transferencia", "mercadopago"];
+
+/** Registra una venta de cantina (walk-in, no ligada a un turno). */
+export async function adminAddCantinaSale({ date, items, method, notes }) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!Array.isArray(items) || items.length === 0) {
+    return { ok: false, error: "Agregá al menos un producto a la venta." };
+  }
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
+  }
+
+  const total = items.reduce(
+    (sum, it) => sum + (Number(it.price) || 0) * (Number(it.qty) || 1),
+    0,
+  );
+  if (total <= 0) {
+    return { ok: false, error: "El total de la venta debe ser mayor a cero." };
+  }
+
+  try {
+    const db = getDb();
+    const ref = db.ref("cantinaSales").push();
+    await ref.set({
+      date: date || toISODate(new Date()),
+      items,
+      total,
+      method: CANTINA_PAYMENT_METHODS.includes(method) ? method : "efectivo",
+      notes: (notes || "").trim(),
+      createdAt: Date.now(),
+    });
+    return { ok: true, saleId: ref.key };
+  } catch (error) {
+    return { ok: false, error: "No se pudo registrar la venta." };
+  }
+}
+
+export async function adminGetCantinaSales(date) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) return { ok: true, sales: [] };
+
+  try {
+    const db = getDb();
+    const snap = await db.ref("cantinaSales").get();
+    const sales = [];
+    if (snap.exists()) {
+      Object.entries(snap.val()).forEach(([id, s]) => {
+        if (!date || s.date === date) sales.push({ id, ...s });
+      });
+    }
+    sales.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    return { ok: true, sales };
+  } catch (error) {
+    return {
+      ok: false,
+      error: "No se pudieron cargar las ventas de cantina.",
+    };
+  }
+}
+
+export async function adminDeleteCantinaSale(saleId) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!saleId) return { ok: false, error: "ID de venta inválido." };
+  try {
+    const db = getDb();
+    await db.ref(`cantinaSales/${saleId}`).remove();
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo eliminar la venta." };
+  }
+}
+
+/**
+ * Torneos: el admin ya inscribe parejas a mano por WhatsApp (ver
+ * TorneosGallery en la landing), esto le da un lugar donde llevar esa lista
+ * con quién pagó en vez de un cuaderno o un chat.
+ */
+export async function adminCreateTournament({ name, date, category, price }) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!name?.trim()) {
+    return { ok: false, error: "Ingresá un nombre para el torneo." };
+  }
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
+  }
+
+  try {
+    const db = getDb();
+    const ref = db.ref("tournaments").push();
+    await ref.set({
+      name: name.trim(),
+      date: date || "",
+      category: (category || "").trim(),
+      price: Number(price) || 0,
+      status: "abierto", // 'abierto' | 'cerrado' | 'finalizado'
+      createdAt: Date.now(),
+    });
+    return { ok: true, tournamentId: ref.key };
+  } catch (error) {
+    return { ok: false, error: "No se pudo crear el torneo." };
+  }
+}
+
+export async function adminGetTournaments() {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) return { ok: true, tournaments: [] };
+
+  try {
+    const db = getDb();
+    const snap = await db.ref("tournaments").get();
+    const tournaments = [];
+    if (snap.exists()) {
+      Object.entries(snap.val()).forEach(([id, t]) => {
+        const players = t.players
+          ? Object.entries(t.players).map(([pid, p]) => ({ id: pid, ...p }))
+          : [];
+        const { players: _omit, ...rest } = t;
+        tournaments.push({ id, ...rest, players });
+      });
+    }
+    tournaments.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    return { ok: true, tournaments };
+  } catch (error) {
+    return { ok: false, error: "No se pudieron cargar los torneos." };
+  }
+}
+
+export async function adminUpdateTournamentStatus(tournamentId, status) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!tournamentId) return { ok: false, error: "Torneo inválido." };
+  try {
+    const db = getDb();
+    await db.ref(`tournaments/${tournamentId}`).update({ status });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo actualizar el torneo." };
+  }
+}
+
+export async function adminDeleteTournament(tournamentId) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!tournamentId) return { ok: false, error: "Torneo inválido." };
+  try {
+    const db = getDb();
+    await db.ref(`tournaments/${tournamentId}`).remove();
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo eliminar el torneo." };
+  }
+}
+
+export async function adminAddTournamentPlayer(tournamentId, input) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const { name, phone, partner } = input || {};
+  if (!tournamentId || !name?.trim()) {
+    return { ok: false, error: "Ingresá el nombre del jugador." };
+  }
+  try {
+    const db = getDb();
+    const ref = db.ref(`tournaments/${tournamentId}/players`).push();
+    await ref.set({
+      name: name.trim(),
+      phone: (phone || "").trim(),
+      partner: (partner || "").trim(),
+      paid: false,
+      createdAt: Date.now(),
+    });
+    return { ok: true, playerId: ref.key };
+  } catch (error) {
+    return { ok: false, error: "No se pudo agregar el jugador." };
+  }
+}
+
+export async function adminTogglePlayerPaid(tournamentId, playerId, paid) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!tournamentId || !playerId)
+    return { ok: false, error: "Datos inválidos." };
+  try {
+    const db = getDb();
+    await db
+      .ref(`tournaments/${tournamentId}/players/${playerId}`)
+      .update({ paid: Boolean(paid) });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo actualizar el pago." };
+  }
+}
+
+export async function adminRemoveTournamentPlayer(tournamentId, playerId) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!tournamentId || !playerId)
+    return { ok: false, error: "Datos inválidos." };
+  try {
+    const db = getDb();
+    await db.ref(`tournaments/${tournamentId}/players/${playerId}`).remove();
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo quitar el jugador." };
+  }
+}
