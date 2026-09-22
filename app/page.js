@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Header from "../components/Header";
 import LiveWeatherRadar from "../components/LiveWeatherRadar";
+import TodayFlashSlots from "../components/TodayFlashSlots";
 import BookingCalendar from "../components/BookingCalendar";
 import AmenitiesSection from "../components/AmenitiesSection";
 import CommunityMatchesSection from "../components/CommunityMatchesSection";
@@ -121,6 +122,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* WIDGET DISPONIBILIDAD INMEDIATA (HOY / MAÑANA) */}
+      <TodayFlashSlots />
 
       {/* 2. RESERVÁ TU TURNO */}
       <section id="turnos" className="section-turnos">

@@ -11,6 +11,9 @@ import {
   WhatsAppMiniIcon,
   paidAmount,
   pendingAmount,
+  buildReminderMessage,
+  buildDepositRequestMessage,
+  buildConfirmationMessage,
 } from "./adminHelpers";
 
 const AVAILABLE_TIMES = [
@@ -125,6 +128,41 @@ export default function BookingDetailModal({
                 title="Chat WhatsApp"
               >
                 <WhatsAppMiniIcon />
+              </a>
+            </div>
+          )}
+
+          {booking.playerPhone && (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+              <a
+                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildReminderMessage(booking))}`}
+                target="_blank"
+                rel="noopener"
+                className="btn btn-secondary"
+                style={{ height: 26, fontSize: 11, padding: "0 8px", textDecoration: "none" }}
+                title="Enviar recordatorio con saldo pendiente"
+              >
+                📩 Recordatorio
+              </a>
+              <a
+                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildDepositRequestMessage(booking))}`}
+                target="_blank"
+                rel="noopener"
+                className="btn btn-secondary"
+                style={{ height: 26, fontSize: 11, padding: "0 8px", textDecoration: "none" }}
+                title="Pedir seña con Alias bancario"
+              >
+                💳 Pedir Seña
+              </a>
+              <a
+                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildConfirmationMessage(booking))}`}
+                target="_blank"
+                rel="noopener"
+                className="btn btn-secondary"
+                style={{ height: 26, fontSize: 11, padding: "0 8px", textDecoration: "none" }}
+                title="Enviar confirmación de turno"
+              >
+                ✓ Confirmar
               </a>
             </div>
           )}

@@ -11,6 +11,28 @@ export default function MonitorPage() {
   const [dayData, setDayData] = useState(null);
   const [currentTime, setCurrentTime] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
+  function playTurnChime(freq = 587.33) {
+    if (!soundEnabled || typeof window === "undefined") return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.7);
+    } catch (e) {
+      // Audio autoplay policy handled silently
+    }
+  }
 
   useEffect(() => {
     checkAdminSession().then((res) => {
@@ -136,6 +158,30 @@ export default function MonitorPage() {
           >
             {currentTime || now.hhmm}
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              const next = !soundEnabled;
+              setSoundEnabled(next);
+              if (next) playTurnChime(659.25);
+            }}
+            style={{
+              background: soundEnabled ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.1)",
+              border: soundEnabled ? "1px solid #10b981" : "1px solid rgba(255, 255, 255, 0.2)",
+              color: soundEnabled ? "#34d399" : "#d1d5db",
+              padding: "8px 14px",
+              borderRadius: 8,
+              cursor: "pointer",
+              fontSize: 13,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+            title="Activar o silenciar aviso sonoro cuando faltan 5 min y al terminar el turno"
+          >
+            {soundEnabled ? "🔔 Sonido Activo" : "🔕 Sonido Desactivado"}
+          </button>
 
           <button
             type="button"

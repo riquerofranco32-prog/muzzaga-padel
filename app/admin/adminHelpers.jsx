@@ -15,20 +15,14 @@ export const PAYMENT_METHODS = [
   { value: "mercadopago", label: "Mercado Pago" },
 ];
 
-/** Suma de todos los cobros ya registrados sobre una reserva. */
-export function paidAmount(booking) {
-  if (!booking?.payments) return 0;
-  return Object.values(booking.payments).reduce(
-    (sum, p) => sum + (Number(p.amount) || 0),
-    0,
-  );
-}
-
-/** Lo que todavía falta cobrar, nunca negativo. */
-export function pendingAmount(booking) {
-  const total = typeof booking?.total === "number" ? booking.total : 0;
-  return Math.max(0, total - paidAmount(booking));
-}
+export {
+  paidAmount,
+  pendingAmount,
+  buildReminderMessage,
+  buildDepositRequestMessage,
+  buildConfirmationMessage,
+  exportBookingsToCSV,
+} from "../../lib/adminMessages";
 
 /** Clase de color del badge según estado. Sin acento para usarla como clase CSS. */
 export function statusClass(status) {

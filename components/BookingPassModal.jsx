@@ -12,6 +12,7 @@ const REAL_CBU = process.env.NEXT_PUBLIC_PAYMENT_CBU || null;
 const TITULAR = process.env.NEXT_PUBLIC_PAYMENT_TITULAR || "Muzzaga Pádel";
 
 import { trackEvent } from "../lib/analytics";
+import { buildGoogleCalendarUrl, downloadIcsCalendar } from "../lib/calendar";
 
 export default function BookingPassModal({
   bookingCode,
@@ -107,42 +108,24 @@ export default function BookingPassModal({
   };
 
   const handleDownloadCalendar = () => {
-    trackEvent("booking_add_calendar", { bookingCode });
-
-    // Clean date string to YYYYMMDD
-    const dateClean = (booking.date || "").replace(/[^0-9]/g, "");
-    const startTimeClean = (booking.startTime || "18:00").replace(":", "") + "00";
-    const endTimeClean = (booking.endTime || "19:30").replace(":", "") + "00";
-
-    const dtStart = `${dateClean}T${startTimeClean}`;
-    const dtEnd = `${dateClean}T${endTimeClean}`;
-
-    const icsContent = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Muzzaga Padel//Sistema de Turnos//ES",
-      "CALSCALE:GREGORIAN",
-      "BEGIN:VEVENT",
-      `SUMMARY:Pádel en Muzzaga (${booking.courtName})`,
-      `DESCRIPTION:Turno confirmado en ${booking.courtName}. Código: ${bookingCode}. Total: $${booking.total}.`,
-      "LOCATION:Muzzaga Pádel\\, Av. Cacique Catriel y Córdoba\\, Catriel\\, Río Negro",
-      `DTSTART:${dtStart}`,
-      `DTEND:${dtEnd}`,
-      "STATUS:CONFIRMED",
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
-
-    const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `turno-muzzaga-${bookingCode}.ics`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    trackEvent("booking_add_calendar_ics", { bookingCode });
+    downloadIcsCalendar({
+      courtName: booking.courtName,
+      date: booking.date,
+      startTime: booking.startTime,
+      endTime: booking.endTime,
+      bookingCode,
+      total: booking.total,
+    });
   };
+
+  const googleCalUrl = buildGoogleCalendarUrl({
+    courtName: booking.courtName,
+    date: booking.date,
+    startTime: booking.startTime,
+    endTime: booking.endTime,
+    bookingCode,
+  });
 
   if (!booking) return null;
 
@@ -406,23 +389,38 @@ export default function BookingPassModal({
             </a>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <a
+                href={googleCalUrl}
+                target="_blank"
+                rel="noopener"
+                className="btn btn-secondary"
+                style={{ justifyContent: "center", height: 38, fontSize: 12 }}
+              >
+                📅 Google Calendar
+              </a>
               <button
                 type="button"
                 className="btn btn-secondary"
-                style={{ justifyContent: "center", height: 38, fontSize: 12.5 }}
+                style={{ justifyContent: "center", height: 38, fontSize: 12 }}
                 onClick={handleDownloadCalendar}
               >
-                📅 Al calendario (.ics)
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ justifyContent: "center", height: 38, fontSize: 12.5 }}
-                onClick={handleShareGroup}
-              >
-                {shareSuccess ? "✓ ¡Copiado!" : "👥 Compartir al grupo"}
+                📥 Apple / Outlook (.ics)
               </button>
             </div>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                height: 38,
+                fontSize: 12.5,
+              }}
+              onClick={handleShareGroup}
+            >
+              {shareSuccess ? "✓ ¡Mensaje para el grupo copiado!" : "👥 Compartir al grupo de WhatsApp"}
+            </button>
 
             <button
               type="button"

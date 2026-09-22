@@ -15,6 +15,7 @@ import {
   paidAmount,
   pendingAmount,
   statusClass,
+  exportBookingsToCSV,
 } from "../adminHelpers";
 
 const DAYS = nextDays(14);
@@ -488,26 +489,38 @@ export default function AgendaView({
               Listado de Reservas del Día ({filteredBookings.length})
             </h2>
 
-            <div className="admin-search-wrap">
-              <IconSearch />
-              <input
-                type="text"
-                placeholder="Buscar por nombre, teléfono o código..."
-                className="admin-search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  className="admin-search-clear"
-                  onClick={() => setSearchQuery("")}
-                  aria-label="Limpiar búsqueda"
-                  title="Limpiar búsqueda"
-                >
-                  <IconClose size={12} />
-                </button>
-              )}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => exportBookingsToCSV(dayData?.bookings || [], activeDate)}
+                className="btn btn-secondary"
+                style={{ height: 36, fontSize: 12.5, padding: "0 12px", gap: 6 }}
+                title="Descargar listado de reservas del día en CSV para Excel"
+              >
+                📥 Exportar CSV
+              </button>
+
+              <div className="admin-search-wrap">
+                <IconSearch />
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, teléfono o código..."
+                  className="admin-search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className="admin-search-clear"
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Limpiar búsqueda"
+                    title="Limpiar búsqueda"
+                  >
+                    <IconClose size={12} />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
