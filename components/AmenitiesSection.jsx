@@ -63,16 +63,13 @@ export default function AmenitiesSection() {
               social de Catriel.
             </p>
           </div>
-          <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+          <div className="mascot-section-badge">
             <Image
               src="/img/mascotas/muzzaguito-mochila.png"
               alt="Muzzaguito equipado con paletero profesional"
-              width={92}
-              height={92}
-              style={{
-                objectFit: "contain",
-                filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.14))",
-              }}
+              width={160}
+              height={160}
+              className="mascot-section-img"
             />
           </div>
         </div>

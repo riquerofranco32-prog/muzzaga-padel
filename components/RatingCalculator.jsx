@@ -239,10 +239,10 @@ export default function RatingCalculator() {
             src="/img/mascotas/muzzaguito-hoodie-gameon.png"
             alt="Mascota oficial Muzzaga Game On"
             style={{
-              width: 52,
-              height: 52,
+              width: 74,
+              height: 74,
               objectFit: "contain",
-              filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.18))",
+              filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.22))",
             }}
           />
         </div>

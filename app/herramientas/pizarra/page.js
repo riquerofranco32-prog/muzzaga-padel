@@ -46,13 +46,16 @@ export default function PizarraPage() {
           >
             <Image
               src="/img/mascotas/muzzaguito-smash.png"
-              alt="Muzzaguito rematando por 3 metros"
-              width={110}
-              height={110}
+              alt="Muzzaguito rematando por 3 metros con pelota luminosa"
+              width={180}
+              height={180}
+              className="mascot-hero-animated"
               style={{
+                width: "clamp(135px, 22vw, 180px)",
+                height: "auto",
                 objectFit: "contain",
                 marginBottom: 16,
-                filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.18))",
+                filter: "drop-shadow(0 14px 28px rgba(0,0,0,0.22))",
               }}
             />
             <h3 style={{ fontSize: 20, color: "var(--color-ink)", marginBottom: 8 }}>

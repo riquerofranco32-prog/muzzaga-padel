@@ -5978,6 +5978,26 @@ textarea:focus-visible {
   transform-origin: center bottom;
 }
 
+.mascot-section-badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mascot-section-img {
+  width: clamp(105px, 14vw, 152px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.16));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: block;
+}
+
+.mascot-section-img:hover {
+  transform: translateY(-6px) scale(1.05);
+}
+
 @keyframes pulseLive {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(232, 114, 42, 0.45);

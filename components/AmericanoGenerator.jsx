@@ -79,16 +79,13 @@ export default function AmericanoGenerator() {
               Armá las rotaciones de parejas al instante para que todos jueguen con y contra todos en partidos de 4 o 6 games. Anotá los resultados en vivo y compartilo por WhatsApp.
             </p>
           </div>
-          <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+          <div className="mascot-section-badge">
             <Image
               src="/img/mascotas/muzzaguito-festejo.png"
               alt="Muzzaguito festejando en el torneo americano"
-              width={92}
-              height={92}
-              style={{
-                objectFit: "contain",
-                filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.14))",
-              }}
+              width={160}
+              height={160}
+              className="mascot-section-img"
             />
           </div>
         </div>

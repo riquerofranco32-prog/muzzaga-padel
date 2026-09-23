@@ -57,17 +57,17 @@ export default function Footer() {
                 background: "var(--color-surface-2, rgba(255,255,255,0.05))",
                 borderRadius: 12,
                 border: "1px solid var(--color-hairline, rgba(255,255,255,0.1))",
-                maxWidth: 320,
+                maxWidth: 360,
               }}
             >
               <img
                 src="/img/mascotas/muzzaguito-salto-alegria.png"
                 alt="Muzzaguito saludando"
-                width={62}
-                height={62}
-                style={{ width: 62, height: "auto", objectFit: "contain", flexShrink: 0, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.2))" }}
+                width={85}
+                height={85}
+                style={{ width: 85, height: "auto", objectFit: "contain", flexShrink: 0, filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.25))" }}
               />
-              <span style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.3 }}>
+              <span style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.35 }}>
                 ¡Nos vemos en la pista! 🎾 Muzzaguito te acompaña en cada partido.
               </span>
             </div>

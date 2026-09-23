@@ -380,28 +380,28 @@ export default function AdminPage() {
       <div className="admin-login-wrapper">
         <div className="admin-login-card">
           <div className="admin-login-header">
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 14, marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
               <img
                 src="/img/logo_badge.png"
                 alt="Muzzaga Pádel"
-                width={52}
-                height={52}
+                width={56}
+                height={56}
                 style={{
-                  width: 52,
-                  height: 52,
+                  width: 56,
+                  height: 56,
                   objectFit: "contain",
                 }}
               />
               <img
                 src="/img/mascotas/muzzaguito-lentes-cruzado.png"
                 alt="Muzzaguito Staff Admin"
-                width={58}
-                height={58}
+                width={76}
+                height={76}
                 style={{
-                  width: 58,
-                  height: 58,
+                  width: 76,
+                  height: 76,
                   objectFit: "contain",
-                  filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.25))",
+                  filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.3))",
                 }}
               />
             </div>
@@ -526,17 +526,17 @@ export default function AdminPage() {
               borderRadius: "12px",
               display: "flex",
               alignItems: "center",
-              gap: 10,
+              gap: 12,
             }}
           >
             <img
               src="/img/mascotas/muzzaguito-lentes-cruzado.png"
               alt="Muzzaguito Staff"
-              width={42}
-              height={42}
+              width={54}
+              height={54}
               style={{ objectFit: "contain", flexShrink: 0 }}
             />
-            <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.25 }}>
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.25 }}>
               <strong style={{ color: "var(--text-primary)", display: "block" }}>Staff Muzzaga</strong>
               Panel de Control
             </div>

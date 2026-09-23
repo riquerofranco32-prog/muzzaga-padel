@@ -101,17 +101,7 @@ export default function CommunityMatchesSection() {
     <section id="canchas-abiertas" className="section-community">
       <div className="container">
         <div className="section-header-row" style={{ alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <img
-              src="/img/mascotas/muzzaguito-selfie.png"
-              alt="Muzzaguito Comunidad y Selfie"
-              style={{
-                width: 72,
-                height: "auto",
-                objectFit: "contain",
-                filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.12))",
-              }}
-            />
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <div>
               <span
                 className="badge-linear badge-amber"
@@ -124,6 +114,15 @@ export default function CommunityMatchesSection() {
                 Sumate a partidos con lugares libres o publicá tu propia
                 convocatoria. Jugá con rivales de tu mismo nivel.
               </p>
+            </div>
+            <div className="mascot-section-badge">
+              <img
+                src="/img/mascotas/muzzaguito-selfie.png"
+                alt="Muzzaguito Comunidad y Selfie"
+                width={150}
+                height={150}
+                className="mascot-section-img"
+              />
             </div>
           </div>
           <button

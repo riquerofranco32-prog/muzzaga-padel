@@ -14,35 +14,32 @@ export default function HomeCantinaTeaser() {
     >
       <div className="container">
         <div className="section-header-row" style={{ alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div>
+            <span
+              className="badge-linear badge-amber"
+              style={{ marginBottom: 6 }}
+            >
+              Gastronomía &amp; Encuentro
+            </span>
+            <h2 className="section-title">Cantina Propia &amp; 3er Tiempo</h2>
+            <p className="section-desc">
+              Pizzas artesanales al horno, empanadas, cervezas frías y el mejor
+              ambiente para seguir jugando afuera de la pista.
+            </p>
+          </div>
+          <div className="mascot-section-badge">
             <img
               src="/img/mascotas/muzzaguito-reposera-cerveza.png"
-              alt="Muzzaguito en la cantina con cerveza"
-              style={{
-                width: 76,
-                height: "auto",
-                objectFit: "contain",
-                filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.12))",
-              }}
+              alt="Muzzaguito disfrutando una cerveza fría en la cantina"
+              width={160}
+              height={160}
+              className="mascot-section-img"
             />
-            <div>
-              <span
-                className="badge-linear badge-amber"
-                style={{ marginBottom: 6 }}
-              >
-                Gastronomía &amp; Encuentro
-              </span>
-              <h2 className="section-title">Cantina Propia &amp; 3er Tiempo</h2>
-              <p className="section-desc">
-                Pizzas caseras a la piedra, tostados, sándwiches abundantes y
-                cervezas heladas con vista directa a la pista.
-              </p>
-            </div>
           </div>
-          <Link href="/menu" className="btn btn-secondary" style={{ gap: 6 }}>
-            Ver Menú Completo (60+ productos) →
-          </Link>
         </div>
+        <Link href="/menu" className="btn btn-secondary" style={{ gap: 6 }}>
+          Ver Menú Completo (60+ productos) →
+        </Link>
 
         <div
           style={{

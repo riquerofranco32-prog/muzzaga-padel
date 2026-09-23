@@ -29,19 +29,13 @@ export default function FaqSection() {
                 Pádel.
               </p>
             </div>
-            <div
-              className="mascot-faq-desktop"
-              style={{ flexShrink: 0, display: "flex", alignItems: "center" }}
-            >
+            <div className="mascot-section-badge">
               <Image
                 src="/img/mascotas/muzzaguito-guino-paleta.png"
                 alt="Muzzaguito respondiendo preguntas frecuentes"
-                width={88}
-                height={88}
-                style={{
-                  objectFit: "contain",
-                  filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.14))",
-                }}
+                width={145}
+                height={145}
+                className="mascot-section-img"
               />
             </div>
           </div>
