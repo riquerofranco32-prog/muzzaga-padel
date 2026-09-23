@@ -65,8 +65,8 @@ export default function AmenitiesSection() {
           </div>
           <div className="mascot-section-badge">
             <Image
-              src="/img/mascotas/muzzaguito-mochila.png"
-              alt="Muzzaguito equipado con paletero profesional"
+              src="/img/mascotas/muzzaguito-descanso-mate.webp"
+              alt="Muzzaguito descansando con mate y su paletero"
               width={160}
               height={160}
               className="mascot-section-img"

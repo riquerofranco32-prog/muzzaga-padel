@@ -56,7 +56,7 @@ export default function HomeTorneosTeaser() {
           </div>
           <div className="mascot-section-badge">
             <img
-              src="/img/mascotas/muzzaguito-copa-campeon.png"
+              src="/img/mascotas/muzzaguito-trofeo-bolso.webp"
               alt="Muzzaguito Campeón con Copa de Torneo"
               width={160}
               height={160}

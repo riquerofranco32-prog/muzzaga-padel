@@ -29,8 +29,8 @@ export default function HomeCantinaTeaser() {
           </div>
           <div className="mascot-section-badge">
             <img
-              src="/img/mascotas/muzzaguito-reposera-cerveza.png"
-              alt="Muzzaguito disfrutando una cerveza fría en la cantina"
+              src="/img/mascotas/muzzaguito-pizza-cerveza.webp"
+              alt="Muzzaguito con pizza y cerveza en la cantina"
               width={160}
               height={160}
               className="mascot-section-img"

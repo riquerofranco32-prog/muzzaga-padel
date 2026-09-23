@@ -236,8 +236,8 @@ export default function RatingCalculator() {
           </div>
 
           <img
-            src="/img/mascotas/muzzaguito-hoodie-gameon.png"
-            alt="Mascota oficial Muzzaga Game On"
+            src="/img/mascotas/muzzaguito-enredado-grip.webp"
+            alt="Muzzaguito enredado con el grip"
             style={{
               width: 74,
               height: 74,

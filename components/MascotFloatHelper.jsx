@@ -164,7 +164,7 @@ export default function MascotFloatHelper() {
           title="Mascota oficial de Muzzaga Pádel"
         >
           <img
-            src="/img/mascota.png"
+            src="/img/mascotas/muzzaguito-guino-paleta-pulgar.webp"
             alt="Muzzaguito - Mascota Muzzaga Pádel"
             width={92}
             height={92}

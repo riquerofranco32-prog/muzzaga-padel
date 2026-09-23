@@ -61,8 +61,8 @@ export default function Footer() {
               }}
             >
               <img
-                src="/img/mascotas/muzzaguito-salto-alegria.png"
-                alt="Muzzaguito saludando"
+                src="/img/mascotas/muzzaguito-mochila-pulgar.webp"
+                alt="Muzzaguito con su mochila haciendo pulgar arriba"
                 width={85}
                 height={85}
                 style={{ width: 85, height: "auto", objectFit: "contain", flexShrink: 0, filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.25))" }}

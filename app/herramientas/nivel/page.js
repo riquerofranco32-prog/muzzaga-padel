@@ -45,7 +45,7 @@ export default function NivelPage() {
               </div>
               <div className="mascot-section-badge">
                 <Image
-                  src="/img/mascotas/muzzaguito-pelota.png"
+                  src="/img/mascotas/muzzaguito-pelota-padel-life.webp"
                   alt="Muzzaguito sosteniendo pelota de pádel"
                   width={160}
                   height={160}

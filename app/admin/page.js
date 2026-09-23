@@ -509,7 +509,7 @@ export default function AdminPage() {
                 }}
               />
               <img
-                src="/img/mascotas/muzzaguito-lentes-cruzado.png"
+                src="/img/mascotas/muzzaguito-lentes-paleta.webp"
                 alt="Muzzaguito Staff Admin"
                 width={76}
                 height={76}
@@ -648,7 +648,7 @@ export default function AdminPage() {
             }}
           >
             <img
-              src="/img/mascotas/muzzaguito-lentes-cruzado.png"
+              src="/img/mascotas/muzzaguito-lentes-paleta.webp"
               alt="Muzzaguito Staff"
               width={54}
               height={54}

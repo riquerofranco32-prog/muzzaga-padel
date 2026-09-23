@@ -31,7 +31,7 @@ export default function FaqSection() {
             </div>
             <div className="mascot-section-badge">
               <Image
-                src="/img/mascotas/muzzaguito-guino-paleta.png"
+                src="/img/mascotas/muzzaguito-guino-paleta-pulgar.webp"
                 alt="Muzzaguito respondiendo preguntas frecuentes"
                 width={145}
                 height={145}

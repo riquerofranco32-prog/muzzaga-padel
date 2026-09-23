@@ -108,8 +108,8 @@ export default function Home() {
           >
             <div style={{ flexShrink: 0 }}>
               <img
-                src="/img/mascota.png"
-                alt="Muzzaguito - Mascota Oficial"
+                src="/img/mascotas/muzzaguito-lentes-paleta.webp"
+                alt="Muzzaguito, la mascota de Muzzaga, con anteojos y paleta"
                 width={150}
                 height={150}
                 className="mascot-hero-animated"

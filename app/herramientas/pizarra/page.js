@@ -45,8 +45,8 @@ export default function PizarraPage() {
             }}
           >
             <Image
-              src="/img/mascotas/muzzaguito-smash.png"
-              alt="Muzzaguito rematando por 3 metros con pelota luminosa"
+              src="/img/mascotas/muzzaguito-enredado-paleta.webp"
+              alt="Muzzaguito enredado con la paleta"
               width={180}
               height={180}
               className="mascot-hero-animated"

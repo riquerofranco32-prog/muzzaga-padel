@@ -81,8 +81,8 @@ export default function AmericanoGenerator() {
           </div>
           <div className="mascot-section-badge">
             <Image
-              src="/img/mascotas/muzzaguito-festejo.png"
-              alt="Muzzaguito festejando en el torneo americano"
+              src="/img/mascotas/muzzaguito-trofeo-paleta.webp"
+              alt="Muzzaguito festejando con la copa del americano"
               width={160}
               height={160}
               className="mascot-section-img"

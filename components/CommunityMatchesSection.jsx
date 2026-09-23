@@ -117,8 +117,8 @@ export default function CommunityMatchesSection() {
             </div>
             <div className="mascot-section-badge">
               <img
-                src="/img/mascotas/muzzaguito-selfie.png"
-                alt="Muzzaguito Comunidad y Selfie"
+                src="/img/mascotas/muzzaguito-pizza-good-vibes.webp"
+                alt="Muzzaguito compartiendo pizza con la comunidad"
                 width={150}
                 height={150}
                 className="mascot-section-img"

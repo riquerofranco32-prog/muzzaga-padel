@@ -95,7 +95,7 @@ export default function SplitCostCalculator() {
           </div>
           <div className="mascot-section-badge">
             <Image
-              src="/img/mascotas/muzzaguito-pizza.png"
+              src="/img/mascotas/muzzaguito-pizza-padel-mood.webp"
               alt="Muzzaguito disfrutando una pizza en el tercer tiempo"
               width={160}
               height={160}
