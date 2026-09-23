@@ -95,6 +95,7 @@ export default function AdminPage() {
   // Clientes (derivados de reservas), compartido con el autocompletar del
   // modal de creación.
   const [clients, setClients] = useState([]);
+  const [clientsLoaded, setClientsLoaded] = useState(false);
 
   // Tendencia de los últimos 7 días (KPIs con flecha hoy-vs-ayer + gráfico)
   const [weekStats, setWeekStats] = useState(null);
@@ -311,7 +312,10 @@ export default function AdminPage() {
 
   async function loadClients() {
     const res = await adminGetClients();
-    if (res.ok) setClients(res.clients || []);
+    if (res.ok) {
+      setClients(res.clients || []);
+      setClientsLoaded(true);
+    }
   }
 
   async function loadWeekStats() {
@@ -788,8 +792,9 @@ export default function AdminPage() {
             {view === "clientes" && (
               <ClientesView
                 key={clientesSearch.key}
-                clients={clients}
+                clients={clientsLoaded ? clients : null}
                 initialSearch={clientesSearch.query}
+                onToast={showToast}
               />
             )}
             {view === "caja" && (
@@ -806,7 +811,10 @@ export default function AdminPage() {
               />
             )}
             {view === "torneos" && (
-              <TorneosView onExpiredSession={handleExpiredSession} />
+              <TorneosView
+                onExpiredSession={handleExpiredSession}
+                onToast={showToast}
+              />
             )}
             {view === "reportes" && (
               <ReportesView onExpiredSession={handleExpiredSession} />
@@ -873,6 +881,9 @@ export default function AdminPage() {
           onRemovePayment={handleRemovePayment}
           onCancel={handleCancel}
           onToggleTest={handleToggleTest}
+          sales={dayData?.sales || []}
+          onSalesChanged={refreshMoney}
+          onToast={showToast}
           onMoved={() => {
             loadDayData(activeDate);
             setDetailBooking(null);

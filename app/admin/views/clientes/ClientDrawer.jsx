@@ -1,0 +1,249 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { CalendarDays, UtensilsCrossed, X } from "lucide-react";
+import { adminGetClientDetail, adminSaveClientNote } from "../../actions";
+import {
+  formatARS,
+  formatDate,
+  formatRelativeDays,
+  plural,
+} from "../../../../lib/format";
+import { formatPhoneAR, toWhatsappNumber } from "../../../../lib/phone";
+import { todayInClub } from "../../../../lib/booking";
+import { categorizeClient } from "../../../../lib/clientsExport";
+import { EmptyState, SkeletonRows } from "../../ui/states";
+import { WhatsAppMiniIcon } from "../../adminHelpers";
+
+const STATUS_LABEL = {
+  confirmado: "Confirmado",
+  señado: "Señado",
+  pagado: "Pagado",
+  cancelado: "Cancelado",
+  bloqueado: "Bloqueado",
+};
+
+export function initials(name) {
+  return String(name || "?")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() || "")
+    .join("");
+}
+
+/** Panel lateral con historial, consumo en cantina, notas y WhatsApp. */
+export default function ClientDrawer({ client, onClose, onToast }) {
+  const [detail, setDetail] = useState(null);
+  const [note, setNote] = useState("");
+  const [savedNote, setSavedNote] = useState("");
+  const [saving, setSaving] = useState(false);
+  const today = todayInClub();
+
+  useEffect(() => {
+    let cancelled = false;
+    setDetail(null);
+    adminGetClientDetail(client.key).then((res) => {
+      if (cancelled) return;
+      if (res.ok) {
+        setDetail(res);
+        setNote(res.note);
+        setSavedNote(res.note);
+      } else {
+        onToast?.(res.error || "No se pudo cargar el cliente.", {
+          tone: "error",
+        });
+      }
+    });
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [client.key]);
+
+  async function saveNote() {
+    setSaving(true);
+    const res = await adminSaveClientNote(client.key, note);
+    setSaving(false);
+    if (res.ok) {
+      setSavedNote(note.trim());
+      onToast?.("Nota guardada");
+    } else {
+      onToast?.(res.error || "No se pudo guardar la nota.", { tone: "error" });
+    }
+  }
+
+  const cat = categorizeClient(client.count);
+  const cantinaTotal = detail?.cantina.reduce((s, c) => s + c.total, 0) || 0;
+
+  return (
+    <div className="admin-drawer-backdrop" onClick={onClose}>
+      <aside
+        className="admin-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="client-drawer-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="admin-drawer-head">
+          <span className="admin-avatar admin-avatar-lg" aria-hidden>
+            {initials(client.name)}
+          </span>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <h3 id="client-drawer-title">{client.name}</h3>
+            <span className="admin-cell-sub">
+              {client.phone ? formatPhoneAR(client.phone) : "Sin teléfono"} ·{" "}
+              {cat.category}
+            </span>
+          </div>
+          <button
+            type="button"
+            className="admin-modal-close"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            <X size={16} strokeWidth={1.75} aria-hidden />
+          </button>
+        </header>
+
+        {client.phone && (
+          <a
+            className="btn btn-whatsapp admin-btn-block"
+            href={`https://wa.me/${toWhatsappNumber(client.phone)}?text=${encodeURIComponent(`Hola ${client.name.split(" ")[0]}! Te escribimos de Muzzaga Pádel 🎾`)}`}
+            target="_blank"
+            rel="noopener"
+          >
+            <WhatsAppMiniIcon size={16} /> Escribir por WhatsApp
+          </a>
+        )}
+
+        <dl className="admin-drawer-stats">
+          <div>
+            <dt>Turnos</dt>
+            <dd>{client.count}</dd>
+          </div>
+          <div>
+            <dt>Total en turnos</dt>
+            <dd>{formatARS(client.totalSpent)}</dd>
+          </div>
+          <div>
+            <dt>Último turno</dt>
+            <dd>{formatRelativeDays(client.lastDate, today)}</dd>
+          </div>
+          <div>
+            <dt>Cliente desde</dt>
+            <dd>{client.firstDate ? formatDate(client.firstDate) : "—"}</dd>
+          </div>
+        </dl>
+
+        <section className="admin-drawer-section">
+          <label className="admin-field-label" htmlFor="client-note">
+            Notas
+          </label>
+          <textarea
+            id="client-note"
+            rows={3}
+            maxLength={1000}
+            placeholder="Nivel, preferencias, con quién juega, si debe algo…"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          {note.trim() !== savedNote && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={saveNote}
+              disabled={saving}
+            >
+              {saving ? "Guardando…" : "Guardar nota"}
+            </button>
+          )}
+        </section>
+
+        <section className="admin-drawer-section">
+          <h4>
+            <CalendarDays size={16} strokeWidth={1.75} aria-hidden /> Historial
+            de reservas
+          </h4>
+          {!detail ? (
+            <SkeletonRows count={4} height={40} />
+          ) : detail.bookings.length === 0 ? (
+            <EmptyState icon={CalendarDays} title="Sin reservas registradas" />
+          ) : (
+            <ul className="admin-drawer-list">
+              {detail.bookings.map((b) => (
+                <li
+                  key={b.id}
+                  className={b.status === "cancelado" ? "is-voided" : undefined}
+                >
+                  <span>
+                    <strong>{formatDate(b.date)}</strong> {b.startTime}
+                    <small>{b.courtName}</small>
+                  </span>
+                  <span className="admin-tag">
+                    {STATUS_LABEL[b.status] || b.status}
+                  </span>
+                  <span className="admin-drawer-amount">
+                    {formatARS(b.total)}
+                    {b.total > b.paid && b.status !== "cancelado" && (
+                      <small className="is-warning">
+                        Debe {formatARS(b.total - b.paid)}
+                      </small>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="admin-drawer-section">
+          <h4>
+            <UtensilsCrossed size={16} strokeWidth={1.75} aria-hidden /> Consumo
+            en cantina
+            {cantinaTotal > 0 && (
+              <span className="admin-cell-sub">
+                {" "}
+                · {formatARS(cantinaTotal)}
+              </span>
+            )}
+          </h4>
+          {!detail ? (
+            <SkeletonRows count={2} height={40} />
+          ) : detail.cantina.length === 0 ? (
+            <p className="admin-field-hint">
+              Sin consumos cargados a sus turnos. Las ventas al paso no quedan
+              asociadas a un cliente.
+            </p>
+          ) : (
+            <ul className="admin-drawer-list">
+              {detail.cantina.map((c) => (
+                <li key={c.id}>
+                  <span>
+                    <strong>{formatDate(c.date)}</strong>
+                    <small>
+                      {c.items.map((it) => `${it.qty}× ${it.name}`).join(", ")}
+                    </small>
+                  </span>
+                  <span className="admin-tag">
+                    {c.settled ? "Cobrado" : "A cuenta"}
+                  </span>
+                  <span className="admin-drawer-amount">
+                    {formatARS(c.total)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {detail && (
+            <p className="admin-field-hint">
+              {plural(detail.cantina.length, "consumo", "consumos")}
+            </p>
+          )}
+        </section>
+      </aside>
+    </div>
+  );
+}

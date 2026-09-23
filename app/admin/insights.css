@@ -1,0 +1,610 @@
+/* ==========================================================================
+   CLIENTES, CALENDARIO, REPORTES (Fase 3) + impresión del reporte.
+   ========================================================================== */
+
+/* Intensidad del heatmap (calendario y reportes) */
+.admin-root [data-heat="0"] {
+  --heat-bg: var(--surface);
+  --heat-fg: var(--text-muted);
+}
+.admin-root [data-heat="1"] {
+  --heat-bg: #fdebdd;
+  --heat-fg: var(--text);
+}
+.admin-root [data-heat="2"] {
+  --heat-bg: #f9c9a4;
+  --heat-fg: var(--text);
+}
+.admin-root [data-heat="3"] {
+  --heat-bg: #f19b62;
+  --heat-fg: #2b1407;
+}
+.admin-root [data-heat="4"] {
+  --heat-bg: #c4520f;
+  --heat-fg: #ffffff;
+}
+.admin-root [data-heat="closed"] {
+  --heat-bg: repeating-linear-gradient(135deg, #efe8de 0 5px, #e6ded2 5px 10px);
+  --heat-fg: var(--text-muted);
+}
+
+/* ---------- Clientes ---------- */
+.admin-root .admin-callout {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: var(--radius-card);
+  background: #fdf3e2;
+  border: 1px solid #f1d29d;
+  color: #8a4b06;
+}
+
+.admin-root .admin-table-clickable tbody tr {
+  cursor: pointer;
+}
+
+.admin-root .admin-th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.admin-root .admin-client-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.admin-root .admin-client-cell .admin-cell-sub {
+  display: block;
+}
+
+.admin-root .admin-avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fdebdd;
+  color: #8a3a0a;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.admin-root .admin-avatar-lg {
+  width: 48px;
+  height: 48px;
+  font-size: 16px;
+}
+
+.admin-root .admin-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgb(22 19 15 / 0.35);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-root .admin-drawer {
+  width: min(440px, 100%);
+  height: 100%;
+  overflow-y: auto;
+  background: var(--surface);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: -12px 0 32px rgb(0 0 0 / 0.12);
+  animation: adminDrawerIn 0.2s ease-out;
+}
+
+@keyframes adminDrawerIn {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.admin-root .admin-drawer-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-root .admin-drawer-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-root .admin-drawer-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+}
+
+.admin-root .admin-drawer-stats div {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+}
+
+.admin-root .admin-drawer-stats dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-drawer-stats dd {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.admin-root .admin-drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-root .admin-drawer-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-root .admin-drawer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+}
+
+.admin-root .admin-drawer-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.admin-root .admin-drawer-list li:last-child {
+  border-bottom: none;
+}
+
+.admin-root .admin-drawer-list li > span:first-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-root .admin-drawer-list small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.admin-root .admin-drawer-list .is-voided {
+  opacity: 0.55;
+}
+
+.admin-root .admin-drawer-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-weight: 600;
+}
+
+.admin-root .admin-drawer-amount .is-warning {
+  color: var(--warning);
+  font-weight: 500;
+}
+
+.admin-root .admin-modal-wide {
+  width: min(560px, calc(100vw - 32px));
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.admin-root .admin-invite-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.admin-root .admin-invite-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-root .admin-invite-list li > span {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-root .admin-invite-list li.is-done {
+  opacity: 0.6;
+}
+
+/* ---------- Calendario ---------- */
+.admin-root .admin-calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-root .admin-calendar-nav strong {
+  min-width: 150px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.admin-root .admin-heatmap {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.admin-root .admin-heatmap-weekday {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 0 4px 2px;
+}
+
+.admin-root .admin-heat-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 76px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--heat-bg);
+  color: var(--heat-fg);
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-root .admin-heat-cell:hover:not(:disabled) {
+  border-color: var(--text);
+}
+
+.admin-root .admin-heat-cell:disabled {
+  cursor: not-allowed;
+}
+
+.admin-root .admin-heat-cell.is-today {
+  box-shadow: inset 0 0 0 2px var(--sidebar-bg);
+}
+
+.admin-root .admin-heat-day {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-root .admin-heat-pct {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.admin-root .admin-heat-meta,
+.admin-root .admin-heat-closed {
+  font-size: 11.5px;
+}
+
+.admin-root .admin-calendar-list {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-root .admin-heat-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-heat-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--heat-bg);
+  border: 1px solid var(--border);
+}
+
+/* ---------- Reportes ---------- */
+.admin-root .admin-period {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-root .admin-period-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-root .admin-period-controls select {
+  width: auto;
+  min-width: 140px;
+}
+
+.admin-root .admin-report-section {
+  margin-top: 24px;
+}
+
+.admin-root .admin-report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 16px;
+}
+
+.admin-root .admin-report-grid .admin-report-section {
+  margin-top: 24px;
+}
+
+.admin-root .admin-linechart {
+  margin: 0;
+}
+
+.admin-root .admin-linechart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.admin-root .admin-linechart-grid {
+  stroke: var(--border);
+  stroke-dasharray: 3 3;
+}
+
+.admin-root .admin-linechart-axis {
+  font-size: 11px;
+  fill: var(--text-muted);
+}
+
+.admin-root .admin-linechart .is-turnos polyline {
+  stroke: var(--accent-strong);
+  stroke-width: 2.5;
+}
+
+.admin-root .admin-linechart .is-turnos circle {
+  fill: var(--accent-strong);
+}
+
+.admin-root .admin-linechart .is-cantina polyline {
+  stroke: #0369a1;
+  stroke-width: 2;
+  stroke-dasharray: 5 3;
+}
+
+.admin-root .admin-linechart .is-cantina circle {
+  fill: #0369a1;
+}
+
+.admin-root .admin-linechart .admin-weekchart-legend .is-cantina::before {
+  background: #0369a1;
+}
+
+.admin-root .admin-heat-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-root .admin-heat-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  padding: 8px;
+  font-size: 12.5px;
+}
+
+.admin-root .admin-heat-table th {
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.admin-root .admin-heat-table th[scope="row"] {
+  text-align: left;
+  padding-right: 8px;
+}
+
+.admin-root .admin-heat-table td {
+  min-width: 52px;
+  height: 36px;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 6px;
+  background: var(--heat-bg);
+  color: var(--heat-fg);
+  border: 1px solid var(--border);
+}
+
+.admin-root .admin-mix-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--surface-muted);
+  margin-bottom: 12px;
+}
+
+.admin-root [data-method="efectivo"] {
+  --method: #15803d;
+}
+.admin-root [data-method="transferencia"] {
+  --method: #0369a1;
+}
+.admin-root [data-method="mercadopago"] {
+  --method: #c4520f;
+}
+
+.admin-root .admin-mix-bar span {
+  background: var(--method);
+}
+
+.admin-root .admin-mix-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-root .admin-mix-list li {
+  display: grid;
+  grid-template-columns: 1fr auto 56px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.admin-root .admin-mix-list li > span:first-child::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 8px;
+  background: var(--method);
+}
+
+.admin-root .admin-mix-list .admin-cell-sub {
+  text-align: right;
+}
+
+.admin-root .admin-print-only {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .admin-root .admin-heatmap,
+  .admin-root .admin-heat-legend {
+    display: none;
+  }
+
+  .admin-root .admin-calendar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .admin-root .admin-calendar-list button {
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 10px;
+    align-items: center;
+    width: 100%;
+    min-height: 56px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .admin-root .admin-calendar-list button .admin-heat-swatch {
+    grid-row: span 2;
+  }
+
+  .admin-root .admin-calendar-list button:disabled {
+    opacity: 0.6;
+  }
+
+  .admin-root .admin-calendar-list button.is-today {
+    border-color: var(--sidebar-bg);
+  }
+
+  .admin-root .admin-drawer {
+    width: 100%;
+  }
+}
+
+/* ---------- Impresión (Reportes → PDF) ---------- */
+@media print {
+  .admin-root .admin-sidebar,
+  .admin-root .admin-main-header,
+  .admin-root .admin-bottom-nav,
+  .admin-root .admin-fab,
+  .admin-root .admin-toaster,
+  .admin-root .admin-no-print {
+    display: none !important;
+  }
+
+  .admin-root .admin-print-only {
+    display: block;
+    font-size: 18px;
+    margin: 0 0 12px;
+  }
+
+  .admin-root .admin-main-inner {
+    padding: 0 !important;
+  }
+
+  .admin-root .admin-dashboard-layout,
+  .admin-root .admin-main {
+    background: #ffffff !important;
+  }
+
+  .admin-root .admin-kpi-card,
+  .admin-root .admin-settings-card,
+  .admin-root .admin-table-wrapper {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+
+  .admin-root .admin-heat-table td,
+  .admin-root .admin-mix-bar span {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

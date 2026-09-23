@@ -5,7 +5,8 @@ import { depositFor, slotTimesFor } from "../../lib/clubConfig";
 import { formatARS } from "../../lib/format";
 import { toWhatsappNumber } from "../../lib/phone";
 import { categorizeClient } from "../../lib/clientsExport";
-import { adminMoveBooking } from "./actions";
+import { adminMoveBooking, adminSettleCantinaSale } from "./actions";
+import { onAccountTotal } from "../../lib/metrics";
 import { formatDate, plural } from "../../lib/format";
 import {
   IconClose,
@@ -33,6 +34,9 @@ export default function BookingDetailModal({
   onCancel,
   onToggleTest,
   onMoved,
+  sales = [],
+  onSalesChanged,
+  onToast,
 }) {
   const [isMoving, setIsMoving] = useState(false);
   const [moveCourtId, setMoveCourtId] = useState(booking.courtId || "cancha-1");
@@ -88,6 +92,9 @@ export default function BookingDetailModal({
   const moveTimes = moveDate
     ? slotTimesFor(clubConfig, moveDate).map((s) => s.start)
     : [];
+  const accountSales = sales.filter(
+    (s) => s.method === "cuenta" && s.chargeTo === booking.id && !s.voided,
+  );
   // Seña según el % de Configuración (antes fija en $15.000).
   const deposit = depositFor(clubConfig, booking.total || 0);
 
@@ -585,6 +592,45 @@ export default function BookingDetailModal({
               {paymentSubmitting ? "Guardando..." : "Agregar cobro"}
             </button>
           </form>
+        )}
+
+        {accountSales.length > 0 && (
+          <div className="admin-account-block">
+            <div className="admin-account-head">
+              <strong>Consumos de cantina a cuenta</strong>
+              <strong>{formatARS(onAccountTotal(accountSales))}</strong>
+            </div>
+            <ul>
+              {accountSales.map((sale) => (
+                <li key={sale.id}>
+                  <span>{(sale.items || []).map((it) => `${it.qty}× ${it.name}`).join(", ")}</span>
+                  <strong>{formatARS(sale.total)}</strong>
+                  <select
+                    aria-label="Cobrar consumo con"
+                    value=""
+                    onChange={async (e) => {
+                      const how = e.target.value;
+                      if (!how) return;
+                      const res = await adminSettleCantinaSale(sale.id, how);
+                      if (res.ok) {
+                        onToast?.(`Consumo cobrado · ${formatARS(sale.total)}`);
+                        onSalesChanged?.();
+                      } else {
+                        onToast?.(res.error || "No se pudo cobrar el consumo.", { tone: "error" });
+                      }
+                    }}
+                  >
+                    <option value="">Cobrar…</option>
+                    {PAYMENT_METHODS.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
 
         {booking.status !== "cancelado" && (

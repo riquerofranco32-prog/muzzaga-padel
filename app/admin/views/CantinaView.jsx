@@ -1,54 +1,129 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ShoppingCart } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Ban,
+  Minus,
+  Plus,
+  Search,
+  ShoppingCart,
+  Trash2,
+  X,
+} from "lucide-react";
 import { EmptyState, SkeletonRows } from "../ui/states";
-import { formatARS } from "../../../lib/format";
+import {
+  formatARS,
+  formatTime,
+  normalizeSearch,
+  plural,
+} from "../../../lib/format";
 import {
   adminAddCantinaSale,
-  adminDeleteCantinaSale,
   adminGetCantinaSales,
+  adminGetTopProducts,
   adminSetTestFlag,
+  adminSettleCantinaSale,
+  adminVoidCantinaSale,
+  getAdminDayData,
 } from "../actions";
 import { MENU_CATEGORIES, MENU_ITEMS } from "../../../data/menu";
 import { todayInClub } from "../../../lib/booking";
-import { computeDailyCash } from "../../../lib/metrics";
-import { IconTrash, PAYMENT_METHODS } from "../adminHelpers";
+import {
+  computeDailyCash,
+  isCountableBooking,
+  onAccountTotal,
+} from "../../../lib/metrics";
+import { PAYMENT_METHODS } from "../adminHelpers";
+
+const ICON = { size: 16, strokeWidth: 1.75, "aria-hidden": true };
+const METHODS = [...PAYMENT_METHODS, { value: "cuenta", label: "A cuenta" }];
+const methodLabel = (m) => METHODS.find((x) => x.value === m)?.label || m;
+// Las categorías del menú público traen emoji adelante; en el admin, texto solo.
+const plainLabel = (label) => String(label || "").replace(/^[^\p{L}\p{N}]+/u, "");
+const categoryLabel = (id) =>
+  plainLabel(MENU_CATEGORIES.find((c) => c.id === id)?.label);
+
+function isTypingTarget(el) {
+  return Boolean(
+    el &&
+    (el.isContentEditable ||
+      ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName)),
+  );
+}
 
 export default function CantinaView({ onExpiredSession, onToast }) {
   const [date, setDate] = useState(todayInClub);
+  const [query, setQuery] = useState("");
   const [selectedCat, setSelectedCat] = useState("all");
-  const [cart, setCart] = useState([]); // [{name, price, qty}]
+  const [cart, setCart] = useState([]); // [{ name, price, qty }]
   const [method, setMethod] = useState("efectivo");
-  const [sales, setSales] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [chargeTo, setChargeTo] = useState("");
+  const [dayBookings, setDayBookings] = useState([]);
+  const [sales, setSales] = useState(null);
+  const [topProducts, setTopProducts] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false); // bottom sheet en mobile
+  const [voiding, setVoiding] = useState(null); // venta a anular
+  const [voidReason, setVoidReason] = useState("");
+  const searchRef = useRef(null);
 
   useEffect(() => {
     loadSales();
+    getAdminDayData(date).then((res) => {
+      if (res.ok) setDayBookings(res.bookings.filter(isCountableBooking));
+    });
   }, [date]);
 
-  async function loadSales() {
-    setLoading(true);
-    const res = await adminGetCantinaSales(date);
-    setLoading(false);
-    if (res.ok) {
-      setSales(res.sales || []);
-    } else if (onExpiredSession) {
-      onExpiredSession(res);
+  useEffect(() => {
+    searchRef.current?.focus();
+    adminGetTopProducts(8).then(
+      (res) => res.ok && setTopProducts(res.products),
+    );
+    // "/" enfoca el buscador desde cualquier lado de la vista.
+    function onKey(e) {
+      if (e.key === "/" && !isTypingTarget(e.target)) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
     }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  async function loadSales() {
+    const res = await adminGetCantinaSales(date);
+    if (res.ok) setSales(res.sales || []);
+    else onExpiredSession?.(res);
   }
 
+  const itemsByName = useMemo(
+    () => new Map(MENU_ITEMS.map((i) => [i.name, i])),
+    [],
+  );
+  const filteredItems = useMemo(() => {
+    const q = normalizeSearch(query);
+    return MENU_ITEMS.filter(
+      (item) =>
+        (selectedCat === "all" || item.category === selectedCat) &&
+        (!q || normalizeSearch(item.name).includes(q)),
+    );
+  }, [query, selectedCat]);
+  const bestSellers = topProducts
+    .map((p) => itemsByName.get(p.name))
+    .filter(Boolean);
+
+  const qtyInCart = (name) => cart.find((it) => it.name === name)?.qty || 0;
+  const cartTotal = cart.reduce((sum, it) => sum + it.price * it.qty, 0);
+  const cartCount = cart.reduce((sum, it) => sum + it.qty, 0);
+
   function addToCart(item) {
-    setCart((prev) => {
-      const existing = prev.find((it) => it.name === item.name);
-      if (existing) {
-        return prev.map((it) =>
-          it.name === item.name ? { ...it, qty: it.qty + 1 } : it,
-        );
-      }
-      return [...prev, { name: item.name, price: item.price, qty: 1 }];
-    });
+    setCart((prev) =>
+      prev.some((it) => it.name === item.name)
+        ? prev.map((it) =>
+            it.name === item.name ? { ...it, qty: it.qty + 1 } : it,
+          )
+        : [...prev, { name: item.name, price: item.price, qty: 1 }],
+    );
   }
 
   function updateQty(name, delta) {
@@ -59,258 +134,516 @@ export default function CantinaView({ onExpiredSession, onToast }) {
     );
   }
 
-  const cartTotal = cart.reduce((sum, it) => sum + it.price * it.qty, 0);
-
   async function handleSubmitSale() {
     if (cart.length === 0) return;
+    if (method === "cuenta" && !chargeTo) {
+      onToast?.("Elegí a qué turno cargar la cuenta.", { tone: "error" });
+      return;
+    }
     setSubmitting(true);
-    const res = await adminAddCantinaSale({ date, items: cart, method });
+    const res = await adminAddCantinaSale({
+      date,
+      items: cart,
+      method,
+      chargeTo: method === "cuenta" ? chargeTo : undefined,
+    });
     setSubmitting(false);
-    if (res.ok) {
-      const total = cartTotal;
-      setCart([]);
-      loadSales();
-      onToast?.(`Venta registrada · ${formatARS(total)}`, {
+    if (!res.ok) {
+      if (!onExpiredSession?.(res)) {
+        onToast?.(res.error || "No se pudo registrar la venta.", {
+          tone: "error",
+        });
+      }
+      return;
+    }
+    setCart([]);
+    setIsCartOpen(false);
+    loadSales();
+    const account = dayBookings.find((b) => b.id === chargeTo);
+    onToast?.(
+      method === "cuenta"
+        ? `Cargado a la cuenta de ${account?.playerName || "el turno"} · ${formatARS(res.total)}`
+        : `Venta registrada · ${formatARS(res.total)}`,
+      {
         action: {
           label: "Deshacer",
           onClick: async () => {
-            const undo = await adminDeleteCantinaSale(res.saleId);
+            const undo = await adminVoidCantinaSale(
+              res.saleId,
+              "Deshecha al registrar",
+            );
             if (!undo.ok) {
-              onToast?.(undo.error || "No se pudo deshacer la venta.", { tone: "error" });
+              onToast?.(undo.error || "No se pudo deshacer la venta.", {
+                tone: "error",
+              });
               return;
             }
             loadSales();
             onToast?.("Venta deshecha");
           },
         },
+      },
+    );
+    searchRef.current?.focus();
+  }
+
+  async function confirmVoid() {
+    const res = await adminVoidCantinaSale(voiding.id, voidReason);
+    if (res.ok) {
+      setVoiding(null);
+      setVoidReason("");
+      loadSales();
+      onToast?.("Venta anulada");
+    } else if (!onExpiredSession?.(res)) {
+      onToast?.(res.error || "No se pudo anular la venta.", { tone: "error" });
+    }
+  }
+
+  async function settle(sale, how) {
+    const res = await adminSettleCantinaSale(sale.id, how);
+    if (res.ok) {
+      loadSales();
+      onToast?.(
+        `Consumo cobrado · ${formatARS(sale.total)} · ${methodLabel(how)}`,
+      );
+    } else if (!onExpiredSession?.(res)) {
+      onToast?.(res.error || "No se pudo cobrar el consumo.", {
+        tone: "error",
       });
-    } else if (!onExpiredSession?.(res)) {
-      onToast?.(res.error || "No se pudo registrar la venta.", { tone: "error" });
     }
   }
 
-  async function handleDeleteSale(saleId) {
-    if (!confirm("¿Eliminar esta venta?")) return;
-    const res = await adminDeleteCantinaSale(saleId);
-    if (res.ok) {
-      loadSales();
-      onToast?.("Venta eliminada");
-    } else if (!onExpiredSession?.(res)) {
-      onToast?.(res.error || "No se pudo eliminar la venta.", { tone: "error" });
-    }
-  }
-
-  const filteredItems =
-    selectedCat === "all"
-      ? MENU_ITEMS
-      : MENU_ITEMS.filter((item) => item.category === selectedCat);
-
-  // Mismo cálculo que Caja: excluye las ventas marcadas como prueba.
-  const dayTotal = computeDailyCash({ sales }).cobradoCantina;
-  const realSalesCount = sales.filter((s) => !s.isTest).length;
-
-  async function handleToggleTest(sale) {
+  async function toggleTest(sale) {
     const res = await adminSetTestFlag("cantinaSales", sale.id, !sale.isTest);
-    if (res.ok) {
-      loadSales();
-      onToast?.(sale.isTest ? "La venta vuelve a sumar" : "Marcada como prueba · ya no suma");
-    } else if (!onExpiredSession?.(res)) {
-      onToast?.(res.error || "No se pudo actualizar la venta.", { tone: "error" });
-    }
+    if (res.ok) loadSales();
+    else
+      onToast?.(res.error || "No se pudo actualizar la venta.", {
+        tone: "error",
+      });
   }
 
-  return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-          flexWrap: "wrap",
-          gap: 12,
-        }}
+  const salesList = sales || [];
+  const dayTotal = computeDailyCash({ sales: salesList }).cobradoCantina;
+  const onAccount = onAccountTotal(salesList);
+  const activeSalesCount = salesList.filter(
+    (s) => !s.voided && !s.isTest,
+  ).length;
+  const bookingLabel = (id) => {
+    const b = dayBookings.find((x) => x.id === id);
+    return b ? `${b.startTime} · ${b.playerName}` : "turno";
+  };
+
+  // Función y no componente: así las cards no se remontan en cada toque
+  // (con un componente definido acá adentro se perdía el foco).
+  const renderProduct = (item, key) => {
+    const qty = qtyInCart(item.name);
+    return (
+      <button
+        key={key}
+        type="button"
+        className={`admin-product${qty ? " is-in-cart" : ""}`}
+        data-category={item.category}
+        onClick={() => addToCart(item)}
+        aria-label={`${item.name}, ${formatARS(item.price)}${qty ? `, ${qty} en la venta` : ""}. Agregar uno`}
       >
-        <h2 className="admin-section-title" style={{ marginBottom: 0 }}>
-          Punto de venta
-        </h2>
-        <input
-          type="date"
-          aria-label="Fecha de las ventas"
-          className="admin-input-field"
-          style={{ width: 170 }}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
+        <span className="admin-product-name">{item.name}</span>
+        <span className="admin-product-price">{formatARS(item.price)}</span>
+        {qty > 0 && <span className="admin-product-qty">{qty}</span>}
+      </button>
+    );
+  };
+
+  const cartPanel = (
+    <div className="admin-pos-cart-inner">
+      <div className="admin-pos-cart-head">
+        <h3 className="admin-section-title" style={{ margin: 0 }}>
+          Venta actual
+        </h3>
+        {cart.length > 0 && (
+          <button
+            type="button"
+            className="admin-link-btn"
+            onClick={() => setCart([])}
+          >
+            Vaciar
+          </button>
+        )}
+        <button
+          type="button"
+          className="admin-modal-close admin-pos-sheet-close"
+          onClick={() => setIsCartOpen(false)}
+          aria-label="Cerrar venta"
+        >
+          <X {...ICON} />
+        </button>
       </div>
 
-      <div className="admin-cantina-layout">
-        <div>
-          <div className="menu-filter-bar" style={{ marginBottom: 14 }}>
-            {MENU_CATEGORIES.map((cat) => (
+      {cart.length === 0 ? (
+        <p className="admin-field-hint">
+          Tocá un producto para sumarlo. Cada toque suma uno.
+        </p>
+      ) : (
+        <ul className="admin-pos-lines">
+          {cart.map((it) => (
+            <li key={it.name}>
+              <span className="admin-pos-line-name">
+                {it.name}
+                <small>{formatARS(it.price)} c/u</small>
+              </span>
+              <span className="admin-pos-qty">
+                <button
+                  type="button"
+                  onClick={() => updateQty(it.name, -1)}
+                  aria-label={`Uno menos de ${it.name}`}
+                >
+                  <Minus {...ICON} />
+                </button>
+                <strong aria-live="polite">{it.qty}</strong>
+                <button
+                  type="button"
+                  onClick={() => updateQty(it.name, 1)}
+                  aria-label={`Uno más de ${it.name}`}
+                >
+                  <Plus {...ICON} />
+                </button>
+              </span>
+              <strong className="admin-pos-line-total">
+                {formatARS(it.price * it.qty)}
+              </strong>
               <button
-                key={cat.id}
                 type="button"
-                className={`menu-filter-pill${selectedCat === cat.id ? " active" : ""}`}
-                onClick={() => setSelectedCat(cat.id)}
+                className="admin-pos-remove"
+                onClick={() => updateQty(it.name, -it.qty)}
+                aria-label={`Sacar ${it.name}`}
               >
-                {cat.label}
+                <Trash2 {...ICON} />
               </button>
-            ))}
-          </div>
+            </li>
+          ))}
+        </ul>
+      )}
 
-          <div className="admin-cantina-menu-grid">
-            {filteredItems.map((item) => (
-              <button
-                key={item.name}
-                type="button"
-                className="admin-cantina-item-btn"
-                onClick={() => addToCart(item)}
-              >
-                <span>{item.name}</span>
-                <span className="admin-cantina-item-price">
-                  {formatARS(item.price)}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
+      <div className="admin-pos-total">
+        <span>Total</span>
+        <strong>{formatARS(cartTotal)}</strong>
+      </div>
 
-        <div className="admin-cantina-cart">
-          <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>
-            Venta Actual
-          </h3>
-          {cart.length === 0 ? (
-            <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
-              Tocá un producto para agregarlo.
-            </p>
-          ) : (
-            <div style={{ marginBottom: 12 }}>
-              {cart.map((it) => (
-                <div key={it.name} className="admin-cantina-cart-line">
-                  <span>{it.name}</span>
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 6 }}
-                  >
-                    <button
-                      type="button"
-                      className="admin-mini-btn"
-                      onClick={() => updateQty(it.name, -1)}
-                    >
-                      -
-                    </button>
-                    <strong style={{ fontSize: 12 }}>{it.qty}</strong>
-                    <button
-                      type="button"
-                      className="admin-mini-btn"
-                      onClick={() => updateQty(it.name, 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              fontWeight: 700,
-              fontSize: 15,
-              marginBottom: 12,
-            }}
+      <div
+        className="admin-segmented admin-segmented-full"
+        role="group"
+        aria-label="Método de pago"
+      >
+        {METHODS.map((m) => (
+          <button
+            key={m.value}
+            type="button"
+            aria-pressed={method === m.value}
+            onClick={() => setMethod(m.value)}
           >
-            <span>Total</span>
-            <span>{formatARS(cartTotal)}</span>
-          </div>
+            {m.label}
+          </button>
+        ))}
+      </div>
 
-          <label className="admin-field-label">Método de pago</label>
+      {method === "cuenta" && (
+        <div className="admin-field" style={{ marginTop: 10 }}>
+          <label className="admin-field-label" htmlFor="pos-charge-to">
+            Cargar a la cuenta de
+          </label>
           <select
-            className="admin-modal-select"
-            style={{ width: "100%", marginBottom: 12 }}
-            value={method}
-            onChange={(e) => setMethod(e.target.value)}
+            id="pos-charge-to"
+            value={chargeTo}
+            onChange={(e) => setChargeTo(e.target.value)}
           >
-            {PAYMENT_METHODS.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
+            <option value="">Elegí un turno de hoy</option>
+            {dayBookings.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.startTime} · {b.courtName} · {b.playerName}
               </option>
             ))}
           </select>
-
-          <button
-            type="button"
-            className="btn btn-linear-primary"
-            style={{ width: "100%", height: 42, justifyContent: "center" }}
-            disabled={cart.length === 0 || submitting}
-            onClick={handleSubmitSale}
-          >
-            {submitting ? "Guardando..." : "Registrar Venta"}
-          </button>
+          {dayBookings.length === 0 && (
+            <p className="admin-field-hint">No hay turnos activos este día.</p>
+          )}
         </div>
-      </div>
+      )}
 
-      <div style={{ marginTop: 32 }}>
-        <h2 className="admin-section-title">
-          Ventas del Día ({realSalesCount}) · {formatARS(dayTotal)}
-        </h2>
-        <div
-          className={`admin-cantina-sales-list ${loading ? "admin-content-loading" : ""}`}
-        >
-          {loading && sales.length === 0 ? (
-            <SkeletonRows count={3} />
-          ) : sales.length > 0 ? (
-            sales.map((s) => (
-              <div key={s.id} className="admin-cantina-sale-row">
-                <span>
-                  {s.items.map((it) => `${it.qty}× ${it.name}`).join(", ")}
-                </span>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <strong style={{ fontFamily: "var(--font-mono)" }}>
-                    {formatARS(s.total)}
-                  </strong>
-                  <span
-                    className="badge-linear badge-emerald"
-                    style={{ fontSize: 10 }}
-                  >
-                    {PAYMENT_METHODS.find((m) => m.value === s.method)?.label ||
-                      s.method}
-                  </span>
-                  <button
-                    type="button"
-                    className={`badge-linear ${s.isTest ? "badge-amber" : ""}`}
-                    style={{ fontSize: 10, cursor: "pointer" }}
-                    onClick={() => handleToggleTest(s)}
-                    title={
-                      s.isTest
-                        ? "Dato de prueba: no suma. Tocá para contarla como venta real."
-                        : "Marcar como dato de prueba (deja de sumar en caja y reportes)"
-                    }
-                  >
-                    {s.isTest ? "PRUEBA" : "¿Prueba?"}
-                  </button>
-                  <button
-                    type="button"
-                    className="admin-table-action-btn delete"
-                    onClick={() => handleDeleteSale(s.id)}
-                    title="Eliminar venta"
-                  >
-                    <IconTrash size={12} />
-                  </button>
-                </div>
-              </div>
-            ))
+      <button
+        type="button"
+        className="btn btn-linear-primary admin-btn-block admin-btn-lg"
+        disabled={
+          cart.length === 0 || submitting || (method === "cuenta" && !chargeTo)
+        }
+        onClick={handleSubmitSale}
+      >
+        {submitting
+          ? "Guardando…"
+          : method === "cuenta"
+            ? `Cargar ${formatARS(cartTotal)} a la cuenta`
+            : `Cobrar ${formatARS(cartTotal)}`}
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="admin-pos">
+      <div className="admin-pos-catalog">
+        <div className="admin-view-toolbar">
+          <div className="admin-search-wrap admin-pos-search">
+            <Search {...ICON} />
+            <input
+              ref={searchRef}
+              type="search"
+              className="admin-search-input"
+              placeholder="Buscar producto (tecla /)"
+              aria-label="Buscar producto"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                // Enter con un solo resultado lo suma directo.
+                if (e.key === "Enter" && filteredItems.length === 1)
+                  addToCart(filteredItems[0]);
+              }}
+            />
+            {query && (
+              <button
+                type="button"
+                className="admin-search-clear"
+                onClick={() => setQuery("")}
+                aria-label="Limpiar búsqueda"
+              >
+                <X size={14} strokeWidth={1.75} aria-hidden />
+              </button>
+            )}
+          </div>
+          <input
+            type="date"
+            aria-label="Fecha de las ventas"
+            value={date}
+            max={todayInClub()}
+            onChange={(e) => e.target.value && setDate(e.target.value)}
+          />
+        </div>
+
+        <div className="admin-chips" role="group" aria-label="Categorías">
+          {MENU_CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              aria-pressed={selectedCat === cat.id}
+              onClick={() => setSelectedCat(cat.id)}
+            >
+              {plainLabel(cat.label)}
+            </button>
+          ))}
+        </div>
+
+        {!query && selectedCat === "all" && bestSellers.length > 0 && (
+          <section aria-label="Más vendidos">
+            <h3 className="admin-pos-group-title">
+              Más vendidos (últimos 30 días)
+            </h3>
+            <div className="admin-product-grid">
+              {bestSellers.map((item) => (
+                renderProduct(item, `top-${item.id}`)
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section aria-label="Productos">
+          {(query || selectedCat !== "all" || bestSellers.length > 0) && (
+            <h3 className="admin-pos-group-title">
+              {query
+                ? plural(filteredItems.length, "resultado", "resultados")
+                : selectedCat === "all"
+                  ? "Todos"
+                  : categoryLabel(selectedCat)}
+            </h3>
+          )}
+          {filteredItems.length === 0 ? (
+            <EmptyState
+              icon={Search}
+              title={`No hay productos con “${query}”`}
+              action={{
+                label: "Limpiar búsqueda",
+                onClick: () => setQuery(""),
+              }}
+            />
           ) : (
+            <div className="admin-product-grid">
+              {filteredItems.map((item) => (
+                renderProduct(item, item.id)
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* VENTAS DEL DÍA */}
+        <section style={{ marginTop: 28 }}>
+          <h2 className="admin-section-title">
+            Ventas del día · {plural(activeSalesCount, "venta", "ventas")} ·{" "}
+            {formatARS(dayTotal)}
+            {onAccount > 0 && (
+              <span className="admin-tag">A cuenta {formatARS(onAccount)}</span>
+            )}
+          </h2>
+          {!sales ? (
+            <SkeletonRows count={3} />
+          ) : salesList.length === 0 ? (
             <EmptyState
               icon={ShoppingCart}
               title="Todavía no hay ventas este día"
-              text="Tocá productos arriba para armar la venta y registrala con el método de pago."
+              text="Tocá productos para armar la venta y cobrala con el método de pago."
             />
+          ) : (
+            <ul className="admin-sales-list">
+              {salesList.map((s) => (
+                <li key={s.id} className={s.voided ? "is-voided" : undefined}>
+                  <span className="admin-sale-time">
+                    {s.createdAt ? formatTime(s.createdAt) : "—"}
+                  </span>
+                  <span className="admin-sale-items">
+                    {(s.items || [])
+                      .map((it) => `${it.qty}× ${it.name}`)
+                      .join(", ")}
+                    {s.voided && <small>Anulada: {s.voidReason}</small>}
+                    {s.method === "cuenta" && !s.voided && (
+                      <small>A cuenta de {bookingLabel(s.chargeTo)}</small>
+                    )}
+                  </span>
+                  <strong className="admin-sale-total">
+                    {formatARS(s.total)}
+                  </strong>
+                  <span className="admin-tag" data-method={s.method}>
+                    {methodLabel(s.method)}
+                  </span>
+                  <span className="admin-sale-actions">
+                    {s.method === "cuenta" && !s.voided && (
+                      <select
+                        aria-label="Cobrar consumo con"
+                        value=""
+                        onChange={(e) =>
+                          e.target.value && settle(s, e.target.value)
+                        }
+                      >
+                        <option value="">Cobrar…</option>
+                        {PAYMENT_METHODS.map((m) => (
+                          <option key={m.value} value={m.value}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    {!s.voided && (
+                      <>
+                        <button
+                          type="button"
+                          className={`admin-tag-btn${s.isTest ? " is-on" : ""}`}
+                          onClick={() => toggleTest(s)}
+                          title="Los datos de prueba no suman en caja ni reportes"
+                        >
+                          {s.isTest ? "Prueba" : "¿Prueba?"}
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-table-action-btn delete"
+                          onClick={() => setVoiding(s)}
+                          aria-label="Anular venta"
+                          title="Anular venta"
+                        >
+                          <Ban {...ICON} />
+                        </button>
+                      </>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
           )}
-        </div>
+        </section>
       </div>
+
+      {/* Carrito: panel sticky en desktop, bottom sheet en mobile */}
+      <aside
+        className={`admin-pos-cart${isCartOpen ? " is-open" : ""}`}
+        aria-label="Venta actual"
+      >
+        {cartPanel}
+      </aside>
+      <button
+        type="button"
+        className="admin-pos-cartbar"
+        onClick={() => setIsCartOpen(true)}
+        aria-label={`Ver venta actual: ${plural(cartCount, "producto", "productos")}, ${formatARS(cartTotal)}`}
+      >
+        <ShoppingCart {...ICON} />
+        <span>{plural(cartCount, "producto", "productos")}</span>
+        <strong>{formatARS(cartTotal)}</strong>
+      </button>
+
+      {voiding && (
+        <div className="admin-modal-backdrop" onClick={() => setVoiding(null)}>
+          <div
+            className="admin-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="void-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="admin-modal-head">
+              <h3 id="void-title">
+                Anular venta de {formatARS(voiding.total)}
+              </h3>
+              <button
+                type="button"
+                className="admin-modal-close"
+                onClick={() => setVoiding(null)}
+                aria-label="Cerrar"
+              >
+                <X {...ICON} />
+              </button>
+            </div>
+            <p className="admin-field-hint">
+              {(voiding.items || [])
+                .map((it) => `${it.qty}× ${it.name}`)
+                .join(", ")}
+              . La venta queda en el historial pero deja de sumar en caja.
+            </p>
+            <div className="admin-field">
+              <label className="admin-field-label" htmlFor="void-reason">
+                Motivo
+              </label>
+              <input
+                id="void-reason"
+                type="text"
+                maxLength={120}
+                placeholder="ej. Se cargó dos veces"
+                value={voidReason}
+                onChange={(e) => setVoidReason(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setVoiding(null)}
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                className="btn btn-linear-primary"
+                onClick={confirmVoid}
+                disabled={!voidReason.trim()}
+              >
+                Anular venta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

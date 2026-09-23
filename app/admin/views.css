@@ -1,0 +1,699 @@
+/* ==========================================================================
+   VISTAS (Fase 3): piezas compartidas + Caja + Cantina.
+   ========================================================================== */
+
+/* ---------- Compartido ---------- */
+.admin-root .admin-view-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-root .admin-view-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-root .admin-btn-block {
+  width: 100%;
+}
+
+.admin-root .admin-btn-lg {
+  min-height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.admin-root .admin-input-lg {
+  font-size: 20px !important;
+  min-height: 48px !important;
+  font-weight: 600;
+}
+
+.admin-root .is-negative {
+  color: var(--danger);
+}
+
+.admin-root .admin-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-root .admin-modal-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.admin-root .admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.admin-root .admin-summary-list {
+  margin: 0 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+}
+
+.admin-root .admin-summary-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-root .admin-summary-list div:last-child {
+  border-bottom: none;
+}
+
+.admin-root .admin-summary-list dt {
+  color: var(--text-muted);
+}
+
+.admin-root .admin-summary-list dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.admin-root .admin-segmented-full {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+.admin-root .admin-segmented-full button {
+  min-height: 40px;
+}
+
+.admin-root .admin-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.admin-root .admin-chips button {
+  min-height: 34px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.admin-root .admin-chips button[aria-pressed="true"] {
+  background: var(--sidebar-bg);
+  border-color: var(--sidebar-bg);
+  color: #ffffff;
+}
+
+.admin-root .admin-tag-btn {
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-root .admin-tag-btn.is-on {
+  border-style: solid;
+  background: #fdf3e2;
+  color: var(--warning);
+}
+
+.admin-root .admin-tag {
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.admin-root .admin-tag[data-method="cuenta"] {
+  background: #fdf3e2;
+  color: var(--warning);
+  border-color: #f1d29d;
+}
+
+/* ---------- Caja ---------- */
+.admin-root .admin-closed-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-card);
+  background: #e8f5ec;
+  border: 1px solid #b3dcc0;
+  color: #14612f;
+}
+
+.admin-root .admin-closed-banner > div {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-root .admin-closed-banner span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-cash-formula {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-root .admin-cash-formula > div {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.admin-root .admin-cash-formula strong {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.admin-root .admin-cash-formula > div.is-result {
+  background: var(--sidebar-bg);
+  border-color: var(--sidebar-bg);
+  color: #ffffff;
+}
+
+.admin-root .admin-cash-formula > div.is-result .admin-kpi-label {
+  color: #c7c0b4;
+}
+
+.admin-root .admin-cash-op {
+  align-self: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-cash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-root .admin-expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.admin-root .admin-expense-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-root .admin-expense-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-root .admin-expense-list li:last-child {
+  border-bottom: none;
+}
+
+.admin-root .admin-expense-list .admin-tag {
+  margin-left: 0;
+}
+
+.admin-root .admin-expense-concept {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-root .admin-expense-concept small {
+  color: var(--text-muted);
+}
+
+.admin-root [data-tone="ok"] {
+  --tone-bg: #e8f5ec;
+  --tone-border: #b3dcc0;
+  --tone-fg: #14612f;
+}
+.admin-root [data-tone="minor"] {
+  --tone-bg: #fdf3e2;
+  --tone-border: #f1d29d;
+  --tone-fg: #8a4b06;
+}
+.admin-root [data-tone="major"] {
+  --tone-bg: #fdecec;
+  --tone-border: #f5c2c2;
+  --tone-fg: #991b1b;
+}
+
+.admin-root .admin-cash-diff {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: var(--radius-control);
+  background: var(--tone-bg);
+  border: 1px solid var(--tone-border);
+  color: var(--tone-fg);
+}
+
+.admin-root .admin-cash-diff strong {
+  font-size: 18px;
+}
+
+.admin-root .admin-diff-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+}
+
+/* ---------- Cantina (POS) ---------- */
+.admin-root .admin-pos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 20px;
+  align-items: start;
+}
+
+.admin-root .admin-pos-search {
+  flex: 1 1 280px;
+}
+
+.admin-root .admin-pos-group-title {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 4px 0 8px;
+}
+
+.admin-root .admin-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.admin-root .admin-product {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 72px;
+  padding: 10px 12px 10px 14px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color 0.12s ease,
+    transform 0.06s ease;
+}
+
+/* Franja de color sutil por categoría */
+.admin-root .admin-product::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--cat, var(--border-strong));
+}
+
+.admin-root .admin-product[data-category="buffet"] {
+  --cat: #e8651a;
+}
+.admin-root .admin-product[data-category="bebidas-sin"] {
+  --cat: #0369a1;
+}
+.admin-root .admin-product[data-category="bebidas-con"] {
+  --cat: #b45309;
+}
+.admin-root .admin-product[data-category="kiosco"] {
+  --cat: #15803d;
+}
+.admin-root .admin-product[data-category="accesorios"] {
+  --cat: #6b635a;
+}
+
+.admin-root .admin-product:hover {
+  border-color: var(--text-muted);
+}
+
+.admin-root .admin-product:active {
+  transform: scale(0.98);
+}
+
+.admin-root .admin-product.is-in-cart {
+  border-color: var(--accent);
+  background: #fffaf6;
+}
+
+.admin-root .admin-product-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  padding-right: 22px;
+}
+
+.admin-root .admin-product-price {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-root .admin-product-qty {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-root .admin-pos-cart {
+  position: sticky;
+  top: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--card-pad);
+}
+
+.admin-root .admin-pos-cart-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.admin-root .admin-pos-cart-head .admin-section-title {
+  flex: 1;
+}
+
+.admin-root .admin-pos-sheet-close {
+  display: none;
+}
+
+.admin-root .admin-pos-lines {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  max-height: 44vh;
+  overflow-y: auto;
+}
+
+.admin-root .admin-pos-lines li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-root .admin-pos-line-name {
+  display: flex;
+  flex-direction: column;
+  font-size: 13.5px;
+  min-width: 0;
+}
+
+.admin-root .admin-pos-line-name small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.admin-root .admin-pos-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-root .admin-pos-qty button,
+.admin-root .admin-pos-remove {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.admin-root .admin-pos-remove {
+  border-color: transparent;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-pos-qty strong {
+  min-width: 20px;
+  text-align: center;
+}
+
+.admin-root .admin-pos-line-total {
+  font-size: 13.5px;
+  min-width: 72px;
+  text-align: right;
+}
+
+.admin-root .admin-pos-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 8px 0 12px;
+}
+
+.admin-root .admin-pos-total strong {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.admin-root .admin-pos-cart .admin-btn-lg {
+  margin-top: 12px;
+}
+
+.admin-root .admin-pos-cartbar {
+  display: none;
+}
+
+.admin-root .admin-sales-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.admin-root .admin-sales-list li {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-root .admin-sales-list li:last-child {
+  border-bottom: none;
+}
+
+.admin-root .admin-sales-list li.is-voided {
+  opacity: 0.6;
+}
+
+.admin-root .admin-sales-list li.is-voided .admin-sale-total {
+  text-decoration: line-through;
+}
+
+.admin-root .admin-sale-time {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-sale-items {
+  display: flex;
+  flex-direction: column;
+  font-size: 13.5px;
+  min-width: 0;
+}
+
+.admin-root .admin-sale-items small {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-sale-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-root .admin-sale-actions select {
+  min-height: 30px !important;
+  padding: 2px 8px !important;
+  font-size: 12.5px !important;
+}
+
+.admin-root .admin-account-block {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-control);
+  background: #fdf3e2;
+  border: 1px solid #f1d29d;
+}
+
+.admin-root .admin-account-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.admin-root .admin-account-block ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-root .admin-account-block li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+@media (max-width: 1024px) {
+  .admin-root .admin-pos {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+@media (max-width: 767px) {
+  .admin-root .admin-pos {
+    grid-template-columns: 1fr;
+    padding-bottom: 64px;
+  }
+
+  .admin-root .admin-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* El carrito pasa a bottom sheet; la barra con el total siempre visible. */
+  .admin-root .admin-pos-cart {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    z-index: 1000;
+    border-radius: 16px 16px 0 0;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform 0.22s ease;
+    box-shadow: 0 -12px 32px rgb(0 0 0 / 0.2);
+  }
+
+  .admin-root .admin-pos-cart.is-open {
+    transform: translateY(0);
+  }
+
+  .admin-root .admin-pos-sheet-close {
+    display: grid;
+  }
+
+  .admin-root .admin-pos-cartbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: fixed;
+    left: 16px;
+    right: 88px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    z-index: 905;
+    min-height: 52px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 999px;
+    background: var(--sidebar-bg);
+    color: #ffffff;
+    font-size: 14px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.25);
+    cursor: pointer;
+  }
+
+  .admin-root .admin-pos-cartbar strong {
+    margin-left: auto;
+    font-size: 16px;
+  }
+
+  .admin-root .admin-sales-list li {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+  }
+
+  .admin-root .admin-sales-list .admin-sale-actions,
+  .admin-root .admin-sales-list li > .admin-tag {
+    grid-column: 2 / -1;
+  }
+
+  .admin-root .admin-cash-op {
+    display: none;
+  }
+
+  .admin-root .admin-cash-formula > div {
+    flex-basis: calc(50% - 4px);
+  }
+}

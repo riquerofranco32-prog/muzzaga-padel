@@ -17,14 +17,26 @@ import {
 } from "../../lib/clubConfig";
 import { getClubConfig, setCachedClubConfig } from "../../lib/clubConfigServer";
 import {
+  bookingTotal,
   buildDailySummaries,
   computeDailyCash,
   dayOccupancy,
   isCountableBooking,
+  isTestRecord,
+  paidAmount,
   periodOccupancy,
   sumSummaries,
   summarizeRecords,
 } from "../../lib/metrics";
+import { clientKey } from "../../lib/clientsExport";
+import {
+  datesBetween,
+  occupancyHeatmap,
+  paymentMix,
+  previousPeriod,
+  topClients,
+  topProducts,
+} from "../../lib/reports";
 import {
   createAdminSession,
   destroyAdminSession,
@@ -121,6 +133,7 @@ export async function getAdminDayData(isoDate) {
   if (denied) return denied;
 
   const date = isoDate || todayInClub();
+  if (!ISO_DATE.test(date)) return { ok: false, error: "Fecha inválida." };
   const config = await getClubConfig();
   const slotTimes = slotTimesFor(config, date);
 
@@ -179,6 +192,7 @@ export async function getAdminDayData(isoDate) {
     date,
     courts: config.courts,
     slots,
+    sales: records.sales,
     bookings: records.bookings.sort((a, b) =>
       a.startTime > b.startTime ? 1 : -1,
     ),
@@ -399,10 +413,11 @@ export async function adminGetWeekStats() {
   }
 }
 
+const CLIENT_KEY = /^(t\d{1,10}|n-[a-z0-9-]{1,80})$/;
+
 /**
- * Listado de clientes derivado de las reservas ya guardadas (agrupadas por
- * teléfono). No agrega una colección nueva: reutiliza `bookings`, que es la
- * única fuente de verdad que ya existe.
+ * Listado de clientes derivado de las reservas (agrupadas por teléfono).
+ * No es una colección nueva: `bookings` sigue siendo la fuente de verdad.
  */
 export async function adminGetClients() {
   const denied = await requireAdmin();
@@ -411,25 +426,36 @@ export async function adminGetClients() {
   if (!isFirebaseConfigured()) return { ok: true, clients: [] };
 
   try {
-    const db = getDb();
-    const snap = await db.ref("bookings").get();
+    const snap = await getDb().ref("bookings").get();
     const byKey = new Map();
 
-    if (snap.exists()) {
-      Object.values(snap.val()).forEach((b) => {
-        if (!isCountableBooking(b)) return;
-        const phone = (b.playerPhone || "").trim();
-        const name = (b.playerName || "Sin nombre").trim();
-        const key = phone || `sin-tel:${name.toLowerCase()}`;
-        const existing = byKey.get(key);
-        if (existing) {
-          existing.count += 1;
-          if ((b.date || "") > existing.lastDate) existing.lastDate = b.date;
-        } else {
-          byKey.set(key, { name, phone, count: 1, lastDate: b.date || "" });
+    snapToList(snap).forEach((b) => {
+      if (!isCountableBooking(b)) return;
+      const phone = (b.playerPhone || "").trim();
+      const name = (b.playerName || "Sin nombre").trim();
+      const key = clientKey(phone, name);
+      const date = b.date || "";
+      const existing = byKey.get(key);
+      if (existing) {
+        existing.count += 1;
+        existing.totalSpent += bookingTotal(b);
+        if (date > existing.lastDate) {
+          existing.lastDate = date;
+          existing.name = name; // el nombre más reciente
         }
-      });
-    }
+        if (date && (!existing.firstDate || date < existing.firstDate)) existing.firstDate = date;
+      } else {
+        byKey.set(key, {
+          key,
+          name,
+          phone,
+          count: 1,
+          totalSpent: bookingTotal(b),
+          lastDate: date,
+          firstDate: date,
+        });
+      }
+    });
 
     const clients = Array.from(byKey.values()).sort(
       (a, b) => b.count - a.count || a.name.localeCompare(b.name),
@@ -437,6 +463,71 @@ export async function adminGetClients() {
     return { ok: true, clients };
   } catch (error) {
     return { ok: false, error: "No se pudo cargar el listado de clientes." };
+  }
+}
+
+/** Historial de reservas, consumo en cantina y notas de un cliente. */
+export async function adminGetClientDetail(key) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!CLIENT_KEY.test(key || "")) return { ok: false, error: "Cliente inválido." };
+  if (!isFirebaseConfigured()) return { ok: true, bookings: [], cantina: [], note: "" };
+
+  try {
+    const db = getDb();
+    const [bookingsSnap, noteSnap] = await Promise.all([
+      db.ref("bookings").get(),
+      db.ref(`clientNotes/${key}`).once("value"),
+    ]);
+    const bookings = snapToList(bookingsSnap)
+      .filter((b) => !isTestRecord(b))
+      .filter((b) => clientKey(b.playerPhone, b.playerName) === key)
+      .map((b) => ({
+        id: b.id,
+        date: b.date,
+        startTime: b.startTime,
+        courtName: b.courtName,
+        status: b.status,
+        total: bookingTotal(b),
+        paid: paidAmount(b),
+      }))
+      .sort((a, b) => (a.date + a.startTime < b.date + b.startTime ? 1 : -1));
+
+    // Consumo en cantina: ventas cargadas a la cuenta de alguno de sus turnos.
+    const ids = new Set(bookings.map((b) => b.id));
+    const dates = bookings.map((b) => b.date).filter(Boolean).sort();
+    const cantina = dates.length
+      ? (await loadByDateRange(db, "cantinaSales", dates[0], dates[dates.length - 1]))
+          .filter((sale) => sale.chargeTo && ids.has(sale.chargeTo) && !sale.voided)
+          .map((sale) => ({
+            id: sale.id,
+            date: sale.date,
+            total: Number(sale.total) || 0,
+            items: sale.items || [],
+            settled: sale.method !== "cuenta",
+          }))
+      : [];
+
+    return { ok: true, bookings, cantina, note: noteSnap.val()?.text || "" };
+  } catch (error) {
+    return { ok: false, error: "No se pudo cargar el historial del cliente." };
+  }
+}
+
+export async function adminSaveClientNote(key, text) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!CLIENT_KEY.test(key || "")) return { ok: false, error: "Cliente inválido." };
+  const note = String(text || "").trim().slice(0, 1000);
+  try {
+    await getDb()
+      .ref(`clientNotes/${key}`)
+      .set(note ? { text: note, updatedAt: Date.now() } : null);
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo guardar la nota." };
   }
 }
 
@@ -459,7 +550,13 @@ async function loadRangeSummaries(dates) {
   }
   return buildDailySummaries(dates, bookings, sales).map((d) => {
     const totalSlots = slotTimesFor(config, d.date).length * config.courts.length;
-    const withSlots = { ...d, totalSlots, closed: totalSlots === 0 };
+    const closed = totalSlots === 0;
+    const closedReason = !closed
+      ? null
+      : config.blockedDates.includes(d.date)
+        ? "Día bloqueado en Configuración"
+        : "Cerrado por horario";
+    const withSlots = { ...d, totalSlots, closed, closedReason };
     return { ...withSlots, ocupacionPct: dayOccupancy(withSlots) };
   });
 }
@@ -512,40 +609,126 @@ export async function adminGetRangeStats(fromIso, count = 14) {
   }
 }
 
-const CANTINA_PAYMENT_METHODS = ["efectivo", "transferencia", "mercadopago"];
+const MAX_REPORT_DAYS = 366;
 
-/** Registra una venta de cantina (walk-in, no ligada a un turno). */
-export async function adminAddCantinaSale({ date, items, method, notes }) {
+/**
+ * Reporte de un período arbitrario: totales vs. el período anterior del
+ * mismo largo, serie diaria, heatmap día × hora, mix de pagos, top productos
+ * y top clientes. Una sola lectura por colección.
+ */
+export async function adminGetReport(from, to) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!ISO_DATE.test(from || "") || !ISO_DATE.test(to || "") || from > to) {
+    return { ok: false, error: "Elegí un período válido." };
+  }
+  const dates = datesBetween(from, to);
+  if (dates.length > MAX_REPORT_DAYS) {
+    return { ok: false, error: "El período puede tener hasta un año." };
+  }
+  const prev = previousPeriod(from, to);
+  const prevDates = datesBetween(prev.from, prev.to);
+
+  try {
+    const config = await getClubConfig();
+    let bookings = [];
+    let sales = [];
+    if (isFirebaseConfigured()) {
+      const db = getDb();
+      [bookings, sales] = await Promise.all([
+        loadByDateRange(db, "bookings", prev.from, to),
+        loadByDateRange(db, "cantinaSales", prev.from, to),
+      ]);
+    }
+    const inRange = (list, a, b) => list.filter((r) => r.date >= a && r.date <= b);
+    const cur = { bookings: inRange(bookings, from, to), sales: inRange(sales, from, to) };
+    const old = { bookings: inRange(bookings, prev.from, prev.to), sales: inRange(sales, prev.from, prev.to) };
+
+    const withSlots = (list) =>
+      list.map((d) => {
+        const totalSlots = slotTimesFor(config, d.date).length * config.courts.length;
+        const day = { ...d, totalSlots };
+        return { ...day, ocupacionPct: dayOccupancy(day) };
+      });
+    const days = withSlots(buildDailySummaries(dates, cur.bookings, cur.sales));
+    const prevDays = withSlots(buildDailySummaries(prevDates, old.bookings, old.sales));
+    const today = todayInClub();
+
+    return {
+      ok: true,
+      from,
+      to,
+      previous: prev,
+      days,
+      totals: { ...sumSummaries(days), ocupacionPct: periodOccupancy(days, today) },
+      previousTotals: { ...sumSummaries(prevDays), ocupacionPct: periodOccupancy(prevDays, today) },
+      heatmap: occupancyHeatmap(config, dates.filter((d) => d <= today), cur.bookings),
+      paymentMix: paymentMix(cur.bookings, cur.sales),
+      topProducts: topProducts(cur.sales),
+      topClients: topClients(cur.bookings),
+    };
+  } catch (error) {
+    return { ok: false, error: "No se pudo armar el reporte." };
+  }
+}
+
+const CANTINA_PAYMENT_METHODS = ["efectivo", "transferencia", "mercadopago"];
+const TOP_PRODUCTS_DAYS = 30;
+
+/**
+ * Registra una venta de cantina. `method: "cuenta"` + `chargeTo` la carga a
+ * la cuenta de un turno: no entra a la caja hasta que se cobra.
+ */
+export async function adminAddCantinaSale({ date, items, method, notes, chargeTo }) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   if (!Array.isArray(items) || items.length === 0) {
     return { ok: false, error: "Agregá al menos un producto a la venta." };
   }
+  const saleDate = date || todayInClub();
+  if (!ISO_DATE.test(saleDate)) return { ok: false, error: "Fecha inválida." };
   if (!isFirebaseConfigured()) {
     return { ok: false, error: "Firebase no está configurado." };
   }
 
-  const total = items.reduce(
-    (sum, it) => sum + (Number(it.price) || 0) * (Number(it.qty) || 1),
-    0,
-  );
+  const cleanItems = items
+    .map((it) => ({
+      name: String(it.name || "").slice(0, 80),
+      price: Number(it.price) || 0,
+      qty: Math.max(1, Math.round(Number(it.qty) || 1)),
+    }))
+    .filter((it) => it.name && it.price > 0);
+  const total = cleanItems.reduce((sum, it) => sum + it.price * it.qty, 0);
   if (total <= 0) {
     return { ok: false, error: "El total de la venta debe ser mayor a cero." };
   }
 
   try {
     const db = getDb();
+    const isOnAccount = method === "cuenta";
+    if (isOnAccount) {
+      const booking = chargeTo ? (await db.ref(`bookings/${chargeTo}`).once("value")).val() : null;
+      if (!booking || booking.status === "cancelado") {
+        return { ok: false, error: "Elegí un turno activo para cargar la cuenta." };
+      }
+    }
     const ref = db.ref("cantinaSales").push();
     await ref.set({
-      date: date || todayInClub(),
-      items,
+      date: saleDate,
+      items: cleanItems,
       total,
-      method: CANTINA_PAYMENT_METHODS.includes(method) ? method : "efectivo",
+      method: isOnAccount
+        ? "cuenta"
+        : CANTINA_PAYMENT_METHODS.includes(method)
+          ? method
+          : "efectivo",
+      ...(isOnAccount ? { chargeTo } : {}),
       notes: (notes || "").trim(),
       createdAt: Date.now(),
     });
-    return { ok: true, saleId: ref.key };
+    return { ok: true, saleId: ref.key, total };
   } catch (error) {
     return { ok: false, error: "No se pudo registrar la venta." };
   }
@@ -556,16 +739,13 @@ export async function adminGetCantinaSales(date) {
   if (denied) return denied;
 
   if (!isFirebaseConfigured()) return { ok: true, sales: [] };
+  if (date && !ISO_DATE.test(date)) return { ok: false, error: "Fecha inválida." };
 
   try {
     const db = getDb();
-    const snap = await db.ref("cantinaSales").get();
-    const sales = [];
-    if (snap.exists()) {
-      Object.entries(snap.val()).forEach(([id, s]) => {
-        if (!date || s.date === date) sales.push({ id, ...s });
-      });
-    }
+    const sales = date
+      ? await loadByDateRange(db, "cantinaSales", date, date)
+      : snapToList(await db.ref("cantinaSales").once("value"));
     sales.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     return { ok: true, sales };
   } catch (error) {
@@ -576,17 +756,80 @@ export async function adminGetCantinaSales(date) {
   }
 }
 
-export async function adminDeleteCantinaSale(saleId) {
+/** Anula una venta con motivo: queda en el historial pero deja de sumar. */
+export async function adminVoidCantinaSale(saleId, reason) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!saleId) return { ok: false, error: "ID de venta inválido." };
+  const why = (reason || "").trim();
+  if (!saleId) return { ok: false, error: "Venta inválida." };
+  if (!why) return { ok: false, error: "Indicá el motivo de la anulación." };
   try {
-    const db = getDb();
-    await db.ref(`cantinaSales/${saleId}`).remove();
+    const ref = getDb().ref(`cantinaSales/${saleId}`);
+    // RTDB llama primero con el valor en caché (null si no hay): devolver
+    // null hace que reintente con el valor real del server en vez de abortar.
+    const result = await ref.transaction((sale) => {
+      if (sale === null) return null;
+      if (sale.voided) return; // ya anulada: aborta
+      return { ...sale, voided: true, voidReason: why.slice(0, 120), voidedAt: Date.now() };
+    });
+    if (!result.committed) return { ok: false, error: "Esa venta ya estaba anulada." };
+    if (!result.snapshot.exists()) return { ok: false, error: "Esa venta no existe." };
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: "No se pudo eliminar la venta." };
+    return { ok: false, error: "No se pudo anular la venta." };
+  }
+}
+
+/** Cobra un consumo que estaba a cuenta de un turno. */
+export async function adminSettleCantinaSale(saleId, method) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!saleId || !CANTINA_PAYMENT_METHODS.includes(method)) {
+    return { ok: false, error: "Elegí cómo se cobró." };
+  }
+  try {
+    const ref = getDb().ref(`cantinaSales/${saleId}`);
+    const result = await ref.transaction((sale) => {
+      if (sale === null) return null; // ver adminVoidCantinaSale
+      if (sale.voided || sale.method !== "cuenta") return;
+      return { ...sale, method, settledAt: Date.now() };
+    });
+    if (!result.committed || !result.snapshot.exists()) {
+      return { ok: false, error: "Ese consumo ya no está a cuenta." };
+    }
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo cobrar el consumo." };
+  }
+}
+
+/** Productos más vendidos de los últimos días, para la fila de accesos rápidos. */
+export async function adminGetTopProducts(limit = 8) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) return { ok: true, products: [] };
+  try {
+    const to = todayInClub();
+    const from = isoAddDays(to, -TOP_PRODUCTS_DAYS);
+    const sales = await loadByDateRange(getDb(), "cantinaSales", from, to);
+    const qtyByName = new Map();
+    sales
+      .filter((sale) => !sale.voided && !sale.isTest)
+      .forEach((sale) =>
+        (sale.items || []).forEach((it) =>
+          qtyByName.set(it.name, (qtyByName.get(it.name) || 0) + (Number(it.qty) || 1)),
+        ),
+      );
+    const products = [...qtyByName.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, Math.min(20, Number(limit) || 8))
+      .map(([name, qty]) => ({ name, qty }));
+    return { ok: true, products };
+  } catch (error) {
+    return { ok: false, error: "No se pudieron calcular los más vendidos." };
   }
 }
 
@@ -781,10 +1024,19 @@ export async function adminSaveClubConfig(input) {
    CAJA DIARIA, EGRESOS Y ARQUEO / CIERRE Z (FASE 2)
    ========================================================================== */
 
-export async function adminAddCashExpense({ date, concept, amount, notes }) {
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const EXPENSE_CATEGORIES = ["hielo", "limpieza", "mantenimiento", "otros"];
+
+async function isCashClosed(db, date) {
+  const snap = await db.ref(`dailyCashSessions/${date}/closed`).once("value");
+  return snap.val() === true;
+}
+
+export async function adminAddCashExpense({ date, concept, amount, notes, category }) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
+  if (!ISO_DATE.test(date || "")) return { ok: false, error: "Fecha inválida." };
   const numericAmount = Number(amount);
   if (!concept?.trim() || !numericAmount || numericAmount <= 0) {
     return { ok: false, error: "Ingresá un concepto y un monto válido." };
@@ -796,9 +1048,13 @@ export async function adminAddCashExpense({ date, concept, amount, notes }) {
 
   try {
     const db = getDb();
+    if (await isCashClosed(db, date)) {
+      return { ok: false, error: "La caja de ese día ya está cerrada." };
+    }
     const ref = db.ref(`cashExpenses/${date}`).push();
     await ref.set({
       concept: concept.trim(),
+      category: EXPENSE_CATEGORIES.includes(category) ? category : "otros",
       amount: numericAmount,
       notes: (notes || "").trim(),
       createdAt: Date.now(),
@@ -814,6 +1070,7 @@ export async function adminGetDailyCashSummary(isoDate) {
   if (denied) return denied;
 
   const date = isoDate || todayInClub();
+  if (!ISO_DATE.test(date)) return { ok: false, error: "Fecha inválida." };
   let records = { bookings: [], sales: [], expenses: [], session: null };
 
   if (isFirebaseConfigured()) {
@@ -845,6 +1102,7 @@ export async function adminGetDailyCashSummary(isoDate) {
       actualCash: session?.actualCash ?? null,
       difference: session?.difference ?? null,
       notes: session?.notes || null,
+      closedBy: session?.closedBy || null,
     },
   };
 }
@@ -872,9 +1130,17 @@ export async function adminSetTestFlag(collection, id, isTest) {
   }
 }
 
-export async function adminCloseDailyCash({ date, actualCash, notes }) {
+export async function adminCloseDailyCash({ date, actualCash, notes, closedBy }) {
   const denied = await requireAdmin();
   if (denied) return denied;
+
+  if (!ISO_DATE.test(date || "")) return { ok: false, error: "Fecha inválida." };
+  const who = (closedBy || "").trim();
+  if (!who) return { ok: false, error: "Indicá quién cierra la caja." };
+  const actual = Number(actualCash);
+  if (!Number.isFinite(actual) || actual < 0) {
+    return { ok: false, error: "Ingresá el efectivo contado." };
+  }
 
   if (!isFirebaseConfigured()) {
     return { ok: false, error: "Firebase no está configurado." };
@@ -885,22 +1151,49 @@ export async function adminCloseDailyCash({ date, actualCash, notes }) {
     if (!summaryRes.ok) return summaryRes;
 
     const expectedCash = summaryRes.summary.expectedCash;
-    const actual = Number(actualCash) || 0;
     const difference = actual - expectedCash;
-
-    const db = getDb();
-    await db.ref(`dailyCashSessions/${date}`).set({
+    const session = {
       closed: true,
       closedAt: Date.now(),
+      closedBy: who.slice(0, 40),
       expectedCash,
       actualCash: actual,
       difference,
       notes: (notes || "").trim(),
-    });
+    };
 
+    // Transacción: dos personas cerrando a la vez no pisan un cierre ya hecho.
+    const result = await getDb()
+      .ref(`dailyCashSessions/${date}`)
+      .transaction((current) => (current?.closed ? undefined : session));
+    if (!result.committed) {
+      return { ok: false, error: "Esa caja ya se cerró. Recargá para ver el cierre." };
+    }
     return { ok: true, difference };
   } catch (err) {
     return { ok: false, error: "No se pudo cerrar la caja." };
+  }
+}
+
+/** Últimos cierres de caja, del más nuevo al más viejo. */
+export async function adminGetCashHistory(limit = 30) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) return { ok: true, sessions: [] };
+  try {
+    const snap = await getDb()
+      .ref("dailyCashSessions")
+      .orderByKey()
+      .limitToLast(Math.min(120, Math.max(1, Number(limit) || 30)))
+      .once("value");
+    const sessions = snapToList(snap)
+      .filter((x) => x.closed)
+      .map(({ id, ...x }) => ({ date: id, ...x }))
+      .sort((a, b) => (a.date < b.date ? 1 : -1));
+    return { ok: true, sessions };
+  } catch (err) {
+    return { ok: false, error: "No se pudo cargar el historial de cierres." };
   }
 }
 

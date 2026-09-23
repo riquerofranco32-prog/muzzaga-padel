@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Skeleton } from "../ui/states";
-import { formatARS, formatPct, plural } from "../../../lib/format";
 import { adminGetMonthStats } from "../actions";
 import { todayInClub } from "../../../lib/booking";
+import { formatARS, formatDate, formatPct, plural } from "../../../lib/format";
+import { Skeleton } from "../ui/states";
 
 const MONTH_NAMES = [
   "Enero",
@@ -21,7 +21,19 @@ const MONTH_NAMES = [
   "Noviembre",
   "Diciembre",
 ];
-const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+// Semana de lunes a domingo, como la piensa el club.
+const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
+/** Nivel de intensidad del heatmap (0 = sin turnos … 4 = casi lleno). */
+function heatLevel(pct) {
+  if (!pct) return 0;
+  if (pct < 25) return 1;
+  if (pct < 50) return 2;
+  if (pct < 75) return 3;
+  return 4;
+}
+
+const shortK = (n) => (n >= 1000 ? `$${Math.round(n / 1000)}k` : formatARS(n));
 
 export default function CalendarioView({ onSelectDate, onExpiredSession }) {
   const todayIso = todayInClub();
@@ -36,11 +48,8 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
     adminGetMonthStats(year, month).then((res) => {
       if (cancelled) return;
       setLoading(false);
-      if (res.ok) {
-        setMonthStats(res);
-      } else if (onExpiredSession) {
-        onExpiredSession(res);
-      }
+      if (res.ok) setMonthStats(res);
+      else onExpiredSession?.(res);
     });
     return () => {
       cancelled = true;
@@ -48,121 +57,148 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
   }, [year, month]);
 
   function changeMonth(delta) {
-    let m = month + delta;
-    let y = year;
-    if (m > 12) {
-      m = 1;
-      y += 1;
-    } else if (m < 1) {
-      m = 12;
-      y -= 1;
-    }
-    setMonth(m);
-    setYear(y);
+    const index = year * 12 + (month - 1) + delta;
+    setYear(Math.floor(index / 12));
+    setMonth((index % 12) + 1);
   }
 
-  const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
-  const leadingBlanks = Array.from({ length: firstWeekday });
+  const isCurrentMonth =
+    year === Number(todayIso.slice(0, 4)) &&
+    month === Number(todayIso.slice(5, 7));
+  // Lunes = 0 … domingo = 6
+  const firstWeekday =
+    (new Date(Date.UTC(year, month - 1, 1)).getUTCDay() + 6) % 7;
+  const days = monthStats?.days || [];
+
+  const describe = (d) =>
+    d.closed
+      ? d.closedReason
+      : `${plural(d.turnos, "turno", "turnos")} · ${formatPct(d.ocupacionPct ?? 0)} ocupado · ${formatARS(d.cobrado)} cobrado`;
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
-        <h2 className="admin-section-title" style={{ marginBottom: 0 }}>
-          Calendario de Ocupación
-        </h2>
+      <div className="admin-view-toolbar">
         <div className="admin-calendar-nav">
           <button
             type="button"
             className="btn btn-secondary"
-            style={{ height: 32, padding: "0 10px" }}
             onClick={() => changeMonth(-1)}
             aria-label="Mes anterior"
           >
             <ChevronLeft size={18} strokeWidth={1.75} aria-hidden />
           </button>
-          <strong>
+          <strong aria-live="polite">
             {MONTH_NAMES[month - 1]} {year}
           </strong>
           <button
             type="button"
             className="btn btn-secondary"
-            style={{ height: 32, padding: "0 10px" }}
             onClick={() => changeMonth(1)}
             aria-label="Mes siguiente"
           >
             <ChevronRight size={18} strokeWidth={1.75} aria-hidden />
           </button>
+          {!isCurrentMonth && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setYear(Number(todayIso.slice(0, 4)));
+                setMonth(Number(todayIso.slice(5, 7)));
+              }}
+            >
+              Hoy
+            </button>
+          )}
         </div>
+        {monthStats && (
+          <span className="admin-field-hint">
+            {plural(monthStats.totals.turnos, "turno", "turnos")} ·{" "}
+            {formatARS(monthStats.totals.cobrado)} cobrado ·{" "}
+            {formatPct(monthStats.ocupacionPct)} de ocupación
+          </span>
+        )}
       </div>
 
-      <div className={loading ? "admin-content-loading" : ""}>
-        <div className="admin-calendar-grid">
+      <div className={loading && monthStats ? "admin-content-loading" : ""}>
+        {/* Desktop / tablet: heatmap mensual */}
+        <div
+          className="admin-heatmap"
+          role="grid"
+          aria-label={`Ocupación de ${MONTH_NAMES[month - 1]}`}
+        >
           {WEEKDAYS.map((w) => (
-            <div key={w} className="admin-calendar-weekday">
+            <div key={w} className="admin-heatmap-weekday" role="columnheader">
               {w}
             </div>
           ))}
-
-          {leadingBlanks.map((_, i) => (
-            <div key={`blank-${i}`} className="admin-calendar-cell is-empty" />
+          {Array.from({ length: firstWeekday }, (_, i) => (
+            <div key={`blank-${i}`} aria-hidden />
           ))}
-
           {!monthStats &&
             Array.from({ length: 30 }, (_, i) => (
-              <Skeleton key={`sk-${i}`} height={72} radius={8} />
+              <Skeleton key={`sk-${i}`} height={76} radius={8} />
             ))}
-
-          {monthStats?.days.map((d) => {
-            const isClosed = d.totalSlots === 0;
-            const ocupacionPct = d.ocupacionPct ?? 0;
-            return (
-              <div
-                key={d.date}
-                className={`admin-calendar-cell${d.date === todayIso ? " is-today" : ""}${isClosed ? " is-closed" : ""}`}
-                style={
-                  !isClosed && ocupacionPct > 0
-                    ? {
-                        background: `rgba(232, 114, 42, ${Math.min(0.55, 0.08 + ocupacionPct / 180)})`,
-                      }
-                    : undefined
-                }
-                onClick={() => !isClosed && onSelectDate(d.date)}
-                title={
-                  isClosed
-                    ? "Cerrado"
-                    : `${plural(d.turnos, "turno", "turnos")} · ${formatARS(d.cobrado)} cobrado · ${formatPct(d.ocupacionPct)} ocupación`
-                }
-              >
-                <span className="admin-calendar-daynum">{d.day}</span>
-                {!isClosed && (
-                  <span className="admin-calendar-stat">
-                    {d.turnos > 0 ? `${d.turnos} · ${formatPct(d.ocupacionPct)}` : "-"}
+          {days.map((d) => (
+            <button
+              key={d.date}
+              type="button"
+              role="gridcell"
+              className={`admin-heat-cell${d.date === todayIso ? " is-today" : ""}`}
+              data-heat={d.closed ? "closed" : heatLevel(d.ocupacionPct)}
+              disabled={d.closed}
+              title={describe(d)}
+              aria-label={`${formatDate(d.date, "long")}: ${describe(d)}`}
+              onClick={() => onSelectDate(d.date)}
+            >
+              <span className="admin-heat-day">{d.day}</span>
+              {d.closed ? (
+                <span className="admin-heat-closed">Cerrado</span>
+              ) : (
+                <>
+                  <span className="admin-heat-pct">
+                    {d.turnos > 0 ? formatPct(d.ocupacionPct) : "—"}
                   </span>
-                )}
-              </div>
-            );
-          })}
+                  {(d.turnos > 0 || d.cobrado > 0) && (
+                    <span className="admin-heat-meta">
+                      {d.turnos}t · {shortK(d.cobrado)}
+                    </span>
+                  )}
+                </>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Mobile: lista de días */}
+        <ul className="admin-calendar-list">
+          {days.map((d) => (
+            <li key={d.date}>
+              <button
+                type="button"
+                className={d.date === todayIso ? "is-today" : undefined}
+                data-heat={d.closed ? "closed" : heatLevel(d.ocupacionPct)}
+                disabled={d.closed}
+                onClick={() => onSelectDate(d.date)}
+              >
+                <span className="admin-heat-swatch" aria-hidden />
+                <strong>{formatDate(d.date, "long")}</strong>
+                <span className="admin-cell-sub">{describe(d)}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <div className="admin-heat-legend" aria-hidden>
+          <span>Menos</span>
+          {[0, 1, 2, 3, 4].map((l) => (
+            <span key={l} className="admin-heat-swatch" data-heat={l} />
+          ))}
+          <span>Más ocupado</span>
+          <span className="admin-heat-swatch" data-heat="closed" />{" "}
+          <span>Cerrado</span>
         </div>
       </div>
-
-      {monthStats && (
-        <div
-          style={{ marginTop: 20, fontSize: 13, color: "var(--text-muted)" }}
-        >
-          Total del mes: <strong>{plural(monthStats.totals.turnos, "turno", "turnos")}</strong> ·{" "}
-          <strong>{formatARS(monthStats.totals.cobrado)}</strong>{" "}
-          recaudados. Tocá un día para ver su agenda.
-        </div>
-      )}
     </div>
   );
 }

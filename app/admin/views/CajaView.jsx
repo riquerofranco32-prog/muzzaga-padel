@@ -1,48 +1,89 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  ArrowDownRight,
-  Banknote,
-  CreditCard,
-  Landmark,
-  Lock,
-  Receipt,
-  Scale,
-} from "lucide-react";
-import { EmptyState, SkeletonCards } from "../ui/states";
-import { formatARS, formatTime, plural } from "../../../lib/format";
+import { Download, Lock, Receipt, Scale, Send, X } from "lucide-react";
+import { EmptyState, SkeletonCards, SkeletonRows } from "../ui/states";
+import { formatARS, formatDate, formatTime, plural } from "../../../lib/format";
+import { cashDiffTone } from "../../../lib/metrics";
 import {
   adminAddCashExpense,
   adminCloseDailyCash,
+  adminGetCashHistory,
   adminGetDailyCashSummary,
 } from "../actions";
 import { todayInClub } from "../../../lib/booking";
 import { CLUB_INFO } from "../../../data/club";
 
-const LABEL_ICON = { size: 14, strokeWidth: 1.75, "aria-hidden": true };
-const TITLE_ICON = { size: 18, strokeWidth: 1.75, "aria-hidden": true };
+const ICON = { size: 18, strokeWidth: 1.75, "aria-hidden": true };
+const CATEGORIES = [
+  { id: "hielo", label: "Hielo" },
+  { id: "limpieza", label: "Limpieza" },
+  { id: "mantenimiento", label: "Mantenimiento" },
+  { id: "otros", label: "Otros" },
+];
+const categoryLabel = (id) =>
+  CATEGORIES.find((c) => c.id === id)?.label || "Otros";
+const DIFF_TEXT = {
+  ok: "Cuadra exacto",
+  minor: "Diferencia chica",
+  major: "Diferencia grande: revisá antes de cerrar",
+};
+const CLOSED_BY_KEY = "muzzaga_admin_closed_by";
+
+function diffLabel(diff) {
+  if (!diff) return "$0";
+  return `${formatARS(diff, { signed: true })} ${diff > 0 ? "sobrante" : "faltante"}`;
+}
+
+function downloadCsv(filename, rows) {
+  const csv = rows
+    .map((r) =>
+      r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";"),
+    )
+    .join("\r\n");
+  const url = URL.createObjectURL(
+    new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8" }),
+  );
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function CajaView({ initialDate, onExpiredSession, onToast }) {
   const [date, setDate] = useState(() => initialDate || todayInClub());
   const [summary, setSummary] = useState(null);
+  const [history, setHistory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
-  // Formulario de egreso
-  const [concept, setConcept] = useState("");
-  const [amount, setAmount] = useState("");
-  const [expenseNotes, setExpenseNotes] = useState("");
+  const [expense, setExpense] = useState({
+    category: "hielo",
+    concept: "",
+    amount: "",
+    notes: "",
+  });
   const [addingExpense, setAddingExpense] = useState(false);
 
-  // Arqueo / Cierre
-  const [actualCashInput, setActualCashInput] = useState("");
+  const [counted, setCounted] = useState("");
   const [closingNotes, setClosingNotes] = useState("");
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [closedBy, setClosedBy] = useState("");
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     loadSummary();
   }, [date]);
+
+  useEffect(() => {
+    loadHistory();
+    try {
+      setClosedBy(localStorage.getItem(CLOSED_BY_KEY) || "");
+    } catch {
+      // Almacenamiento bloqueado: se tipea cada vez.
+    }
+  }, []);
 
   async function loadSummary() {
     setLoading(true);
@@ -51,687 +92,547 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
     setLoading(false);
     if (res.ok) {
       setSummary(res.summary);
-      if (res.summary.actualCash != null) {
-        setActualCashInput(String(res.summary.actualCash));
-      } else {
-        setActualCashInput("");
-      }
+      setCounted(
+        res.summary.actualCash != null ? String(res.summary.actualCash) : "",
+      );
     } else if (!onExpiredSession?.(res)) {
       setSummary(null);
       setLoadError(res.error || "No se pudo calcular la caja del día.");
     }
   }
 
+  async function loadHistory() {
+    const res = await adminGetCashHistory(30);
+    if (res.ok) setHistory(res.sessions);
+  }
+
   async function handleAddExpense(e) {
     e.preventDefault();
     setAddingExpense(true);
-    const res = await adminAddCashExpense({
-      date,
-      concept,
-      amount,
-      notes: expenseNotes,
-    });
+    const concept = expense.concept.trim() || categoryLabel(expense.category);
+    const res = await adminAddCashExpense({ date, ...expense, concept });
     setAddingExpense(false);
     if (res.ok) {
-      onToast?.(`Egreso cargado · ${concept.trim()} · ${formatARS(-Number(amount))}`);
-      setConcept("");
-      setAmount("");
-      setExpenseNotes("");
+      onToast?.(
+        `Egreso cargado · ${concept} · ${formatARS(-Number(expense.amount))}`,
+      );
+      setExpense((x) => ({ ...x, concept: "", amount: "", notes: "" }));
       loadSummary();
     } else if (!onExpiredSession?.(res)) {
-      onToast?.(res.error || "No se pudo registrar el egreso.", { tone: "error" });
+      onToast?.(res.error || "No se pudo registrar el egreso.", {
+        tone: "error",
+      });
     }
   }
 
-  async function handleCloseCash(e) {
-    e.preventDefault();
-    if (!actualCashInput) {
-      onToast?.("Ingresá el efectivo que contaste en el cajón.", { tone: "error" });
-      return;
-    }
+  async function handleClose() {
     setClosing(true);
     const res = await adminCloseDailyCash({
       date,
-      actualCash: actualCashInput,
+      actualCash: counted,
       notes: closingNotes,
+      closedBy,
     });
     setClosing(false);
     if (res.ok) {
-      onToast?.(
-        res.difference
-          ? `Caja cerrada · diferencia ${formatARS(res.difference, { signed: true })}`
-          : "Caja cerrada · cuadra exacto",
-      );
+      try {
+        localStorage.setItem(CLOSED_BY_KEY, closedBy.trim());
+      } catch {
+        // sin persistencia local, no pasa nada
+      }
+      setIsConfirmOpen(false);
+      onToast?.(`Caja cerrada · ${diffLabel(res.difference)}`);
       loadSummary();
+      loadHistory();
     } else if (!onExpiredSession?.(res)) {
       onToast?.(res.error || "No se pudo cerrar la caja.", { tone: "error" });
     }
   }
 
-  function handleShareCloseWhatsApp() {
+  function shareWhatsApp() {
     if (!summary) return;
-    const difference = summary.difference ?? 0;
-    const diff =
-      difference > 0
-        ? `${formatARS(difference, { signed: true })} (Sobrante)`
-        : difference < 0
-          ? `${formatARS(difference)} (Faltante)`
-          : "$0 (Exacto)";
-
-    let text = `📊 *CIERRE DE CAJA MUZZAGA PÁDEL*\n`;
-    text += `📅 Fecha: ${date}\n\n`;
-    text += `💰 *INGRESOS EN EFECTIVO*\n`;
-    text += `• Turnos: ${formatARS(summary.cashTurnos)}\n`;
-    text += `• Cantina: ${formatARS(summary.cashCantina)}\n`;
-    text += `• Total Egresos Caja: ${formatARS(-summary.totalExpenses)}\n`;
-    text += `👉 *Efectivo esperado en cajón: ${formatARS(summary.expectedCash)}*\n`;
-    text += `👉 *Efectivo real contado: ${formatARS(summary.actualCash || 0)}*\n`;
-    text += `⚖️ *Diferencia:* ${diff}\n\n`;
-    text += `🏦 *TRANSFERENCIAS / MERCADO PAGO*\n`;
-    text += `• Transferencias directas: ${formatARS(summary.transferTurnos + summary.transferCantina)}\n`;
-    text += `• Mercado Pago acreditado: ${formatARS(summary.mpTurnos + summary.mpCantina)}\n\n`;
-    if (summary.notes) {
-      text += `📝 Observaciones: ${summary.notes}\n\n`;
-    }
-    text += `Cierre sellado en sistema Muzzaga.`;
-
+    const lines = [
+      `📊 *CIERRE DE CAJA MUZZAGA PÁDEL*`,
+      `📅 ${formatDate(date, "long")}`,
+      "",
+      `💰 *EFECTIVO*`,
+      `• Turnos: ${formatARS(summary.cashTurnos)}`,
+      `• Cantina: ${formatARS(summary.cashCantina)}`,
+      `• Egresos: ${formatARS(-summary.totalExpenses)}`,
+      `👉 *Esperado en cajón: ${formatARS(summary.expectedCash)}*`,
+      `👉 *Contado: ${formatARS(summary.actualCash || 0)}*`,
+      `⚖️ *Diferencia:* ${diffLabel(summary.difference ?? 0)}`,
+      "",
+      `🏦 Transferencias: ${formatARS(summary.transferTurnos + summary.transferCantina)}`,
+      `💳 Mercado Pago: ${formatARS(summary.mpTurnos + summary.mpCantina)}`,
+      summary.notes ? `\n📝 ${summary.notes}` : "",
+      summary.closedBy
+        ? `\nCerró: ${summary.closedBy} a las ${formatTime(summary.closedAt)}`
+        : "",
+    ];
     window.open(
-      `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(text)}`,
+      `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(lines.join("\n"))}`,
       "_blank",
+      "noopener",
     );
   }
 
-  const expectedCash = summary?.expectedCash || 0;
-  const counted = Number(actualCashInput) || 0;
-  const liveDiff = actualCashInput ? counted - expectedCash : null;
+  function exportHistory() {
+    downloadCsv(`muzzaga-cierres-${todayInClub()}.csv`, [
+      ["Fecha", "Esperado", "Contado", "Diferencia", "Cerró", "Hora", "Notas"],
+      ...(history || []).map((h) => [
+        h.date,
+        h.expectedCash,
+        h.actualCash,
+        h.difference,
+        h.closedBy || "",
+        h.closedAt ? formatTime(h.closedAt) : "",
+        h.notes || "",
+      ]),
+    ]);
+  }
 
-  return (
-    <div>
-      {/* HEADER DE CAJA */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 12,
-          marginBottom: 20,
-        }}
-      >
-        <h2 className="admin-section-title" style={{ margin: 0 }}>
-          Arqueo del día
-        </h2>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <input
-            type="date"
-            aria-label="Fecha de la caja"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            style={{
-              padding: "8px 12px",
-              borderRadius: "var(--radius-md)",
-              border: "1px solid var(--color-hairline-strong)",
-              fontSize: 13,
-            }}
-          />
+  const header = (
+    <div className="admin-view-toolbar">
+      <h2 className="admin-section-title" style={{ margin: 0 }}>
+        Arqueo del {formatDate(date, "long")}
+      </h2>
+      <div className="admin-view-toolbar-actions">
+        <input
+          type="date"
+          aria-label="Fecha de la caja"
+          value={date}
+          max={todayInClub()}
+          onChange={(e) => e.target.value && setDate(e.target.value)}
+        />
+        {date !== todayInClub() && (
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={loadSummary}
-            style={{ height: 38, fontSize: 13 }}
+            onClick={() => setDate(todayInClub())}
           >
-            Actualizar
+            Hoy
           </button>
-        </div>
+        )}
       </div>
+    </div>
+  );
 
-      {!summary ? (
-        loadError ? (
-          <div role="alert" style={{ padding: 24, color: "#b91c1c" }}>
+  if (!summary) {
+    return (
+      <div>
+        {header}
+        {loadError ? (
+          <div
+            role="alert"
+            className="admin-settings-card"
+            style={{ color: "#b91c1c" }}
+          >
             {loadError}
           </div>
         ) : (
           <SkeletonCards count={4} />
-        )
-      ) : (
-        <div
-          className={loading ? "admin-content-loading" : ""}
-          style={{ display: "flex", flexDirection: "column", gap: 20 }}
-        >
-          {/* BANNER DE CAJA CERRADA */}
-          {summary?.closed && (
-            <div
-              style={{
-                background: "rgba(37, 211, 102, 0.12)",
-                border: "1px solid rgba(37, 211, 102, 0.4)",
-                borderRadius: "var(--radius-lg)",
-                padding: "16px 20px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: 12,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <Lock size={24} strokeWidth={1.75} aria-hidden color="var(--success)" />
-                <div>
-                  <strong
-                    style={{ fontSize: 16, color: "var(--success)", display: "block" }}
+        )}
+      </div>
+    );
+  }
+
+  const isClosed = summary.closed;
+  const liveDiff =
+    counted === "" ? null : Number(counted) - summary.expectedCash;
+  const tone = liveDiff == null ? null : cashDiffTone(liveDiff);
+
+  return (
+    <div className={loading ? "admin-content-loading" : ""}>
+      {header}
+
+      {isClosed && (
+        <div className="admin-closed-banner" role="status">
+          <Lock {...ICON} />
+          <div>
+            <strong>
+              Cerrado{summary.closedBy ? ` por ${summary.closedBy}` : ""} a las{" "}
+              {formatTime(summary.closedAt)}
+            </strong>
+            <span>
+              Contado {formatARS(summary.actualCash || 0)} ·{" "}
+              {diffLabel(summary.difference ?? 0)}. El día queda en solo
+              lectura.
+            </span>
+          </div>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={shareWhatsApp}
+          >
+            <Send {...ICON} /> Enviar por WhatsApp
+          </button>
+        </div>
+      )}
+
+      {/* Fórmula del esperado en cajón */}
+      <div
+        className="admin-cash-formula"
+        aria-label="Cómo se calcula el efectivo esperado"
+      >
+        <div>
+          <span className="admin-kpi-label">Efectivo turnos</span>
+          <strong>{formatARS(summary.cashTurnos)}</strong>
+        </div>
+        <span className="admin-cash-op" aria-hidden>
+          +
+        </span>
+        <div>
+          <span className="admin-kpi-label">Efectivo cantina</span>
+          <strong>{formatARS(summary.cashCantina)}</strong>
+        </div>
+        <span className="admin-cash-op" aria-hidden>
+          −
+        </span>
+        <div>
+          <span className="admin-kpi-label">Egresos</span>
+          <strong className={summary.totalExpenses > 0 ? "is-negative" : ""}>
+            {formatARS(-summary.totalExpenses)}
+          </strong>
+        </div>
+        <span className="admin-cash-op" aria-hidden>
+          =
+        </span>
+        <div className="is-result">
+          <span className="admin-kpi-label">Esperado en cajón</span>
+          <strong>{formatARS(summary.expectedCash)}</strong>
+        </div>
+      </div>
+      <p className="admin-field-hint" style={{ margin: "8px 0 20px" }}>
+        Fuera del cajón: Transferencias{" "}
+        {formatARS(summary.transferTurnos + summary.transferCantina)} · Mercado
+        Pago {formatARS(summary.mpTurnos + summary.mpCantina)}
+      </p>
+
+      <div className="admin-cash-grid">
+        {/* EGRESOS */}
+        <section className="admin-settings-card">
+          <h3 className="admin-section-title">
+            <Receipt {...ICON} /> Egresos del día
+          </h3>
+
+          {!isClosed && (
+            <form onSubmit={handleAddExpense} className="admin-expense-form">
+              <div
+                className="admin-segmented"
+                role="group"
+                aria-label="Categoría del egreso"
+              >
+                {CATEGORIES.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    aria-pressed={expense.category === c.id}
+                    onClick={() =>
+                      setExpense((x) => ({ ...x, category: c.id }))
+                    }
                   >
-                    Caja Cerrada y Sellada
-                  </strong>
-                  <span
-                    style={{ fontSize: 12, color: "var(--text-secondary)" }}
-                  >
-                    Cierre realizado a las {formatTime(summary.closedAt)}.
-                    Diferencia registrada:{" "}
-                    {summary.difference
-                      ? formatARS(summary.difference, { signed: true })
-                      : "$0 (exacto)"}
-                  </span>
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+              <div className="admin-field-row">
+                <div className="admin-field">
+                  <label className="admin-field-label" htmlFor="exp-concept">
+                    Detalle
+                  </label>
+                  <input
+                    id="exp-concept"
+                    type="text"
+                    placeholder={`ej. ${categoryLabel(expense.category)} para la cantina`}
+                    value={expense.concept}
+                    onChange={(e) =>
+                      setExpense((x) => ({ ...x, concept: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="admin-field">
+                  <label className="admin-field-label" htmlFor="exp-amount">
+                    Monto ($)
+                  </label>
+                  <input
+                    id="exp-amount"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    required
+                    value={expense.amount}
+                    onChange={(e) =>
+                      setExpense((x) => ({ ...x, amount: e.target.value }))
+                    }
+                  />
                 </div>
               </div>
-
               <button
-                type="button"
-                className="btn btn-whatsapp"
-                onClick={handleShareCloseWhatsApp}
-                style={{ gap: 6, height: 38, fontSize: 13 }}
+                type="submit"
+                className="btn btn-secondary"
+                disabled={addingExpense || !expense.amount}
               >
-                Enviar reporte por WhatsApp →
+                {addingExpense ? "Cargando…" : "Cargar egreso"}
               </button>
+            </form>
+          )}
+
+          {summary.expensesList.length === 0 ? (
+            <EmptyState
+              icon={Receipt}
+              title="Sin egresos este día"
+              text={
+                isClosed
+                  ? "No se registraron salidas de dinero."
+                  : "Cargá lo que sale del cajón (hielo, limpieza, cambio) para que el arqueo cuadre."
+              }
+            />
+          ) : (
+            <ul className="admin-expense-list">
+              {summary.expensesList.map((x) => (
+                <li key={x.id}>
+                  <span className="admin-tag">{categoryLabel(x.category)}</span>
+                  <span className="admin-expense-concept">
+                    {x.concept}
+                    {x.notes && <small> · {x.notes}</small>}
+                  </span>
+                  <strong className="is-negative">
+                    {formatARS(-x.amount)}
+                  </strong>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* ARQUEO */}
+        <section className="admin-settings-card">
+          <h3 className="admin-section-title">
+            <Scale {...ICON} /> Arqueo y cierre
+          </h3>
+          <div className="admin-field">
+            <label className="admin-field-label" htmlFor="cash-counted">
+              Efectivo contado en el cajón ($)
+            </label>
+            <input
+              id="cash-counted"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              className="admin-input-lg"
+              placeholder="Contá los billetes y poné el total"
+              value={counted}
+              readOnly={isClosed}
+              onChange={(e) => setCounted(e.target.value)}
+            />
+          </div>
+
+          {liveDiff != null && (
+            <div
+              className="admin-cash-diff"
+              data-tone={tone}
+              role="status"
+              aria-live="polite"
+            >
+              <span>{DIFF_TEXT[tone]}</span>
+              <strong>{diffLabel(liveDiff)}</strong>
             </div>
           )}
 
-          {/* TARJETAS KPI DE CAJA */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",
-              gap: 14,
-            }}
+          {!isClosed && (
+            <>
+              <div className="admin-field">
+                <label className="admin-field-label" htmlFor="cash-notes">
+                  Observaciones
+                </label>
+                <textarea
+                  id="cash-notes"
+                  rows={2}
+                  placeholder="ej. Quedaron $10.000 de cambio para mañana"
+                  value={closingNotes}
+                  onChange={(e) => setClosingNotes(e.target.value)}
+                />
+              </div>
+              <button
+                type="button"
+                className="btn btn-linear-primary admin-btn-block"
+                disabled={counted === ""}
+                onClick={() => setIsConfirmOpen(true)}
+              >
+                <Lock {...ICON} /> Cerrar caja del día
+              </button>
+            </>
+          )}
+        </section>
+      </div>
+
+      {/* HISTORIAL */}
+      <section style={{ marginTop: 28 }}>
+        <div className="admin-view-toolbar">
+          <h2 className="admin-section-title" style={{ margin: 0 }}>
+            Cierres anteriores
+          </h2>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={exportHistory}
+            disabled={!history?.length}
           >
-            {/* EFECTIVO ESPERADO */}
-            <div
-              style={{
-                background: "var(--color-surface-card)",
-                border: "1px solid var(--color-hairline-strong)",
-                borderRadius: "var(--radius-lg)",
-                padding: "16px 18px",
-              }}
-            >
-              <span
-                className="admin-kpi-label"
-                style={{ display: "flex", alignItems: "center", gap: 6 }}
-              >
-                <Banknote {...LABEL_ICON} /> Efectivo en cajón (esperado)
-              </span>
-              <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: 800,
-                  color: "var(--success)",
-                  fontFamily: "var(--font-jetbrains-mono), monospace",
-                  marginTop: 6,
-                }}
-              >
-                {formatARS(summary.expectedCash)}
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "var(--text-secondary)",
-                  marginTop: 4,
-                }}
-              >
-                Turnos: {formatARS(summary.cashTurnos)} · Cantina:{" "}
-                {formatARS(summary.cashCantina)}
-              </div>
-            </div>
-
-            {/* TRANSFERENCIAS */}
-            <div
-              style={{
-                background: "var(--color-surface-card)",
-                border: "1px solid var(--color-hairline-strong)",
-                borderRadius: "var(--radius-lg)",
-                padding: "16px 18px",
-              }}
-            >
-              <span
-                className="admin-kpi-label"
-                style={{ display: "flex", alignItems: "center", gap: 6 }}
-              >
-                <Landmark {...LABEL_ICON} /> Transferencias
-              </span>
-              <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: 800,
-                  color: "var(--color-ink)",
-                  fontFamily: "var(--font-jetbrains-mono), monospace",
-                  marginTop: 6,
-                }}
-              >
-                {formatARS(summary.transferTurnos + summary.transferCantina)}
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "var(--text-secondary)",
-                  marginTop: 4,
-                }}
-              >
-                Cobrado en cuenta banco/alias
-              </div>
-            </div>
-
-            {/* MERCADO PAGO */}
-            <div
-              style={{
-                background: "var(--color-surface-card)",
-                border: "1px solid var(--color-hairline-strong)",
-                borderRadius: "var(--radius-lg)",
-                padding: "16px 18px",
-              }}
-            >
-              <span
-                className="admin-kpi-label"
-                style={{ display: "flex", alignItems: "center", gap: 6 }}
-              >
-                <CreditCard {...LABEL_ICON} /> Mercado Pago
-              </span>
-              <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: 800,
-                  color: "var(--info)",
-                  fontFamily: "var(--font-jetbrains-mono), monospace",
-                  marginTop: 6,
-                }}
-              >
-                {formatARS(summary.mpTurnos + summary.mpCantina)}
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "var(--text-secondary)",
-                  marginTop: 4,
-                }}
-              >
-                Señas y pagos acreditados
-              </div>
-            </div>
-
-            {/* EGRESOS REGISTRADOS */}
-            <div
-              style={{
-                background: "var(--color-surface-card)",
-                border: "1px solid var(--color-hairline-strong)",
-                borderRadius: "var(--radius-lg)",
-                padding: "16px 18px",
-              }}
-            >
-              <span
-                className="admin-kpi-label"
-                style={{ display: "flex", alignItems: "center", gap: 6 }}
-              >
-                <ArrowDownRight {...LABEL_ICON} /> Egresos de caja
-              </span>
-              <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: 800,
-                  color: summary.totalExpenses > 0 ? "var(--danger)" : "var(--text)",
-                  fontFamily: "var(--font-jetbrains-mono), monospace",
-                  marginTop: 6,
-                }}
-              >
-                {formatARS(-summary.totalExpenses)}
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "var(--text-secondary)",
-                  marginTop: 4,
-                }}
-              >
-                {plural(
-                  summary.expensesList.length,
-                  "salida de dinero",
-                  "salidas de dinero",
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* GRID: REGISTRO DE EGRESOS & ARQUEO */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
-              gap: 20,
-              alignItems: "start",
-            }}
-          >
-            {/* MÓDULO DE EGRESOS */}
-            <div
-              style={{
-                background: "var(--color-surface-card)",
-                border: "1px solid var(--color-hairline-strong)",
-                borderRadius: "var(--radius-lg)",
-                padding: "20px",
-              }}
-            >
-              <h3 className="admin-section-title" style={{ margin: "0 0 14px" }}>
-                <Receipt {...TITLE_ICON} /> Registrar egreso
-              </h3>
-
-              <form
-                onSubmit={handleAddExpense}
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      marginBottom: 4,
-                    }}
-                  >
-                    Concepto del gasto:
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="ej. Hielo cantina, carbón, artículos limpieza"
-                    value={concept}
-                    onChange={(e) => setConcept(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: "var(--radius-md)",
-                      border: "1px solid var(--color-hairline-strong)",
-                      fontSize: 13,
-                    }}
-                  />
-                </div>
-
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 10,
-                  }}
-                >
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontSize: 12,
-                        fontWeight: 600,
-                        marginBottom: 4,
-                      }}
-                    >
-                      Monto en efectivo ($):
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      min="1"
-                      placeholder="ej. 3500"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        borderRadius: "var(--radius-md)",
-                        border: "1px solid var(--color-hairline-strong)",
-                        fontSize: 13,
-                        fontFamily: "var(--font-jetbrains-mono), monospace",
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        fontSize: 12,
-                        fontWeight: 600,
-                        marginBottom: 4,
-                      }}
-                    >
-                      Nota / Comprobante:
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Opcional"
-                      value={expenseNotes}
-                      onChange={(e) => setExpenseNotes(e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        borderRadius: "var(--radius-md)",
-                        border: "1px solid var(--color-hairline-strong)",
-                        fontSize: 13,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn btn-secondary"
-                  disabled={addingExpense}
-                  style={{ height: 38, fontSize: 13, justifyContent: "center" }}
-                >
-                  {addingExpense ? "Registrando…" : "+ Cargar Egreso"}
-                </button>
-              </form>
-
-              {/* LISTA DE EGRESOS */}
-              <div style={{ marginTop: 18 }}>
-                <span
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: "var(--text-muted)",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  Egresos de hoy:
-                </span>
-                {summary.expensesList.length === 0 ? (
-                  <EmptyState
-                    icon={Receipt}
-                    title="Sin egresos este día"
-                    text="Cargá acá lo que sale del cajón (hielo, limpieza, cambio) para que el arqueo cuadre."
-                  />
+            <Download {...ICON} /> Exportar CSV
+          </button>
+        </div>
+        {!history ? (
+          <SkeletonRows count={4} />
+        ) : (
+          <div className="admin-table-wrapper">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Esperado</th>
+                  <th>Contado</th>
+                  <th>Diferencia</th>
+                  <th>Cerró</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.length === 0 ? (
+                  <tr>
+                    <td colSpan="5">
+                      <EmptyState
+                        icon={Lock}
+                        title="Todavía no hay cierres"
+                        text="Cada vez que cierres la caja del día queda registrada acá."
+                      />
+                    </td>
+                  </tr>
                 ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 6,
-                      marginTop: 8,
-                    }}
-                  >
-                    {summary.expensesList.map((exp) => (
-                      <div
-                        key={exp.id}
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          padding: "6px 10px",
-                          background: "var(--color-surface-subtle)",
-                          borderRadius: "var(--radius-sm)",
-                          fontSize: 12.5,
-                        }}
-                      >
-                        <div>
-                          <strong>{exp.concept}</strong>
-                          {exp.notes && (
-                            <span
-                              style={{
-                                color: "var(--text-muted)",
-                                marginLeft: 6,
-                              }}
-                            >
-                              ({exp.notes})
+                  history.map((h) => {
+                    const t = cashDiffTone(h.difference);
+                    return (
+                      <tr key={h.date}>
+                        <td data-label="Fecha">
+                          <button
+                            type="button"
+                            className="admin-link-btn"
+                            onClick={() => setDate(h.date)}
+                          >
+                            {formatDate(h.date, "long")}
+                          </button>
+                        </td>
+                        <td data-label="Esperado">
+                          {formatARS(h.expectedCash)}
+                        </td>
+                        <td data-label="Contado">{formatARS(h.actualCash)}</td>
+                        <td data-label="Diferencia">
+                          <span className="admin-diff-pill" data-tone={t}>
+                            {diffLabel(h.difference)}
+                          </span>
+                        </td>
+                        <td data-label="Cerró">
+                          {h.closedBy || "—"}
+                          {h.closedAt && (
+                            <span className="admin-cell-sub">
+                              {" "}
+                              {formatTime(h.closedAt)}
                             </span>
                           )}
-                        </div>
-                        <span
-                          style={{
-                            color: "#dc2626",
-                            fontWeight: 700,
-                            fontFamily: "var(--font-jetbrains-mono)",
-                          }}
-                        >
-                          {formatARS(-exp.amount)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
-              </div>
-            </div>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
-            {/* MÓDULO DE ARQUEO Y CIERRE Z */}
-            <div
-              style={{
-                background: "var(--color-surface-card)",
-                border: "1px solid var(--color-hairline-strong)",
-                borderRadius: "var(--radius-lg)",
-                padding: "20px",
-              }}
-            >
-              <h3 className="admin-section-title" style={{ margin: "0 0 14px" }}>
-                <Scale {...TITLE_ICON} /> Arqueo y cierre de jornada
+      {isConfirmOpen && (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => !closing && setIsConfirmOpen(false)}
+        >
+          <div
+            className="admin-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="close-cash-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="admin-modal-head">
+              <h3 id="close-cash-title">
+                Cerrar caja del {formatDate(date, "long")}
               </h3>
-
-              <form
-                onSubmit={handleCloseCash}
-                style={{ display: "flex", flexDirection: "column", gap: 14 }}
+              <button
+                type="button"
+                className="admin-modal-close"
+                onClick={() => setIsConfirmOpen(false)}
+                aria-label="Cerrar"
               >
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      marginBottom: 4,
-                    }}
-                  >
-                    Efectivo real contado en cajón ($):
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="Contá los billetes y poné el total"
-                    value={actualCashInput}
-                    onChange={(e) => setActualCashInput(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "10px 14px",
-                      borderRadius: "var(--radius-md)",
-                      border: "1px solid var(--color-hairline-strong)",
-                      fontSize: 16,
-                      fontFamily: "var(--font-jetbrains-mono), monospace",
-                    }}
-                  />
-                </div>
-
-                {liveDiff != null && (
-                  <div
-                    style={{
-                      padding: "10px 14px",
-                      borderRadius: "var(--radius-md)",
-                      background:
-                        liveDiff === 0
-                          ? "rgba(37, 211, 102, 0.1)"
-                          : liveDiff > 0
-                            ? "rgba(56, 189, 248, 0.1)"
-                            : "rgba(239, 68, 68, 0.1)",
-                      border: `1px solid ${
-                        liveDiff === 0
-                          ? "rgba(37, 211, 102, 0.3)"
-                          : liveDiff > 0
-                            ? "rgba(56, 189, 248, 0.3)"
-                            : "rgba(239, 68, 68, 0.3)"
-                      }`,
-                      fontSize: 13,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span>Diferencia de Caja:</span>
-                    <strong
-                      style={{
-                        fontFamily: "var(--font-jetbrains-mono), monospace",
-                        color:
-                          liveDiff === 0
-                            ? "#16a34a"
-                            : liveDiff > 0
-                              ? "#0284c7"
-                              : "#dc2626",
-                      }}
-                    >
-                      {liveDiff === 0
-                        ? "Exacto ($0)"
-                        : liveDiff > 0
-                          ? `Sobrante: ${formatARS(liveDiff, { signed: true })}`
-                          : `Faltante: ${formatARS(liveDiff)}`}
-                    </strong>
-                  </div>
-                )}
-
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      marginBottom: 4,
-                    }}
-                  >
-                    Observaciones del cierre:
-                  </label>
-                  <textarea
-                    rows={2}
-                    placeholder="ej. Se dejaron $10.000 de cambio para el turno de la tarde"
-                    value={closingNotes}
-                    onChange={(e) => setClosingNotes(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: "var(--radius-md)",
-                      border: "1px solid var(--color-hairline-strong)",
-                      fontSize: 13,
-                      resize: "none",
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn btn-linear-primary"
-                  disabled={closing}
-                  style={{ height: 44, fontSize: 14, justifyContent: "center" }}
-                >
-                  {closing
-                    ? "Cerrando jornada…"
-                    : summary.closed
-                      ? "Actualizar Cierre de Caja"
-                      : "Cerrar caja del día"}
-                </button>
-              </form>
+                <X size={16} strokeWidth={1.75} aria-hidden />
+              </button>
+            </div>
+            <dl className="admin-summary-list">
+              <div>
+                <dt>Esperado en cajón</dt>
+                <dd>{formatARS(summary.expectedCash)}</dd>
+              </div>
+              <div>
+                <dt>Contado</dt>
+                <dd>{formatARS(Number(counted))}</dd>
+              </div>
+              <div>
+                <dt>Diferencia</dt>
+                <dd>
+                  <span className="admin-diff-pill" data-tone={tone}>
+                    {diffLabel(liveDiff)}
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt>Egresos</dt>
+                <dd>
+                  {plural(summary.expensesList.length, "egreso", "egresos")} ·{" "}
+                  {formatARS(-summary.totalExpenses)}
+                </dd>
+              </div>
+            </dl>
+            <div className="admin-field">
+              <label className="admin-field-label" htmlFor="closed-by">
+                ¿Quién cierra?
+              </label>
+              <input
+                id="closed-by"
+                type="text"
+                maxLength={40}
+                placeholder="Tu nombre"
+                value={closedBy}
+                onChange={(e) => setClosedBy(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <p className="admin-field-hint">
+              Una vez cerrada, la caja de este día queda en solo lectura.
+            </p>
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setIsConfirmOpen(false)}
+                disabled={closing}
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                className="btn btn-linear-primary"
+                onClick={handleClose}
+                disabled={closing || !closedBy.trim()}
+              >
+                {closing ? "Cerrando…" : "Confirmar cierre"}
+              </button>
             </div>
           </div>
         </div>

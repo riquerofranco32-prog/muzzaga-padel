@@ -312,6 +312,10 @@
   box-shadow: none;
   min-height: 36px;
   background: transparent;
+  /* Lugar para el ícono de lupa (absoluto a 12px) y la X de limpiar. */
+  /* !important: la regla genérica de inputs tiene más especificidad (:is + :not). */
+  padding-left: 36px !important;
+  padding-right: 32px !important;
 }
 
 .admin-root .admin-dashboard-layout .admin-search-wrap:focus-within {
@@ -683,6 +687,10 @@
     display: flex;
     justify-content: flex-start;
     gap: 8px;
+  }
+
+  .admin-root .admin-main-header {
+    align-items: stretch;
   }
 
   .admin-root .admin-quick-actions > * {
@@ -1223,4 +1231,13 @@
     bottom: calc(60px + env(safe-area-inset-bottom));
     padding: 10px 16px;
   }
+}
+
+/* body tiene overflow-x:hidden (globals.css) igual que html: eso lo vuelve
+   contenedor de scroll y rompe el position:sticky del sidebar. En el admin
+   se recorta con clip, que no crea contenedor. También sobra el padding de
+   la barra inferior de la web pública. */
+body:has(.admin-root .admin-dashboard-layout) {
+  overflow-x: clip;
+  padding-bottom: 0;
 }

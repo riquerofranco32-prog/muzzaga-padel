@@ -195,3 +195,43 @@ test("estado de cobro para la grilla", async () => {
   assert.equal(paymentState(b({ status: "bloqueado" })), "bloqueado");
   assert.equal(paymentState(b({ isTest: true })), "prueba");
 });
+
+test("tono de la diferencia del arqueo", async () => {
+  const { cashDiffTone } = await import("../lib/metrics.js");
+  assert.equal(cashDiffTone(0), "ok");
+  assert.equal(cashDiffTone(-1500), "minor");
+  assert.equal(cashDiffTone(2000), "minor");
+  assert.equal(cashDiffTone(-2500), "major");
+});
+
+test("ventas anuladas y a cuenta no suman como cobrado; a cuenta suma como por cobrar", async () => {
+  const { computeDailyCash, summarizeRecords, onAccountTotal } = await import("../lib/metrics.js");
+  const sales = [
+    { method: "efectivo", total: 10000 },
+    { method: "efectivo", total: 5000, voided: true, voidReason: "cargada dos veces" },
+    { method: "cuenta", total: 8000, chargeTo: "b1" },
+    { method: "cuenta", total: 3000, chargeTo: "b2" },
+  ];
+  const cash = computeDailyCash({ sales });
+  assert.equal(cash.cantina.efectivo, 10000);
+  assert.equal(cash.cobradoCantina, 10000);
+  assert.equal(summarizeRecords({ sales }).porCobrar, 11000);
+  assert.equal(onAccountTotal(sales, "b1"), 8000);
+});
+
+test("teléfono argentino, fecha relativa y clave de cliente", async () => {
+  const { formatPhoneAR } = await import("../lib/phone.js");
+  const { formatRelativeDays } = await import("../lib/format.js");
+  const { clientKey, isInactiveClient } = await import("../lib/clientsExport.js");
+  assert.equal(formatPhoneAR("2995551234"), "+54 9 299 555-1234");
+  assert.equal(formatPhoneAR("0299 15 555 1234".replace(" 15", "")), "+54 9 299 555-1234");
+  assert.equal(formatPhoneAR("1145678901"), "+54 9 11 4567-8901");
+  assert.equal(formatPhoneAR("123"), "123");
+  assert.equal(formatRelativeDays("2026-09-21", "2026-09-22"), "hace 1 día");
+  assert.equal(formatRelativeDays("2026-09-22", "2026-09-22"), "hoy");
+  assert.equal(formatRelativeDays("2026-06-01", "2026-09-22"), "hace 4 meses");
+  assert.equal(clientKey("+54 9 299 555-1234"), "t2995551234");
+  assert.equal(clientKey("", "José Pérez"), "n-jose-perez");
+  assert.equal(isInactiveClient({ lastDate: "2026-08-01" }, "2026-09-22"), true);
+  assert.equal(isInactiveClient({ lastDate: "2026-09-10" }, "2026-09-22"), false);
+});

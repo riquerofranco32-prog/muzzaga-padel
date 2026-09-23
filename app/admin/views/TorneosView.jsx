@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Trophy } from "lucide-react";
+import { EmptyState, SkeletonRows } from "../ui/states";
 import { formatARS, plural } from "../../../lib/format";
 import {
   adminAddTournamentPlayer,
@@ -23,8 +25,11 @@ const STATUS_LABELS = {
 const EMPTY_TOURNAMENT_FORM = { name: "", date: "", category: "", price: "" };
 const EMPTY_PLAYER_FORM = { name: "", phone: "", partner: "" };
 
-export default function TorneosView({ onExpiredSession }) {
-  const [tournaments, setTournaments] = useState([]);
+const toastError = (onToast, res, fallback) =>
+  onToast?.(res?.error || fallback, { tone: "error" });
+
+export default function TorneosView({ onExpiredSession, onToast }) {
+  const [tournaments, setTournaments] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createForm, setCreateForm] = useState(EMPTY_TOURNAMENT_FORM);
@@ -54,11 +59,12 @@ export default function TorneosView({ onExpiredSession }) {
     const res = await adminCreateTournament(createForm);
     setCreating(false);
     if (res.ok) {
+      onToast?.(`Torneo creado · ${createForm.name.trim()}`);
       setCreateForm(EMPTY_TOURNAMENT_FORM);
       setShowCreateForm(false);
       loadTournaments();
     } else if (!onExpiredSession?.(res)) {
-      alert(res.error || "No se pudo crear el torneo.");
+      toastError(onToast, res, "No se pudo crear el torneo.");
     }
   }
 
@@ -66,13 +72,13 @@ export default function TorneosView({ onExpiredSession }) {
     if (!confirm("¿Eliminar este torneo y todos sus inscriptos?")) return;
     const res = await adminDeleteTournament(id);
     if (res.ok) loadTournaments();
-    else if (!onExpiredSession?.(res)) alert(res.error);
+    else if (!onExpiredSession?.(res)) toastError(onToast, res, "No se pudo actualizar el torneo.");
   }
 
   async function handleStatusChange(id, status) {
     const res = await adminUpdateTournamentStatus(id, status);
     if (res.ok) loadTournaments();
-    else if (!onExpiredSession?.(res)) alert(res.error);
+    else if (!onExpiredSession?.(res)) toastError(onToast, res, "No se pudo actualizar el torneo.");
   }
 
   async function handleAddPlayer(e, tournamentId) {
@@ -81,24 +87,25 @@ export default function TorneosView({ onExpiredSession }) {
     const res = await adminAddTournamentPlayer(tournamentId, playerForm);
     setAddingPlayer(false);
     if (res.ok) {
+      onToast?.(`Inscripto · ${playerForm.name.trim()}`);
       setPlayerForm(EMPTY_PLAYER_FORM);
       loadTournaments();
     } else if (!onExpiredSession?.(res)) {
-      alert(res.error || "No se pudo agregar el jugador.");
+      toastError(onToast, res, "No se pudo agregar el jugador.");
     }
   }
 
   async function handleTogglePaid(tournamentId, playerId, paid) {
     const res = await adminTogglePlayerPaid(tournamentId, playerId, !paid);
     if (res.ok) loadTournaments();
-    else if (!onExpiredSession?.(res)) alert(res.error);
+    else if (!onExpiredSession?.(res)) toastError(onToast, res, "No se pudo actualizar el torneo.");
   }
 
   async function handleRemovePlayer(tournamentId, playerId) {
     if (!confirm("¿Quitar a este jugador del torneo?")) return;
     const res = await adminRemoveTournamentPlayer(tournamentId, playerId);
     if (res.ok) loadTournaments();
-    else if (!onExpiredSession?.(res)) alert(res.error);
+    else if (!onExpiredSession?.(res)) toastError(onToast, res, "No se pudo actualizar el torneo.");
   }
 
   return (
@@ -114,13 +121,13 @@ export default function TorneosView({ onExpiredSession }) {
         }}
       >
         <h2 className="admin-section-title" style={{ marginBottom: 0 }}>
-          Torneos
+          {tournaments ? plural(tournaments.length, "torneo", "torneos") : "Torneos"}
         </h2>
         <button
           type="button"
           className="btn btn-linear-primary"
-          style={{ height: 36, padding: "6px 14px", fontSize: 13 }}
           onClick={() => setShowCreateForm((v) => !v)}
+          aria-expanded={showCreateForm}
         >
           <IconPlus /> Nuevo Torneo
         </button>
@@ -199,10 +206,17 @@ export default function TorneosView({ onExpiredSession }) {
       )}
 
       <div className={loading ? "admin-content-loading" : ""}>
-        {tournaments.length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
-            Todavía no cargaste ningún torneo.
-          </p>
+        {!tournaments ? (
+          <SkeletonRows count={3} height={72} />
+        ) : tournaments.length === 0 ? (
+          <div className="admin-settings-card">
+            <EmptyState
+              icon={Trophy}
+              title="Todavía no cargaste ningún torneo"
+              text="Creá uno para llevar la lista de parejas inscriptas y quién ya pagó."
+              action={{ label: "Nuevo torneo", onClick: () => setShowCreateForm(true) }}
+            />
+          </div>
         ) : (
           tournaments.map((t) => {
             const isOpen = expandedId === t.id;
@@ -212,7 +226,16 @@ export default function TorneosView({ onExpiredSession }) {
               <div key={t.id} className="admin-tournament-card">
                 <div
                   className="admin-tournament-header"
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isOpen}
                   onClick={() => setExpandedId(isOpen ? null : t.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setExpandedId(isOpen ? null : t.id);
+                    }
+                  }}
                 >
                   <div>
                     <strong style={{ fontSize: 16, color: "var(--color-ink)" }}>
