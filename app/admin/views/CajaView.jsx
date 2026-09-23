@@ -1,18 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatARS, formatTime, plural } from "../../../lib/format";
 import {
   adminAddCashExpense,
   adminCloseDailyCash,
   adminGetDailyCashSummary,
 } from "../actions";
-import { toISODate } from "../../../lib/booking";
+import { todayInClub } from "../../../lib/booking";
 import { CLUB_INFO } from "../../../data/club";
 
-export default function CajaView({ onExpiredSession }) {
-  const [date, setDate] = useState(toISODate(new Date()));
+export default function CajaView({ initialDate, onExpiredSession }) {
+  const [date, setDate] = useState(() => initialDate || todayInClub());
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
   // Formulario de egreso
   const [concept, setConcept] = useState("");
@@ -31,6 +33,7 @@ export default function CajaView({ onExpiredSession }) {
 
   async function loadSummary() {
     setLoading(true);
+    setLoadError("");
     const res = await adminGetDailyCashSummary(date);
     setLoading(false);
     if (res.ok) {
@@ -40,8 +43,9 @@ export default function CajaView({ onExpiredSession }) {
       } else {
         setActualCashInput("");
       }
-    } else if (onExpiredSession) {
-      onExpiredSession(res);
+    } else if (!onExpiredSession?.(res)) {
+      setSummary(null);
+      setLoadError(res.error || "No se pudo calcular la caja del día.");
     }
   }
 
@@ -87,25 +91,26 @@ export default function CajaView({ onExpiredSession }) {
 
   function handleShareCloseWhatsApp() {
     if (!summary) return;
+    const difference = summary.difference ?? 0;
     const diff =
-      summary.difference > 0
-        ? `+$${summary.difference.toLocaleString("es-AR")} (Sobrante)`
-        : summary.difference < 0
-        ? `-$${Math.abs(summary.difference).toLocaleString("es-AR")} (Faltante)`
-        : "$0 (Exacto)";
+      difference > 0
+        ? `${formatARS(difference, { signed: true })} (Sobrante)`
+        : difference < 0
+          ? `${formatARS(difference)} (Faltante)`
+          : "$0 (Exacto)";
 
     let text = `📊 *CIERRE DE CAJA MUZZAGA PÁDEL*\n`;
     text += `📅 Fecha: ${date}\n\n`;
     text += `💰 *INGRESOS EN EFECTIVO*\n`;
-    text += `• Turnos: $${summary.cashTurnos.toLocaleString("es-AR")}\n`;
-    text += `• Cantina: $${summary.cashCantina.toLocaleString("es-AR")}\n`;
-    text += `• Total Egresos Caja: -$${summary.totalExpenses.toLocaleString("es-AR")}\n`;
-    text += `👉 *Efectivo esperado en cajón: $${summary.expectedCash.toLocaleString("es-AR")}*\n`;
-    text += `👉 *Efectivo real contado: $${(summary.actualCash || 0).toLocaleString("es-AR")}*\n`;
+    text += `• Turnos: ${formatARS(summary.cashTurnos)}\n`;
+    text += `• Cantina: ${formatARS(summary.cashCantina)}\n`;
+    text += `• Total Egresos Caja: ${formatARS(-summary.totalExpenses)}\n`;
+    text += `👉 *Efectivo esperado en cajón: ${formatARS(summary.expectedCash)}*\n`;
+    text += `👉 *Efectivo real contado: ${formatARS(summary.actualCash || 0)}*\n`;
     text += `⚖️ *Diferencia:* ${diff}\n\n`;
     text += `🏦 *TRANSFERENCIAS / MERCADO PAGO*\n`;
-    text += `• Transferencias directas: $${(summary.transferTurnos + summary.transferCantina).toLocaleString("es-AR")}\n`;
-    text += `• Mercado Pago acreditado: $${(summary.mpTurnos + summary.mpCantina).toLocaleString("es-AR")}\n\n`;
+    text += `• Transferencias directas: ${formatARS(summary.transferTurnos + summary.transferCantina)}\n`;
+    text += `• Mercado Pago acreditado: ${formatARS(summary.mpTurnos + summary.mpCantina)}\n\n`;
     if (summary.notes) {
       text += `📝 Observaciones: ${summary.notes}\n\n`;
     }
@@ -113,7 +118,7 @@ export default function CajaView({ onExpiredSession }) {
 
     window.open(
       `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(text)}`,
-      "_blank"
+      "_blank",
     );
   }
 
@@ -135,10 +140,15 @@ export default function CajaView({ onExpiredSession }) {
         }}
       >
         <div>
-          <span className="badge-linear badge-emerald" style={{ marginBottom: 6 }}>
+          <span
+            className="badge-linear badge-emerald"
+            style={{ marginBottom: 6 }}
+          >
             Arqueo &amp; Control Financiero
           </span>
-          <h2 style={{ fontSize: 22, margin: "4px 0", color: "var(--color-ink)" }}>
+          <h2
+            style={{ fontSize: 22, margin: "4px 0", color: "var(--color-ink)" }}
+          >
             Caja Diaria y Cierre Z
           </h2>
         </div>
@@ -166,9 +176,15 @@ export default function CajaView({ onExpiredSession }) {
         </div>
       </div>
 
-      {loading ? (
-        <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>
-          Calculando balance de caja…
+      {loading || !summary ? (
+        <div
+          style={{
+            padding: 40,
+            textAlign: "center",
+            color: loadError ? "#b91c1c" : "var(--text-muted)",
+          }}
+        >
+          {loadError || "Calculando balance de caja…"}
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -190,17 +206,19 @@ export default function CajaView({ onExpiredSession }) {
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <span style={{ fontSize: 26 }}>🔒</span>
                 <div>
-                  <strong style={{ fontSize: 16, color: "#16a34a", display: "block" }}>
+                  <strong
+                    style={{ fontSize: 16, color: "#16a34a", display: "block" }}
+                  >
                     Caja Cerrada y Sellada
                   </strong>
-                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-                    Cierre realizado el{" "}
-                    {new Date(summary.closedAt).toLocaleTimeString("es-AR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}{" "}
-                    hs. Diferencia registrada:{" "}
-                    {summary.difference >= 0 ? `+$${summary.difference}` : `-$${Math.abs(summary.difference)}`}
+                  <span
+                    style={{ fontSize: 12, color: "var(--text-secondary)" }}
+                  >
+                    Cierre realizado a las {formatTime(summary.closedAt)}.
+                    Diferencia registrada:{" "}
+                    {summary.difference
+                      ? formatARS(summary.difference, { signed: true })
+                      : "$0 (exacto)"}
                   </span>
                 </div>
               </div>
@@ -220,7 +238,8 @@ export default function CajaView({ onExpiredSession }) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",
               gap: 14,
             }}
           >
@@ -233,7 +252,14 @@ export default function CajaView({ onExpiredSession }) {
                 padding: "16px 18px",
               }}
             >
-              <span style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-muted)",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                }}
+              >
                 💵 Efectivo en Cajón (Esperado)
               </span>
               <div
@@ -245,10 +271,17 @@ export default function CajaView({ onExpiredSession }) {
                   marginTop: 6,
                 }}
               >
-                ${summary.expectedCash.toLocaleString("es-AR")}
+                {formatARS(summary.expectedCash)}
               </div>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                Turnos: ${summary.cashTurnos.toLocaleString("es-AR")} · Cantina: ${summary.cashCantina.toLocaleString("es-AR")}
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-secondary)",
+                  marginTop: 4,
+                }}
+              >
+                Turnos: {formatARS(summary.cashTurnos)} · Cantina:{" "}
+                {formatARS(summary.cashCantina)}
               </div>
             </div>
 
@@ -261,7 +294,14 @@ export default function CajaView({ onExpiredSession }) {
                 padding: "16px 18px",
               }}
             >
-              <span style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-muted)",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                }}
+              >
                 🏦 Transferencias Directas
               </span>
               <div
@@ -273,9 +313,15 @@ export default function CajaView({ onExpiredSession }) {
                   marginTop: 6,
                 }}
               >
-                ${(summary.transferTurnos + summary.transferCantina).toLocaleString("es-AR")}
+                {formatARS(summary.transferTurnos + summary.transferCantina)}
               </div>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-secondary)",
+                  marginTop: 4,
+                }}
+              >
                 Cobrado en cuenta banco/alias
               </div>
             </div>
@@ -289,7 +335,14 @@ export default function CajaView({ onExpiredSession }) {
                 padding: "16px 18px",
               }}
             >
-              <span style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-muted)",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                }}
+              >
                 💳 Mercado Pago (Online)
               </span>
               <div
@@ -301,9 +354,15 @@ export default function CajaView({ onExpiredSession }) {
                   marginTop: 6,
                 }}
               >
-                ${(summary.mpTurnos + summary.mpCantina).toLocaleString("es-AR")}
+                {formatARS(summary.mpTurnos + summary.mpCantina)}
               </div>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-secondary)",
+                  marginTop: 4,
+                }}
+              >
                 Señas y pagos acreditados
               </div>
             </div>
@@ -317,7 +376,14 @@ export default function CajaView({ onExpiredSession }) {
                 padding: "16px 18px",
               }}
             >
-              <span style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-muted)",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                }}
+              >
                 📉 Egresos de Caja Física
               </span>
               <div
@@ -329,10 +395,20 @@ export default function CajaView({ onExpiredSession }) {
                   marginTop: 6,
                 }}
               >
-                -${summary.totalExpenses.toLocaleString("es-AR")}
+                {formatARS(-summary.totalExpenses)}
               </div>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 4 }}>
-                {summary.expensesList.length} salidas de dinero
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--text-secondary)",
+                  marginTop: 4,
+                }}
+              >
+                {plural(
+                  summary.expensesList.length,
+                  "salida de dinero",
+                  "salidas de dinero",
+                )}
               </div>
             </div>
           </div>
@@ -341,7 +417,8 @@ export default function CajaView({ onExpiredSession }) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
               gap: 20,
               alignItems: "start",
             }}
@@ -355,13 +432,29 @@ export default function CajaView({ onExpiredSession }) {
                 padding: "20px",
               }}
             >
-              <h3 style={{ fontSize: 16, margin: "0 0 14px", color: "var(--color-ink)" }}>
+              <h3
+                style={{
+                  fontSize: 16,
+                  margin: "0 0 14px",
+                  color: "var(--color-ink)",
+                }}
+              >
                 💸 Registrar Salida de Dinero (Egreso)
               </h3>
 
-              <form onSubmit={handleAddExpense} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <form
+                onSubmit={handleAddExpense}
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              >
                 <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      marginBottom: 4,
+                    }}
+                  >
                     Concepto del gasto:
                   </label>
                   <input
@@ -380,9 +473,22 @@ export default function CajaView({ onExpiredSession }) {
                   />
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 10,
+                  }}
+                >
                   <div>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        marginBottom: 4,
+                      }}
+                    >
                       Monto en efectivo ($):
                     </label>
                     <input
@@ -403,7 +509,14 @@ export default function CajaView({ onExpiredSession }) {
                     />
                   </div>
                   <div>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        marginBottom: 4,
+                      }}
+                    >
                       Nota / Comprobante:
                     </label>
                     <input
@@ -434,15 +547,35 @@ export default function CajaView({ onExpiredSession }) {
 
               {/* LISTA DE EGRESOS */}
               <div style={{ marginTop: 18 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: "var(--text-muted)",
+                    textTransform: "uppercase",
+                  }}
+                >
                   Egresos de hoy:
                 </span>
                 {summary.expensesList.length === 0 ? (
-                  <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: "8px 0" }}>
+                  <p
+                    style={{
+                      fontSize: 12.5,
+                      color: "var(--text-muted)",
+                      margin: "8px 0",
+                    }}
+                  >
                     No hay egresos registrados en esta fecha.
                   </p>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 6,
+                      marginTop: 8,
+                    }}
+                  >
                     {summary.expensesList.map((exp) => (
                       <div
                         key={exp.id}
@@ -458,13 +591,24 @@ export default function CajaView({ onExpiredSession }) {
                         <div>
                           <strong>{exp.concept}</strong>
                           {exp.notes && (
-                            <span style={{ color: "var(--text-muted)", marginLeft: 6 }}>
+                            <span
+                              style={{
+                                color: "var(--text-muted)",
+                                marginLeft: 6,
+                              }}
+                            >
                               ({exp.notes})
                             </span>
                           )}
                         </div>
-                        <span style={{ color: "#dc2626", fontWeight: 700, fontFamily: "var(--font-jetbrains-mono)" }}>
-                          -${exp.amount.toLocaleString("es-AR")}
+                        <span
+                          style={{
+                            color: "#dc2626",
+                            fontWeight: 700,
+                            fontFamily: "var(--font-jetbrains-mono)",
+                          }}
+                        >
+                          {formatARS(-exp.amount)}
                         </span>
                       </div>
                     ))}
@@ -482,13 +626,29 @@ export default function CajaView({ onExpiredSession }) {
                 padding: "20px",
               }}
             >
-              <h3 style={{ fontSize: 16, margin: "0 0 14px", color: "var(--color-ink)" }}>
+              <h3
+                style={{
+                  fontSize: 16,
+                  margin: "0 0 14px",
+                  color: "var(--color-ink)",
+                }}
+              >
                 ⚖️ Arqueo de Efectivo &amp; Cierre de Jornada
               </h3>
 
-              <form onSubmit={handleCloseCash} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <form
+                onSubmit={handleCloseCash}
+                style={{ display: "flex", flexDirection: "column", gap: 14 }}
+              >
                 <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      marginBottom: 4,
+                    }}
+                  >
                     Efectivo real contado en cajón ($):
                   </label>
                   <input
@@ -517,14 +677,14 @@ export default function CajaView({ onExpiredSession }) {
                         liveDiff === 0
                           ? "rgba(37, 211, 102, 0.1)"
                           : liveDiff > 0
-                          ? "rgba(56, 189, 248, 0.1)"
-                          : "rgba(239, 68, 68, 0.1)",
+                            ? "rgba(56, 189, 248, 0.1)"
+                            : "rgba(239, 68, 68, 0.1)",
                       border: `1px solid ${
                         liveDiff === 0
                           ? "rgba(37, 211, 102, 0.3)"
                           : liveDiff > 0
-                          ? "rgba(56, 189, 248, 0.3)"
-                          : "rgba(239, 68, 68, 0.3)"
+                            ? "rgba(56, 189, 248, 0.3)"
+                            : "rgba(239, 68, 68, 0.3)"
                       }`,
                       fontSize: 13,
                       display: "flex",
@@ -540,21 +700,28 @@ export default function CajaView({ onExpiredSession }) {
                           liveDiff === 0
                             ? "#16a34a"
                             : liveDiff > 0
-                            ? "#0284c7"
-                            : "#dc2626",
+                              ? "#0284c7"
+                              : "#dc2626",
                       }}
                     >
                       {liveDiff === 0
                         ? "Exacto ($0)"
                         : liveDiff > 0
-                        ? `Sobrante: +$${liveDiff.toLocaleString("es-AR")}`
-                        : `Faltante: -$${Math.abs(liveDiff).toLocaleString("es-AR")}`}
+                          ? `Sobrante: ${formatARS(liveDiff, { signed: true })}`
+                          : `Faltante: ${formatARS(liveDiff)}`}
                     </strong>
                   </div>
                 )}
 
                 <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      marginBottom: 4,
+                    }}
+                  >
                     Observaciones del cierre:
                   </label>
                   <textarea
@@ -582,8 +749,8 @@ export default function CajaView({ onExpiredSession }) {
                   {closing
                     ? "Cerrando jornada…"
                     : summary.closed
-                    ? "Actualizar Cierre de Caja"
-                    : "🔒 Cerrar Caja del Día"}
+                      ? "Actualizar Cierre de Caja"
+                      : "🔒 Cerrar Caja del Día"}
                 </button>
               </form>
             </div>

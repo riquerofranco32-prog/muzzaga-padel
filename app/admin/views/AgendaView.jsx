@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { COURTS, nextDays, priceForSlot } from "../../../lib/booking";
+import { COURTS, nextDays, todayInClub } from "../../../lib/booking";
+import { bookingTotal, trendPct } from "../../../lib/metrics";
+import { formatARS, formatDate, formatPct, plural } from "../../../lib/format";
 import { toWhatsappNumber } from "../../../lib/phone";
 import {
   IconClose,
@@ -10,16 +12,12 @@ import {
   IconRefresh,
   IconSearch,
   IconTrash,
-  PAYMENT_METHODS,
   STATUS_OPTIONS,
   WhatsAppMiniIcon,
-  paidAmount,
   pendingAmount,
   statusClass,
   exportBookingsToCSV,
 } from "../adminHelpers";
-
-const DAYS = nextDays(14);
 
 export default function AgendaView({
   activeDate,
@@ -29,6 +27,8 @@ export default function AgendaView({
   searchQuery,
   setSearchQuery,
   weekStats,
+  lastWeekSameDay,
+  onGoToCaja,
   onRefresh,
   onOpenCreate,
   onOpenDetail,
@@ -36,6 +36,10 @@ export default function AgendaView({
   onCancel,
 }) {
   const [statusFilter, setStatusFilter] = useState("all"); // "all" | "pending_payment" | "confirmed" | "cancelled"
+  // Se calcula en cada render (no a nivel módulo) para que "Hoy" cambie a
+  // la medianoche de Catriel aunque el panel quede abierto.
+  const days = nextDays(14);
+  const isViewingToday = activeDate === todayInClub();
 
   const allBookings = dayData?.bookings || [];
   const pendingCount = allBookings.filter(
@@ -82,46 +86,25 @@ export default function AgendaView({
     (b) => bookingMatchesStatus(b) && bookingMatchesSearch(b),
   );
 
-  const totalPendingToday = (dayData?.bookings || [])
-    .filter((b) => b.status !== "cancelado")
-    .reduce((sum, b) => sum + pendingAmount(b), 0);
+  const summary = dayData?.summary;
+  const cash = dayData?.cash;
 
-  // Cobros del día agrupados por método (efectivo/transferencia/MP): suma
-  // los payments ya cargados en cada booking, no pide nada nuevo al servidor.
-  const cashCloseByMethod = PAYMENT_METHODS.map((m) => ({
-    ...m,
-    total: (dayData?.bookings || [])
-      .filter((b) => b.status !== "cancelado")
-      .flatMap((b) => Object.values(b.payments || {}))
-      .filter((p) => (p.method || "efectivo") === m.value)
-      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0),
-  }));
-  const totalCashCloseToday = cashCloseByMethod.reduce(
-    (sum, m) => sum + m.total,
-    0,
-  );
-
-  // Flecha de tendencia hoy vs ayer para las KPIs, a partir de los últimos
-  // 7 días (weekStats siempre termina hoy, sin importar qué día mira la
-  // agenda).
-  function trendVs(field) {
-    if (!weekStats || weekStats.length < 2) return null;
-    const today = weekStats[weekStats.length - 1][field];
-    const yesterday = weekStats[weekStats.length - 2][field];
-    if (!yesterday) return null;
-    const pct = Math.round(((today - yesterday) / yesterday) * 100);
-    if (pct === 0) return null;
-    return { pct, up: pct > 0 };
-  }
-  const ingresosTrend = trendVs("ingresos");
-  const turnosTrend = trendVs("turnos");
+  // Tendencia contra el mismo día de la semana pasada. Solo tiene sentido
+  // mirando hoy: weekStats siempre termina hoy en Catriel.
+  const todayStats = weekStats?.find((d) => d.isToday);
+  const trend = (field) =>
+    isViewingToday && todayStats && lastWeekSameDay
+      ? trendPct(todayStats[field], lastWeekSameDay[field])
+      : null;
+  const ingresosTrend = trend("cobrado");
+  const turnosTrend = trend("turnos");
 
   return (
     <>
       {/* DATE SELECTOR BAR */}
       <div className="admin-date-picker-row">
         <div className="admin-dates-scroll">
-          {DAYS.map((d) => (
+          {days.map((d) => (
             <button
               key={d.iso}
               type="button"
@@ -170,45 +153,37 @@ export default function AgendaView({
           <div className="admin-kpi-card" data-tone="orange">
             <span className="admin-kpi-label">Ocupación del Día</span>
             <div className="admin-kpi-val">
-              {dayData.stats.takenSlots} / {dayData.stats.totalSlots}
+              {dayData.stats.reservados} / {dayData.stats.disponibles}
               <span className="admin-kpi-sub">
-                ({dayData.stats.ocupacionPct}%)
+                ({formatPct(dayData.stats.ocupacionPct)})
               </span>
             </div>
           </div>
 
           <div className="admin-kpi-card" data-tone="emerald">
-            <span className="admin-kpi-label">Recaudación Estimada</span>
+            <span className="admin-kpi-label">Cobrado Hoy</span>
             <div className="admin-kpi-val" style={{ color: "#047857" }}>
-              ${dayData.stats.ingresosEstimados.toLocaleString("es-AR")}
-              {ingresosTrend && (
-                <span
-                  className={`admin-kpi-trend ${ingresosTrend.up ? "up" : "down"}`}
-                >
-                  {ingresosTrend.up ? "▲" : "▼"} {Math.abs(ingresosTrend.pct)}%
-                </span>
-              )}
+              {formatARS(cash.cobrado)}
+              <TrendBadge pct={ingresosTrend} />
             </div>
+            <span className="admin-kpi-sub">
+              Turnos {formatARS(cash.cobradoTurnos)} · Cantina{" "}
+              {formatARS(cash.cobradoCantina)}
+            </span>
           </div>
 
           <div className="admin-kpi-card" data-tone="sky">
             <span className="admin-kpi-label">Horarios Disponibles</span>
             <div className="admin-kpi-val" style={{ color: "#0369a1" }}>
-              {dayData.stats.libres} libres
+              {plural(dayData.stats.libres, "libre", "libres")}
             </div>
           </div>
 
           <div className="admin-kpi-card" data-tone="ink">
-            <span className="admin-kpi-label">Reservas Confirmadas</span>
+            <span className="admin-kpi-label">Turnos del Día</span>
             <div className="admin-kpi-val">
-              {dayData.bookings.length} partidos
-              {turnosTrend && (
-                <span
-                  className={`admin-kpi-trend ${turnosTrend.up ? "up" : "down"}`}
-                >
-                  {turnosTrend.up ? "▲" : "▼"} {Math.abs(turnosTrend.pct)}%
-                </span>
-              )}
+              {plural(summary.turnos, "turno", "turnos")}
+              <TrendBadge pct={turnosTrend} />
             </div>
           </div>
 
@@ -216,10 +191,13 @@ export default function AgendaView({
             <span className="admin-kpi-label">Por Cobrar Hoy</span>
             <div
               className="admin-kpi-val"
-              style={{ color: totalPendingToday > 0 ? "#b45309" : "#047857" }}
+              style={{ color: summary.porCobrar > 0 ? "#b45309" : "#047857" }}
             >
-              ${totalPendingToday.toLocaleString("es-AR")}
+              {formatARS(summary.porCobrar)}
             </div>
+            <span className="admin-kpi-sub">
+              Facturado {formatARS(summary.facturadoTurnos)}
+            </span>
           </div>
         </div>
       )}
@@ -236,30 +214,47 @@ export default function AgendaView({
           }}
         >
           <div>
-            <h2 className="admin-section-title">Cierre de Caja del Día</h2>
-            <div className="admin-cashclose-grid">
-              {cashCloseByMethod.map((m) => (
-                <div key={m.value} className="admin-cashclose-card">
-                  <span className="admin-cashclose-label">{m.label}</span>
-                  <div className="admin-cashclose-val">
-                    ${m.total.toLocaleString("es-AR")}
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 400,
-                        color: "var(--text-muted)",
-                        marginLeft: 4,
-                      }}
-                    >
-                      (
-                      {totalCashCloseToday > 0
-                        ? Math.round((m.total / totalCashCloseToday) * 100)
-                        : 0}
-                      %)
-                    </span>
-                  </div>
-                </div>
-              ))}
+            <h2 className="admin-section-title">Caja del Día</h2>
+            <div className="admin-cashclose-card">
+              <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+                Efectivo {formatARS(cash.byMethod.efectivo)} · Transferencia{" "}
+                {formatARS(cash.byMethod.transferencia)} · Mercado Pago{" "}
+                {formatARS(cash.byMethod.mercadopago)} · Egresos{" "}
+                {formatARS(-cash.totalExpenses)}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: 8,
+                  gap: 12,
+                  flexWrap: "wrap",
+                }}
+              >
+                <strong>
+                  Esperado en cajón: {formatARS(cash.expectedCash)}
+                </strong>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ height: 32, padding: "4px 12px", fontSize: 12.5 }}
+                  onClick={onGoToCaja}
+                >
+                  Ir a Caja →
+                </button>
+              </div>
+              {summary.pagadosSinCobro > 0 && (
+                <p style={{ fontSize: 12, color: "#b45309", marginTop: 8 }}>
+                  ⚠️{" "}
+                  {plural(
+                    summary.pagadosSinCobro,
+                    "turno marcado pagado no tiene",
+                    "turnos marcados pagados no tienen",
+                  )}{" "}
+                  cobro cargado: no suman en caja.
+                </p>
+              )}
             </div>
           </div>
 
@@ -268,20 +263,20 @@ export default function AgendaView({
             {weekStats ? (
               <div className="admin-week-chart">
                 {(() => {
-                  const max = Math.max(1, ...weekStats.map((d) => d.ingresos));
-                  return weekStats.map((d, i) => (
+                  const max = Math.max(1, ...weekStats.map((d) => d.cobrado));
+                  return weekStats.map((d) => (
                     <div key={d.date} className="admin-week-bar-col">
                       <span className="admin-week-bar-val">
-                        {d.ingresos > 0
-                          ? `$${Math.round(d.ingresos / 1000)}k`
+                        {d.cobrado > 0
+                          ? `$${Math.round(d.cobrado / 1000)}k`
                           : ""}
                       </span>
                       <div
-                        className={`admin-week-bar${i === weekStats.length - 1 ? " is-today" : ""}`}
+                        className={`admin-week-bar${d.isToday ? " is-today" : ""}`}
                         style={{
-                          height: `${Math.max(4, (d.ingresos / max) * 100)}px`,
+                          height: `${Math.max(4, (d.cobrado / max) * 100)}px`,
                         }}
-                        title={`${d.dayLabel}: $${d.ingresos.toLocaleString("es-AR")}`}
+                        title={`${d.dayLabel} ${formatDate(d.date)}: ${formatARS(d.cobrado)} (turnos ${formatARS(d.cobradoTurnos)} · cantina ${formatARS(d.cantina)})`}
                       />
                       <span className="admin-week-bar-label">{d.dayLabel}</span>
                     </div>
@@ -301,7 +296,7 @@ export default function AgendaView({
         {/* COURT TIMELINES (CANCHA 1 VS CANCHA 2) */}
         <div style={{ marginTop: 32 }}>
           <h2 className="admin-section-title">
-            Grilla Horaria de Pistas ({activeDate})
+            Grilla Horaria de Pistas ({formatDate(activeDate, "long")})
           </h2>
 
           <div className="admin-courts-timeline-grid">
@@ -328,7 +323,11 @@ export default function AgendaView({
                       </span>
                     </div>
                     <span className="badge-linear badge-emerald">
-                      {courtSlots.filter((s) => s.isTaken).length} reservados
+                      {plural(
+                        courtSlots.filter((s) => s.isTaken).length,
+                        "reservado",
+                        "reservados",
+                      )}
                     </span>
                   </div>
 
@@ -373,6 +372,7 @@ export default function AgendaView({
                                     >
                                       {b.playerName}
                                     </strong>
+                                    {b.isTest && <TestBadge />}
                                     {b.playerPhone && (
                                       <span
                                         style={{
@@ -687,10 +687,11 @@ export default function AgendaView({
                       </td>
                       <td>{b.courtName}</td>
                       <td>
-                        <strong>{b.startTime}</strong> - {b.endTime} hs
+                        <strong>{b.startTime}</strong>–{b.endTime}
                       </td>
                       <td>
                         <strong>{b.playerName}</strong>
+                        {b.isTest && <TestBadge />}
                       </td>
                       <td>
                         <span
@@ -709,20 +710,11 @@ export default function AgendaView({
                             fontFamily: "var(--font-mono)",
                           }}
                         >
-                          $
-                          {(typeof b.total === "number"
-                            ? b.total
-                            : b.fullCourt !== false
-                              ? priceForSlot(b.date || activeDate, b.startTime)
-                                  .total
-                              : (b.playersCount || 4) *
-                                priceForSlot(b.date || activeDate, b.startTime)
-                                  .perPlayer
-                          ).toLocaleString("es-AR")}
+                          {formatARS(bookingTotal(b))}
                         </strong>
-                        {pendingAmount(b) > 0 && b.status !== "cancelado" && (
+                        {pendingAmount(b) > 0 && (
                           <div style={{ fontSize: 11, color: "#b45309" }}>
-                            Debe ${pendingAmount(b).toLocaleString("es-AR")}
+                            Debe {formatARS(pendingAmount(b))}
                           </div>
                         )}
                       </td>
@@ -816,5 +808,31 @@ export default function AgendaView({
         </div>
       </div>
     </>
+  );
+}
+
+function TrendBadge({ pct }) {
+  if (pct == null) return null;
+  const up = pct > 0;
+  return (
+    <span
+      className={`admin-kpi-trend ${up ? "up" : "down"}`}
+      title="vs. mismo día de la semana pasada"
+    >
+      {up ? "▲ +" : "▼ -"}
+      {Math.abs(pct)}%
+    </span>
+  );
+}
+
+function TestBadge() {
+  return (
+    <span
+      className="badge-linear badge-amber"
+      style={{ fontSize: 10, padding: "1px 6px", marginLeft: 6 }}
+      title="Dato de prueba: no suma en ningún total"
+    >
+      PRUEBA
+    </span>
   );
 }

@@ -7,6 +7,8 @@ import {
   adminCancelBooking,
   adminCreateManualBooking,
   adminGetClients,
+  adminGetClubConfig,
+  adminSetTestFlag,
   adminGetWeekStats,
   adminLogout,
   adminRemovePayment,
@@ -19,9 +21,11 @@ import {
   COURTS,
   SLOT_DURATION_MIN,
   addMinutes,
-  isClosedDay,
-  toISODate,
+  nowInClubTimezone,
+  todayInClub,
 } from "../../lib/booking";
+import { getClubStatus } from "../../data/horarios";
+import { formatPct, formatTime } from "../../lib/format";
 import { IconAlert, IconPlus, isExpiredSessionError } from "./adminHelpers";
 import AgendaView from "./views/AgendaView";
 import ClientesView from "./views/ClientesView";
@@ -45,17 +49,15 @@ const NAV_ITEMS = [
   { id: "configuracion", label: "⚙️ Configuración" },
 ];
 
-/** El club abre 14:00-00:30, lunes a sábado (ver DAILY_START_TIMES en lib/booking). */
-function isClubOpenNow() {
-  const now = new Date();
-  const minutes = now.getHours() * 60 + now.getMinutes();
-  if (minutes <= 30) return true; // franja 00:00-00:30 del día siguiente
-  if (isClosedDay(toISODate(now))) return false;
-  return minutes >= 14 * 60;
-}
+const CLUB_PILL_CLASS = {
+  abierto: "is-open",
+  "cierra-pronto": "is-closing",
+  cerrado: "is-closed",
+  bloqueado: "is-closed",
+};
 
 function greetingWord() {
-  const h = new Date().getHours();
+  const h = Number(nowInClubTimezone().hhmm.slice(0, 2));
   if (h < 12) return "Buenos días";
   if (h < 20) return "Buenas tardes";
   return "Buenas noches";
@@ -72,7 +74,7 @@ export default function AdminPage() {
   const [view, setView] = useState("agenda");
 
   // Dashboard Data State (Agenda)
-  const [activeDate, setActiveDate] = useState(toISODate(new Date()));
+  const [activeDate, setActiveDate] = useState(todayInClub);
   const [dayData, setDayData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
@@ -98,7 +100,12 @@ export default function AdminPage() {
 
   // Tendencia de los últimos 7 días (KPIs con flecha hoy-vs-ayer + gráfico)
   const [weekStats, setWeekStats] = useState(null);
+  const [lastWeekSameDay, setLastWeekSameDay] = useState(null);
   const [nowLabel, setNowLabel] = useState("");
+
+  // Días bloqueados de Configuración: el estado del club los respeta.
+  const [blockedDates, setBlockedDates] = useState([]);
+  const [isOnline, setIsOnline] = useState(true);
 
   // Detalle de turno: cobros parciales, saldo pendiente, cancelar
   const [detailBooking, setDetailBooking] = useState(null);
@@ -131,19 +138,28 @@ export default function AdminPage() {
     if (!isAuthenticated) return;
     loadClients();
     loadWeekStats();
+    adminGetClubConfig().then((res) => {
+      if (res.ok) setBlockedDates(res.config.blockedDates || []);
+    });
   }, [isAuthenticated]);
+
+  // Solo se avisa cuando se PIERDE la conexión: si todo anda, no hay badge.
+  useEffect(() => {
+    const update = () => setIsOnline(navigator.onLine);
+    update();
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
+  }, []);
 
   // Reloj del saludo del header: se actualiza solo, no hace falta refrescar
   // la página para que dejen de mostrar la hora con la que se logueó el admin.
   useEffect(() => {
     if (!isAuthenticated) return;
-    const update = () =>
-      setNowLabel(
-        new Date().toLocaleTimeString("es-AR", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      );
+    const update = () => setNowLabel(formatTime());
     update();
     const id = setInterval(update, 30000);
     return () => clearInterval(id);
@@ -211,6 +227,7 @@ export default function AdminPage() {
     if (res.ok) {
       setActionMessage("✓ Estado actualizado");
       loadDayData(activeDate);
+      loadWeekStats();
       setTimeout(() => setActionMessage(""), 2000);
     } else if (!handleExpiredSession(res)) {
       alert(res.error || "No se pudo actualizar el estado.");
@@ -247,7 +264,21 @@ export default function AdminPage() {
 
   async function loadWeekStats() {
     const res = await adminGetWeekStats();
-    if (res.ok) setWeekStats(res.days);
+    if (res.ok) {
+      setWeekStats(res.days);
+      setLastWeekSameDay(res.lastWeekSameDay);
+    }
+  }
+
+  async function handleToggleTest(booking) {
+    const res = await adminSetTestFlag("bookings", booking.id, !booking.isTest);
+    if (res.ok) {
+      loadDayData(activeDate);
+      loadWeekStats();
+      loadClients();
+    } else if (!handleExpiredSession(res)) {
+      alert(res.error || "No se pudo actualizar el turno.");
+    }
   }
 
   function openDetail(booking) {
@@ -268,6 +299,7 @@ export default function AdminPage() {
     if (res.ok) {
       setPaymentForm({ method: paymentForm.method, amount: "" });
       loadDayData(activeDate);
+      loadWeekStats();
     } else if (!handleExpiredSession(res)) {
       alert(res.error || "No se pudo registrar el cobro.");
     }
@@ -278,6 +310,7 @@ export default function AdminPage() {
     const res = await adminRemovePayment(detailBooking.id, paymentId);
     if (res.ok) {
       loadDayData(activeDate);
+      loadWeekStats();
     } else if (!handleExpiredSession(res)) {
       alert(res.error || "No se pudo eliminar el cobro.");
     }
@@ -334,7 +367,7 @@ export default function AdminPage() {
     if (!dayData) return;
     let text = `📋 *PLANILLA DE TURNOS - MUZZAGA PÁDEL*\n`;
     text += `📅 *Fecha:* ${dayData.date}\n`;
-    text += `🎾 *Ocupación:* ${dayData.stats.takenSlots}/${dayData.stats.totalSlots} turnos (${dayData.stats.ocupacionPct}%)\n\n`;
+    text += `🎾 *Ocupación:* ${dayData.stats.takenSlots}/${dayData.stats.totalSlots} turnos (${formatPct(dayData.stats.ocupacionPct)})\n\n`;
 
     COURTS.forEach((court) => {
       text += `🏟️ *${court.name.toUpperCase()} (${court.type}):*\n`;
@@ -361,6 +394,8 @@ export default function AdminPage() {
     setActiveDate(date);
     setView("agenda");
   }
+
+  const clubStatus = getClubStatus(new Date(), { blockedDates });
 
   // Mientras el servidor confirma la cookie no mostramos nada: si no, al
   // admin ya logueado le parpadea el formulario en cada recarga.
@@ -568,29 +603,25 @@ export default function AdminPage() {
                   {greetingWord()}, Muzzaga 👋
                 </h1>
                 <div className="admin-greeting-sub">
-                  <span>{nowLabel} hs en Catriel</span>
+                  <span>{nowLabel} en Catriel</span>
                   <span
-                    className={`admin-live-pill ${isClubOpenNow() ? "is-open" : "is-closed"}`}
+                    className={`admin-live-pill ${CLUB_PILL_CLASS[clubStatus.state]}`}
                   >
-                    {isClubOpenNow() ? "Club Abierto" : "Club Cerrado"}
+                    {clubStatus.statusText}
                   </span>
-                  <span
-                    className={`badge-linear ${dayData?.firebaseOk ? "badge-emerald" : "badge-amber"}`}
-                    style={{ fontSize: 10, padding: "2px 6px" }}
-                    title={
-                      dayData?.firebaseOk
-                        ? "Conectado a la base de datos"
-                        : "No se pudo confirmar la conexión a Firebase: los datos pueden no ser reales"
-                    }
-                  >
-                    {dayData?.firebaseOk ? (
-                      "Firebase conectado"
-                    ) : (
-                      <>
-                        <IconAlert size={11} /> Firebase sin confirmar
-                      </>
-                    )}
-                  </span>
+                  {!isOnline ? (
+                    <span className="admin-live-pill is-offline" role="status">
+                      <IconAlert size={11} /> Sin conexión — lo que cargues
+                      ahora no se va a guardar
+                    </span>
+                  ) : (
+                    dayData?.firebaseOk === false && (
+                      <span className="admin-live-pill is-offline" role="status">
+                        <IconAlert size={11} /> No se pudo leer la base — los
+                        datos pueden no estar actualizados
+                      </span>
+                    )
+                  )}
                   {actionMessage && (
                     <span className="admin-toast-badge">{actionMessage}</span>
                   )}
@@ -628,6 +659,8 @@ export default function AdminPage() {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 weekStats={weekStats}
+                lastWeekSameDay={lastWeekSameDay}
+                onGoToCaja={() => setView("caja")}
                 onRefresh={() => loadDayData(activeDate)}
                 onOpenCreate={openCreateModal}
                 onOpenDetail={openDetail}
@@ -643,7 +676,10 @@ export default function AdminPage() {
             )}
             {view === "clientes" && <ClientesView clients={clients} />}
             {view === "caja" && (
-              <CajaView onExpiredSession={handleExpiredSession} />
+              <CajaView
+                initialDate={activeDate}
+                onExpiredSession={handleExpiredSession}
+              />
             )}
             {view === "cantina" && (
               <CantinaView onExpiredSession={handleExpiredSession} />
@@ -687,6 +723,7 @@ export default function AdminPage() {
           onAddPayment={handleAddPayment}
           onRemovePayment={handleRemovePayment}
           onCancel={handleCancel}
+          onToggleTest={handleToggleTest}
           onMoved={() => {
             loadDayData(activeDate);
             setDetailBooking(null);

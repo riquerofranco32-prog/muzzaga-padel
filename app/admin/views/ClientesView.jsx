@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { toWhatsappNumber } from "../../../lib/phone";
+import { plural } from "../../../lib/format";
 import {
   categorizeClient,
   getClientsMetrics,
@@ -113,14 +114,34 @@ export default function ClientesView({ clients = [] }) {
             padding: "12px 16px",
           }}
         >
-          <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+              textTransform: "uppercase",
+              fontWeight: 700,
+            }}
+          >
             Total Jugadores
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", marginTop: 4 }}>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "var(--text-primary)",
+              marginTop: 4,
+            }}
+          >
             {metrics.totalClients}
           </div>
-          <div style={{ fontSize: 11.5, color: "var(--text-secondary)", marginTop: 2 }}>
-            {metrics.totalBookings} turnos jugados
+          <div
+            style={{
+              fontSize: 11.5,
+              color: "var(--text-secondary)",
+              marginTop: 2,
+            }}
+          >
+            {plural(metrics.totalBookings, "turno jugado", "turnos jugados")}
           </div>
         </div>
 
@@ -132,13 +153,33 @@ export default function ClientesView({ clients = [] }) {
             padding: "12px 16px",
           }}
         >
-          <div style={{ fontSize: 11, color: "#b45309", textTransform: "uppercase", fontWeight: 700 }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: "#b45309",
+              textTransform: "uppercase",
+              fontWeight: 700,
+            }}
+          >
             ⭐ Jugadores VIP
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#d97706", marginTop: 4 }}>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "#d97706",
+              marginTop: 4,
+            }}
+          >
             {metrics.vipCount}
           </div>
-          <div style={{ fontSize: 11.5, color: "var(--text-secondary)", marginTop: 2 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: "var(--text-secondary)",
+              marginTop: 2,
+            }}
+          >
             4 o más turnos
           </div>
         </div>
@@ -151,13 +192,33 @@ export default function ClientesView({ clients = [] }) {
             padding: "12px 16px",
           }}
         >
-          <div style={{ fontSize: 11, color: "#2563eb", textTransform: "uppercase", fontWeight: 700 }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: "#2563eb",
+              textTransform: "uppercase",
+              fontWeight: 700,
+            }}
+          >
             🎾 Frecuentes
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#3b82f6", marginTop: 4 }}>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "#3b82f6",
+              marginTop: 4,
+            }}
+          >
             {metrics.frequentCount}
           </div>
-          <div style={{ fontSize: 11.5, color: "var(--text-secondary)", marginTop: 2 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: "var(--text-secondary)",
+              marginTop: 2,
+            }}
+          >
             2 a 3 turnos
           </div>
         </div>
@@ -170,13 +231,33 @@ export default function ClientesView({ clients = [] }) {
             padding: "12px 16px",
           }}
         >
-          <div style={{ fontSize: 11, color: "#059669", textTransform: "uppercase", fontWeight: 700 }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: "#059669",
+              textTransform: "uppercase",
+              fontWeight: 700,
+            }}
+          >
             🌱 Nuevos
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#10b981", marginTop: 4 }}>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "#10b981",
+              marginTop: 4,
+            }}
+          >
             {metrics.newCount}
           </div>
-          <div style={{ fontSize: 11.5, color: "var(--text-secondary)", marginTop: 2 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: "var(--text-secondary)",
+              marginTop: 2,
+            }}
+          >
             Primer turno
           </div>
         </div>
@@ -231,8 +312,12 @@ export default function ClientesView({ clients = [] }) {
               padding: "4px 10px",
               fontSize: 12,
               borderRadius: 6,
-              background: segmentFilter === "all" ? "var(--surface, #fff)" : "transparent",
-              boxShadow: segmentFilter === "all" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+              background:
+                segmentFilter === "all"
+                  ? "var(--surface, #fff)"
+                  : "transparent",
+              boxShadow:
+                segmentFilter === "all" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
               fontWeight: segmentFilter === "all" ? 600 : 400,
             }}
             onClick={() => setSegmentFilter("all")}
@@ -246,8 +331,12 @@ export default function ClientesView({ clients = [] }) {
               padding: "4px 10px",
               fontSize: 12,
               borderRadius: 6,
-              background: segmentFilter === "vip" ? "var(--surface, #fff)" : "transparent",
-              boxShadow: segmentFilter === "vip" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+              background:
+                segmentFilter === "vip"
+                  ? "var(--surface, #fff)"
+                  : "transparent",
+              boxShadow:
+                segmentFilter === "vip" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
               fontWeight: segmentFilter === "vip" ? 600 : 400,
             }}
             onClick={() => setSegmentFilter("vip")}
@@ -261,8 +350,14 @@ export default function ClientesView({ clients = [] }) {
               padding: "4px 10px",
               fontSize: 12,
               borderRadius: 6,
-              background: segmentFilter === "frecuente" ? "var(--surface, #fff)" : "transparent",
-              boxShadow: segmentFilter === "frecuente" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+              background:
+                segmentFilter === "frecuente"
+                  ? "var(--surface, #fff)"
+                  : "transparent",
+              boxShadow:
+                segmentFilter === "frecuente"
+                  ? "0 1px 2px rgba(0,0,0,0.08)"
+                  : "none",
               fontWeight: segmentFilter === "frecuente" ? 600 : 400,
             }}
             onClick={() => setSegmentFilter("frecuente")}
@@ -276,8 +371,14 @@ export default function ClientesView({ clients = [] }) {
               padding: "4px 10px",
               fontSize: 12,
               borderRadius: 6,
-              background: segmentFilter === "nuevo" ? "var(--surface, #fff)" : "transparent",
-              boxShadow: segmentFilter === "nuevo" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+              background:
+                segmentFilter === "nuevo"
+                  ? "var(--surface, #fff)"
+                  : "transparent",
+              boxShadow:
+                segmentFilter === "nuevo"
+                  ? "0 1px 2px rgba(0,0,0,0.08)"
+                  : "none",
               fontWeight: segmentFilter === "nuevo" ? 600 : 400,
             }}
             onClick={() => setSegmentFilter("nuevo")}
@@ -305,7 +406,13 @@ export default function ClientesView({ clients = [] }) {
                 return (
                   <tr key={c.phone || c.name}>
                     <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
                         <strong>{c.name}</strong>
                         {cat.category === "VIP" && (
                           <span
@@ -369,7 +476,10 @@ export default function ClientesView({ clients = [] }) {
                       <span
                         style={{
                           fontWeight: c.count >= 4 ? 700 : 500,
-                          color: c.count >= 4 ? "var(--color-primary-orange, #ff5722)" : "inherit",
+                          color:
+                            c.count >= 4
+                              ? "var(--color-primary-orange, #ff5722)"
+                              : "inherit",
                         }}
                       >
                         {c.count} {c.count === 1 ? "turno" : "turnos"}

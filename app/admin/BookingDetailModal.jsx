@@ -5,6 +5,7 @@ import { COURTS, PRICE_PER_PLAYER } from "../../lib/booking";
 import { toWhatsappNumber } from "../../lib/phone";
 import { categorizeClient } from "../../lib/clientsExport";
 import { adminMoveBooking } from "./actions";
+import { formatDate, plural } from "../../lib/format";
 import {
   IconClose,
   IconTrash,
@@ -37,12 +38,15 @@ export default function BookingDetailModal({
   onAddPayment,
   onRemovePayment,
   onCancel,
+  onToggleTest,
   onMoved,
 }) {
   const [isMoving, setIsMoving] = useState(false);
   const [moveCourtId, setMoveCourtId] = useState(booking.courtId || "cancha-1");
   const [moveDate, setMoveDate] = useState(booking.date || "");
-  const [moveStartTime, setMoveStartTime] = useState(booking.startTime || "14:00");
+  const [moveStartTime, setMoveStartTime] = useState(
+    booking.startTime || "14:00",
+  );
   const [moveSubmitting, setMoveSubmitting] = useState(false);
   const [moveError, setMoveError] = useState("");
 
@@ -101,7 +105,8 @@ export default function BookingDetailModal({
           }}
         >
           <h3 style={{ fontSize: 18, color: "var(--color-ink)", margin: 0 }}>
-            Turno {booking.date} · {booking.startTime} hs
+            Turno {formatDate(booking.date)} · {booking.startTime}
+            {booking.isTest && " · PRUEBA"}
           </h3>
           <button type="button" className="admin-modal-close" onClick={onClose}>
             <IconClose size={14} />
@@ -134,9 +139,9 @@ export default function BookingDetailModal({
                   fontWeight: 700,
                   whiteSpace: "nowrap",
                 }}
-                title={`${clientData.count} turnos jugados en Muzzaga`}
+                title={`${plural(clientData.count, "turno jugado", "turnos jugados")} en Muzzaga`}
               >
-                ⭐ VIP ({clientData.count} turnos)
+                ⭐ VIP ({plural(clientData.count, "turno", "turnos")})
               </span>
             )}
             {clientCat && clientCat.category === "Frecuente" && (
@@ -151,7 +156,11 @@ export default function BookingDetailModal({
                   fontWeight: 600,
                   whiteSpace: "nowrap",
                 }}
-                title={`${clientData.count} turnos jugados`}
+                title={plural(
+                  clientData.count,
+                  "turno jugado",
+                  "turnos jugados",
+                )}
               >
                 🎾 Frecuente ({clientData.count})
               </span>
@@ -205,13 +214,25 @@ export default function BookingDetailModal({
           )}
 
           {booking.playerPhone && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 6,
+                flexWrap: "wrap",
+                marginTop: 8,
+              }}
+            >
               <a
                 href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildReminderMessage(booking))}`}
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary"
-                style={{ height: 26, fontSize: 11, padding: "0 8px", textDecoration: "none" }}
+                style={{
+                  height: 26,
+                  fontSize: 11,
+                  padding: "0 8px",
+                  textDecoration: "none",
+                }}
                 title="Enviar recordatorio con saldo pendiente"
               >
                 📩 Recordatorio
@@ -221,7 +242,12 @@ export default function BookingDetailModal({
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary"
-                style={{ height: 26, fontSize: 11, padding: "0 8px", textDecoration: "none" }}
+                style={{
+                  height: 26,
+                  fontSize: 11,
+                  padding: "0 8px",
+                  textDecoration: "none",
+                }}
                 title="Pedir seña con Alias bancario"
               >
                 💳 Pedir Seña
@@ -231,7 +257,12 @@ export default function BookingDetailModal({
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary"
-                style={{ height: 26, fontSize: 11, padding: "0 8px", textDecoration: "none" }}
+                style={{
+                  height: 26,
+                  fontSize: 11,
+                  padding: "0 8px",
+                  textDecoration: "none",
+                }}
                 title="Enviar confirmación de turno"
               >
                 ✓ Confirmar
@@ -262,7 +293,9 @@ export default function BookingDetailModal({
           style={{
             marginBottom: 16,
             padding: 12,
-            background: isMoving ? "var(--color-surface-2, #f8fafc)" : "transparent",
+            background: isMoving
+              ? "var(--color-surface-2, #f8fafc)"
+              : "transparent",
             border: "1px dashed var(--color-hairline, #e2e8f0)",
             borderRadius: 8,
           }}
@@ -292,8 +325,15 @@ export default function BookingDetailModal({
 
           {isMoving && (
             <form onSubmit={handleMoveSubmit} style={{ marginTop: 12 }}>
-              <p style={{ fontSize: 12, color: "var(--text-secondary)", margin: "0 0 10px" }}>
-                Mové este turno a otra cancha o fecha conservando la seña y los cobros ya cargados.
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-secondary)",
+                  margin: "0 0 10px",
+                }}
+              >
+                Mové este turno a otra cancha o fecha conservando la seña y los
+                cobros ya cargados.
               </p>
 
               {moveError && (
@@ -311,7 +351,14 @@ export default function BookingDetailModal({
                 </div>
               )}
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 10,
+                  marginBottom: 10,
+                }}
+              >
                 <div>
                   <label className="admin-field-label">Nueva Cancha</label>
                   <select
@@ -550,6 +597,25 @@ export default function BookingDetailModal({
             }}
           >
             <IconTrash size={12} /> Cancelar turno
+          </button>
+        )}
+
+        {onToggleTest && (
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={{
+              height: 32,
+              padding: "4px 12px",
+              fontSize: 12,
+              marginLeft: 8,
+            }}
+            onClick={() => onToggleTest(booking)}
+            title="Los datos de prueba siguen ocupando el horario pero no suman en caja, reportes ni clientes"
+          >
+            {booking.isTest
+              ? "Contar como turno real"
+              : "Marcar como dato de prueba"}
           </button>
         )}
       </div>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatARS, formatDate, formatPct, plural } from "../../../lib/format";
+import { todayInClub } from "../../../lib/booking";
 import { adminGetMonthStats } from "../actions";
 import { IconClipboard } from "../adminHelpers";
 
@@ -37,9 +39,9 @@ function downloadCsv(filename, rows) {
 }
 
 export default function ReportesView({ onExpiredSession }) {
-  const today = new Date();
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth() + 1);
+  const today = todayInClub();
+  const [year, setYear] = useState(Number(today.slice(0, 4)));
+  const [month, setMonth] = useState(Number(today.slice(5, 7)));
   const [monthStats, setMonthStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -60,34 +62,36 @@ export default function ReportesView({ onExpiredSession }) {
     };
   }, [year, month]);
 
-  const activeDays = monthStats?.days.filter((d) => d.totalSlots > 0) || [];
-  const daysWithTurnos = activeDays.filter((d) => d.turnos > 0);
-  const promedioDiario =
-    daysWithTurnos.length > 0
-      ? Math.round(monthStats.totals.ingresos / daysWithTurnos.length)
-      : 0;
-  const ocupacionPromedio =
-    activeDays.length > 0
-      ? Math.round(
-          (activeDays.reduce((s, d) => s + d.turnos, 0) /
-            activeDays.reduce((s, d) => s + d.totalSlots, 0)) *
-            100,
-        )
-      : 0;
-  const topDays = [...daysWithTurnos]
-    .sort((a, b) => b.ingresos - a.ingresos)
+  const totals = monthStats?.totals;
+  const topDays = (monthStats?.days || [])
+    .filter((d) => d.cobrado > 0 || d.turnos > 0)
+    .sort((a, b) => b.cobrado - a.cobrado)
     .slice(0, 5);
 
   function handleExportCsv() {
     if (!monthStats) return;
     const rows = [
-      ["Fecha", "Turnos", "Recaudación", "Cupos Totales", "Ocupación %"],
+      [
+        "Fecha",
+        "Turnos",
+        "Cobrado turnos",
+        "Cantina",
+        "Cobrado total",
+        "Facturado turnos",
+        "Por cobrar",
+        "Cupos",
+        "Ocupación %",
+      ],
       ...monthStats.days.map((d) => [
         d.date,
         d.turnos,
-        d.ingresos,
+        d.cobradoTurnos,
+        d.cantina,
+        d.cobrado,
+        d.facturadoTurnos,
+        d.porCobrar,
         d.totalSlots,
-        d.totalSlots ? Math.round((d.turnos / d.totalSlots) * 100) : 0,
+        d.ocupacionPct ?? "",
       ]),
     ];
     downloadCsv(
@@ -151,26 +155,55 @@ export default function ReportesView({ onExpiredSession }) {
           <>
             <div className="admin-report-summary-grid">
               <div className="admin-report-summary-card">
-                <span className="admin-kpi-label">Recaudación del Mes</span>
+                <span className="admin-kpi-label">Cobrado del Mes</span>
                 <div className="admin-kpi-val" style={{ color: "#047857" }}>
-                  ${monthStats.totals.ingresos.toLocaleString("es-AR")}
+                  {formatARS(totals.cobrado)}
                 </div>
+                <span className="admin-kpi-sub">
+                  Turnos {formatARS(totals.cobradoTurnos)} · Cantina{" "}
+                  {formatARS(totals.cantina)}
+                </span>
               </div>
               <div className="admin-report-summary-card">
                 <span className="admin-kpi-label">Turnos Jugados</span>
-                <div className="admin-kpi-val">{monthStats.totals.turnos}</div>
-              </div>
-              <div className="admin-report-summary-card">
-                <span className="admin-kpi-label">Promedio por Día Activo</span>
-                <div className="admin-kpi-val" style={{ color: "#0369a1" }}>
-                  ${promedioDiario.toLocaleString("es-AR")}
+                <div className="admin-kpi-val">
+                  {plural(totals.turnos, "turno", "turnos")}
                 </div>
               </div>
               <div className="admin-report-summary-card">
+                <span className="admin-kpi-label">Por Cobrar</span>
+                <div
+                  className="admin-kpi-val"
+                  style={{
+                    color: totals.porCobrar > 0 ? "#b45309" : "#047857",
+                  }}
+                >
+                  {formatARS(totals.porCobrar)}
+                </div>
+                <span className="admin-kpi-sub">
+                  Facturado turnos {formatARS(totals.facturadoTurnos)}
+                </span>
+              </div>
+              <div className="admin-report-summary-card">
                 <span className="admin-kpi-label">Ocupación Promedio</span>
-                <div className="admin-kpi-val">{ocupacionPromedio}%</div>
+                <div className="admin-kpi-val">
+                  {formatPct(monthStats.ocupacionPct)}
+                </div>
+                <span className="admin-kpi-sub">Días abiertos hasta hoy</span>
               </div>
             </div>
+
+            {totals.pagadosSinCobro > 0 && (
+              <p style={{ fontSize: 13, color: "#b45309", margin: "0 0 16px" }}>
+                ⚠️{" "}
+                {plural(
+                  totals.pagadosSinCobro,
+                  "turno marcado pagado no tiene",
+                  "turnos marcados pagados no tienen",
+                )}{" "}
+                cobro cargado: esa plata no aparece como cobrada.
+              </p>
+            )}
 
             <h3
               style={{
@@ -189,7 +222,7 @@ export default function ReportesView({ onExpiredSession }) {
                     <th>Fecha</th>
                     <th>Turnos</th>
                     <th>Ocupación</th>
-                    <th>Recaudación</th>
+                    <th>Cobrado</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -197,15 +230,10 @@ export default function ReportesView({ onExpiredSession }) {
                     topDays.map((d) => (
                       <tr key={d.date}>
                         <td>
-                          <strong>{d.date}</strong>
+                          <strong>{formatDate(d.date)}</strong>
                         </td>
                         <td>{d.turnos}</td>
-                        <td>
-                          {d.totalSlots
-                            ? Math.round((d.turnos / d.totalSlots) * 100)
-                            : 0}
-                          %
-                        </td>
+                        <td>{formatPct(d.ocupacionPct)}</td>
                         <td
                           style={{
                             color: "#047857",
@@ -213,7 +241,7 @@ export default function ReportesView({ onExpiredSession }) {
                             fontWeight: 600,
                           }}
                         >
-                          ${d.ingresos.toLocaleString("es-AR")}
+                          {formatARS(d.cobrado)}
                         </td>
                       </tr>
                     ))

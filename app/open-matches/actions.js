@@ -1,7 +1,7 @@
 "use server";
 
 import { getDb, isFirebaseConfigured } from "../../lib/firebase";
-import { toISODate } from "../../lib/booking";
+import { todayInClub } from "../../lib/booking";
 import { PRECIO_POR_JUGADOR } from "../../data/pricing";
 
 export async function getOpenMatches() {
@@ -78,7 +78,7 @@ export async function createOpenMatch(data) {
     category,
     badgeColor,
     courtName: courtName || "Cancha 1 · Cristal",
-    date: date || toISODate(new Date()),
+    date: date || todayInClub(),
     time: time || "20:00 hs",
     desc: (desc || "Convocatoria abierta para jugar al pádel.").trim(),
     pricePerPlayer: PRECIO_POR_JUGADOR,

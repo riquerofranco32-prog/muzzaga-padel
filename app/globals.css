@@ -2383,7 +2383,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
   left: 0;
   right: 0;
   padding: 16px 8px 6px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
   color: #ffffff;
   font-size: 11px;
   font-weight: 600;
@@ -3606,7 +3610,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .admin-sidebar-link.active {
-  background: linear-gradient(90deg, rgba(232, 114, 42, 0.22) 0%, rgba(232, 114, 42, 0.06) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(232, 114, 42, 0.22) 0%,
+    rgba(232, 114, 42, 0.06) 100%
+  );
   color: #ffffff;
   font-weight: 600;
   border-left: 3px solid var(--color-accent-orange);
@@ -3687,6 +3695,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .admin-live-pill.is-closed {
   background: var(--color-surface-strong);
   color: var(--text-muted);
+}
+
+.admin-live-pill.is-closing {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.admin-live-pill.is-offline {
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 .admin-quick-actions {
@@ -4221,18 +4239,30 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-xl);
   padding: 28px;
-  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 25px 60px -10px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
   animation: modalScaleIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modalScaleIn {
-  from { opacity: 0; transform: scale(0.95) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .admin-modal-close {
@@ -5965,7 +5995,8 @@ textarea:focus-visible {
    PREMIUM MICRO-ANIMATIONS & MASCOT EFFECTS
    ========================================================================== */
 @keyframes mascotFloat {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
   50% {
@@ -5999,7 +6030,8 @@ textarea:focus-visible {
 }
 
 @keyframes pulseLive {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(232, 114, 42, 0.45);
   }
   50% {
@@ -6021,4 +6053,3 @@ textarea:focus-visible {
     scroll-behavior: auto !important;
   }
 }
-

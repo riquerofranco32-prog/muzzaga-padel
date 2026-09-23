@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getAdminDayData, checkAdminSession } from "../actions";
-import { toISODate, COURTS, nowInClubTimezone } from "../../../lib/booking";
+import { todayInClub, COURTS, nowInClubTimezone } from "../../../lib/booking";
 import { getClubTimeString } from "../../../data/horarios";
 
 export default function MonitorPage() {
@@ -58,7 +58,7 @@ export default function MonitorPage() {
   }
 
   async function loadData() {
-    const today = toISODate(new Date());
+    const today = todayInClub();
     const res = await getAdminDayData(today);
     if (res.ok) {
       setDayData(res);

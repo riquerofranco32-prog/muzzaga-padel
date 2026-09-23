@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatARS } from "../../../lib/format";
 import {
   adminAddCantinaSale,
   adminDeleteCantinaSale,
   adminGetCantinaSales,
+  adminSetTestFlag,
 } from "../actions";
 import { MENU_CATEGORIES, MENU_ITEMS } from "../../../data/menu";
-import { toISODate } from "../../../lib/booking";
+import { todayInClub } from "../../../lib/booking";
+import { computeDailyCash } from "../../../lib/metrics";
 import { IconTrash, PAYMENT_METHODS } from "../adminHelpers";
 
 export default function CantinaView({ onExpiredSession }) {
-  const [date, setDate] = useState(toISODate(new Date()));
+  const [date, setDate] = useState(todayInClub);
   const [selectedCat, setSelectedCat] = useState("all");
   const [cart, setCart] = useState([]); // [{name, price, qty}]
   const [method, setMethod] = useState("efectivo");
@@ -84,7 +87,18 @@ export default function CantinaView({ onExpiredSession }) {
       ? MENU_ITEMS
       : MENU_ITEMS.filter((item) => item.category === selectedCat);
 
-  const dayTotal = sales.reduce((sum, s) => sum + (s.total || 0), 0);
+  // Mismo cálculo que Caja: excluye las ventas marcadas como prueba.
+  const dayTotal = computeDailyCash({ sales }).cobradoCantina;
+  const realSalesCount = sales.filter((s) => !s.isTest).length;
+
+  async function handleToggleTest(sale) {
+    const res = await adminSetTestFlag("cantinaSales", sale.id, !sale.isTest);
+    if (res.ok) {
+      loadSales();
+    } else if (!onExpiredSession?.(res)) {
+      alert(res.error || "No se pudo actualizar la venta.");
+    }
+  }
 
   return (
     <div>
@@ -135,7 +149,7 @@ export default function CantinaView({ onExpiredSession }) {
               >
                 <span>{item.name}</span>
                 <span className="admin-cantina-item-price">
-                  ${item.price.toLocaleString("es-AR")}
+                  {formatARS(item.price)}
                 </span>
               </button>
             ))}
@@ -189,7 +203,7 @@ export default function CantinaView({ onExpiredSession }) {
             }}
           >
             <span>Total</span>
-            <span>${cartTotal.toLocaleString("es-AR")}</span>
+            <span>{formatARS(cartTotal)}</span>
           </div>
 
           <label className="admin-field-label">Método de pago</label>
@@ -220,7 +234,7 @@ export default function CantinaView({ onExpiredSession }) {
 
       <div style={{ marginTop: 32 }}>
         <h2 className="admin-section-title">
-          Ventas del Día ({sales.length}) · ${dayTotal.toLocaleString("es-AR")}
+          Ventas del Día ({realSalesCount}) · {formatARS(dayTotal)}
         </h2>
         <div
           className={`admin-cantina-sales-list ${loading ? "admin-content-loading" : ""}`}
@@ -233,7 +247,7 @@ export default function CantinaView({ onExpiredSession }) {
                 </span>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <strong style={{ fontFamily: "var(--font-mono)" }}>
-                    ${s.total.toLocaleString("es-AR")}
+                    {formatARS(s.total)}
                   </strong>
                   <span
                     className="badge-linear badge-emerald"
@@ -242,6 +256,19 @@ export default function CantinaView({ onExpiredSession }) {
                     {PAYMENT_METHODS.find((m) => m.value === s.method)?.label ||
                       s.method}
                   </span>
+                  <button
+                    type="button"
+                    className={`badge-linear ${s.isTest ? "badge-amber" : ""}`}
+                    style={{ fontSize: 10, cursor: "pointer" }}
+                    onClick={() => handleToggleTest(s)}
+                    title={
+                      s.isTest
+                        ? "Dato de prueba: no suma. Tocá para contarla como venta real."
+                        : "Marcar como dato de prueba (deja de sumar en caja y reportes)"
+                    }
+                  >
+                    {s.isTest ? "PRUEBA" : "¿Prueba?"}
+                  </button>
                   <button
                     type="button"
                     className="admin-table-action-btn delete"

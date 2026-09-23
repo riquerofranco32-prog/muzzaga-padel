@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatARS, plural } from "../../../lib/format";
 import {
   adminAddTournamentPlayer,
   adminCreateTournament,
@@ -225,9 +226,9 @@ export default function TorneosView({ onExpiredSession }) {
                       }}
                     >
                       {t.date || "Sin fecha"} · {t.category || "Sin categoría"}{" "}
-                      · {t.players.length} inscriptos ({paidCount} pagados)
-                      {t.price > 0 &&
-                        ` · $${t.price.toLocaleString("es-AR")} por pareja`}
+                      · {plural(t.players.length, "inscripto", "inscriptos")} (
+                      {plural(paidCount, "pagado", "pagados")})
+                      {t.price > 0 && ` · ${formatARS(t.price)} por pareja`}
                     </div>
                   </div>
                   <span className={`badge-linear ${statusInfo.tone}`}>

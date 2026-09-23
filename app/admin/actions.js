@@ -3,12 +3,24 @@
 import { getDb, isFirebaseConfigured } from "../../lib/firebase";
 import {
   COURTS,
+  addMinutes,
   findCourt,
   getSlotTimesForDate,
+  isoAddDays,
+  isoWeekday,
   priceForSlot,
   slotKey,
-  toISODate,
+  todayInClub,
 } from "../../lib/booking";
+import {
+  buildDailySummaries,
+  computeDailyCash,
+  dayOccupancy,
+  isCountableBooking,
+  periodOccupancy,
+  sumSummaries,
+  summarizeRecords,
+} from "../../lib/metrics";
 import {
   createAdminSession,
   destroyAdminSession,
@@ -54,54 +66,74 @@ export async function adminLogout() {
   return { ok: true };
 }
 
+/** Lista { id, ...val } de un snapshot de Realtime Database. */
+function snapToList(snap) {
+  if (!snap.exists()) return [];
+  return Object.entries(snap.val()).map(([id, val]) => ({ id, ...val }));
+}
+
+/** Registros de `path` con `date` entre dos fechas ISO (inclusive). */
+async function loadByDateRange(db, path, fromIso, toIso) {
+  const snap = await db
+    .ref(path)
+    .orderByChild("date")
+    .startAt(fromIso)
+    .endAt(toIso)
+    .once("value");
+  return snapToList(snap);
+}
+
+const withBookingCode = (b) => ({
+  ...b,
+  bookingCode: `MUZZ-${b.id.slice(-5).toUpperCase()}`,
+});
+
+/**
+ * Todo lo que pasó en un día: locks, reservas, ventas de cantina, egresos y
+ * cierre. Lo comparten Agenda y Caja para que nunca calculen distinto.
+ */
+async function loadDayRecords(db, date) {
+  const [claimsSnap, bookings, sales, expSnap, sessionSnap] = await Promise.all([
+    db.ref(`slotClaims/${date}`).get(),
+    loadByDateRange(db, "bookings", date, date),
+    loadByDateRange(db, "cantinaSales", date, date),
+    db.ref(`cashExpenses/${date}`).once("value"),
+    db.ref(`dailyCashSessions/${date}`).once("value"),
+  ]);
+  return {
+    claims: claimsSnap.exists() ? claimsSnap.val() : {},
+    bookings: bookings.map(withBookingCode),
+    sales,
+    expenses: snapToList(expSnap),
+    session: sessionSnap.exists() ? sessionSnap.val() : null,
+  };
+}
+
 export async function getAdminDayData(isoDate) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const date = isoDate || toISODate(new Date());
+  const date = isoDate || todayInClub();
   const slotTimes = getSlotTimesForDate(date);
 
-  let takenMap = {};
-  let bookingsList = [];
+  let records = { claims: {}, bookings: [], sales: [], expenses: [] };
   let firebaseOk = false;
 
   if (isFirebaseConfigured()) {
     try {
-      const db = getDb();
-
-      // Obtener locks de horarios para el día
-      const claimsSnap = await db.ref(`slotClaims/${date}`).get();
-      if (claimsSnap.exists()) {
-        takenMap = claimsSnap.val();
-      }
-
-      // Obtener todas las reservas y filtrar por fecha
-      const bookingsSnap = await db.ref("bookings").get();
-      if (bookingsSnap.exists()) {
-        const all = bookingsSnap.val();
-        Object.entries(all).forEach(([key, val]) => {
-          if (val.date === date) {
-            bookingsList.push({
-              id: key,
-              bookingCode: `MUZZ-${key.slice(-5).toUpperCase()}`,
-              ...val,
-            });
-          }
-        });
-      }
+      records = await loadDayRecords(getDb(), date);
       firebaseOk = true;
     } catch (error) {
       console.warn("Aviso Firebase en Admin:", error.message);
     }
   }
 
-  // Armar matriz de horarios para Cancha 1 y Cancha 2
   const slots = COURTS.flatMap((court) =>
     slotTimes.map(({ start, end }) => {
       const key = slotKey(court.id, start);
-      const bookingId = takenMap[key] || null;
+      const bookingId = records.claims[key] || null;
       const booking = bookingId
-        ? bookingsList.find((b) => b.id === bookingId)
+        ? records.bookings.find((b) => b.id === bookingId) || null
         : null;
       return {
         courtId: court.id,
@@ -117,36 +149,27 @@ export async function getAdminDayData(isoDate) {
     }),
   );
 
-  const totalSlotsCount = slots.length;
-  const takenSlotsCount = slots.filter((s) => s.isTaken).length;
-  const ocupacionPct =
-    totalSlotsCount > 0
-      ? Math.round((takenSlotsCount / totalSlotsCount) * 100)
-      : 0;
-
-  const ingresos = bookingsList.reduce((acc, b) => {
-    if (b.status === "cancelado") return acc;
-    if (typeof b.total === "number") return acc + b.total;
-    const pricing = priceForSlot(b.date || date, b.startTime);
-    const amount =
-      b.fullCourt !== false
-        ? pricing.total
-        : (b.playersCount || 4) * pricing.perPlayer;
-    return acc + amount;
-  }, 0);
+  const totalSlots = slots.length;
+  const takenSlots = slots.filter((s) => s.isTaken).length;
+  const summary = summarizeRecords(records);
 
   return {
     ok: true,
     firebaseOk,
     date,
     slots,
-    bookings: bookingsList.sort((a, b) => (a.startTime > b.startTime ? 1 : -1)),
+    bookings: records.bookings.sort((a, b) =>
+      a.startTime > b.startTime ? 1 : -1,
+    ),
+    summary,
+    cash: computeDailyCash(records),
     stats: {
-      totalSlots: totalSlotsCount,
-      takenSlots: takenSlotsCount,
-      libres: totalSlotsCount - takenSlotsCount,
-      ocupacionPct,
-      ingresosEstimados: ingresos,
+      totalSlots,
+      takenSlots,
+      libres: totalSlots - takenSlots,
+      reservados: summary.turnos,
+      disponibles: totalSlots - summary.bloqueados,
+      ocupacionPct: dayOccupancy({ ...summary, totalSlots }),
     },
   };
 }
@@ -306,52 +329,38 @@ export async function adminRemovePayment(bookingId, paymentId) {
   }
 }
 
+const WEEKDAY_LABELS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
 /**
- * Recaudación y turnos de los últimos 7 días (hoy incluido), para el
- * gráfico de la semana y las flechas de tendencia hoy-vs-ayer del
- * dashboard. Una sola lectura de `bookings` en vez de 7 llamadas a
- * getAdminDayData.
+ * Resumen de los últimos 7 días (hoy en Catriel incluido) para el gráfico de
+ * la semana, más el mismo día de la semana anterior para las tendencias.
  */
 export async function adminGetWeekStats() {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const today = new Date();
-  const days = [];
-  for (let i = 6; i >= 0; i -= 1) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    days.push({
-      date: toISODate(d),
-      dayLabel: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()],
-      ingresos: 0,
-      turnos: 0,
-    });
-  }
-  const byDate = new Map(days.map((d) => [d.date, d]));
+  const today = todayInClub();
+  const dates = Array.from({ length: 7 }, (_, i) => isoAddDays(today, i - 6));
+  const allDates = [isoAddDays(today, -7), ...dates];
+  const shape = (summaries) => ({
+    ok: true,
+    days: summaries.slice(1).map((d) => ({
+      ...d,
+      dayLabel: WEEKDAY_LABELS[isoWeekday(d.date)],
+      isToday: d.date === today,
+    })),
+    lastWeekSameDay: summaries[0],
+  });
 
-  if (!isFirebaseConfigured()) return { ok: true, days };
+  if (!isFirebaseConfigured()) return shape(buildDailySummaries(allDates));
 
   try {
     const db = getDb();
-    const snap = await db.ref("bookings").get();
-    if (snap.exists()) {
-      Object.values(snap.val()).forEach((b) => {
-        if (b.status === "cancelado") return;
-        const bucket = byDate.get(b.date);
-        if (!bucket) return;
-        const pricing = priceForSlot(b.date, b.startTime);
-        const amount =
-          typeof b.total === "number"
-            ? b.total
-            : b.fullCourt !== false
-              ? pricing.total
-              : (b.playersCount || 4) * pricing.perPlayer;
-        bucket.ingresos += amount;
-        bucket.turnos += 1;
-      });
-    }
-    return { ok: true, days };
+    const [bookings, sales] = await Promise.all([
+      loadByDateRange(db, "bookings", allDates[0], today),
+      loadByDateRange(db, "cantinaSales", allDates[0], today),
+    ]);
+    return shape(buildDailySummaries(allDates, bookings, sales));
   } catch (error) {
     return { ok: false, error: "No se pudo cargar la tendencia semanal." };
   }
@@ -375,7 +384,7 @@ export async function adminGetClients() {
 
     if (snap.exists()) {
       Object.values(snap.val()).forEach((b) => {
-        if (b.status === "cancelado") return;
+        if (!isCountableBooking(b)) return;
         const phone = (b.playerPhone || "").trim();
         const name = (b.playerName || "Sin nombre").trim();
         const key = phone || `sin-tel:${name.toLowerCase()}`;
@@ -399,9 +408,8 @@ export async function adminGetClients() {
 }
 
 /**
- * Reservas e ingresos día por día de un mes calendario completo. Alimenta
- * tanto la vista Calendario (heatmap de ocupación) como Reportes (totales +
- * exportación). Una sola lectura de `bookings`, igual que adminGetWeekStats.
+ * Resumen día por día de un mes calendario (turnos + cantina). Alimenta
+ * Calendario y Reportes, así los dos muestran los mismos números.
  */
 export async function adminGetMonthStats(year, month) {
   const denied = await requireAdmin();
@@ -409,46 +417,36 @@ export async function adminGetMonthStats(year, month) {
 
   const y = Number(year);
   const m = Number(month); // 1-12
-  const daysInMonth = new Date(y, m, 0).getDate();
-  const days = [];
-  for (let d = 1; d <= daysInMonth; d += 1) {
-    const date = toISODate(new Date(y, m - 1, d));
-    const totalSlots = getSlotTimesForDate(date).length * COURTS.length;
-    days.push({ date, day: d, turnos: 0, ingresos: 0, totalSlots });
-  }
-  const byDate = new Map(days.map((d) => [d.date, d]));
+  const first = `${y}-${String(m).padStart(2, "0")}-01`;
+  const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const dates = Array.from({ length: daysInMonth }, (_, i) =>
+    isoAddDays(first, i),
+  );
+  const last = dates[dates.length - 1];
 
-  if (!isFirebaseConfigured()) {
-    return { ok: true, days, totals: { turnos: 0, ingresos: 0 } };
-  }
+  const build = (bookings, sales) => {
+    const days = buildDailySummaries(dates, bookings, sales).map((d, i) => {
+      const totalSlots = getSlotTimesForDate(d.date).length * COURTS.length;
+      const withSlots = { ...d, day: i + 1, totalSlots };
+      return { ...withSlots, ocupacionPct: dayOccupancy(withSlots) };
+    });
+    return {
+      ok: true,
+      days,
+      totals: sumSummaries(days),
+      ocupacionPct: periodOccupancy(days, todayInClub()),
+    };
+  };
+
+  if (!isFirebaseConfigured()) return build([], []);
 
   try {
     const db = getDb();
-    const snap = await db.ref("bookings").get();
-    if (snap.exists()) {
-      Object.values(snap.val()).forEach((b) => {
-        if (b.status === "cancelado") return;
-        const bucket = byDate.get(b.date);
-        if (!bucket) return;
-        const pricing = priceForSlot(b.date, b.startTime);
-        const amount =
-          typeof b.total === "number"
-            ? b.total
-            : b.fullCourt !== false
-              ? pricing.total
-              : (b.playersCount || 4) * pricing.perPlayer;
-        bucket.ingresos += amount;
-        bucket.turnos += 1;
-      });
-    }
-    const totals = days.reduce(
-      (acc, d) => ({
-        turnos: acc.turnos + d.turnos,
-        ingresos: acc.ingresos + d.ingresos,
-      }),
-      { turnos: 0, ingresos: 0 },
-    );
-    return { ok: true, days, totals };
+    const [bookings, sales] = await Promise.all([
+      loadByDateRange(db, "bookings", first, last),
+      loadByDateRange(db, "cantinaSales", first, last),
+    ]);
+    return build(bookings, sales);
   } catch (error) {
     return { ok: false, error: "No se pudo cargar el reporte del mes." };
   }
@@ -480,7 +478,7 @@ export async function adminAddCantinaSale({ date, items, method, notes }) {
     const db = getDb();
     const ref = db.ref("cantinaSales").push();
     await ref.set({
-      date: date || toISODate(new Date()),
+      date: date || todayInClub(),
       items,
       total,
       method: CANTINA_PAYMENT_METHODS.includes(method) ? method : "efectivo",
@@ -773,113 +771,62 @@ export async function adminGetDailyCashSummary(isoDate) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!isFirebaseConfigured()) {
-    return {
-      ok: true,
-      summary: {
-        date: isoDate,
-        cashTurnos: 0,
-        cashCantina: 0,
-        totalExpenses: 0,
-        transferTurnos: 0,
-        transferCantina: 0,
-        mpTurnos: 0,
-        mpCantina: 0,
-        expectedCash: 0,
-        expensesList: [],
-        closed: false,
-      },
-    };
+  const date = isoDate || todayInClub();
+  let records = { bookings: [], sales: [], expenses: [], session: null };
+
+  if (isFirebaseConfigured()) {
+    try {
+      records = await loadDayRecords(getDb(), date);
+    } catch (err) {
+      return { ok: false, error: "No se pudo calcular la caja del día." };
+    }
   }
 
+  const cash = computeDailyCash(records);
+  const { session } = records;
+  return {
+    ok: true,
+    summary: {
+      date,
+      cashTurnos: cash.turnos.efectivo,
+      cashCantina: cash.cantina.efectivo,
+      transferTurnos: cash.turnos.transferencia,
+      transferCantina: cash.cantina.transferencia,
+      mpTurnos: cash.turnos.mercadopago,
+      mpCantina: cash.cantina.mercadopago,
+      totalExpenses: cash.totalExpenses,
+      expectedCash: cash.expectedCash,
+      expensesList: records.expenses,
+      closed: Boolean(session?.closed),
+      closedAt: session?.closedAt ?? null,
+      // `??` y no `||`: un cierre exacto ($0 de diferencia) es un dato válido.
+      actualCash: session?.actualCash ?? null,
+      difference: session?.difference ?? null,
+      notes: session?.notes || null,
+    },
+  };
+}
+
+const TEST_FLAG_COLLECTIONS = ["bookings", "cantinaSales"];
+
+/**
+ * Marca o desmarca un registro como dato de prueba: sigue existiendo pero
+ * no suma en ningún total. Desmarcar borra el campo en vez de guardar false.
+ */
+export async function adminSetTestFlag(collection, id, isTest) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!TEST_FLAG_COLLECTIONS.includes(collection) || !id) {
+    return { ok: false, error: "Registro inválido." };
+  }
   try {
-    const db = getDb();
-    // 1. Obtener egresos del día
-    const expSnap = await db.ref(`cashExpenses/${isoDate}`).once("value");
-    const expensesList = [];
-    let totalExpenses = 0;
-    if (expSnap.exists()) {
-      expSnap.forEach((child) => {
-        const val = child.val();
-        totalExpenses += val.amount || 0;
-        expensesList.push({ id: child.key, ...val });
-      });
-    }
-
-    // 2. Obtener reservas del día y sumar cobros según método
-    const bookingsSnap = await db
-      .ref("bookings")
-      .orderByChild("date")
-      .equalTo(isoDate)
-      .once("value");
-
-    let cashTurnos = 0;
-    let transferTurnos = 0;
-    let mpTurnos = 0;
-
-    if (bookingsSnap.exists()) {
-      bookingsSnap.forEach((b) => {
-        const data = b.val();
-        if (data.status === "cancelado") return;
-        const payments = data.payments || [];
-        payments.forEach((p) => {
-          const amt = Number(p.amount) || 0;
-          if (p.method === "efectivo") cashTurnos += amt;
-          else if (p.method === "mercadopago") mpTurnos += amt;
-          else transferTurnos += amt;
-        });
-      });
-    }
-
-    // 3. Obtener ventas de cantina del día
-    const cantinaSnap = await db
-      .ref("cantinaSales")
-      .orderByChild("date")
-      .equalTo(isoDate)
-      .once("value");
-
-    let cashCantina = 0;
-    let transferCantina = 0;
-    let mpCantina = 0;
-
-    if (cantinaSnap.exists()) {
-      cantinaSnap.forEach((s) => {
-        const val = s.val();
-        const amt = Number(val.total) || 0;
-        if (val.method === "efectivo") cashCantina += amt;
-        else if (val.method === "mercadopago") mpCantina += amt;
-        else transferCantina += amt;
-      });
-    }
-
-    // 4. Estado de cierre de caja
-    const sessionSnap = await db.ref(`dailyCashSessions/${isoDate}`).once("value");
-    const session = sessionSnap.exists() ? sessionSnap.val() : null;
-
-    const expectedCash = cashTurnos + cashCantina - totalExpenses;
-
-    return {
-      ok: true,
-      summary: {
-        date: isoDate,
-        cashTurnos,
-        cashCantina,
-        totalExpenses,
-        transferTurnos,
-        transferCantina,
-        mpTurnos,
-        mpCantina,
-        expectedCash,
-        expensesList,
-        closed: Boolean(session?.closed),
-        closedAt: session?.closedAt || null,
-        actualCash: session?.actualCash || null,
-        difference: session?.difference || null,
-        notes: session?.notes || null,
-      },
-    };
+    await getDb()
+      .ref(`${collection}/${id}/isTest`)
+      .set(isTest ? true : null);
+    return { ok: true };
   } catch (err) {
-    return { ok: false, error: err.message };
+    return { ok: false, error: "No se pudo actualizar el registro." };
   }
 }
 

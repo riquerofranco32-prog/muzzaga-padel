@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatARS, formatPct, plural } from "../../../lib/format";
 import { adminGetMonthStats } from "../actions";
-import { toISODate } from "../../../lib/booking";
+import { todayInClub } from "../../../lib/booking";
 
 const MONTH_NAMES = [
   "Enero",
@@ -21,9 +22,9 @@ const MONTH_NAMES = [
 const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 export default function CalendarioView({ onSelectDate, onExpiredSession }) {
-  const today = new Date();
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth() + 1); // 1-12
+  const todayIso = todayInClub();
+  const [year, setYear] = useState(Number(todayIso.slice(0, 4)));
+  const [month, setMonth] = useState(Number(todayIso.slice(5, 7))); // 1-12
   const [monthStats, setMonthStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -58,8 +59,7 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
     setYear(y);
   }
 
-  const todayIso = toISODate(today);
-  const firstWeekday = new Date(year, month - 1, 1).getDay();
+  const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
   const leadingBlanks = Array.from({ length: firstWeekday });
 
   return (
@@ -114,9 +114,7 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
 
           {monthStats?.days.map((d) => {
             const isClosed = d.totalSlots === 0;
-            const ocupacionPct = d.totalSlots
-              ? Math.round((d.turnos / d.totalSlots) * 100)
-              : 0;
+            const ocupacionPct = d.ocupacionPct ?? 0;
             return (
               <div
                 key={d.date}
@@ -132,13 +130,13 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
                 title={
                   isClosed
                     ? "Cerrado"
-                    : `${d.turnos} turnos · $${d.ingresos.toLocaleString("es-AR")} · ${ocupacionPct}% ocupación`
+                    : `${plural(d.turnos, "turno", "turnos")} · ${formatARS(d.cobrado)} cobrado · ${formatPct(d.ocupacionPct)} ocupación`
                 }
               >
                 <span className="admin-calendar-daynum">{d.day}</span>
                 {!isClosed && (
                   <span className="admin-calendar-stat">
-                    {d.turnos > 0 ? `${d.turnos} · ${ocupacionPct}%` : "-"}
+                    {d.turnos > 0 ? `${d.turnos} · ${formatPct(d.ocupacionPct)}` : "-"}
                   </span>
                 )}
               </div>
@@ -151,8 +149,8 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
         <div
           style={{ marginTop: 20, fontSize: 13, color: "var(--text-muted)" }}
         >
-          Total del mes: <strong>{monthStats.totals.turnos} turnos</strong> ·{" "}
-          <strong>${monthStats.totals.ingresos.toLocaleString("es-AR")}</strong>{" "}
+          Total del mes: <strong>{plural(monthStats.totals.turnos, "turno", "turnos")}</strong> ·{" "}
+          <strong>{formatARS(monthStats.totals.cobrado)}</strong>{" "}
           recaudados. Tocá un día para ver su agenda.
         </div>
       )}
