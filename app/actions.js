@@ -1,13 +1,14 @@
 "use server";
 
 import { getDb, isFirebaseConfigured } from "../lib/firebase";
+import { addMinutes, nowInClubTimezone, slotKey } from "../lib/booking";
 import {
-  findCourt,
-  isValidSlot,
-  nowInClubTimezone,
-  priceForSlot,
-  slotKey,
-} from "../lib/booking";
+  findCourtIn,
+  hasSlotStarted,
+  isValidSlotFor,
+  priceFor,
+} from "../lib/clubConfig";
+import { getClubConfig } from "../lib/clubConfigServer";
 
 /**
  * @param {{date: string, courtId: string, startTime: string, endTime: string, playerName: string, playerPhone: string, playersCount: number, fullCourt: boolean}} input
@@ -18,16 +19,17 @@ export async function createBooking(input) {
     date,
     courtId,
     startTime,
-    endTime,
     playerName,
     playerPhone,
     playersCount,
     fullCourt,
   } = input;
 
-  const court = findCourt(courtId);
+  // Canchas, horarios y precios salen de Configuración del admin.
+  const config = await getClubConfig();
+  const court = findCourtIn(config, courtId);
   if (!court) return { ok: false, error: "Cancha inválida." };
-  if (!isValidSlot(date, courtId, startTime)) {
+  if (!isValidSlotFor(config, date, courtId, startTime)) {
     return {
       ok: false,
       error: "Ese horario no existe o el club está cerrado ese día.",
@@ -37,7 +39,7 @@ export async function createBooking(input) {
   // ocultado el slot: usa el horario del club (America/Argentina/Buenos_Aires),
   // no la medianoche del servidor (Vercel corre en UTC).
   const now = nowInClubTimezone();
-  if (date < now.isoDate || (date === now.isoDate && startTime <= now.hhmm)) {
+  if (hasSlotStarted(config, date, startTime, now)) {
     return {
       ok: false,
       error: "Ese horario ya pasó. Elegí un turno futuro.",
@@ -52,7 +54,13 @@ export async function createBooking(input) {
   if (players < 1 || players > 4)
     return { ok: false, error: "La cancha admite entre 1 y 4 jugadores." };
 
-  const courtName = `${court.name} (${court.type})`;
+  const courtName = court.type ? `${court.name} (${court.type})` : court.name;
+  // El fin y el precio los decide el server, no lo que mande el navegador.
+  const endTime = addMinutes(startTime, config.slotDurationMin);
+  const slotPricing = priceFor(config, date, startTime);
+  const total = fullCourt
+    ? slotPricing.total
+    : slotPricing.perPlayer * players;
 
   // Sin esto, un corte de Firebase (env vars mal puestas, cuota, red) generaba
   // un código de reserva falso: el cliente veía "¡Turno reservado!" pero nunca
@@ -105,6 +113,8 @@ export async function createBooking(input) {
       playerPhone: phone,
       playersCount: players,
       fullCourt: Boolean(fullCourt),
+      total,
+      priceBand: slotPricing.band,
       status: "confirmado",
       paymentStatus: "pending",
       createdAt: Date.now(),
@@ -125,8 +135,6 @@ export async function createBooking(input) {
   }
 
   const bookingCode = `MUZZ-${bookingKey.slice(-5).toUpperCase()}`;
-  const slotPricing = priceForSlot(date, startTime);
-  const total = fullCourt ? slotPricing.total : slotPricing.perPlayer * players;
 
   // The WhatsApp message is built client-side in BookingCalendar, not here:
   // this action only returns plain data.

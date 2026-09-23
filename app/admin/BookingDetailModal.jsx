@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { COURTS, PRICE_PER_PLAYER } from "../../lib/booking";
+import { depositFor, slotTimesFor } from "../../lib/clubConfig";
+import { formatARS } from "../../lib/format";
 import { toWhatsappNumber } from "../../lib/phone";
 import { categorizeClient } from "../../lib/clientsExport";
 import { adminMoveBooking } from "./actions";
@@ -18,18 +19,10 @@ import {
   buildConfirmationMessage,
 } from "./adminHelpers";
 
-const AVAILABLE_TIMES = [
-  "14:00",
-  "15:30",
-  "17:00",
-  "18:30",
-  "20:00",
-  "21:30",
-  "23:00",
-];
 
 export default function BookingDetailModal({
   booking,
+  clubConfig,
   clients = [],
   paymentForm,
   setPaymentForm,
@@ -92,6 +85,11 @@ export default function BookingDetailModal({
         c.name.toLowerCase() === booking.playerName.toLowerCase()),
   );
   const clientCat = clientData ? categorizeClient(clientData.count) : null;
+  const moveTimes = moveDate
+    ? slotTimesFor(clubConfig, moveDate).map((s) => s.start)
+    : [];
+  // Seña según el % de Configuración (antes fija en $15.000).
+  const deposit = depositFor(clubConfig, booking.total || 0);
 
   return (
     <div className="admin-modal-backdrop" onClick={onClose}>
@@ -238,7 +236,7 @@ export default function BookingDetailModal({
                 Recordatorio
               </a>
               <a
-                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildDepositRequestMessage(booking))}`}
+                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildDepositRequestMessage(booking, clubConfig.paymentAlias, deposit))}`}
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary"
@@ -366,9 +364,9 @@ export default function BookingDetailModal({
                     value={moveCourtId}
                     onChange={(e) => setMoveCourtId(e.target.value)}
                   >
-                    {COURTS.map((c) => (
+                    {clubConfig.courts.map((c) => (
                       <option key={c.id} value={c.id}>
-                        {c.name} ({c.type})
+                        {c.type ? `${c.name} (${c.type})` : c.name}
                       </option>
                     ))}
                   </select>
@@ -392,9 +390,12 @@ export default function BookingDetailModal({
                   value={moveStartTime}
                   onChange={(e) => setMoveStartTime(e.target.value)}
                 >
-                  {AVAILABLE_TIMES.map((t) => (
+                  {moveTimes.length === 0 && (
+                    <option value="">Ese día el club no abre</option>
+                  )}
+                  {moveTimes.map((t) => (
                     <option key={t} value={t}>
-                      {t} hs
+                      {t}
                     </option>
                   ))}
                 </select>
@@ -556,11 +557,11 @@ export default function BookingDetailModal({
               onClick={() =>
                 setPaymentForm({
                   ...paymentForm,
-                  amount: String(PRICE_PER_PLAYER),
+                  amount: String(deposit),
                 })
               }
             >
-              Seña ${PRICE_PER_PLAYER.toLocaleString("es-AR")}
+              Seña {formatARS(deposit)}
             </button>
             <button
               type="button"

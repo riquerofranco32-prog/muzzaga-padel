@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import "./admin.css";
+import "./agenda.css";
 
 // Una sola sans para todo el admin (inputs, montos, placeholders). La web
 // pública sigue con Poppins: esta fuente y admin.css solo aplican dentro de

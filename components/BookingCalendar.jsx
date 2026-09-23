@@ -27,6 +27,9 @@ export default function BookingCalendar() {
   const [activeDate, setActiveDate] = useState(DAYS[0].iso);
   const [courtFilter, setCourtFilter] = useState("all");
   const [slots, setSlots] = useState(null);
+  // Canchas de Configuración (vienen con la disponibilidad); COURTS es el
+  // default hasta que responde la API.
+  const [courts, setCourts] = useState(COURTS);
   const [loadError, setLoadError] = useState(null);
   const [selected, setSelected] = useState(null); // { courtId, start, end }
   const [form, setForm] = useState({
@@ -89,7 +92,9 @@ export default function BookingCalendar() {
         return res.json();
       })
       .then((data) => {
-        if (!cancelled) setSlots(data.slots);
+        if (cancelled) return;
+        setSlots(data.slots);
+        if (data.courts?.length) setCourts(data.courts);
       })
       .catch(() => {
         if (!cancelled)
@@ -113,7 +118,8 @@ export default function BookingCalendar() {
 
   const selectedPricing = useMemo(() => {
     if (!selected) return null;
-    return priceForSlot(activeDate, selected.start);
+    // El precio lo calcula el server según la franja (pico/valle).
+    return selected.price || priceForSlot(activeDate, selected.start);
   }, [activeDate, selected]);
 
   // Normalización de teléfono argentino (mínimo 10 dígitos útiles)
@@ -230,7 +236,7 @@ export default function BookingCalendar() {
         >
           Todas las Canchas
         </button>
-        {COURTS.map((court) => (
+        {courts.map((court) => (
           <button
             key={court.id}
             type="button"
@@ -261,15 +267,15 @@ export default function BookingCalendar() {
         <div
           className="booking-matrix-container"
           style={{
-            "--court-columns": courtFilter === "all" ? COURTS.length : 1,
+            "--court-columns": courtFilter === "all" ? courts.length : 1,
           }}
         >
           {/* Encabezado de columnas de canchas */}
           <div className="booking-matrix-header">
             <div>Horario</div>
             {(courtFilter === "all"
-              ? COURTS
-              : COURTS.filter((c) => c.id === courtFilter)
+              ? courts
+              : courts.filter((c) => c.id === courtFilter)
             ).map((c) => (
               <div key={c.id}>
                 {c.name} ({c.type})
@@ -278,11 +284,13 @@ export default function BookingCalendar() {
           </div>
 
           {/* Filas de la matriz por horario */}
-          {[...new Set(visibleSlots.map((s) => s.start))].sort().map((time) => {
-            const courts =
+          {/* Sin .sort(): los horarios ya vienen en orden de la noche, y un
+              00:30 (club abierto pasada la medianoche) iría primero. */}
+          {[...new Set(visibleSlots.map((s) => s.start))].map((time) => {
+            const rowCourts =
               courtFilter === "all"
-                ? COURTS
-                : COURTS.filter((c) => c.id === courtFilter);
+                ? courts
+                : courts.filter((c) => c.id === courtFilter);
 
             return (
               <div key={time} className="booking-matrix-row">
@@ -291,7 +299,7 @@ export default function BookingCalendar() {
                   <span>hs</span>
                 </div>
 
-                {courts.map((court) => {
+                {rowCourts.map((court) => {
                   const slot = visibleSlots.find(
                     (s) => s.courtId === court.id && s.start === time,
                   );
@@ -360,7 +368,7 @@ export default function BookingCalendar() {
                   <h3 style={{ margin: 0 }}>Confirmar reserva</h3>
                   <p style={{ margin: "4px 0 0" }}>
                     {selected.start} hs ·{" "}
-                    {COURTS.find((c) => c.id === selected.courtId)?.name}
+                    {courts.find((c) => c.id === selected.courtId)?.name}
                   </p>
                 </div>
                 <button

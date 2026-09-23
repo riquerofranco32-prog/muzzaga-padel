@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import { getDb, isFirebaseConfigured } from "../../../lib/firebase";
-import {
-  COURTS,
-  getSlotTimesForDate,
-  nowInClubTimezone,
-  slotKey,
-} from "../../../lib/booking";
+import { nowInClubTimezone, slotKey } from "../../../lib/booking";
+import { hasSlotStarted, priceFor, slotTimesFor } from "../../../lib/clubConfig";
+import { getClubConfig } from "../../../lib/clubConfigServer";
 
 /** GET /api/availability?date=YYYY-MM-DD */
 export async function GET(request) {
@@ -17,9 +14,12 @@ export async function GET(request) {
     return NextResponse.json({ error: "Fecha inválida" }, { status: 400 });
   }
 
-  const slotTimes = getSlotTimesForDate(date);
+  // Canchas, horarios y precios salen de Configuración del admin.
+  const config = await getClubConfig();
+  const { courts } = config;
+  const slotTimes = slotTimesFor(config, date);
   if (slotTimes.length === 0) {
-    return NextResponse.json({ date, courts: COURTS, slots: [] });
+    return NextResponse.json({ date, courts, slots: [], closed: true });
   }
 
   let taken = {};
@@ -38,22 +38,22 @@ export async function GET(request) {
     }
   }
 
-  // Un turno de hoy que ya arrancó no es una opción real: sin este chequeo
-  // se podían "reservar" las 14:00 estando ya a las 17:22.
-  const isToday = date === now.isoDate;
-
-  const slots = COURTS.flatMap((court) =>
+  // Un turno que ya arrancó no es una opción real: sin este chequeo se
+  // podían "reservar" las 14:00 estando ya a las 17:22.
+  const slots = courts.flatMap((court) =>
     slotTimes.map(({ start, end }) => {
-      const isPast = isToday && start <= now.hhmm;
+      const isPast = hasSlotStarted(config, date, start, now);
+      const { total, perPlayer, band } = priceFor(config, date, start);
       return {
         courtId: court.id,
         start,
         end,
         past: isPast,
         available: !isPast && !taken[slotKey(court.id, start)],
+        price: { total, perPlayer, band },
       };
     }),
   );
 
-  return NextResponse.json({ date, courts: COURTS, slots });
+  return NextResponse.json({ date, courts, slots, closed: false });
 }

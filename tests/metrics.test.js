@@ -185,3 +185,13 @@ test("normalizeSearch tolera tildes y mayúsculas", async () => {
   assert.equal(normalizeSearch("  Martín PÉREZ "), "martin perez");
   assert.ok(normalizeSearch("Muñoz").includes(normalizeSearch("MUNOZ")));
 });
+
+test("estado de cobro para la grilla", async () => {
+  const { paymentState } = await import("../lib/metrics.js");
+  const b = (over) => ({ status: "confirmado", total: 60000, ...over });
+  assert.equal(paymentState(b({})), "pendiente");
+  assert.equal(paymentState(b({ payments: { a: { amount: 15000 } } })), "senado");
+  assert.equal(paymentState(b({ payments: { a: { amount: 60000 } } })), "pagado");
+  assert.equal(paymentState(b({ status: "bloqueado" })), "bloqueado");
+  assert.equal(paymentState(b({ isTest: true })), "prueba");
+});

@@ -2,16 +2,20 @@
 
 import { getDb, isFirebaseConfigured } from "../../lib/firebase";
 import {
-  COURTS,
   addMinutes,
-  findCourt,
-  getSlotTimesForDate,
   isoAddDays,
   isoWeekday,
-  priceForSlot,
   slotKey,
   todayInClub,
 } from "../../lib/booking";
+import {
+  findCourtIn,
+  isValidSlotFor,
+  priceFor,
+  slotTimesFor,
+  validateConfig,
+} from "../../lib/clubConfig";
+import { getClubConfig, setCachedClubConfig } from "../../lib/clubConfigServer";
 import {
   buildDailySummaries,
   computeDailyCash,
@@ -83,6 +87,9 @@ async function loadByDateRange(db, path, fromIso, toIso) {
   return snapToList(snap);
 }
 
+const courtLabel = (court) =>
+  court.type ? `${court.name} (${court.type})` : court.name;
+
 const withBookingCode = (b) => ({
   ...b,
   bookingCode: `MUZZ-${b.id.slice(-5).toUpperCase()}`,
@@ -114,21 +121,31 @@ export async function getAdminDayData(isoDate) {
   if (denied) return denied;
 
   const date = isoDate || todayInClub();
-  const slotTimes = getSlotTimesForDate(date);
+  const config = await getClubConfig();
+  const slotTimes = slotTimesFor(config, date);
 
   let records = { claims: {}, bookings: [], sales: [], expenses: [] };
+  let lastWeek = { bookings: [], sales: [] };
   let firebaseOk = false;
 
   if (isFirebaseConfigured()) {
     try {
-      records = await loadDayRecords(getDb(), date);
+      const db = getDb();
+      const lastWeekDate = isoAddDays(date, -7);
+      const [day, lwBookings, lwSales] = await Promise.all([
+        loadDayRecords(db, date),
+        loadByDateRange(db, "bookings", lastWeekDate, lastWeekDate),
+        loadByDateRange(db, "cantinaSales", lastWeekDate, lastWeekDate),
+      ]);
+      records = day;
+      lastWeek = { bookings: lwBookings, sales: lwSales };
       firebaseOk = true;
     } catch (error) {
       console.warn("Aviso Firebase en Admin:", error.message);
     }
   }
 
-  const slots = COURTS.flatMap((court) =>
+  const slots = config.courts.flatMap((court) =>
     slotTimes.map(({ start, end }) => {
       const key = slotKey(court.id, start);
       const bookingId = records.claims[key] || null;
@@ -141,6 +158,7 @@ export async function getAdminDayData(isoDate) {
         courtType: court.type,
         start,
         end,
+        price: priceFor(config, date, start),
         slotKey: key,
         isTaken: Boolean(bookingId),
         bookingId,
@@ -152,16 +170,23 @@ export async function getAdminDayData(isoDate) {
   const totalSlots = slots.length;
   const takenSlots = slots.filter((s) => s.isTaken).length;
   const summary = summarizeRecords(records);
+  // Mismo día de la semana anterior, para las comparaciones de los KPIs.
+  const lastWeekSummary = summarizeRecords(lastWeek);
 
   return {
     ok: true,
     firebaseOk,
     date,
+    courts: config.courts,
     slots,
     bookings: records.bookings.sort((a, b) =>
       a.startTime > b.startTime ? 1 : -1,
     ),
     summary,
+    lastWeek: {
+      ...lastWeekSummary,
+      ocupacionPct: dayOccupancy({ ...lastWeekSummary, totalSlots }),
+    },
     cash: computeDailyCash(records),
     stats: {
       totalSlots,
@@ -182,7 +207,6 @@ export async function adminCreateManualBooking(input) {
     date,
     courtId,
     startTime,
-    endTime,
     playerName,
     playerPhone,
     playersCount,
@@ -191,8 +215,16 @@ export async function adminCreateManualBooking(input) {
     notes,
   } = input;
 
-  const court = findCourt(courtId);
+  const config = await getClubConfig();
+  const court = findCourtIn(config, courtId);
   if (!court) return { ok: false, error: "Cancha inválida." };
+  if (!isValidSlotFor(config, date, courtId, startTime)) {
+    return {
+      ok: false,
+      error: "Ese horario no existe en la grilla de ese día (¿día cerrado o bloqueado?).",
+    };
+  }
+  const endTime = addMinutes(startTime, config.slotDurationMin);
 
   if (!isFirebaseConfigured()) {
     return {
@@ -217,10 +249,10 @@ export async function adminCreateManualBooking(input) {
       return { ok: false, error: "Ese horario ya se encuentra ocupado." };
     }
 
-    const slotPricing = priceForSlot(date, startTime);
+    const slotPricing = priceFor(config, date, startTime);
     const booking = {
       courtId,
-      courtName: `${court.name} (${court.type})`,
+      courtName: courtLabel(court),
       date,
       startTime,
       endTime,
@@ -232,6 +264,7 @@ export async function adminCreateManualBooking(input) {
         fullCourt !== false
           ? slotPricing.total
           : (Number(playersCount) || 4) * slotPricing.perPlayer,
+      priceBand: slotPricing.band,
       status: status || "confirmado", // 'confirmado' | 'señado' | 'pagado' | 'bloqueado'
       notes: (notes || "").trim(),
       createdFromAdmin: true,
@@ -408,8 +441,32 @@ export async function adminGetClients() {
 }
 
 /**
- * Resumen día por día de un mes calendario (turnos + cantina). Alimenta
- * Calendario y Reportes, así los dos muestran los mismos números.
+ * Resumen día por día de un rango de fechas (turnos + cantina + ocupación),
+ * con los cupos de cada día según Configuración.
+ */
+async function loadRangeSummaries(dates) {
+  const config = await getClubConfig();
+  const first = dates[0];
+  const last = dates[dates.length - 1];
+  let bookings = [];
+  let sales = [];
+  if (isFirebaseConfigured()) {
+    const db = getDb();
+    [bookings, sales] = await Promise.all([
+      loadByDateRange(db, "bookings", first, last),
+      loadByDateRange(db, "cantinaSales", first, last),
+    ]);
+  }
+  return buildDailySummaries(dates, bookings, sales).map((d) => {
+    const totalSlots = slotTimesFor(config, d.date).length * config.courts.length;
+    const withSlots = { ...d, totalSlots, closed: totalSlots === 0 };
+    return { ...withSlots, ocupacionPct: dayOccupancy(withSlots) };
+  });
+}
+
+/**
+ * Resumen día por día de un mes calendario. Alimenta Calendario y
+ * Reportes, así los dos muestran los mismos números.
  */
 export async function adminGetMonthStats(year, month) {
   const denied = await requireAdmin();
@@ -422,33 +479,36 @@ export async function adminGetMonthStats(year, month) {
   const dates = Array.from({ length: daysInMonth }, (_, i) =>
     isoAddDays(first, i),
   );
-  const last = dates[dates.length - 1];
 
-  const build = (bookings, sales) => {
-    const days = buildDailySummaries(dates, bookings, sales).map((d, i) => {
-      const totalSlots = getSlotTimesForDate(d.date).length * COURTS.length;
-      const withSlots = { ...d, day: i + 1, totalSlots };
-      return { ...withSlots, ocupacionPct: dayOccupancy(withSlots) };
-    });
+  try {
+    const days = (await loadRangeSummaries(dates)).map((d, i) => ({
+      ...d,
+      day: i + 1,
+    }));
     return {
       ok: true,
       days,
       totals: sumSummaries(days),
       ocupacionPct: periodOccupancy(days, todayInClub()),
     };
-  };
-
-  if (!isFirebaseConfigured()) return build([], []);
-
-  try {
-    const db = getDb();
-    const [bookings, sales] = await Promise.all([
-      loadByDateRange(db, "bookings", first, last),
-      loadByDateRange(db, "cantinaSales", first, last),
-    ]);
-    return build(bookings, sales);
   } catch (error) {
     return { ok: false, error: "No se pudo cargar el reporte del mes." };
+  }
+}
+
+/** Ocupación de `count` días desde `fromIso`, para la tira de días de Agenda. */
+export async function adminGetRangeStats(fromIso, count = 14) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const n = Math.min(62, Math.max(1, Number(count) || 14));
+  const dates = Array.from({ length: n }, (_, i) =>
+    isoAddDays(fromIso || todayInClub(), i),
+  );
+  try {
+    return { ok: true, days: await loadRangeSummaries(dates) };
+  } catch (error) {
+    return { ok: false, error: "No se pudo cargar la ocupación de los próximos días." };
   }
 }
 
@@ -680,35 +740,10 @@ export async function adminRemoveTournamentPlayer(tournamentId, playerId) {
 export async function adminGetClubConfig() {
   const denied = await requireAdmin();
   if (denied) return denied;
-
-  const fallback = {
-    fullCourtPrice: 60000,
-    perPlayerPrice: 15000,
-    slotDurationMin: 90,
-    paymentAlias: "muzzaga.padel.mp",
-    paymentCbu: "0000003100010002000304",
-    paymentTitular: "Muzzaga Pádel",
-    clubPhone: "5492995974176",
-    blockedDates: [],
-  };
-
-  if (!isFirebaseConfigured()) {
-    return { ok: true, config: fallback };
-  }
-
-  try {
-    const db = getDb();
-    const snap = await db.ref("clubConfig").once("value");
-    if (!snap.exists()) {
-      return { ok: true, config: fallback };
-    }
-    return { ok: true, config: { ...fallback, ...snap.val() } };
-  } catch (err) {
-    return { ok: true, config: fallback };
-  }
+  return { ok: true, config: await getClubConfig({ fresh: true }) };
 }
 
-export async function adminSaveClubConfig(config) {
+export async function adminSaveClubConfig(input) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
@@ -716,20 +751,27 @@ export async function adminSaveClubConfig(config) {
     return { ok: false, error: "Firebase no está configurado." };
   }
 
+  const result = validateConfig(input || {});
+  if (!result.ok) {
+    return {
+      ok: false,
+      error: "Revisá los campos marcados.",
+      fieldErrors: result.errors,
+    };
+  }
+
   try {
-    const db = getDb();
-    await db.ref("clubConfig").set({
-      fullCourtPrice: Number(config.fullCourtPrice) || 60000,
-      perPlayerPrice: Number(config.perPlayerPrice) || 15000,
-      slotDurationMin: Number(config.slotDurationMin) || 90,
-      paymentAlias: (config.paymentAlias || "").trim(),
-      paymentCbu: (config.paymentCbu || "").trim(),
-      paymentTitular: (config.paymentTitular || "").trim(),
-      clubPhone: (config.clubPhone || "").trim(),
-      blockedDates: Array.isArray(config.blockedDates) ? config.blockedDates : [],
-      updatedAt: Date.now(),
-    });
-    return { ok: true };
+    const config = {
+      ...result.config,
+      paymentAlias: result.config.paymentAlias.trim(),
+      paymentTitular: result.config.paymentTitular.trim(),
+      clubPhone: result.config.clubPhone.trim(),
+    };
+    await getDb()
+      .ref("clubConfig")
+      .set({ ...config, updatedAt: Date.now() });
+    setCachedClubConfig(config);
+    return { ok: true, config };
   } catch (err) {
     return { ok: false, error: "No se pudo guardar la configuración." };
   }
@@ -874,7 +916,6 @@ export async function adminMoveBooking({
   newDate,
   newCourtId,
   newStartTime,
-  newEndTime,
 }) {
   const denied = await requireAdmin();
   if (denied) return denied;
@@ -887,8 +928,12 @@ export async function adminMoveBooking({
     return { ok: false, error: "Firebase no está configurado." };
   }
 
-  const court = findCourt(newCourtId);
+  const config = await getClubConfig();
+  const court = findCourtIn(config, newCourtId);
   if (!court) return { ok: false, error: "Cancha destino inválida." };
+  if (!isValidSlotFor(config, newDate, newCourtId, newStartTime)) {
+    return { ok: false, error: "Ese horario no existe en la grilla del día destino." };
+  }
 
   try {
     const db = getDb();
@@ -914,10 +959,10 @@ export async function adminMoveBooking({
     // 3. Actualizar la reserva conservando pagos y cliente
     await db.ref(`bookings/${bookingId}`).update({
       courtId: newCourtId,
-      courtName: `${court.name} (${court.type})`,
+      courtName: courtLabel(court),
       date: newDate,
       startTime: newStartTime,
-      endTime: newEndTime || addMinutes(newStartTime, 90),
+      endTime: addMinutes(newStartTime, config.slotDurationMin),
       reprogrammedAt: Date.now(),
     });
 

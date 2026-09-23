@@ -44,8 +44,8 @@ const toMinutes = (hhmm) => {
  * Ventana abierta de un día en minutos desde su 00:00. Un cierre "00:30" es
  * del día siguiente: queda como 1470. null si ese día no abre.
  */
-function openWindow(isoDate, blockedDates) {
-  const day = SCHEDULE[isoWeekday(isoDate)];
+function openWindow(isoDate, blockedDates, schedule) {
+  const day = schedule[isoWeekday(isoDate)];
   if (!day?.open || blockedDates.includes(isoDate)) return null;
   const start = toMinutes(day.start);
   const end = toMinutes(day.end);
@@ -53,13 +53,16 @@ function openWindow(isoDate, blockedDates) {
 }
 
 /**
- * Estado del club ahora, según SCHEDULE y los días bloqueados de la
- * configuración.
+ * Estado del club ahora, según el horario (el de Configuración, o SCHEDULE
+ * por defecto) y los días bloqueados.
  * state: "abierto" | "cierra-pronto" | "cerrado" | "bloqueado"
  * @param {Date} [date]
- * @param {{ blockedDates?: string[] }} [opts]
+ * @param {{ blockedDates?: string[], schedule?: Array<{ open: boolean, start: string, end: string }> }} [opts]
  */
-export function getClubStatus(date = new Date(), { blockedDates = [] } = {}) {
+export function getClubStatus(
+  date = new Date(),
+  { blockedDates = [], schedule = SCHEDULE } = {},
+) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: TIMEZONE,
     year: "numeric",
@@ -75,8 +78,8 @@ export function getClubStatus(date = new Date(), { blockedDates = [] } = {}) {
   const minutes = hour * 60 + Number(get("minute"));
 
   // Después de medianoche sigue abierto si el turno de ayer todavía no cerró.
-  const today = openWindow(iso, blockedDates);
-  const yesterday = openWindow(isoAddDays(iso, -1), blockedDates);
+  const today = openWindow(iso, blockedDates, schedule);
+  const yesterday = openWindow(isoAddDays(iso, -1), blockedDates, schedule);
   let closesInMin = null;
   if (today && minutes >= today.start && minutes < today.end) {
     closesInMin = today.end - minutes;

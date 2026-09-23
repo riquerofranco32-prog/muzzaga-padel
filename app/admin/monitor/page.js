@@ -221,7 +221,7 @@ export default function MonitorPage() {
           flex: 1,
         }}
       >
-        {COURTS.map((court) => {
+        {(dayData?.courts || COURTS).map((court) => {
           // Filtrar reservas del día para esta cancha
           const courtBookings = (dayData?.bookings || [])
             .filter((b) => b.courtId === court.id && b.status !== "cancelado")

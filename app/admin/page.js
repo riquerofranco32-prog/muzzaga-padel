@@ -18,13 +18,8 @@ import {
   getAdminDayData,
   verifyAdminPassword,
 } from "./actions";
-import {
-  COURTS,
-  SLOT_DURATION_MIN,
-  addMinutes,
-  nowInClubTimezone,
-  todayInClub,
-} from "../../lib/booking";
+import { nowInClubTimezone, todayInClub } from "../../lib/booking";
+import { normalizeConfig } from "../../lib/clubConfig";
 import { getClubStatus } from "../../data/horarios";
 import { formatARS, formatDate, formatPct, formatTime } from "../../lib/format";
 import { IconAlert, IconPlus, isExpiredSessionError } from "./adminHelpers";
@@ -103,11 +98,11 @@ export default function AdminPage() {
 
   // Tendencia de los últimos 7 días (KPIs con flecha hoy-vs-ayer + gráfico)
   const [weekStats, setWeekStats] = useState(null);
-  const [lastWeekSameDay, setLastWeekSameDay] = useState(null);
   const [nowLabel, setNowLabel] = useState("");
 
-  // Días bloqueados de Configuración: el estado del club los respeta.
-  const [blockedDates, setBlockedDates] = useState([]);
+  // Configuración del club (canchas, horarios, precios, seña, días
+  // bloqueados). Arranca con los defaults hasta que responde el server.
+  const [clubConfig, setClubConfig] = useState(() => normalizeConfig({}));
   const [isOnline, setIsOnline] = useState(true);
 
   // Detalle de turno: cobros parciales, saldo pendiente, cancelar
@@ -148,7 +143,7 @@ export default function AdminPage() {
     loadClients();
     loadWeekStats();
     adminGetClubConfig().then((res) => {
-      if (res.ok) setBlockedDates(res.config.blockedDates || []);
+      if (res.ok) setClubConfig(res.config);
     });
   }, [isAuthenticated]);
 
@@ -321,10 +316,7 @@ export default function AdminPage() {
 
   async function loadWeekStats() {
     const res = await adminGetWeekStats();
-    if (res.ok) {
-      setWeekStats(res.days);
-      setLastWeekSameDay(res.lastWeekSameDay);
-    }
+    if (res.ok) setWeekStats(res.days);
   }
 
   async function handleToggleTest(booking) {
@@ -380,9 +372,11 @@ export default function AdminPage() {
   }
 
   function openCreateModal(courtId, startTime) {
+    // Sin horario elegido, se propone el primer turno libre del día.
+    const firstFree = dayData?.slots?.find((s) => !s.isTaken);
     setModalForm({
-      courtId: courtId || "cancha-1",
-      startTime: startTime || "18:30",
+      courtId: courtId || firstFree?.courtId || clubConfig.courts[0]?.id,
+      startTime: startTime || firstFree?.start || "",
       playerName: "",
       playerPhone: "",
       playersCount: 4,
@@ -396,13 +390,8 @@ export default function AdminPage() {
   async function handleCreateSubmit(e) {
     e.preventDefault();
     setModalSubmitting(true);
-    const res = await adminCreateManualBooking({
-      date: activeDate,
-      ...modalForm,
-      // El fin siempre se deriva del inicio: antes quedaba fijo en "20:00"
-      // y se guardaba mal en cualquier turno que no arrancara 18:30.
-      endTime: addMinutes(modalForm.startTime, SLOT_DURATION_MIN),
-    });
+    // El fin del turno lo calcula el server según la duración configurada.
+    const res = await adminCreateManualBooking({ date: activeDate, ...modalForm });
     setModalSubmitting(false);
     if (!res.ok) return showError(res, "No se pudo crear la reserva.");
     setIsModalOpen(false);
@@ -429,7 +418,7 @@ export default function AdminPage() {
     text += `📅 *Fecha:* ${dayData.date}\n`;
     text += `🎾 *Ocupación:* ${dayData.stats.takenSlots}/${dayData.stats.totalSlots} turnos (${formatPct(dayData.stats.ocupacionPct)})\n\n`;
 
-    COURTS.forEach((court) => {
+    dayData.courts.forEach((court) => {
       text += `🏟️ *${court.name.toUpperCase()} (${court.type}):*\n`;
       const courtSlots = dayData.slots.filter((s) => s.courtId === court.id);
       courtSlots.forEach((slot) => {
@@ -468,7 +457,10 @@ export default function AdminPage() {
     setView("agenda");
   }
 
-  const clubStatus = getClubStatus(new Date(), { blockedDates });
+  const clubStatus = getClubStatus(new Date(), {
+    blockedDates: clubConfig.blockedDates,
+    schedule: clubConfig.schedule,
+  });
 
   // Mientras el servidor confirma la cookie no mostramos nada: si no, al
   // admin ya logueado le parpadea el formulario en cada recarga.
@@ -778,7 +770,7 @@ export default function AdminPage() {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 weekStats={weekStats}
-                lastWeekSameDay={lastWeekSameDay}
+                clubConfig={clubConfig}
                 onGoToCaja={() => navigate("caja")}
                 onRefresh={() => loadDayData(activeDate)}
                 onOpenCreate={openCreateModal}
@@ -820,7 +812,14 @@ export default function AdminPage() {
               <ReportesView onExpiredSession={handleExpiredSession} />
             )}
             {view === "configuracion" && (
-              <ConfiguracionView onExpiredSession={handleExpiredSession} />
+              <ConfiguracionView
+                onExpiredSession={handleExpiredSession}
+                onToast={showToast}
+                onSaved={(config) => {
+                  setClubConfig(config);
+                  loadDayData(activeDate);
+                }}
+              />
             )}
           </div>
         </main>
@@ -849,6 +848,7 @@ export default function AdminPage() {
       {isModalOpen && (
         <CreateBookingModal
           activeDate={activeDate}
+          clubConfig={clubConfig}
           modalForm={modalForm}
           setModalForm={setModalForm}
           modalSubmitting={modalSubmitting}
@@ -863,6 +863,7 @@ export default function AdminPage() {
       {detailBooking && (
         <BookingDetailModal
           booking={detailBooking}
+          clubConfig={clubConfig}
           clients={clients}
           paymentForm={paymentForm}
           setPaymentForm={setPaymentForm}

@@ -9,6 +9,7 @@ export default function TodayFlashSlots() {
   const [activeDate, setActiveDate] = useState("");
   const [dateLabel, setDateLabel] = useState("Hoy");
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [courts, setCourts] = useState(COURTS);
 
   useEffect(() => {
     fetchSlots();
@@ -37,6 +38,7 @@ export default function TodayFlashSlots() {
 
       const free = (data.slots || []).filter((s) => s.available && !s.past);
       setAvailableSlots(free);
+      if (data.courts?.length) setCourts(data.courts);
     } catch (err) {
       console.error("Error loading flash slots", err);
     } finally {
@@ -177,7 +179,7 @@ export default function TodayFlashSlots() {
           }}
         >
           {availableSlots.map((slot) => {
-            const court = COURTS.find((c) => c.id === slot.courtId);
+            const court = courts.find((c) => c.id === slot.courtId);
             return (
               <button
                 key={`${slot.courtId}-${slot.start}`}

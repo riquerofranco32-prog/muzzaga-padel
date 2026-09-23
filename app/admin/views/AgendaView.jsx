@@ -1,41 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { CalendarDays, CircleCheck, Download, TriangleAlert } from "lucide-react";
-import { EmptyState, SkeletonCards, SkeletonRows } from "../ui/states";
-import { COURTS, nextDays, todayInClub } from "../../../lib/booking";
-import { bookingTotal, trendPct } from "../../../lib/metrics";
+import { useEffect, useState } from "react";
+import { ArrowDown, ArrowUp, TriangleAlert } from "lucide-react";
+import { SkeletonCards, SkeletonRows } from "../ui/states";
+import { adminGetRangeStats } from "../actions";
+import { nextDays, nowInClubTimezone, todayInClub } from "../../../lib/booking";
+import { hasSlotStarted } from "../../../lib/clubConfig";
 import {
-  formatARS,
-  formatDate,
-  formatPct,
-  normalizeSearch,
-  plural,
-} from "../../../lib/format";
-import { toWhatsappNumber } from "../../../lib/phone";
-import {
-  IconClose,
-  IconPhone,
-  IconPlus,
-  IconRefresh,
-  IconSearch,
-  IconTrash,
-  STATUS_OPTIONS,
-  WhatsAppMiniIcon,
+  isCountableBooking,
   pendingAmount,
-  statusClass,
-  exportBookingsToCSV,
-} from "../adminHelpers";
+  trendPct,
+} from "../../../lib/metrics";
+import { formatARS, formatDate, formatPct, plural } from "../../../lib/format";
+import DayStrip from "./agenda/DayStrip";
+import CourtTimeline from "./agenda/CourtTimeline";
+import WeekChart from "./agenda/WeekChart";
+import BookingsTable, {
+  STATUS_FILTERS,
+  matchesSearch,
+} from "./agenda/BookingsTable";
+
+/** ↑12% vs. el mismo día de la semana pasada. `goodWhenDown` para "por cobrar". */
+function Trend({ current, previous, goodWhenDown = false }) {
+  const pct = trendPct(current, previous);
+  if (pct == null) return null;
+  const up = pct > 0;
+  const good = goodWhenDown ? !up : up;
+  const Icon = up ? ArrowUp : ArrowDown;
+  return (
+    <span
+      className={`admin-kpi-trend ${good ? "up" : "down"}`}
+      title="vs. mismo día de la semana pasada"
+    >
+      <Icon size={12} strokeWidth={2} aria-hidden />
+      {up ? "+" : "-"}
+      {Math.abs(pct)}%<span className="sr-only"> vs. semana pasada</span>
+    </span>
+  );
+}
 
 export default function AgendaView({
   activeDate,
   setActiveDate,
   dayData,
+  clubConfig,
   loading,
   searchQuery,
   setSearchQuery,
   weekStats,
-  lastWeekSameDay,
   onGoToCaja,
   onRefresh,
   onOpenCreate,
@@ -43,140 +55,102 @@ export default function AgendaView({
   onStatusChange,
   onCancel,
 }) {
-  const [statusFilter, setStatusFilter] = useState("all"); // "all" | "pending_payment" | "confirmed" | "cancelled"
-  // Se calcula en cada render (no a nivel módulo) para que "Hoy" cambie a
-  // la medianoche de Catriel aunque el panel quede abierto.
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [rangeStats, setRangeStats] = useState(null);
+  const todayIso = todayInClub();
+  const now = nowInClubTimezone();
+  // En cada render (no a nivel módulo): "Hoy" cambia a la medianoche de Catriel.
   const days = nextDays(14);
-  const isViewingToday = activeDate === todayInClub();
 
-  const allBookings = dayData?.bookings || [];
-  const pendingCount = allBookings.filter(
-    (b) => b.status !== "cancelado" && pendingAmount(b) > 0,
-  ).length;
-  const confirmedCount = allBookings.filter(
-    (b) =>
-      b.status === "confirmado" ||
-      (b.status !== "cancelado" && pendingAmount(b) === 0),
-  ).length;
-  const cancelledCount = allBookings.filter(
-    (b) => b.status === "cancelado",
-  ).length;
+  // Ocupación de los próximos 14 días para la tira; se refresca con cada cambio del día.
+  useEffect(() => {
+    let cancelled = false;
+    adminGetRangeStats(todayIso, 14).then((res) => {
+      if (!cancelled && res.ok) setRangeStats(res.days);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [dayData, todayIso]);
 
-  function bookingMatchesStatus(b) {
-    if (!b) return false;
-    if (statusFilter === "pending_payment") {
-      return b.status !== "cancelado" && pendingAmount(b) > 0;
-    }
-    if (statusFilter === "confirmed") {
-      return (
-        b.status === "confirmado" ||
-        (b.status !== "cancelado" && pendingAmount(b) === 0)
-      );
-    }
-    if (statusFilter === "cancelled") {
-      return b.status === "cancelado";
-    }
-    return true;
-  }
-
-  function bookingMatchesSearch(b) {
-    if (!searchQuery || !b) return true;
-    const q = normalizeSearch(searchQuery);
-    return normalizeSearch(
-      `${b.playerName || ""} ${b.playerPhone || ""} ${b.bookingCode || ""} ${b.courtName || ""}`,
-    ).includes(q);
-  }
-
-  const filteredBookings = allBookings.filter(
-    (b) => bookingMatchesStatus(b) && bookingMatchesSearch(b),
+  const strip = (
+    <DayStrip
+      days={days}
+      rangeStats={rangeStats}
+      activeDate={activeDate}
+      todayIso={todayIso}
+      loading={loading}
+      onSelect={setActiveDate}
+      onRefresh={onRefresh}
+    />
   );
 
-  const summary = dayData?.summary;
-  const cash = dayData?.cash;
+  if (!dayData) {
+    return (
+      <>
+        {strip}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <SkeletonCards count={4} />
+          <SkeletonRows count={7} height={64} />
+        </div>
+      </>
+    );
+  }
 
-  // Tendencia contra el mismo día de la semana pasada. Solo tiene sentido
-  // mirando hoy: weekStats siempre termina hoy en Catriel.
-  const todayStats = weekStats?.find((d) => d.isToday);
-  const trend = (field) =>
-    isViewingToday && todayStats && lastWeekSameDay
-      ? trendPct(todayStats[field], lastWeekSameDay[field])
-      : null;
-  const ingresosTrend = trend("cobrado");
-  const turnosTrend = trend("turnos");
+  const { summary, cash, stats, lastWeek } = dayData;
+  const bookings = dayData.bookings || [];
+  const pendingBookings = bookings.filter(
+    (b) => isCountableBooking(b) && pendingAmount(b) > 0,
+  ).length;
+
+  // Próximo turno: el primer reservado que todavía no arrancó (o el primero
+  // del día si se mira una fecha futura). Los slots vienen por cancha; el
+  // orden del día es el de la primera aparición de cada horario.
+  const rowOrder = [...new Set(dayData.slots.map((s) => s.start))];
+  const nextSlot =
+    dayData.slots
+      .filter((s) => s.booking && isCountableBooking(s.booking))
+      .filter((s) => !hasSlotStarted(clubConfig, activeDate, s.start, now))
+      .sort((a, b) => rowOrder.indexOf(a.start) - rowOrder.indexOf(b.start))[0] || null;
+  const courtName = (id) => dayData.courts.find((c) => c.id === id)?.name || id;
+
+  const isDimmed = (b) =>
+    (searchQuery && !matchesSearch(b, searchQuery)) ||
+    (statusFilter !== "all" && !STATUS_FILTERS[statusFilter](b));
+
+  const occupancy = stats.ocupacionPct;
 
   return (
     <>
-      {/* DATE SELECTOR BAR */}
-      <div className="admin-date-picker-row">
-        <div className="admin-dates-scroll">
-          {days.map((d) => (
-            <button
-              key={d.iso}
-              type="button"
-              className={`admin-date-tab${activeDate === d.iso ? " active" : ""}`}
-              onClick={() => setActiveDate(d.iso)}
-            >
-              <span
-                style={{
-                  fontSize: 11,
-                  display: "block",
-                  textTransform: "uppercase",
-                }}
-              >
-                {d.dayName}
-              </span>
-              <strong style={{ fontSize: 17, display: "block" }}>
-                {d.dayNumber}
-              </strong>
-              <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
-                {d.monthName}
-              </span>
-            </button>
-          ))}
-        </div>
+      {strip}
 
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={onRefresh}
-          style={{ height: 42, padding: "8px 14px" }}
-          disabled={loading}
-        >
-          {loading ? (
-            "Actualizando..."
-          ) : (
-            <>
-              <IconRefresh /> Refrescar
-            </>
-          )}
-        </button>
-      </div>
-
-      {!dayData && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <SkeletonCards count={5} />
-          <SkeletonRows count={6} height={64} />
-        </div>
-      )}
-
-      {/* STATS / KPIS ROW */}
-      {dayData && (
-        <div className="admin-kpis-grid">
-          <div className="admin-kpi-card" data-tone="orange">
-            <span className="admin-kpi-label">Ocupación del Día</span>
+      <div className={loading ? "admin-content-loading" : ""}>
+        {/* KPIs */}
+        <div className="admin-kpis-grid admin-kpis-4">
+          <div className="admin-kpi-card">
+            <span className="admin-kpi-label">Ocupación</span>
             <div className="admin-kpi-val">
-              {dayData.stats.reservados} / {dayData.stats.disponibles}
-              <span className="admin-kpi-sub">
-                ({formatPct(dayData.stats.ocupacionPct)})
-              </span>
+              {stats.reservados}/{stats.disponibles}
+              <span className="admin-kpi-sub">{formatPct(occupancy)}</span>
+              <Trend current={occupancy} previous={lastWeek?.ocupacionPct} />
+            </div>
+            <div
+              className="admin-progress"
+              role="progressbar"
+              aria-label="Ocupación del día"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={occupancy ?? 0}
+            >
+              <span style={{ width: `${occupancy ?? 0}%` }} />
             </div>
           </div>
 
-          <div className="admin-kpi-card" data-tone="emerald">
-            <span className="admin-kpi-label">Cobrado Hoy</span>
-            <div className="admin-kpi-val" style={{ color: "#047857" }}>
+          <div className="admin-kpi-card">
+            <span className="admin-kpi-label">Ingresos del día</span>
+            <div className="admin-kpi-val">
               {formatARS(cash.cobrado)}
-              <TrendBadge pct={ingresosTrend} />
+              <Trend current={cash.cobrado} previous={lastWeek?.cobrado} />
             </div>
             <span className="admin-kpi-sub">
               Turnos {formatARS(cash.cobradoTurnos)} · Cantina{" "}
@@ -184,78 +158,114 @@ export default function AgendaView({
             </span>
           </div>
 
-          <div className="admin-kpi-card" data-tone="sky">
-            <span className="admin-kpi-label">Horarios Disponibles</span>
-            <div className="admin-kpi-val" style={{ color: "#0369a1" }}>
-              {plural(dayData.stats.libres, "libre", "libres")}
+          <div className="admin-kpi-card">
+            <span className="admin-kpi-label">Por cobrar</span>
+            <div
+              className="admin-kpi-val"
+              style={{
+                color: summary.porCobrar > 0 ? "var(--warning)" : "var(--text)",
+              }}
+            >
+              {formatARS(summary.porCobrar)}
+              <Trend
+                current={summary.porCobrar}
+                previous={lastWeek?.porCobrar}
+                goodWhenDown
+              />
             </div>
-          </div>
-
-          <div className="admin-kpi-card" data-tone="ink">
-            <span className="admin-kpi-label">Turnos del Día</span>
-            <div className="admin-kpi-val">
-              {plural(summary.turnos, "turno", "turnos")}
-              <TrendBadge pct={turnosTrend} />
-            </div>
+            <span className="admin-kpi-sub">
+              {pendingBookings > 0
+                ? plural(
+                    pendingBookings,
+                    "reserva pendiente",
+                    "reservas pendientes",
+                  )
+                : "Todo cobrado"}
+            </span>
           </div>
 
           <div className="admin-kpi-card">
-            <span className="admin-kpi-label">Por Cobrar Hoy</span>
-            <div
-              className="admin-kpi-val"
-              style={{ color: summary.porCobrar > 0 ? "#b45309" : "#047857" }}
-            >
-              {formatARS(summary.porCobrar)}
-            </div>
-            <span className="admin-kpi-sub">
-              Facturado {formatARS(summary.facturadoTurnos)}
-            </span>
+            <span className="admin-kpi-label">Próximo turno</span>
+            {nextSlot ? (
+              <>
+                <div className="admin-kpi-val">{nextSlot.start}</div>
+                <span className="admin-kpi-sub">
+                  {courtName(nextSlot.courtId)} · {nextSlot.booking.playerName}
+                </span>
+              </>
+            ) : (
+              <>
+                <div
+                  className="admin-kpi-val"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Sin turnos
+                </div>
+                <span className="admin-kpi-sub">
+                  {stats.totalSlots === 0
+                    ? "El club no abre este día"
+                    : "No quedan turnos reservados"}
+                </span>
+              </>
+            )}
           </div>
         </div>
-      )}
 
-      {/* CIERRE DE CAJA + TENDENCIA SEMANAL */}
-      {dayData && (
-        <div
-          className="admin-cashweek-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.3fr 1fr",
-            gap: 20,
-            marginTop: 24,
-          }}
-        >
-          <div>
-            <h2 className="admin-section-title">Caja del Día</h2>
-            <div className="admin-cashclose-card">
-              <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+        {/* GRILLA */}
+        <section style={{ marginTop: 24 }}>
+          <h2 className="admin-section-title">
+            Grilla del {formatDate(activeDate, "long")}
+          </h2>
+          {stats.totalSlots === 0 ? (
+            <div className="admin-settings-card admin-closed-day">
+              El club no abre este día (cerrado por horario o día bloqueado en
+              Configuración).
+            </div>
+          ) : (
+            <CourtTimeline
+              courts={dayData.courts}
+              slots={dayData.slots}
+              activeDate={activeDate}
+              clubConfig={clubConfig}
+              now={now}
+              isDimmed={isDimmed}
+              onAssign={onOpenCreate}
+              onOpenDetail={onOpenDetail}
+              onCancel={onCancel}
+            />
+          )}
+          <ul
+            className="admin-timeline-legend"
+            aria-label="Referencias de colores"
+          >
+            <li data-state="pendiente">Pendiente de pago</li>
+            <li data-state="senado">Seña pagada</li>
+            <li data-state="pagado">Pagado completo</li>
+            <li data-state="bloqueado">Bloqueado</li>
+          </ul>
+        </section>
+
+        {/* CAJA + SEMANA */}
+        <div className="admin-agenda-split">
+          <section>
+            <h2 className="admin-section-title">Caja del día</h2>
+            <div className="admin-cashclose-card admin-cash-line">
+              <span>
                 Efectivo {formatARS(cash.byMethod.efectivo)} · Transferencia{" "}
-                {formatARS(cash.byMethod.transferencia)} · Mercado Pago{" "}
+                {formatARS(cash.byMethod.transferencia)} · MP{" "}
                 {formatARS(cash.byMethod.mercadopago)} · Egresos{" "}
                 {formatARS(-cash.totalExpenses)}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginTop: 8,
-                  gap: 12,
-                  flexWrap: "wrap",
-                }}
-              >
-                <strong>
-                  Esperado en cajón: {formatARS(cash.expectedCash)}
-                </strong>
+              </span>
+              <span className="admin-cash-line-total">
+                <strong>En cajón: {formatARS(cash.expectedCash)}</strong>
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  style={{ height: 32, padding: "4px 12px", fontSize: 12.5 }}
                   onClick={onGoToCaja}
                 >
                   Ir a Caja →
                 </button>
-              </div>
+              </span>
               {summary.pagadosSinCobro > 0 && (
                 <p className="admin-alert">
                   <TriangleAlert size={14} strokeWidth={1.75} aria-hidden />
@@ -268,582 +278,31 @@ export default function AgendaView({
                 </p>
               )}
             </div>
-          </div>
+          </section>
 
-          <div>
-            <h2 className="admin-section-title">Recaudación de la Semana</h2>
+          <section>
+            <h2 className="admin-section-title">Recaudación de la semana</h2>
             {weekStats ? (
-              <div className="admin-week-chart">
-                {(() => {
-                  const max = Math.max(1, ...weekStats.map((d) => d.cobrado));
-                  return weekStats.map((d) => (
-                    <div key={d.date} className="admin-week-bar-col">
-                      <span className="admin-week-bar-val">
-                        {d.cobrado > 0
-                          ? `$${Math.round(d.cobrado / 1000)}k`
-                          : ""}
-                      </span>
-                      <div
-                        className={`admin-week-bar${d.isToday ? " is-today" : ""}`}
-                        style={{
-                          height: `${Math.max(4, (d.cobrado / max) * 100)}px`,
-                        }}
-                        title={`${d.dayLabel} ${formatDate(d.date)}: ${formatARS(d.cobrado)} (turnos ${formatARS(d.cobradoTurnos)} · cantina ${formatARS(d.cantina)})`}
-                      />
-                      <span className="admin-week-bar-label">{d.dayLabel}</span>
-                    </div>
-                  ));
-                })()}
-              </div>
+              <WeekChart days={weekStats} />
             ) : (
-              <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
-                Cargando tendencia...
-              </p>
+              <SkeletonRows count={1} height={180} />
             )}
-          </div>
-        </div>
-      )}
-
-      <div className={loading ? "admin-content-loading" : ""} hidden={!dayData}>
-        {/* COURT TIMELINES (CANCHA 1 VS CANCHA 2) */}
-        <div style={{ marginTop: 32 }}>
-          <h2 className="admin-section-title">
-            Grilla Horaria de Pistas ({formatDate(activeDate, "long")})
-          </h2>
-
-          <div className="admin-courts-timeline-grid">
-            {COURTS.map((court) => {
-              const courtSlots =
-                dayData?.slots?.filter((s) => s.courtId === court.id) || [];
-              return (
-                <div key={court.id} className="admin-court-col">
-                  <div className="admin-court-col-header">
-                    <div>
-                      <strong
-                        style={{ fontSize: 16, color: "var(--color-ink)" }}
-                      >
-                        {court.name}
-                      </strong>
-                      <span
-                        style={{
-                          fontSize: 12,
-                          color: "var(--text-muted)",
-                          marginLeft: 6,
-                        }}
-                      >
-                        ({court.type})
-                      </span>
-                    </div>
-                    <span className="badge-linear badge-emerald">
-                      {plural(
-                        courtSlots.filter((s) => s.isTaken).length,
-                        "reservado",
-                        "reservados",
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="admin-slots-vertical-list">
-                    {courtSlots.map((slot) => {
-                      const b = slot.booking;
-                      const isTaken = slot.isTaken;
-                      const isDimmed =
-                        isTaken &&
-                        ((searchQuery && !bookingMatchesSearch(b)) ||
-                          (statusFilter !== "all" && !bookingMatchesStatus(b)));
-
-                      return (
-                        <div
-                          key={slot.slotKey}
-                          className={`admin-timeline-slot${isTaken ? " occupied" : " free"}${isDimmed ? " dimmed" : ""}`}
-                          data-status={
-                            isTaken ? statusClass(b.status) : undefined
-                          }
-                        >
-                          <div className="admin-slot-time-col">
-                            <strong>{slot.start}</strong>
-                            <span>{slot.end}</span>
-                          </div>
-
-                          <div className="admin-slot-info-col">
-                            {isTaken && b ? (
-                              <>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "flex-start",
-                                  }}
-                                >
-                                  <div>
-                                    <strong
-                                      style={{
-                                        fontSize: 14,
-                                        color: "var(--color-ink)",
-                                      }}
-                                    >
-                                      {b.playerName}
-                                    </strong>
-                                    {b.isTest && <TestBadge />}
-                                    {b.playerPhone && (
-                                      <span
-                                        style={{
-                                          fontSize: 12,
-                                          color: "var(--text-secondary)",
-                                          display: "flex",
-                                          alignItems: "center",
-                                          gap: 4,
-                                        }}
-                                      >
-                                        <IconPhone /> {b.playerPhone}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <span
-                                    className={`admin-status-badge ${statusClass(b.status)}`}
-                                  >
-                                    {b.status.toUpperCase()}
-                                  </span>
-                                </div>
-
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    gap: 8,
-                                    marginTop: 8,
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <button
-                                    type="button"
-                                    className="admin-mini-btn"
-                                    onClick={() => onOpenDetail(b)}
-                                    title="Ver detalle y cobros"
-                                  >
-                                    $ Cobros
-                                  </button>
-                                  {b.playerPhone && (
-                                    <a
-                                      href={`https://wa.me/${toWhatsappNumber(b.playerPhone)}?text=${encodeURIComponent(
-                                        `Hola ${b.playerName}! Te escribimos de Muzzaga Pádel por tu turno del ${activeDate} a las ${slot.start} hs en ${court.name}. ¿Todo bien?`,
-                                      )}`}
-                                      target="_blank"
-                                      rel="noopener"
-                                      className="admin-mini-btn whatsapp"
-                                      title="Escribir por WhatsApp"
-                                    >
-                                      <WhatsAppMiniIcon /> WhatsApp
-                                    </a>
-                                  )}
-
-                                  <select
-                                    className="admin-mini-select"
-                                    data-status={statusClass(b.status)}
-                                    value={b.status}
-                                    onChange={(e) =>
-                                      e.target.value === "cancelado"
-                                        ? onCancel(b.id, court.id, slot.start)
-                                        : onStatusChange(b.id, e.target.value)
-                                    }
-                                  >
-                                    {STATUS_OPTIONS.map((o) => (
-                                      <option key={o.value} value={o.value}>
-                                        {o.label}
-                                      </option>
-                                    ))}
-                                  </select>
-
-                                  <button
-                                    type="button"
-                                    className="admin-mini-btn cancel"
-                                    onClick={() =>
-                                      onCancel(b.id, court.id, slot.start)
-                                    }
-                                    title="Cancelar turno y liberar horario"
-                                  >
-                                    <IconClose size={11} /> Liberar
-                                  </button>
-                                </div>
-                              </>
-                            ) : (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <span
-                                  style={{
-                                    fontSize: 13,
-                                    color: "var(--text-muted)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 6,
-                                  }}
-                                >
-                                  <span
-                                    style={{
-                                      width: 7,
-                                      height: 7,
-                                      borderRadius: "50%",
-                                      background:
-                                        "var(--color-hairline-strong)",
-                                      display: "inline-block",
-                                    }}
-                                  />
-                                  Horario Disponible
-                                </span>
-                                <button
-                                  type="button"
-                                  className="btn btn-secondary"
-                                  style={{
-                                    height: 28,
-                                    padding: "2px 10px",
-                                    fontSize: 11,
-                                  }}
-                                  onClick={() =>
-                                    onOpenCreate(court.id, slot.start)
-                                  }
-                                >
-                                  <IconPlus size={11} /> Asignar
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          </section>
         </div>
 
-        {/* DETAILED BOOKINGS TABLE */}
-        <div style={{ marginTop: 40 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16,
-              flexWrap: "wrap",
-              gap: 12,
-            }}
-          >
-            <h2 className="admin-section-title" style={{ marginBottom: 0 }}>
-              Listado de Reservas del Día ({filteredBookings.length})
-            </h2>
-
-            <div
-              style={{
-                display: "inline-flex",
-                background: "var(--surface-muted, #f1f5f9)",
-                padding: 3,
-                borderRadius: 8,
-                gap: 2,
-              }}
-            >
-              <button
-                type="button"
-                className={`btn-secondary${statusFilter === "all" ? " active" : ""}`}
-                style={{
-                  padding: "4px 10px",
-                  fontSize: 12,
-                  borderRadius: 6,
-                  background:
-                    statusFilter === "all"
-                      ? "var(--surface, #fff)"
-                      : "transparent",
-                  boxShadow:
-                    statusFilter === "all"
-                      ? "0 1px 2px rgba(0,0,0,0.08)"
-                      : "none",
-                  fontWeight: statusFilter === "all" ? 600 : 400,
-                }}
-                onClick={() => setStatusFilter("all")}
-              >
-                Todos ({allBookings.length})
-              </button>
-              <button
-                type="button"
-                className={`btn-secondary${statusFilter === "pending_payment" ? " active" : ""}`}
-                style={{
-                  padding: "4px 10px",
-                  fontSize: 12,
-                  borderRadius: 6,
-                  background:
-                    statusFilter === "pending_payment"
-                      ? "var(--surface, #fff)"
-                      : "transparent",
-                  boxShadow:
-                    statusFilter === "pending_payment"
-                      ? "0 1px 2px rgba(0,0,0,0.08)"
-                      : "none",
-                  fontWeight: statusFilter === "pending_payment" ? 600 : 400,
-                  color:
-                    pendingCount > 0
-                      ? "var(--color-primary-orange, #ff5722)"
-                      : "inherit",
-                }}
-                onClick={() => setStatusFilter("pending_payment")}
-              >
-                Con saldo pendiente ({pendingCount})
-              </button>
-              <button
-                type="button"
-                className={`btn-secondary${statusFilter === "confirmed" ? " active" : ""}`}
-                style={{
-                  padding: "4px 10px",
-                  fontSize: 12,
-                  borderRadius: 6,
-                  background:
-                    statusFilter === "confirmed"
-                      ? "var(--surface, #fff)"
-                      : "transparent",
-                  boxShadow:
-                    statusFilter === "confirmed"
-                      ? "0 1px 2px rgba(0,0,0,0.08)"
-                      : "none",
-                  fontWeight: statusFilter === "confirmed" ? 600 : 400,
-                }}
-                onClick={() => setStatusFilter("confirmed")}
-              >
-                Confirmados ({confirmedCount})
-              </button>
-              {cancelledCount > 0 && (
-                <button
-                  type="button"
-                  className={`btn-secondary${statusFilter === "cancelled" ? " active" : ""}`}
-                  style={{
-                    padding: "4px 10px",
-                    fontSize: 12,
-                    borderRadius: 6,
-                    background:
-                      statusFilter === "cancelled"
-                        ? "var(--surface, #fff)"
-                        : "transparent",
-                    boxShadow:
-                      statusFilter === "cancelled"
-                        ? "0 1px 2px rgba(0,0,0,0.08)"
-                        : "none",
-                    fontWeight: statusFilter === "cancelled" ? 600 : 400,
-                    color: "var(--color-muted)",
-                  }}
-                  onClick={() => setStatusFilter("cancelled")}
-                >
-                  Cancelados ({cancelledCount})
-                </button>
-              )}
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <button
-                type="button"
-                onClick={() => exportBookingsToCSV(dayData?.bookings || [], activeDate)}
-                className="btn btn-secondary"
-                style={{ height: 36, fontSize: 12.5, padding: "0 12px", gap: 6 }}
-                title="Descargar listado de reservas del día en CSV para Excel"
-              >
-                <Download size={16} strokeWidth={1.75} aria-hidden />{" "}
-                Exportar CSV
-              </button>
-
-              <div className="admin-search-wrap">
-                <IconSearch />
-                <input
-                  type="text"
-                  placeholder="Buscar por nombre, teléfono o código..."
-                  className="admin-search-input"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    className="admin-search-clear"
-                    onClick={() => setSearchQuery("")}
-                    aria-label="Limpiar búsqueda"
-                    title="Limpiar búsqueda"
-                  >
-                    <IconClose size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="admin-table-wrapper">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Cancha</th>
-                  <th>Horario</th>
-                  <th>Cliente</th>
-                  <th>Teléfono</th>
-                  <th>Monto</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBookings.length > 0 ? (
-                  filteredBookings.map((b) => (
-                    <tr key={b.id}>
-                      <td data-label="Código">
-                        <code style={{ color: "#0369a1", fontWeight: 600 }}>
-                          {b.bookingCode}
-                        </code>
-                      </td>
-                      <td data-label="Cancha">{b.courtName}</td>
-                      <td data-label="Horario">
-                        <strong>{b.startTime}</strong>–{b.endTime}
-                      </td>
-                      <td data-label="Cliente">
-                        <strong>{b.playerName}</strong>
-                        {b.isTest && <TestBadge />}
-                      </td>
-                      <td data-label="Teléfono">
-                        <span style={{ color: "var(--text-secondary)" }}>
-                          {b.playerPhone || "-"}
-                        </span>
-                      </td>
-                      <td data-label="Monto">
-                        <strong style={{ color: "var(--success)" }}>
-                          {formatARS(bookingTotal(b))}
-                        </strong>
-                        {pendingAmount(b) > 0 && (
-                          <div style={{ fontSize: 11, color: "#b45309" }}>
-                            Debe {formatARS(pendingAmount(b))}
-                          </div>
-                        )}
-                      </td>
-                      <td data-label="Estado">
-                        <select
-                          className="admin-mini-select"
-                          data-status={statusClass(b.status)}
-                          value={b.status}
-                          aria-label={`Estado del turno de ${b.playerName}`}
-                          onChange={(e) =>
-                            e.target.value === "cancelado"
-                              ? onCancel(b.id, b.courtId, b.startTime)
-                              : onStatusChange(b.id, e.target.value)
-                          }
-                        >
-                          {STATUS_OPTIONS.map((o) => (
-                            <option key={o.value} value={o.value}>
-                              {o.label}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td data-label="Acciones">
-                        <div style={{ display: "flex", gap: 6 }}>
-                          <button
-                            type="button"
-                            className="admin-table-action-btn"
-                            onClick={() => onOpenDetail(b)}
-                            title="Ver detalle y cobros"
-                            aria-label={`Cobros de ${b.playerName}`}
-                          >
-                            $
-                          </button>
-                          {b.playerPhone && (
-                            <a
-                              href={`https://wa.me/${toWhatsappNumber(b.playerPhone)}`}
-                              target="_blank"
-                              rel="noopener"
-                              className="admin-table-action-btn"
-                              title="Chat WhatsApp"
-                            >
-                              <WhatsAppMiniIcon />
-                            </a>
-                          )}
-                          <button
-                            type="button"
-                            className="admin-table-action-btn delete"
-                            onClick={() =>
-                              onCancel(b.id, b.courtId, b.startTime)
-                            }
-                            title="Cancelar reserva"
-                            aria-label={`Cancelar reserva de ${b.playerName}`}
-                          >
-                            <IconTrash />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="8">
-                      {searchQuery ? (
-                        <EmptyState
-                          icon={CalendarDays}
-                          title={`Ninguna reserva coincide con “${searchQuery}”`}
-                          text="Buscá por nombre, teléfono o código de reserva."
-                          action={{
-                            label: "Limpiar búsqueda",
-                            onClick: () => setSearchQuery(""),
-                          }}
-                        />
-                      ) : statusFilter !== "all" ? (
-                        <EmptyState
-                          icon={CircleCheck}
-                          title="No hay reservas con ese filtro"
-                          action={{
-                            label: "Ver todas",
-                            onClick: () => setStatusFilter("all"),
-                          }}
-                        />
-                      ) : (
-                        <EmptyState
-                          icon={CalendarDays}
-                          title="Sin reservas para este día"
-                          text="Cuando alguien reserve desde la web o cargues un turno a mano, aparece acá."
-                          action={{
-                            label: "Nueva reserva",
-                            onClick: () => onOpenCreate(),
-                          }}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <BookingsTable
+          bookings={bookings}
+          activeDate={activeDate}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onOpenCreate={onOpenCreate}
+          onOpenDetail={onOpenDetail}
+          onStatusChange={onStatusChange}
+          onCancel={onCancel}
+        />
       </div>
     </>
-  );
-}
-
-function TrendBadge({ pct }) {
-  if (pct == null) return null;
-  const up = pct > 0;
-  return (
-    <span
-      className={`admin-kpi-trend ${up ? "up" : "down"}`}
-      title="vs. mismo día de la semana pasada"
-    >
-      {up ? "▲ +" : "▼ -"}
-      {Math.abs(pct)}%
-    </span>
-  );
-}
-
-function TestBadge() {
-  return (
-    <span
-      className="badge-linear badge-amber"
-      style={{ fontSize: 10, padding: "1px 6px", marginLeft: 6 }}
-      title="Dato de prueba: no suma en ningún total"
-    >
-      PRUEBA
-    </span>
   );
 }

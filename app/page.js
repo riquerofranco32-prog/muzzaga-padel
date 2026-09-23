@@ -17,7 +17,7 @@ import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
 import ScrollProgress from "../components/ScrollProgress";
 
-import { priceForSlot } from "../lib/booking";
+import { getClubConfig } from "../lib/clubConfigServer";
 import { CLUB_INFO } from "../data/club";
 import { FAQS } from "../data/faq";
 
@@ -34,8 +34,20 @@ const faqJsonLd = {
   })),
 };
 
-export default function Home() {
-  const pricing = priceForSlot();
+// El precio del turno sale de Configuración: la home se regenera cada 5 min
+// para reflejar cambios sin redeploy.
+export const revalidate = 300;
+
+export default async function Home() {
+  const config = await getClubConfig();
+  const { valle, pico, picoEnabled } = config.pricing;
+  // Se anuncia el precio más bajo ("desde") cuando hay horario pico.
+  const cheapest = picoEnabled && pico.court < valle.court ? pico : valle;
+  const pricing = {
+    total: cheapest.court,
+    perPlayer: cheapest.perPlayer || Math.round(cheapest.court / 4),
+  };
+  const priceFrom = picoEnabled && pico.court !== valle.court ? "Desde " : "";
 
   return (
     <>
@@ -204,7 +216,8 @@ export default function Home() {
               }}
             >
               <div style={{ fontWeight: 600, color: "var(--color-ink)", fontSize: 14 }}>
-                ${pricing.total.toLocaleString("es-AR")} por turno (90 min)
+                {priceFrom}${pricing.total.toLocaleString("es-AR")} por turno (
+                {config.slotDurationMin} min)
               </div>
               <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
                 ${pricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro

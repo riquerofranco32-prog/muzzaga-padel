@@ -1,25 +1,11 @@
 "use client";
 
-import {
-  COURTS,
-  SLOT_DURATION_MIN,
-  addMinutes,
-  priceForSlot,
-} from "../../lib/booking";
+import { priceFor, slotTimesFor } from "../../lib/clubConfig";
 import { IconClose, IconPlus, STATUS_OPTIONS } from "./adminHelpers";
-
-const START_TIMES = [
-  "14:00",
-  "15:30",
-  "17:00",
-  "18:30",
-  "20:00",
-  "21:30",
-  "23:00",
-];
 
 export default function CreateBookingModal({
   activeDate,
+  clubConfig,
   modalForm,
   setModalForm,
   modalSubmitting,
@@ -30,7 +16,10 @@ export default function CreateBookingModal({
 }) {
   // Mismo cálculo que hace el server action, para que el modal muestre
   // exactamente el total que se va a guardar.
-  const modalRate = priceForSlot(activeDate, modalForm.startTime);
+  const slotTimes = slotTimesFor(clubConfig, activeDate);
+  const selectedSlot =
+    slotTimes.find((s) => s.start === modalForm.startTime) || slotTimes[0];
+  const modalRate = priceFor(clubConfig, activeDate, modalForm.startTime);
   const perPlayerPrice = modalRate.perPlayer;
   const modalPrice = modalForm.fullCourt
     ? modalRate.total
@@ -82,7 +71,7 @@ export default function CreateBookingModal({
                   setModalForm({ ...modalForm, courtId: e.target.value })
                 }
               >
-                {COURTS.map((c) => (
+                {clubConfig.courts.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name} ({c.type})
                   </option>
@@ -99,9 +88,11 @@ export default function CreateBookingModal({
                   setModalForm({ ...modalForm, startTime: e.target.value })
                 }
               >
-                {START_TIMES.map((t) => (
+                {slotTimes.map(({ start: t, end }) => (
                   <option key={t} value={t}>
-                    {t} a {addMinutes(t, SLOT_DURATION_MIN)} hs
+                    {t} a {end}
+                    {clubConfig.pricing.picoEnabled &&
+                      (priceFor(clubConfig, activeDate, t).band === "pico" ? " · pico" : " · valle")}
                   </option>
                 ))}
               </select>
@@ -218,7 +209,7 @@ export default function CreateBookingModal({
           <div className="admin-modal-hint">
             Se va a guardar de <strong>{modalForm.startTime}</strong> a{" "}
             <strong>
-              {addMinutes(modalForm.startTime, SLOT_DURATION_MIN)}
+              {selectedSlot?.end}
             </strong>{" "}
             hs · Total <strong>${modalPrice.toLocaleString("es-AR")}</strong>
             {!modalForm.fullCourt &&
