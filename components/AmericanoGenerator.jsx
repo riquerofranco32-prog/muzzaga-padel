@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import {
   generateFixtures,
   buildAmericanoShareMessage,
@@ -77,6 +78,18 @@ export default function AmericanoGenerator() {
             <p className="section-desc">
               Armá las rotaciones de parejas al instante para que todos jueguen con y contra todos en partidos de 4 o 6 games. Anotá los resultados en vivo y compartilo por WhatsApp.
             </p>
+          </div>
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+            <Image
+              src="/img/mascotas/muzzaguito-festejo.png"
+              alt="Muzzaguito festejando en el torneo americano"
+              width={92}
+              height={92}
+              style={{
+                objectFit: "contain",
+                filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.14))",
+              }}
+            />
           </div>
         </div>
 

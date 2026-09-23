@@ -236,13 +236,13 @@ export default function RatingCalculator() {
           </div>
 
           <img
-            src="/img/mascota.png"
-            alt="Mascota oficial Muzzaga"
+            src="/img/mascotas/muzzaguito-hoodie-gameon.png"
+            alt="Mascota oficial Muzzaga Game On"
             style={{
-              width: 48,
-              height: 48,
+              width: 52,
+              height: 52,
               objectFit: "contain",
-              filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.12))",
+              filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.18))",
             }}
           />
         </div>

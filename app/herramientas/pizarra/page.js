@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
@@ -38,12 +39,26 @@ export default function PizarraPage() {
               padding: "32px 24px",
               maxWidth: 600,
               margin: "0 auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
+            <Image
+              src="/img/mascotas/muzzaguito-smash.png"
+              alt="Muzzaguito rematando por 3 metros"
+              width={110}
+              height={110}
+              style={{
+                objectFit: "contain",
+                marginBottom: 16,
+                filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.18))",
+              }}
+            />
             <h3 style={{ fontSize: 20, color: "var(--color-ink)", marginBottom: 8 }}>
               Llevá la táctica a la pista
             </h3>
-            <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 20 }}>
+            <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 20, maxWidth: 440 }}>
               Reservá turno en nuestras canchas de cristal y poné a prueba estas jugadas en tu próximo partido.
             </p>
             <Link href="/#turnos" className="btn btn-linear-primary" style={{ padding: "10px 24px" }}>

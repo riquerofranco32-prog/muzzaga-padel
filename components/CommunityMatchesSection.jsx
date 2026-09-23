@@ -100,19 +100,31 @@ export default function CommunityMatchesSection() {
   return (
     <section id="canchas-abiertas" className="section-community">
       <div className="container">
-        <div className="section-header-row">
-          <div>
-            <span
-              className="badge-linear badge-amber"
-              style={{ marginBottom: 8 }}
-            >
-              En Vivo · Matchmaking &amp; Comunidad
-            </span>
-            <h2 className="section-title">Canchas Abiertas en Catriel</h2>
-            <p className="section-desc">
-              Sumate a partidos con lugares libres o publicá tu propia
-              convocatoria. Jugá con rivales de tu mismo nivel.
-            </p>
+        <div className="section-header-row" style={{ alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <img
+              src="/img/mascotas/muzzaguito-selfie.png"
+              alt="Muzzaguito Comunidad y Selfie"
+              style={{
+                width: 72,
+                height: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.12))",
+              }}
+            />
+            <div>
+              <span
+                className="badge-linear badge-amber"
+                style={{ marginBottom: 6 }}
+              >
+                En Vivo · Matchmaking &amp; Comunidad
+              </span>
+              <h2 className="section-title">Canchas Abiertas en Catriel</h2>
+              <p className="section-desc">
+                Sumate a partidos con lugares libres o publicá tu propia
+                convocatoria. Jugá con rivales de tu mismo nivel.
+              </p>
+            </div>
           </div>
           <button
             type="button"

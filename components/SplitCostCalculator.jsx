@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { PRECIO_TURNO, PRECIO_POR_JUGADOR } from "../data/pricing";
 import { CALCULATOR_ITEMS as EXTRAS } from "../data/menu";
 import {
@@ -91,6 +92,18 @@ export default function SplitCostCalculator() {
               Dividí en segundos la cancha y lo que van a comer o tomar en la
               cantina. Copiá el desglose y pasalo al grupo.
             </p>
+          </div>
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+            <Image
+              src="/img/mascotas/muzzaguito-pizza.png"
+              alt="Muzzaguito disfrutando una pizza en el tercer tiempo"
+              width={92}
+              height={92}
+              style={{
+                objectFit: "contain",
+                filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.14))",
+              }}
+            />
           </div>
         </div>
 

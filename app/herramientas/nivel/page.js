@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
@@ -16,7 +17,7 @@ export default function NivelPage() {
     <>
       <Header />
       <main style={{ paddingTop: 90, minHeight: "80vh" }}>
-        <div className="container" style={{ marginBottom: 20 }}>
+        <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
             <Link href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
               ← Volver al Inicio
@@ -41,6 +42,18 @@ export default function NivelPage() {
                   categorías del pádel argentino (7ma a 1ra) para que siempre
                   compitas de igual a igual.
                 </p>
+              </div>
+              <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+                <Image
+                  src="/img/mascotas/muzzaguito-pelota.png"
+                  alt="Muzzaguito sosteniendo pelota de pádel"
+                  width={92}
+                  height={92}
+                  style={{
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.14))",
+                  }}
+                />
               </div>
             </div>
 

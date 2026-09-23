@@ -380,19 +380,31 @@ export default function AdminPage() {
       <div className="admin-login-wrapper">
         <div className="admin-login-card">
           <div className="admin-login-header">
-            <img
-              src="/img/logo_badge.png"
-              alt="Muzzaga Pádel"
-              width={56}
-              height={56}
-              style={{
-                width: 56,
-                height: 56,
-                margin: "0 auto 12px",
-                display: "block",
-                objectFit: "contain",
-              }}
-            />
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 14, marginBottom: 12 }}>
+              <img
+                src="/img/logo_badge.png"
+                alt="Muzzaga Pádel"
+                width={52}
+                height={52}
+                style={{
+                  width: 52,
+                  height: 52,
+                  objectFit: "contain",
+                }}
+              />
+              <img
+                src="/img/mascotas/muzzaguito-lentes-cruzado.png"
+                alt="Muzzaguito Staff Admin"
+                width={58}
+                height={58}
+                style={{
+                  width: 58,
+                  height: 58,
+                  objectFit: "contain",
+                  filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.25))",
+                }}
+              />
+            </div>
             <h1
               style={{
                 fontSize: 22,
@@ -504,6 +516,31 @@ export default function AdminPage() {
               </button>
             ))}
           </nav>
+
+          <div
+            style={{
+              margin: "14px 12px 6px",
+              padding: "10px 12px",
+              background: "rgba(255, 255, 255, 0.04)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <img
+              src="/img/mascotas/muzzaguito-lentes-cruzado.png"
+              alt="Muzzaguito Staff"
+              width={42}
+              height={42}
+              style={{ objectFit: "contain", flexShrink: 0 }}
+            />
+            <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.25 }}>
+              <strong style={{ color: "var(--text-primary)", display: "block" }}>Staff Muzzaga</strong>
+              Panel de Control
+            </div>
+          </div>
 
           <div className="admin-sidebar-footer">
             <Link href="/admin/monitor" target="_blank" className="admin-sidebar-link">

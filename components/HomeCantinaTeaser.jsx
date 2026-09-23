@@ -13,19 +13,31 @@ export default function HomeCantinaTeaser() {
       style={{ background: "var(--bg-surface)" }}
     >
       <div className="container">
-        <div className="section-header-row">
-          <div>
-            <span
-              className="badge-linear badge-amber"
-              style={{ marginBottom: 8 }}
-            >
-              Gastronomía &amp; Encuentro
-            </span>
-            <h2 className="section-title">Cantina Propia &amp; 3er Tiempo</h2>
-            <p className="section-desc">
-              Pizzas caseras a la piedra, tostados, sándwiches abundantes y
-              cervezas heladas con vista directa a la pista.
-            </p>
+        <div className="section-header-row" style={{ alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <img
+              src="/img/mascotas/muzzaguito-reposera-cerveza.png"
+              alt="Muzzaguito en la cantina con cerveza"
+              style={{
+                width: 76,
+                height: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.12))",
+              }}
+            />
+            <div>
+              <span
+                className="badge-linear badge-amber"
+                style={{ marginBottom: 6 }}
+              >
+                Gastronomía &amp; Encuentro
+              </span>
+              <h2 className="section-title">Cantina Propia &amp; 3er Tiempo</h2>
+              <p className="section-desc">
+                Pizzas caseras a la piedra, tostados, sándwiches abundantes y
+                cervezas heladas con vista directa a la pista.
+              </p>
+            </div>
           </div>
           <Link href="/menu" className="btn btn-secondary" style={{ gap: 6 }}>
             Ver Menú Completo (60+ productos) →

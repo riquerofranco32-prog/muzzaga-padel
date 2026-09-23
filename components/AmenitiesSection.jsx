@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import FeatureCarousel from "./FeatureCarousel";
 
 const SPECS = [
@@ -61,6 +62,18 @@ export default function AmenitiesSection() {
               Diseñado de cero para brindar la mejor experiencia deportiva y
               social de Catriel.
             </p>
+          </div>
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+            <Image
+              src="/img/mascotas/muzzaguito-mochila.png"
+              alt="Muzzaguito equipado con paletero profesional"
+              width={92}
+              height={92}
+              style={{
+                objectFit: "contain",
+                filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.14))",
+              }}
+            />
           </div>
         </div>
 

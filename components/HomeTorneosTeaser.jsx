@@ -44,15 +44,27 @@ export default function HomeTorneosTeaser() {
   return (
     <section id="torneos" className="section-turnos" style={{ background: "var(--bg-surface)" }}>
       <div className="container">
-        <div className="section-header-row">
-          <div>
-            <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-              Competencia &amp; Comunidad
-            </span>
-            <h2 className="section-title">Torneos en Muzzaga</h2>
-            <p className="section-desc">
-              Fechas oficiales por categoría con fase de grupos, copas de oro y plata, trofeos y premios en efectivo.
-            </p>
+        <div className="section-header-row" style={{ alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <img
+              src="/img/mascotas/muzzaguito-copa-campeon.png"
+              alt="Muzzaguito Campeón con Copa de Torneo"
+              style={{
+                width: 74,
+                height: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 6px 14px rgba(245, 158, 11, 0.25))",
+              }}
+            />
+            <div>
+              <span className="badge-linear badge-amber" style={{ marginBottom: 6 }}>
+                Competencia &amp; Comunidad
+              </span>
+              <h2 className="section-title">Torneos en Muzzaga</h2>
+              <p className="section-desc">
+                Fechas oficiales por categoría con fase de grupos, copas de oro y plata, trofeos y premios en efectivo.
+              </p>
+            </div>
           </div>
           <Link href="/torneos" className="btn btn-secondary" style={{ gap: 6 }}>
             Ver galería completa y fixture →

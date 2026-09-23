@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { FAQS } from "../data/faq";
 
 export default function FaqSection() {
@@ -14,18 +15,35 @@ export default function FaqSection() {
     <section id="faq" className="section-turnos">
       <div className="container">
         <div className="section-header-row">
-          <div>
-            <span
-              className="badge-linear badge-indigo"
-              style={{ marginBottom: 8 }}
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <div>
+              <span
+                className="badge-linear badge-indigo"
+                style={{ marginBottom: 8 }}
+              >
+                Dudas habituales
+              </span>
+              <h2 className="section-title">Preguntas Frecuentes</h2>
+              <p className="section-desc">
+                Todo lo que necesitás saber antes de venir a jugar a Muzzaga
+                Pádel.
+              </p>
+            </div>
+            <div
+              className="mascot-faq-desktop"
+              style={{ flexShrink: 0, display: "flex", alignItems: "center" }}
             >
-              Dudas habituales
-            </span>
-            <h2 className="section-title">Preguntas Frecuentes</h2>
-            <p className="section-desc">
-              Todo lo que necesitás saber antes de venir a jugar a Muzzaga
-              Pádel.
-            </p>
+              <Image
+                src="/img/mascotas/muzzaguito-guino-paleta.png"
+                alt="Muzzaguito respondiendo preguntas frecuentes"
+                width={88}
+                height={88}
+                style={{
+                  objectFit: "contain",
+                  filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.14))",
+                }}
+              />
+            </div>
           </div>
           <a
             href="https://wa.me/5492995974176?text=Hola%20Muzzaga!%20Tengo%20una%20consulta."

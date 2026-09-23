@@ -110,8 +110,8 @@ export default function TodayFlashSlots() {
       >
         <div style={{ flexShrink: 0 }}>
           <img
-            src="/img/mascota.png"
-            alt="Muzzaguito - Mascota Muzzaga"
+            src="/img/mascotas/muzzaguito-paleta-apunta.png"
+            alt="Muzzaguito invitando a jugar los turnos de hoy"
             width={100}
             height={100}
             className="mascot-hero-animated"
