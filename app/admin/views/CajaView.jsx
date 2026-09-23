@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, Lock, Receipt, Scale, Send, X } from "lucide-react";
+import { Coins, Download, Lock, Receipt, Scale, Send, X } from "lucide-react";
 import { EmptyState, SkeletonCards, SkeletonRows } from "../ui/states";
 import { formatARS, formatDate, formatTime, plural } from "../../../lib/format";
 import { cashDiffTone } from "../../../lib/metrics";
@@ -270,37 +270,66 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
         </div>
       )}
 
-      {/* Fórmula del esperado en cajón */}
-      <div
-        className="admin-cash-formula"
-        aria-label="Cómo se calcula el efectivo esperado"
-      >
-        <div>
-          <span className="admin-kpi-label">Efectivo turnos</span>
-          <strong>{formatARS(summary.cashTurnos)}</strong>
+      {/* 4 KPI Cards de Caja Estilo Kravio */}
+      <div className="admin-kpis-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", marginBottom: 20 }}>
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">Efectivo Turnos</span>
+            <Coins size={17} style={{ color: "#15803d" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: "#15803d" }}>
+                {formatARS(summary.cashTurnos)}
+              </div>
+              <span className="admin-cell-sub">Cobrado en mano por turnos</span>
+            </div>
+          </div>
         </div>
-        <span className="admin-cash-op" aria-hidden>
-          +
-        </span>
-        <div>
-          <span className="admin-kpi-label">Efectivo cantina</span>
-          <strong>{formatARS(summary.cashCantina)}</strong>
+
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">Efectivo Cantina</span>
+            <Receipt size={17} style={{ color: "#ea580c" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: "#ea580c" }}>
+                {formatARS(summary.cashCantina)}
+              </div>
+              <span className="admin-cell-sub">Ventas tercer tiempo</span>
+            </div>
+          </div>
         </div>
-        <span className="admin-cash-op" aria-hidden>
-          −
-        </span>
-        <div>
-          <span className="admin-kpi-label">Egresos</span>
-          <strong className={summary.totalExpenses > 0 ? "is-negative" : ""}>
-            {formatARS(-summary.totalExpenses)}
-          </strong>
+
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">Egresos / Gastos</span>
+            <Receipt size={17} style={{ color: summary.totalExpenses > 0 ? "#dc2626" : "#6b7280" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: summary.totalExpenses > 0 ? "#dc2626" : "#111827" }}>
+                {formatARS(-summary.totalExpenses)}
+              </div>
+              <span className="admin-cell-sub">Hielo, limpieza y mantenimiento</span>
+            </div>
+          </div>
         </div>
-        <span className="admin-cash-op" aria-hidden>
-          =
-        </span>
-        <div className="is-result">
-          <span className="admin-kpi-label">Esperado en cajón</span>
-          <strong>{formatARS(summary.expectedCash)}</strong>
+
+        <div className="admin-kravio-kpi-card" style={{ background: "#111827", borderColor: "#1f2937", color: "#ffffff" }}>
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title" style={{ color: "#9ca3af" }}>Esperado en Cajón</span>
+            <Scale size={17} style={{ color: "#f97316" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: "#ffffff" }}>
+                {formatARS(summary.expectedCash)}
+              </div>
+              <span style={{ fontSize: 12, color: "#cbd5e1" }}>Efectivo físico a controlar</span>
+            </div>
+          </div>
         </div>
       </div>
       <p className="admin-field-hint" style={{ margin: "8px 0 20px" }}>

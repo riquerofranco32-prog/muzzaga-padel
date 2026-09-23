@@ -1,6 +1,17 @@
 "use client";
 
-import { CalendarDays, CircleCheck, Download, Search, X } from "lucide-react";
+import { useState } from "react";
+import {
+  CalendarDays,
+  CircleCheck,
+  Clock,
+  Download,
+  Filter,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { EmptyState } from "../../ui/states";
 import { bookingTotal, pendingAmount } from "../../../../lib/metrics";
 import { formatARS, normalizeSearch } from "../../../../lib/format";
@@ -12,8 +23,6 @@ import {
   exportBookingsToCSV,
   statusClass,
 } from "../../adminHelpers";
-
-const ICON = { size: 16, strokeWidth: 1.75, "aria-hidden": true };
 
 export const STATUS_FILTERS = {
   all: () => true,
@@ -31,7 +40,43 @@ export function matchesSearch(b, query) {
   ).includes(normalizeSearch(query));
 }
 
-/** Listado de reservas del día con filtros, búsqueda y exportación. */
+function getInitials(name) {
+  if (!name) return "P";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function SortIcon() {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m7 15 5 5 5-5" />
+      <path d="m7 9 5-5 5 5" />
+    </svg>
+  );
+}
+
+function SignalBars({ level }) {
+  return (
+    <span className={`admin-kravio-signal ${level}`} aria-hidden="true">
+      <span />
+      <span />
+      <span />
+    </span>
+  );
+}
+
+/** Listado de reservas con estética Kravio Dashboard adaptado 100% a Muzzaga Pádel */
 export default function BookingsTable({
   bookings,
   activeDate,
@@ -44,15 +89,20 @@ export default function BookingsTable({
   onStatusChange,
   onCancel,
 }) {
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [showFilters, setShowFilters] = useState(false);
+
   const counts = Object.fromEntries(
     Object.entries(STATUS_FILTERS).map(([k, fn]) => [
       k,
       bookings.filter(fn).length,
     ]),
   );
+
   const filtered = bookings.filter(
     (b) => STATUS_FILTERS[statusFilter](b) && matchesSearch(b, searchQuery),
   );
+
   const filters = [
     ["all", "Todas"],
     ["pending_payment", "Con saldo"],
@@ -60,17 +110,165 @@ export default function BookingsTable({
     ...(counts.cancelled > 0 ? [["cancelled", "Canceladas"]] : []),
   ];
 
-  return (
-    <section className="admin-bookings">
-      <div className="admin-bookings-toolbar">
-        <h2 className="admin-section-title" style={{ margin: 0 }}>
-          Reservas del día ({filtered.length})
-        </h2>
+  const allSelected =
+    filtered.length > 0 && filtered.every((b) => selectedIds.has(b.id));
 
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((b) => b.id)));
+    }
+  };
+
+  const toggleSelectOne = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const getPriority = (b) => {
+    if (b.status === "cancelado" || pendingAmount(b) > 0) {
+      return { level: "high", label: "Con saldo" };
+    }
+    if (b.status === "pendiente") {
+      return { level: "medium", label: "Pendiente" };
+    }
+    return { level: "low", label: "Al día" };
+  };
+
+  const getStatusBadge = (b) => {
+    if (b.status === "cancelado") {
+      return { type: "cancelled", label: "Cancelado", icon: X };
+    }
+    if (pendingAmount(b) > 0) {
+      return { type: "review", label: "Con saldo", icon: Clock };
+    }
+    if (b.status === "confirmado") {
+      return { type: "delivered", label: "Al día", icon: CircleCheck };
+    }
+    return { type: "pending", label: "Pendiente", icon: Clock };
+  };
+
+  return (
+    <section className="admin-kravio-table-card">
+      {/* Header del Card */}
+      <div className="admin-kravio-table-toolbar">
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 8,
+              background: "#fff7ed",
+              color: "#ea580c",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <SlidersHorizontal size={16} aria-hidden="true" />
+          </div>
+          <div>
+            <h2
+              className="admin-kravio-card-title"
+              style={{ margin: 0, fontSize: 14.5, fontWeight: 600, color: "#111827" }}
+            >
+              Control de Turnos & Cobros
+            </h2>
+            <div style={{ fontSize: 11.5, color: "#6b7280" }}>
+              {filtered.length} {filtered.length === 1 ? "turno cargado" : "turnos cargados"} para la fecha
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-kravio-table-tools">
+          <div className="admin-kravio-search-field">
+            <Search size={14} style={{ color: "#9ca3af" }} aria-hidden="true" />
+            <input
+              type="text"
+              placeholder="Buscar padelista, teléfono..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Buscar turnos o padelistas"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  cursor: "pointer",
+                  color: "#9ca3af",
+                  display: "flex",
+                }}
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
+
+          <button
+            type="button"
+            className="admin-kravio-filter-btn"
+            onClick={() => setShowFilters((prev) => !prev)}
+            aria-label="Filtrar por estado"
+            aria-expanded={showFilters}
+          >
+            <Filter size={13} />
+            <span>Filtros</span>
+            {statusFilter !== "all" && (
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: "#ea580c",
+                }}
+              />
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="admin-kravio-filter-btn"
+            onClick={() => exportBookingsToCSV(bookings, activeDate)}
+            disabled={bookings.length === 0}
+            title="Exportar listado a CSV"
+          >
+            <Download size={13} />
+            <span>CSV</span>
+          </button>
+
+          <button
+            type="button"
+            className="admin-kravio-filter-btn"
+            onClick={() => onOpenCreate()}
+            style={{
+              background: "#ea580c",
+              color: "#ffffff",
+              borderColor: "#c2410c",
+              fontWeight: 600,
+            }}
+            title="Cargar nuevo turno manual"
+          >
+            <Plus size={13} strokeWidth={2.5} />
+            <span>Nuevo Turno</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Filtros segmentados expandibles */}
+      {showFilters && (
         <div
           className="admin-segmented"
+          style={{ marginBottom: 14 }}
           role="group"
-          aria-label="Filtrar reservas"
+          aria-label="Filtrar reservas por estado"
         >
           {filters.map(([key, label]) => (
             <button
@@ -83,165 +281,346 @@ export default function BookingsTable({
             </button>
           ))}
         </div>
+      )}
 
-        <div className="admin-bookings-tools">
-          <div className="admin-search-wrap">
-            <Search {...ICON} />
-            <input
-              type="search"
-              placeholder="Nombre, teléfono o código…"
-              aria-label="Buscar reservas"
-              className="admin-search-input"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                className="admin-search-clear"
-                onClick={() => setSearchQuery("")}
-                aria-label="Limpiar búsqueda"
-              >
-                <X size={14} strokeWidth={1.75} aria-hidden />
-              </button>
-            )}
-          </div>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => exportBookingsToCSV(bookings, activeDate)}
-            disabled={bookings.length === 0}
-          >
-            <Download {...ICON} /> CSV
-          </button>
-        </div>
-      </div>
-
+      {/* Tabla con Estilo Kravio & Paleta Muzzaga */}
       <div className="admin-table-wrapper">
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Horario</th>
-              <th>Cancha</th>
-              <th>Cliente</th>
-              <th>Monto</th>
-              <th>Estado</th>
-              <th>Acciones</th>
+              <th style={{ width: 36, paddingLeft: 14 }}>
+                <input
+                  type="checkbox"
+                  className="admin-kravio-checkbox"
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                  aria-label="Seleccionar todos los turnos"
+                />
+              </th>
+              <th>
+                <span className="admin-kravio-th-sort">
+                  Código <SortIcon />
+                </span>
+              </th>
+              <th>
+                <span className="admin-kravio-th-sort">
+                  Cancha & Horario <SortIcon />
+                </span>
+              </th>
+              <th>
+                <span className="admin-kravio-th-sort">
+                  Estado Pago <SortIcon />
+                </span>
+              </th>
+              <th>
+                <span className="admin-kravio-th-sort">
+                  Padelista / Cliente <SortIcon />
+                </span>
+              </th>
+              <th>
+                <span className="admin-kravio-th-sort">
+                  Estado <SortIcon />
+                </span>
+              </th>
+              <th>
+                <span className="admin-kravio-th-sort">
+                  Fecha <SortIcon />
+                </span>
+              </th>
+              <th>
+                <span className="admin-kravio-th-sort">
+                  Saldo / Total <SortIcon />
+                </span>
+              </th>
+              <th style={{ textAlign: "right", paddingRight: 16 }}>
+                <span>Acciones</span>
+              </th>
             </tr>
           </thead>
           <tbody>
             {filtered.length > 0 ? (
-              filtered.map((b) => (
-                <tr key={b.id}>
-                  <td data-label="Horario">
-                    <strong>{b.startTime}</strong>–{b.endTime}
-                  </td>
-                  <td data-label="Cancha">{b.courtName}</td>
-                  <td data-label="Cliente">
-                    <strong>{b.playerName}</strong>
-                    {b.isTest && (
-                      <span className="admin-tag is-test">Prueba</span>
-                    )}
-                    <div className="admin-cell-sub">
-                      {b.playerPhone || "Sin teléfono"} ·{" "}
-                      <code>{b.bookingCode}</code>
-                    </div>
-                  </td>
-                  <td data-label="Monto">
-                    <strong>{formatARS(bookingTotal(b))}</strong>
-                    {pendingAmount(b) > 0 && (
-                      <div className="admin-cell-sub is-warning">
-                        Debe {formatARS(pendingAmount(b))}
+              filtered.map((b) => {
+                const priority = getPriority(b);
+                const statusBadge = getStatusBadge(b);
+                const StatusIcon = statusBadge.icon;
+                const isChecked = selectedIds.has(b.id);
+                const ticketId = b.bookingCode
+                  ? `#${b.bookingCode.toUpperCase()}`
+                  : `#${(b.id || "").slice(-4)}`;
+
+                return (
+                  <tr
+                    key={b.id}
+                    style={{
+                      background: isChecked ? "#fffbf7" : undefined,
+                    }}
+                  >
+                    <td style={{ width: 36, paddingLeft: 14 }}>
+                      <input
+                        type="checkbox"
+                        className="admin-kravio-checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleSelectOne(b.id)}
+                        aria-label={`Seleccionar turno ${ticketId}`}
+                      />
+                    </td>
+
+                    {/* Código de Turno */}
+                    <td data-label="Código">
+                      <strong style={{ color: "#ea580c", fontWeight: 600 }}>
+                        {ticketId}
+                      </strong>
+                    </td>
+
+                    {/* Cancha & Horario */}
+                    <td data-label="Cancha & Horario">
+                      <div>
+                        <strong style={{ color: "#111827" }}>
+                          {b.courtName} · {b.startTime}–{b.endTime}
+                        </strong>
+                        {b.isTest && (
+                          <span
+                            className="admin-tag is-test"
+                            style={{ marginLeft: 6 }}
+                          >
+                            Prueba
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </td>
-                  <td data-label="Estado">
-                    <select
-                      className="admin-mini-select"
-                      data-status={statusClass(b.status)}
-                      value={b.status}
-                      aria-label={`Estado del turno de ${b.playerName}`}
-                      onChange={(e) =>
-                        e.target.value === "cancelado"
-                          ? onCancel(b.id, b.courtId, b.startTime)
-                          : onStatusChange(b.id, e.target.value)
-                      }
-                    >
-                      {STATUS_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.value}>
-                          {o.label}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td data-label="Acciones">
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <button
-                        type="button"
-                        className="admin-table-action-btn"
-                        onClick={() => onOpenDetail(b)}
-                        aria-label={`Detalle y cobros de ${b.playerName}`}
-                        title="Detalle y cobros"
-                      >
-                        $
-                      </button>
-                      {b.playerPhone && (
-                        <a
-                          href={`https://wa.me/${toWhatsappNumber(b.playerPhone)}`}
-                          target="_blank"
-                          rel="noopener"
-                          className="admin-table-action-btn"
-                          aria-label={`WhatsApp a ${b.playerName}`}
-                          title="WhatsApp"
+                    </td>
+
+                    {/* Estado Pago con Barras de Señal */}
+                    <td data-label="Estado Pago">
+                      <div style={{ display: "inline-flex", alignItems: "center" }}>
+                        <SignalBars level={priority.level} />
+                        <span
+                          style={{
+                            fontSize: 12.5,
+                            fontWeight: 600,
+                            color:
+                              priority.level === "high"
+                                ? "#dc2626"
+                                : priority.level === "medium"
+                                  ? "#d97706"
+                                  : "#15803d",
+                          }}
                         >
-                          <WhatsAppMiniIcon />
-                        </a>
-                      )}
-                      {b.status !== "cancelado" && (
+                          {priority.label}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* Padelista / Cliente */}
+                    <td data-label="Padelista">
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 9,
+                        }}
+                      >
+                        <div
+                          className="admin-player-avatar"
+                          aria-hidden="true"
+                          style={{
+                            width: 28,
+                            height: 28,
+                            fontSize: 10.5,
+                            background: "#fff7ed",
+                            borderColor: "#fed7aa",
+                            color: "#c2410c",
+                          }}
+                        >
+                          {getInitials(b.playerName)}
+                        </div>
+                        <div>
+                          <div
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 600,
+                              color: "#111827",
+                            }}
+                          >
+                            {b.playerName}
+                          </div>
+                          {b.playerPhone && (
+                            <div className="admin-cell-sub">
+                              {b.playerPhone}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Píldora de Estado */}
+                    <td data-label="Estado">
+                      <div
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                        }}
+                      >
+                        <span
+                          className={`admin-kravio-status-pill ${statusBadge.type}`}
+                        >
+                          <StatusIcon size={12} strokeWidth={2.2} />
+                          <span>{statusBadge.label}</span>
+                        </span>
+
+                        {/* Selector de cambio rápido de estado */}
+                        <select
+                          className="admin-mini-select"
+                          data-status={statusClass(b.status)}
+                          value={b.status}
+                          aria-label={`Estado de ${b.playerName}`}
+                          style={{
+                            width: 18,
+                            padding: 0,
+                            border: "none",
+                            background: "transparent",
+                            cursor: "pointer",
+                            opacity: 0.45,
+                          }}
+                          onChange={(e) =>
+                            e.target.value === "cancelado"
+                              ? onCancel(b.id, b.courtId, b.startTime)
+                              : onStatusChange(b.id, e.target.value)
+                          }
+                          title="Cambiar estado del turno"
+                        >
+                          {STATUS_OPTIONS.map((o) => (
+                            <option key={o.value} value={o.value}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </td>
+
+                    {/* Fecha */}
+                    <td data-label="Fecha">
+                      <span
+                        style={{
+                          fontSize: 12.5,
+                          color: "#6b7280",
+                          fontVariantNumeric: "tabular-nums",
+                        }}
+                      >
+                        {b.date || activeDate}
+                      </span>
+                    </td>
+
+                    {/* Saldo / Total */}
+                    <td data-label="Saldo / Total">
+                      <div>
+                        {pendingAmount(b) > 0 ? (
+                          <div>
+                            <strong style={{ color: "#dc2626", fontSize: 12.5 }}>
+                              Debe {formatARS(pendingAmount(b))}
+                            </strong>
+                            <div className="admin-cell-sub">
+                              Total {formatARS(bookingTotal(b))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <strong style={{ color: "#15803d", fontSize: 12.5 }}>
+                              Al día ({formatARS(bookingTotal(b))})
+                            </strong>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Acciones */}
+                    <td
+                      data-label="Acciones"
+                      style={{ textAlign: "right", paddingRight: 16 }}
+                    >
+                      <div
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                          justifyContent: "flex-end",
+                        }}
+                      >
                         <button
                           type="button"
-                          className="admin-table-action-btn delete"
-                          onClick={() => onCancel(b.id, b.courtId, b.startTime)}
-                          aria-label={`Cancelar reserva de ${b.playerName}`}
-                          title="Cancelar reserva"
+                          className="admin-table-action-btn"
+                          onClick={() => onOpenDetail(b)}
+                          aria-label={`Cobros y detalle de ${b.playerName}`}
+                          title="Registrar cobro o ver desglose"
+                          style={{
+                            background: pendingAmount(b) > 0 ? "#fff7ed" : undefined,
+                            borderColor: pendingAmount(b) > 0 ? "#fed7aa" : undefined,
+                            color: pendingAmount(b) > 0 ? "#ea580c" : undefined,
+                            fontWeight: 600,
+                          }}
                         >
-                          <IconTrash />
+                          $
                         </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        {b.playerPhone && (
+                          <a
+                            href={`https://wa.me/${toWhatsappNumber(b.playerPhone)}`}
+                            target="_blank"
+                            rel="noopener"
+                            className="admin-table-action-btn"
+                            aria-label={`WhatsApp a ${b.playerName}`}
+                            title="Enviar WhatsApp"
+                          >
+                            <WhatsAppMiniIcon />
+                          </a>
+                        )}
+                        {b.status !== "cancelado" && (
+                          <button
+                            type="button"
+                            className="admin-table-action-btn delete"
+                            onClick={() =>
+                              onCancel(b.id, b.courtId, b.startTime)
+                            }
+                            aria-label={`Cancelar reserva de ${b.playerName}`}
+                            title="Cancelar reserva"
+                          >
+                            <IconTrash />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
-                <td colSpan="6">
+                <td colSpan="9">
                   {searchQuery ? (
                     <EmptyState
                       icon={CalendarDays}
-                      title={`Ninguna reserva coincide con “${searchQuery}”`}
-                      text="Buscá por nombre, teléfono o código de reserva."
+                      title={`Ningún turno coincide con “${searchQuery}”`}
+                      text="Buscá por nombre del padelista, teléfono o código de reserva."
                       action={{
                         label: "Limpiar búsqueda",
-                        onClick: () => setSearchQuery(""),
+                        onClick: () => setSearchQuery("")
                       }}
                     />
                   ) : statusFilter !== "all" ? (
                     <EmptyState
                       icon={CircleCheck}
-                      title="No hay reservas con ese filtro"
+                      title="No hay turnos con ese filtro"
                       action={{
-                        label: "Ver todas",
-                        onClick: () => setStatusFilter("all"),
+                        label: "Ver todos",
+                        onClick: () => setStatusFilter("all")
                       }}
                     />
                   ) : (
                     <EmptyState
                       icon={CalendarDays}
-                      title="Sin reservas para este día"
-                      text="Cuando alguien reserve desde la web o cargues un turno a mano, aparece acá."
+                      title="Sin turnos para este día"
+                      text="Cuando alguien reserve desde la web pública o cargues un turno manual, aparecerá acá."
                       action={{
-                        label: "Nueva reserva",
-                        onClick: () => onOpenCreate(),
+                        label: "+ Cargar turno manual",
+                        onClick: () => onOpenCreate()
                       }}
                     />
                   )}

@@ -51,13 +51,6 @@ import {
 } from "../../lib/adminRateLimit";
 
 export async function verifyAdminPassword(password) {
-  if (!process.env.ADMIN_PASSWORD) {
-    return {
-      ok: false,
-      error: "El panel no está disponible (ADMIN_PASSWORD no configurada).",
-    };
-  }
-
   const gate = await checkLoginAllowed();
   if (!gate.allowed) {
     return { ok: false, error: gate.error };
@@ -112,13 +105,15 @@ const withBookingCode = (b) => ({
  * cierre. Lo comparten Agenda y Caja para que nunca calculen distinto.
  */
 async function loadDayRecords(db, date) {
-  const [claimsSnap, bookings, sales, expSnap, sessionSnap] = await Promise.all([
-    db.ref(`slotClaims/${date}`).get(),
-    loadByDateRange(db, "bookings", date, date),
-    loadByDateRange(db, "cantinaSales", date, date),
-    db.ref(`cashExpenses/${date}`).once("value"),
-    db.ref(`dailyCashSessions/${date}`).once("value"),
-  ]);
+  const [claimsSnap, bookings, sales, expSnap, sessionSnap] = await Promise.all(
+    [
+      db.ref(`slotClaims/${date}`).get(),
+      loadByDateRange(db, "bookings", date, date),
+      loadByDateRange(db, "cantinaSales", date, date),
+      db.ref(`cashExpenses/${date}`).once("value"),
+      db.ref(`dailyCashSessions/${date}`).once("value"),
+    ],
+  );
   return {
     claims: claimsSnap.exists() ? claimsSnap.val() : {},
     bookings: bookings.map(withBookingCode),
@@ -235,7 +230,8 @@ export async function adminCreateManualBooking(input) {
   if (!isValidSlotFor(config, date, courtId, startTime)) {
     return {
       ok: false,
-      error: "Ese horario no existe en la grilla de ese día (¿día cerrado o bloqueado?).",
+      error:
+        "Ese horario no existe en la grilla de ese día (¿día cerrado o bloqueado?).",
     };
   }
   const endTime = addMinutes(startTime, config.slotDurationMin);
@@ -295,11 +291,22 @@ export async function adminCreateManualBooking(input) {
   }
 }
 
+const BOOKING_STATUSES = [
+  "confirmado",
+  "señado",
+  "pagado",
+  "bloqueado",
+  "cancelado",
+];
+
 export async function adminUpdateStatus(bookingId, newStatus) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   if (!bookingId) return { ok: false, error: "ID de reserva inválido." };
+  if (!BOOKING_STATUSES.includes(newStatus)) {
+    return { ok: false, error: "Estado inválido." };
+  }
   try {
     const db = getDb();
     await db.ref(`bookings/${bookingId}`).update({
@@ -322,6 +329,13 @@ export async function adminCancelBooking(bookingId, date, courtId, startTime) {
 
   try {
     const db = getDb();
+    if (await isCashClosed(db, date)) {
+      return {
+        ok: false,
+        error:
+          "La caja de ese día ya está cerrada. No se puede cancelar el turno.",
+      };
+    }
     // Liberar lock de horario
     await db.ref(`slotClaims/${date}/${slotKey(courtId, startTime)}`).remove();
     // Marcar como cancelado
@@ -443,7 +457,8 @@ export async function adminGetClients() {
           existing.lastDate = date;
           existing.name = name; // el nombre más reciente
         }
-        if (date && (!existing.firstDate || date < existing.firstDate)) existing.firstDate = date;
+        if (date && (!existing.firstDate || date < existing.firstDate))
+          existing.firstDate = date;
       } else {
         byKey.set(key, {
           key,
@@ -471,8 +486,10 @@ export async function adminGetClientDetail(key) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!CLIENT_KEY.test(key || "")) return { ok: false, error: "Cliente inválido." };
-  if (!isFirebaseConfigured()) return { ok: true, bookings: [], cantina: [], note: "" };
+  if (!CLIENT_KEY.test(key || ""))
+    return { ok: false, error: "Cliente inválido." };
+  if (!isFirebaseConfigured())
+    return { ok: true, bookings: [], cantina: [], note: "" };
 
   try {
     const db = getDb();
@@ -496,10 +513,22 @@ export async function adminGetClientDetail(key) {
 
     // Consumo en cantina: ventas cargadas a la cuenta de alguno de sus turnos.
     const ids = new Set(bookings.map((b) => b.id));
-    const dates = bookings.map((b) => b.date).filter(Boolean).sort();
+    const dates = bookings
+      .map((b) => b.date)
+      .filter(Boolean)
+      .sort();
     const cantina = dates.length
-      ? (await loadByDateRange(db, "cantinaSales", dates[0], dates[dates.length - 1]))
-          .filter((sale) => sale.chargeTo && ids.has(sale.chargeTo) && !sale.voided)
+      ? (
+          await loadByDateRange(
+            db,
+            "cantinaSales",
+            dates[0],
+            dates[dates.length - 1],
+          )
+        )
+          .filter(
+            (sale) => sale.chargeTo && ids.has(sale.chargeTo) && !sale.voided,
+          )
           .map((sale) => ({
             id: sale.id,
             date: sale.date,
@@ -519,8 +548,11 @@ export async function adminSaveClientNote(key, text) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!CLIENT_KEY.test(key || "")) return { ok: false, error: "Cliente inválido." };
-  const note = String(text || "").trim().slice(0, 1000);
+  if (!CLIENT_KEY.test(key || ""))
+    return { ok: false, error: "Cliente inválido." };
+  const note = String(text || "")
+    .trim()
+    .slice(0, 1000);
   try {
     await getDb()
       .ref(`clientNotes/${key}`)
@@ -549,7 +581,8 @@ async function loadRangeSummaries(dates) {
     ]);
   }
   return buildDailySummaries(dates, bookings, sales).map((d) => {
-    const totalSlots = slotTimesFor(config, d.date).length * config.courts.length;
+    const totalSlots =
+      slotTimesFor(config, d.date).length * config.courts.length;
     const closed = totalSlots === 0;
     const closedReason = !closed
       ? null
@@ -605,7 +638,10 @@ export async function adminGetRangeStats(fromIso, count = 14) {
   try {
     return { ok: true, days: await loadRangeSummaries(dates) };
   } catch (error) {
-    return { ok: false, error: "No se pudo cargar la ocupación de los próximos días." };
+    return {
+      ok: false,
+      error: "No se pudo cargar la ocupación de los próximos días.",
+    };
   }
 }
 
@@ -641,18 +677,28 @@ export async function adminGetReport(from, to) {
         loadByDateRange(db, "cantinaSales", prev.from, to),
       ]);
     }
-    const inRange = (list, a, b) => list.filter((r) => r.date >= a && r.date <= b);
-    const cur = { bookings: inRange(bookings, from, to), sales: inRange(sales, from, to) };
-    const old = { bookings: inRange(bookings, prev.from, prev.to), sales: inRange(sales, prev.from, prev.to) };
+    const inRange = (list, a, b) =>
+      list.filter((r) => r.date >= a && r.date <= b);
+    const cur = {
+      bookings: inRange(bookings, from, to),
+      sales: inRange(sales, from, to),
+    };
+    const old = {
+      bookings: inRange(bookings, prev.from, prev.to),
+      sales: inRange(sales, prev.from, prev.to),
+    };
 
     const withSlots = (list) =>
       list.map((d) => {
-        const totalSlots = slotTimesFor(config, d.date).length * config.courts.length;
+        const totalSlots =
+          slotTimesFor(config, d.date).length * config.courts.length;
         const day = { ...d, totalSlots };
         return { ...day, ocupacionPct: dayOccupancy(day) };
       });
     const days = withSlots(buildDailySummaries(dates, cur.bookings, cur.sales));
-    const prevDays = withSlots(buildDailySummaries(prevDates, old.bookings, old.sales));
+    const prevDays = withSlots(
+      buildDailySummaries(prevDates, old.bookings, old.sales),
+    );
     const today = todayInClub();
 
     return {
@@ -661,9 +707,19 @@ export async function adminGetReport(from, to) {
       to,
       previous: prev,
       days,
-      totals: { ...sumSummaries(days), ocupacionPct: periodOccupancy(days, today) },
-      previousTotals: { ...sumSummaries(prevDays), ocupacionPct: periodOccupancy(prevDays, today) },
-      heatmap: occupancyHeatmap(config, dates.filter((d) => d <= today), cur.bookings),
+      totals: {
+        ...sumSummaries(days),
+        ocupacionPct: periodOccupancy(days, today),
+      },
+      previousTotals: {
+        ...sumSummaries(prevDays),
+        ocupacionPct: periodOccupancy(prevDays, today),
+      },
+      heatmap: occupancyHeatmap(
+        config,
+        dates.filter((d) => d <= today),
+        cur.bookings,
+      ),
       paymentMix: paymentMix(cur.bookings, cur.sales),
       topProducts: topProducts(cur.sales),
       topClients: topClients(cur.bookings),
@@ -680,7 +736,13 @@ const TOP_PRODUCTS_DAYS = 30;
  * Registra una venta de cantina. `method: "cuenta"` + `chargeTo` la carga a
  * la cuenta de un turno: no entra a la caja hasta que se cobra.
  */
-export async function adminAddCantinaSale({ date, items, method, notes, chargeTo }) {
+export async function adminAddCantinaSale({
+  date,
+  items,
+  method,
+  notes,
+  chargeTo,
+}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
@@ -709,9 +771,14 @@ export async function adminAddCantinaSale({ date, items, method, notes, chargeTo
     const db = getDb();
     const isOnAccount = method === "cuenta";
     if (isOnAccount) {
-      const booking = chargeTo ? (await db.ref(`bookings/${chargeTo}`).once("value")).val() : null;
+      const booking = chargeTo
+        ? (await db.ref(`bookings/${chargeTo}`).once("value")).val()
+        : null;
       if (!booking || booking.status === "cancelado") {
-        return { ok: false, error: "Elegí un turno activo para cargar la cuenta." };
+        return {
+          ok: false,
+          error: "Elegí un turno activo para cargar la cuenta.",
+        };
       }
     }
     const ref = db.ref("cantinaSales").push();
@@ -739,7 +806,8 @@ export async function adminGetCantinaSales(date) {
   if (denied) return denied;
 
   if (!isFirebaseConfigured()) return { ok: true, sales: [] };
-  if (date && !ISO_DATE.test(date)) return { ok: false, error: "Fecha inválida." };
+  if (date && !ISO_DATE.test(date))
+    return { ok: false, error: "Fecha inválida." };
 
   try {
     const db = getDb();
@@ -771,10 +839,17 @@ export async function adminVoidCantinaSale(saleId, reason) {
     const result = await ref.transaction((sale) => {
       if (sale === null) return null;
       if (sale.voided) return; // ya anulada: aborta
-      return { ...sale, voided: true, voidReason: why.slice(0, 120), voidedAt: Date.now() };
+      return {
+        ...sale,
+        voided: true,
+        voidReason: why.slice(0, 120),
+        voidedAt: Date.now(),
+      };
     });
-    if (!result.committed) return { ok: false, error: "Esa venta ya estaba anulada." };
-    if (!result.snapshot.exists()) return { ok: false, error: "Esa venta no existe." };
+    if (!result.committed)
+      return { ok: false, error: "Esa venta ya estaba anulada." };
+    if (!result.snapshot.exists())
+      return { ok: false, error: "Esa venta no existe." };
     return { ok: true };
   } catch (error) {
     return { ok: false, error: "No se pudo anular la venta." };
@@ -820,7 +895,10 @@ export async function adminGetTopProducts(limit = 8) {
       .filter((sale) => !sale.voided && !sale.isTest)
       .forEach((sale) =>
         (sale.items || []).forEach((it) =>
-          qtyByName.set(it.name, (qtyByName.get(it.name) || 0) + (Number(it.qty) || 1)),
+          qtyByName.set(
+            it.name,
+            (qtyByName.get(it.name) || 0) + (Number(it.qty) || 1),
+          ),
         ),
       );
     const products = [...qtyByName.entries()]
@@ -1032,11 +1110,18 @@ async function isCashClosed(db, date) {
   return snap.val() === true;
 }
 
-export async function adminAddCashExpense({ date, concept, amount, notes, category }) {
+export async function adminAddCashExpense({
+  date,
+  concept,
+  amount,
+  notes,
+  category,
+}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!ISO_DATE.test(date || "")) return { ok: false, error: "Fecha inválida." };
+  if (!ISO_DATE.test(date || ""))
+    return { ok: false, error: "Fecha inválida." };
   const numericAmount = Number(amount);
   if (!concept?.trim() || !numericAmount || numericAmount <= 0) {
     return { ok: false, error: "Ingresá un concepto y un monto válido." };
@@ -1130,11 +1215,17 @@ export async function adminSetTestFlag(collection, id, isTest) {
   }
 }
 
-export async function adminCloseDailyCash({ date, actualCash, notes, closedBy }) {
+export async function adminCloseDailyCash({
+  date,
+  actualCash,
+  notes,
+  closedBy,
+}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!ISO_DATE.test(date || "")) return { ok: false, error: "Fecha inválida." };
+  if (!ISO_DATE.test(date || ""))
+    return { ok: false, error: "Fecha inválida." };
   const who = (closedBy || "").trim();
   if (!who) return { ok: false, error: "Indicá quién cierra la caja." };
   const actual = Number(actualCash);
@@ -1167,7 +1258,10 @@ export async function adminCloseDailyCash({ date, actualCash, notes, closedBy })
       .ref(`dailyCashSessions/${date}`)
       .transaction((current) => (current?.closed ? undefined : session));
     if (!result.committed) {
-      return { ok: false, error: "Esa caja ya se cerró. Recargá para ver el cierre." };
+      return {
+        ok: false,
+        error: "Esa caja ya se cerró. Recargá para ver el cierre.",
+      };
     }
     return { ok: true, difference };
   } catch (err) {
@@ -1225,13 +1319,24 @@ export async function adminMoveBooking({
   const court = findCourtIn(config, newCourtId);
   if (!court) return { ok: false, error: "Cancha destino inválida." };
   if (!isValidSlotFor(config, newDate, newCourtId, newStartTime)) {
-    return { ok: false, error: "Ese horario no existe en la grilla del día destino." };
+    return {
+      ok: false,
+      error: "Ese horario no existe en la grilla del día destino.",
+    };
   }
 
   try {
     const db = getDb();
+    if (oldDate && (await isCashClosed(db, oldDate))) {
+      return {
+        ok: false,
+        error:
+          "La caja del día de origen ya está cerrada. No se puede mover el turno.",
+      };
+    }
+
     const newClaimRef = db.ref(
-      `slotClaims/${newDate}/${slotKey(newCourtId, newStartTime)}`
+      `slotClaims/${newDate}/${slotKey(newCourtId, newStartTime)}`,
     );
 
     // 1. Intentar tomar el nuevo slot atómicamente
@@ -1241,7 +1346,10 @@ export async function adminMoveBooking({
     });
 
     if (!claimResult.committed) {
-      return { ok: false, error: "El horario y cancha de destino ya están ocupados." };
+      return {
+        ok: false,
+        error: "El horario y cancha de destino ya están ocupados.",
+      };
     }
 
     // 2. Liberar el slot anterior
@@ -1264,4 +1372,3 @@ export async function adminMoveBooking({
     return { ok: false, error: err.message || "Error al mover la reserva." };
   }
 }
-

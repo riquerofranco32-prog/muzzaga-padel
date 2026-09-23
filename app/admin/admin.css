@@ -9,28 +9,32 @@
 
 .admin-root .admin-dashboard-layout,
 .admin-root .admin-login-wrapper {
-  /* Tokens del brief */
-  --bg: #f4efe8;
+  /* Kravio Design System Tokens */
+  --bg: #f8f8f8;
   --surface: #ffffff;
-  --surface-muted: #faf7f2;
-  --border: #e7e0d6;
-  --border-strong: #d8cfc2;
-  --text: #1a1714;
-  --text-secondary: #3f3932;
-  --text-muted: #6b635a; /* piso de contraste: nunca más claro que esto */
-  --accent: #e8651a; /* barras, indicadores, focus ring (no texto) */
-  --accent-strong: #c4520f; /* fondo de botones con texto blanco: 4.6:1 */
-  --accent-text: #b4470c; /* texto naranja sobre blanco: 5.5:1 */
-  --accent-soft: rgba(232, 101, 26, 0.12);
-  --success: #15803d;
-  --info: #0369a1;
-  --danger: #dc2626;
-  --warning: #b45309;
-  --sidebar-bg: #16130f;
+  --surface-muted: #f9fafb;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --text: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --accent: #1f2937; /* botones primarios y tabs activas */
+  --accent-strong: #111827; /* hover botón primario */
+  --accent-text: #1f2937;
+  --accent-soft: rgba(31, 41, 55, 0.08);
+  --accent-orange: #e8651a; /* acento de marca Pádel */
+  --accent-orange-soft: rgba(232, 101, 26, 0.1);
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.1);
+  --info: #0284c7;
+  --danger: #ef4444;
+  --warning: #d97706;
+  --sidebar-bg: #ffffff;
 
   --radius-card: 12px;
   --radius-control: 8px;
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  --shadow-elevated: 0 4px 14px 0 rgba(0, 0, 0, 0.04);
   --card-pad: 20px;
   --font-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
@@ -39,10 +43,10 @@
   --color-canvas-soft: var(--bg);
   --color-surface-card: var(--surface);
   --color-surface-subtle: var(--surface-muted);
-  --color-surface-strong: #efe8de;
+  --color-surface-strong: #f3f4f6;
   --bg-card: var(--surface);
   --color-hairline: var(--border);
-  --color-hairline-soft: #efe9e0;
+  --color-hairline-soft: #f3f4f6;
   --color-hairline-strong: var(--border);
   --color-ink: var(--text);
   --color-body: var(--text-secondary);
@@ -50,12 +54,12 @@
   --color-muted: var(--text-muted);
   --color-muted-soft: var(--text-muted);
   --text-primary: var(--text);
-  --color-accent-orange: var(--accent);
-  --color-accent-orange-text: var(--accent-text);
-  --color-accent-orange-hover: var(--accent-strong);
-  --color-accent-orange-subtle: #fdf3ec;
-  --color-primary-orange: var(--accent-text);
-  --accent-sky: var(--accent-text);
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-orange-text: var(--accent-orange);
+  --color-accent-orange-hover: #c4520f;
+  --color-accent-orange-subtle: #fff7ed;
+  --color-primary-orange: var(--accent-orange);
+  --accent-sky: #0284c7;
   --accent-emerald: var(--success);
   --radius-lg: var(--radius-card);
   --radius-xl: var(--radius-card);
@@ -215,7 +219,7 @@
   margin-top: 1px;
 }
 
-/* ---------- Botones ---------- */
+/* ---------- Botones Kravio ---------- */
 .admin-root .admin-dashboard-layout .btn,
 .admin-root .admin-login-wrapper .btn {
   display: inline-flex;
@@ -224,36 +228,45 @@
   gap: 6px;
   min-height: 36px;
   border-radius: var(--radius-control);
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
   box-shadow: none;
   transform: none;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .admin-root .btn-linear-primary {
-  background: var(--accent-strong);
-  border: 1px solid var(--accent-strong);
+  background: #1f2937;
+  border: 1px solid #111827;
   color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .admin-root .btn-linear-primary:hover:not(:disabled) {
-  background: #a9460d;
-  border-color: #a9460d;
+  background: #111827;
+  border-color: #030712;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.admin-root .btn-linear-primary:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .admin-root .admin-dashboard-layout .btn-secondary {
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
+  background: #ffffff;
+  border: 1px solid var(--border);
   color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .admin-root .admin-dashboard-layout .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-muted);
-  border-color: var(--text-muted);
+  background: #f9fafb;
+  border-color: #d1d5db;
 }
 
 .admin-root .admin-dashboard-layout .btn:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -323,84 +336,376 @@
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
-/* ---------- Sidebar ---------- */
+/* ---------- Kravio Sidebar ---------- */
 .admin-root .admin-sidebar {
-  background: var(--sidebar-bg);
-  color: #e8e2d8;
+  width: 250px;
+  background: #ffffff;
+  border-right: 1px solid var(--border);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 40;
+}
+
+.admin-root .admin-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-root .admin-sidebar.collapsed {
+  width: 68px;
+}
+
+.admin-root .admin-sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 14px;
+  border-bottom: 1px solid #f3f4f6;
+  gap: 8px;
+}
+
+.admin-root .admin-sidebar-brand-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.admin-root .admin-sidebar-brand strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.admin-root .admin-sidebar-brand span {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: block;
+}
+
+.admin-root .admin-sidebar-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.admin-root .admin-sidebar-collapse-btn:hover {
+  background: #f3f4f6;
+  color: var(--text);
+}
+
+.admin-root .admin-sidebar-search-btn {
+  margin: 12px 10px 4px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 13px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-root .admin-sidebar-search-btn:hover {
+  border-color: #cbd5e1;
+  background: #f9fafb;
+  color: var(--text);
+}
+
+.admin-root .admin-sidebar-nav {
+  padding: 6px 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.admin-root .admin-sidebar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5px;
+}
+
+.admin-root .admin-sidebar-group-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  padding: 8px 10px 4px;
+  margin: 0;
 }
 
 .admin-root .admin-sidebar-link {
-  color: #c7c0b4;
-  font-size: 13.5px;
+  display: flex;
+  align-items: center;
   gap: 10px;
-  min-height: 38px;
-  border-left: 3px solid transparent;
-  border-radius: var(--radius-control);
-  padding: 8px 12px 8px 9px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
 .admin-root .admin-sidebar-link:hover {
+  background: #f3f4f6;
+  color: #111827;
   transform: none;
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
 }
 
 .admin-root .admin-sidebar-link.active {
-  background: var(--accent-soft);
-  box-shadow: none;
-  border-left: 3px solid var(--accent);
-  padding-left: 9px;
-  color: #ffffff;
+  background: #f3f4f6;
+  color: #111827;
   font-weight: 600;
+  border-color: #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.admin-root .admin-sidebar-link.active::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 9999px;
+  background: var(--accent-orange);
 }
 
 .admin-root .admin-sidebar-link svg {
   flex-shrink: 0;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
-.admin-root .admin-sidebar-brand span {
-  color: #9c9483;
+.admin-root .admin-sidebar-footer {
+  padding: 10px 10px 14px;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* ---------- Header global ---------- */
-.admin-root .admin-main-header {
+.admin-root .admin-sidebar-user-card {
+  display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all 0.15s ease;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.admin-root .admin-sidebar-user-card:hover {
+  background: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.admin-root .admin-sidebar-avatar {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.admin-root .admin-sidebar-avatar-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: #10b981;
+  border: 1.5px solid #ffffff;
+}
+
+.admin-root .admin-sidebar-avatar-dot.ping::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.5);
+  animation: pulseDot 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.admin-root .admin-sidebar-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-root .admin-sidebar-user-info strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.admin-root .admin-sidebar-user-info span {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Header global Kravio ---------- */
+.admin-root .admin-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-root .admin-page-title {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-root .admin-wave-hand {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: waveHand 2.2s ease-in-out infinite;
+}
+
+@keyframes waveHand {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+  60% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
 }
 
 .admin-root .admin-greeting-sub {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   font-size: 13px;
   color: var(--text-muted);
 }
 
 .admin-root .admin-live-pill {
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 11.5px;
   font-weight: 500;
+  line-height: 1.2;
+}
+
+.admin-root .admin-live-pill::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
 }
 
 .admin-root .admin-live-pill.is-open {
-  background: #e8f5ec;
-  color: var(--success);
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.admin-root .admin-live-pill.is-open::before {
+  background: #10b981;
 }
 
 .admin-root .admin-live-pill.is-closing {
-  background: #fdf3e2;
-  color: var(--warning);
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid rgba(180, 83, 9, 0.2);
+}
+
+.admin-root .admin-live-pill.is-closing::before {
+  background: #f59e0b;
 }
 
 .admin-root .admin-live-pill.is-closed {
-  background: #efe8de;
-  color: var(--text-muted);
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.admin-root .admin-live-pill.is-closed::before {
+  background: #9ca3af;
 }
 
 .admin-root .admin-live-pill.is-offline {
-  background: #fdecec;
+  background: #fef2f2;
   color: #b91c1c;
+  border: 1px solid rgba(185, 28, 28, 0.2);
 }
 
 .admin-root .admin-live-pill.is-offline::before {
@@ -409,11 +714,674 @@
 
 .admin-root .admin-palette-trigger {
   color: var(--text-muted);
-  min-width: 200px;
+  min-width: 180px;
   justify-content: space-between;
 }
 
+/* ---------- Kravio Breadcrumbs & Top Bar ---------- */
+.admin-root .admin-kravio-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.admin-root .admin-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-breadcrumbs svg {
+  color: #9ca3af;
+}
+
+.admin-root .admin-breadcrumbs a,
+.admin-root .admin-breadcrumbs span {
+  color: #6b7280;
+  text-decoration: none;
+}
+
+.admin-root .admin-breadcrumbs .admin-breadcrumb-active {
+  color: #111827;
+  font-weight: 500;
+}
+
+.admin-root .admin-kravio-top-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-root .admin-top-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-root .admin-top-icon-btn:hover {
+  background: #f9fafb;
+  color: #111827;
+  border-color: #cbd5e1;
+}
+
+/* ---------- Kravio 3 KPI Cards Row ---------- */
+.admin-root .admin-kpis-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1024px) {
+  .admin-root .admin-kpis-3 {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+.admin-root .admin-kravio-kpi-card {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 142px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-root .admin-kravio-kpi-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+}
+
+.admin-root .admin-kravio-kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.admin-root .admin-kravio-kpi-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.admin-root .admin-kravio-kpi-icon {
+  color: #9ca3af;
+}
+
+.admin-root .admin-kravio-kpi-content {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-root .admin-kravio-kpi-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-root .admin-kravio-kpi-number {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #111827;
+  line-height: 1.1;
+}
+
+.admin-root .admin-kravio-kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.admin-root .admin-kravio-kpi-delta.is-positive {
+  color: #059669;
+}
+
+.admin-root .admin-kravio-kpi-delta.is-negative {
+  color: #ef4444;
+}
+
+.admin-root .admin-kravio-kpi-delta span {
+  color: #9ca3af;
+  margin-left: 2px;
+}
+
+.admin-root .admin-kravio-kpi-sparkline {
+  width: 105px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+/* ---------- Kravio Middle Section (Volume Trend + Latest Updates) ---------- */
+.admin-root .admin-kravio-middle {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(310px, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1100px) {
+  .admin-root .admin-kravio-middle {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card Izquierda: Ticket Volume Trend */
+.admin-root .admin-kravio-trend-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-root .admin-kravio-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.admin-root .admin-kravio-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.admin-root .admin-kravio-range-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: #4b5563;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.admin-root .admin-kravio-range-btn:hover {
+  background: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.admin-root .admin-kravio-trend-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.admin-root .admin-kravio-trend-big {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Gráfico de Barras Kravio */
+.admin-root .admin-kravio-chart-container {
+  position: relative;
+  height: 220px;
+  width: 100%;
+  display: flex;
+}
+
+.admin-root .admin-kravio-bars-area {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 28px;
+  padding-right: 14px;
+}
+
+.admin-root .admin-kravio-chart-y-axis {
+  width: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 28px;
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: right;
+  border-left: 1px dashed #f3f4f6;
+  padding-left: 6px;
+}
+
+.admin-root .admin-kravio-bar-col {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  cursor: pointer;
+}
+
+.admin-root .admin-kravio-bar-pill {
+  width: 44px;
+  border-radius: 8px 8px 0 0;
+  background: #f1f3f5;
+  transition: all 0.2s ease;
+}
+
+.admin-root .admin-kravio-bar-col:hover .admin-kravio-bar-pill {
+  background: #ffedd5;
+}
+
+.admin-root .admin-kravio-bar-col.is-active .admin-kravio-bar-pill {
+  background: linear-gradient(180deg, #ea580c 0%, #c2410c 100%);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.28);
+}
+
+.admin-root .admin-kravio-bar-day {
+  position: absolute;
+  bottom: 4px;
+  font-size: 11.5px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.admin-root .admin-kravio-bar-col.is-active .admin-kravio-bar-day {
+  color: #c2410c;
+  font-weight: 700;
+}
+
+.admin-root .admin-kravio-bar-tooltip {
+  position: absolute;
+  top: -34px;
+  background: #111827;
+  color: #ffffff;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 10;
+  border: 1px solid rgba(234, 88, 12, 0.4);
+}
+
+.admin-root .admin-kravio-bar-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px 4px 0 4px;
+  border-style: solid;
+  border-color: #111827 transparent transparent transparent;
+}
+
+.admin-root .admin-kravio-dashed-ref {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1.5px dashed #cbd5e1;
+  pointer-events: none;
+}
+
+/* Card Derecha: Latest Updates */
+.admin-root .admin-kravio-updates-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-root .admin-kravio-updates-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  margin-bottom: 12px;
+}
+
+.admin-root .admin-kravio-updates-tab {
+  flex: 1;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.admin-root .admin-kravio-updates-tab.is-active {
+  background: #1f2937;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.admin-root .admin-kravio-updates-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: #9ca3af;
+  font-size: 12.5px;
+  margin-bottom: 12px;
+}
+
+.admin-root .admin-kravio-updates-search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 12px;
+  color: #1f2937;
+}
+
+.admin-root .admin-kravio-updates-sub {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 10px;
+}
+
+.admin-root .admin-kravio-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: 230px;
+}
+
+.admin-root .admin-kravio-feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.admin-root .admin-kravio-feed-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.admin-root .admin-kravio-feed-icon.green {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.admin-root .admin-kravio-feed-icon.red {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.admin-root .admin-kravio-feed-icon.blue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.admin-root .admin-kravio-feed-icon.purple {
+  background: #faf5ff;
+  color: #9333ea;
+}
+
+.admin-root .admin-kravio-feed-icon.teal {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+.admin-root .admin-kravio-feed-icon.amber {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.admin-root .admin-kravio-feed-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-root .admin-kravio-feed-title {
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.25;
+}
+
+.admin-root .admin-kravio-feed-desc {
+  color: #6b7280;
+  font-size: 11px;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-root .admin-kravio-feed-time {
+  font-size: 11px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+/* ---------- Kravio Table Card (SLA Monitoring style) ---------- */
+.admin-root .admin-kravio-table-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  margin-top: 20px;
+}
+
+.admin-root .admin-kravio-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-root .admin-kravio-table-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-root .admin-kravio-search-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: #6b7280;
+  font-size: 12.5px;
+  min-width: 180px;
+}
+
+.admin-root .admin-kravio-search-field input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 12.5px;
+  color: #1f2937;
+}
+
+.admin-root .admin-kravio-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: #374151;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.admin-root .admin-kravio-filter-btn:hover {
+  background: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.admin-root .admin-kravio-signal {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.admin-root .admin-kravio-signal span {
+  width: 2.5px;
+  border-radius: 1px;
+  background: #e5e7eb;
+}
+
+.admin-root .admin-kravio-signal span:nth-child(1) { height: 4px; }
+.admin-root .admin-kravio-signal span:nth-child(2) { height: 8px; }
+.admin-root .admin-kravio-signal span:nth-child(3) { height: 12px; }
+
+.admin-root .admin-kravio-signal.high span { background: #ef4444; }
+.admin-root .admin-kravio-signal.medium span:nth-child(1),
+.admin-root .admin-kravio-signal.medium span:nth-child(2) { background: #f59e0b; }
+.admin-root .admin-kravio-signal.low span:nth-child(1) { background: #10b981; }
+
+.admin-root .admin-kravio-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  line-height: 1;
+}
+
+.admin-root .admin-kravio-status-pill.review {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.admin-root .admin-kravio-status-pill.delivered {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-root .admin-kravio-status-pill.pending {
+  background: #fefce8;
+  color: #a16207;
+  border: 1px solid #fef08a;
+}
+
+.admin-root .admin-kravio-status-pill.cancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-root .admin-kravio-checkbox {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1.5px solid #d1d5db;
+  cursor: pointer;
+  accent-color: #ea580c;
+  vertical-align: middle;
+}
+
+.admin-root .admin-kravio-th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.admin-root .admin-kravio-th-sort svg {
+  color: #9ca3af;
+  opacity: 0.7;
+}
+
+.admin-root .admin-kravio-th-sort:hover svg {
+  color: #1f2937;
+  opacity: 1;
+}
+
 /* ---------- Tablas ---------- */
+.admin-root .admin-player-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  flex-shrink: 0;
+}
+
 .admin-root .admin-table th {
   font-size: 12px;
   font-weight: 500;
@@ -905,11 +1873,11 @@
   border-color: var(--accent);
 }
 
-/* El sidebar es oscuro: sus textos no heredan los tokens claros del panel. */
+/* El sidebar de Kravio es blanco y limpio: sus textos usan tokens oscuros de alto contraste. */
 .admin-root .admin-sidebar {
-  --text-primary: #ffffff;
-  --text-secondary: #c7c0b4;
-  --text-muted: #9c9483;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
 }
 
 /* ---------- Formularios ---------- */

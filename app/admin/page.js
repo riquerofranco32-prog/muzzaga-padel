@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ExternalLink, LogOut, Search, Tv } from "lucide-react";
+import { Bell, ExternalLink, LayoutDashboard, LogOut, PanelLeft, PanelLeftClose, Search, Tv } from "lucide-react";
 import {
   adminAddPayment,
   adminCancelBooking,
@@ -33,7 +33,7 @@ import CajaView from "./views/CajaView";
 import ConfiguracionView from "./views/ConfiguracionView";
 import CreateBookingModal from "./CreateBookingModal";
 import BookingDetailModal from "./BookingDetailModal";
-import { ICON_PROPS, NAV_ITEMS, findNavItem } from "./nav";
+import { ICON_PROPS, NAV_GROUPS, NAV_ITEMS, findNavItem } from "./nav";
 import { Toaster, useToasts } from "./ui/Toaster";
 import CommandPalette from "./ui/CommandPalette";
 import MobileNav from "./ui/MobileNav";
@@ -71,6 +71,7 @@ export default function AdminPage() {
 
   // Vista activa del sidebar
   const [view, setView] = useState("agenda");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Dashboard Data State (Agenda)
   const [activeDate, setActiveDate] = useState(todayInClub);
@@ -595,108 +596,173 @@ export default function AdminPage() {
   return (
     <div className="admin-dashboard-layout">
       <div className="admin-shell">
-        {/* SIDEBAR */}
-        <aside className="admin-sidebar">
+        {/* SIDEBAR ESTILO KRAVIO */}
+        <aside className={`admin-sidebar${sidebarCollapsed ? " collapsed" : ""}`}>
           <div className="admin-sidebar-brand">
-            <img
-              src="/img/logo_badge.png"
-              alt="Muzzaga"
-              width={30}
-              height={30}
-              style={{
-                width: 30,
-                height: 30,
-                objectFit: "contain",
-                display: "block",
-              }}
-            />
-            <div>
-              <strong>Muzzaga Admin</strong>
-              <span>Catriel, Río Negro</span>
-            </div>
+            <Link href="/admin" className="admin-sidebar-brand-inner">
+              <img
+                src="/img/logo_badge.png"
+                alt="Muzzaga"
+                width={30}
+                height={30}
+                style={{
+                  width: 30,
+                  height: 30,
+                  objectFit: "contain",
+                  display: "block",
+                  flexShrink: 0,
+                }}
+              />
+              {!sidebarCollapsed && (
+                <div>
+                  <strong>Muzzaga Pádel</strong>
+                  <span>Catriel, Río Negro</span>
+                </div>
+              )}
+            </Link>
+            <button
+              type="button"
+              className="admin-sidebar-collapse-btn"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              title={sidebarCollapsed ? "Expandir barra lateral" : "Colapsar barra lateral"}
+              aria-label={sidebarCollapsed ? "Expandir barra lateral" : "Colapsar barra lateral"}
+            >
+              {sidebarCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+            </button>
           </div>
+
+          {!sidebarCollapsed && (
+            <button
+              type="button"
+              className="admin-sidebar-search-btn"
+              onClick={() => setIsPaletteOpen(true)}
+              aria-label="Buscar en el panel (Ctrl + K)"
+            >
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <Search size={14} />
+                <span>Buscar…</span>
+              </span>
+              <kbd className="admin-kbd" style={{ fontSize: 10 }}>Ctrl K</kbd>
+            </button>
+          )}
 
           <nav className="admin-sidebar-nav">
-            {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                type="button"
-                className={`admin-sidebar-link${view === id ? " active" : ""}`}
-                aria-current={view === id ? "page" : undefined}
-                onClick={() => navigate(id)}
-              >
-                <Icon {...ICON_PROPS} />
-                {label}
-              </button>
+            {NAV_GROUPS.map((group) => (
+              <div key={group.title} className="admin-sidebar-group">
+                {!sidebarCollapsed && (
+                  <p className="admin-sidebar-group-title">{group.title}</p>
+                )}
+                {group.items.map(({ id, label, icon: Icon }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`admin-sidebar-link${view === id ? " active" : ""}`}
+                    aria-current={view === id ? "page" : undefined}
+                    onClick={() => navigate(id)}
+                    title={sidebarCollapsed ? label : undefined}
+                  >
+                    <Icon {...ICON_PROPS} />
+                    {!sidebarCollapsed && <span>{label}</span>}
+                  </button>
+                ))}
+              </div>
             ))}
           </nav>
-
-          <div
-            style={{
-              margin: "14px 12px 6px",
-              padding: "10px 12px",
-              background: "rgba(255, 255, 255, 0.04)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: "12px",
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-            }}
-          >
-            <img
-              src="/img/mascotas/muzzaguito-lentes-paleta.webp"
-              alt="Muzzaguito Staff"
-              width={54}
-              height={54}
-              style={{ objectFit: "contain", flexShrink: 0 }}
-            />
-            <div
-              style={{
-                fontSize: 12,
-                color: "var(--text-secondary)",
-                lineHeight: 1.25,
-              }}
-            >
-              <strong
-                style={{ color: "var(--text-primary)", display: "block" }}
-              >
-                Staff Muzzaga
-              </strong>
-              Panel de Control
-            </div>
-          </div>
 
           <div className="admin-sidebar-footer">
             <Link
               href="/admin/monitor"
               target="_blank"
               className="admin-sidebar-link"
+              title={sidebarCollapsed ? "Monitor TV Pistas" : undefined}
             >
-              <Tv {...ICON_PROPS} /> Monitor TV Pistas
+              <Tv {...ICON_PROPS} />
+              {!sidebarCollapsed && <span>Monitor TV Pistas</span>}
             </Link>
-            <Link href="/" target="_blank" className="admin-sidebar-link">
-              <ExternalLink {...ICON_PROPS} /> Ver Web
-            </Link>
-            <button
-              type="button"
+            <Link
+              href="/"
+              target="_blank"
               className="admin-sidebar-link"
-              onClick={handleLogout}
+              title={sidebarCollapsed ? "Ver Web Pública" : undefined}
             >
-              <LogOut {...ICON_PROPS} /> Salir
-            </button>
+              <ExternalLink {...ICON_PROPS} />
+              {!sidebarCollapsed && <span>Ver Web</span>}
+            </Link>
+
+            {/* Kravio User Card */}
+            <div
+              className="admin-sidebar-user-card"
+              onClick={handleLogout}
+              title="Cerrar sesión"
+              role="button"
+              tabIndex={0}
+            >
+              <div className="admin-sidebar-avatar">
+                <span>SM</span>
+                <span className="admin-sidebar-avatar-dot ping" />
+              </div>
+              {!sidebarCollapsed && (
+                <>
+                  <div className="admin-sidebar-user-info">
+                    <strong>Staff Muzzaga</strong>
+                    <span>admin@muzzaga.com</span>
+                  </div>
+                  <LogOut size={15} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
+                </>
+              )}
+            </div>
           </div>
         </aside>
 
         {/* CONTENIDO */}
         <main className="admin-main">
           <div className="admin-main-inner">
+            {/* Kravio Top Breadcrumbs Bar */}
+            <div className="admin-kravio-topbar">
+              <div className="admin-breadcrumbs">
+                <LayoutDashboard size={14} />
+                <span>Panel General</span>
+                <span className="admin-breadcrumb-sep" style={{ color: "#d1d5db" }}>/</span>
+                <span className="admin-breadcrumb-active">
+                  {view === "agenda" ? "Agenda & Control" : findNavItem(view).label}
+                </span>
+              </div>
+              <div className="admin-kravio-top-tools">
+                <button
+                  type="button"
+                  className="admin-top-icon-btn"
+                  title="Notificaciones"
+                  onClick={() => showToast("Sin alertas pendientes", "info")}
+                  aria-label="Notificaciones"
+                >
+                  <Bell size={15} />
+                </button>
+                <Link
+                  href="/admin/monitor"
+                  target="_blank"
+                  className="admin-top-icon-btn"
+                  title="Monitor TV Pistas"
+                  aria-label="Monitor TV Pistas"
+                >
+                  <Tv size={15} />
+                </Link>
+              </div>
+            </div>
+
             <header className="admin-main-header">
               <div>
                 {/* El saludo solo en Agenda; el resto muestra el título de la sección. */}
                 <h1 className="admin-page-title">
-                  {view === "agenda"
-                    ? `${greetingWord()}, Muzzaga`
-                    : findNavItem(view).label}
+                  {view === "agenda" ? (
+                    <>
+                      {greetingWord()}, Staff Muzzaga{" "}
+                      <span className="admin-wave-hand" aria-hidden="true">
+                        👋
+                      </span>
+                    </>
+                  ) : (
+                    findNavItem(view).label
+                  )}
                 </h1>
                 <div className="admin-greeting-sub">
                   <span>

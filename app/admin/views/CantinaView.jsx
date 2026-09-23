@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Ban,
+  Coins,
   Minus,
   Plus,
+  Receipt,
   Search,
   ShoppingCart,
   Trash2,
@@ -386,9 +388,58 @@ export default function CantinaView({ onExpiredSession, onToast }) {
   );
 
   return (
-    <div className="admin-pos">
-      <div className="admin-pos-catalog">
-        <div className="admin-view-toolbar">
+    <div>
+      {/* 3 KPI Cards de Cantina Estilo Kravio */}
+      <div className="admin-kpis-3" style={{ marginBottom: 20 }}>
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">Recaudado Cantina</span>
+            <Coins size={17} style={{ color: "#15803d" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: "#15803d" }}>
+                {formatARS(dayTotal)}
+              </div>
+              <span className="admin-cell-sub">Cobrado hoy en el bar</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">A Cuenta / Turnos</span>
+            <Receipt size={17} style={{ color: onAccount > 0 ? "#ea580c" : "#6b7280" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: onAccount > 0 ? "#ea580c" : "#111827" }}>
+                {formatARS(onAccount)}
+              </div>
+              <span className="admin-cell-sub">Cargado a cuentas de turnos</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">Tickets del Día</span>
+            <ShoppingCart size={17} style={{ color: "#2563eb" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: "#111827" }}>
+                {activeSalesCount}
+              </div>
+              <span className="admin-cell-sub">Ventas activas registradas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="admin-pos">
+        <div className="admin-pos-catalog">
+          <div className="admin-view-toolbar">
           <div className="admin-search-wrap admin-pos-search">
             <Search {...ICON} />
             <input
@@ -644,6 +695,7 @@ export default function CantinaView({ onExpiredSession, onToast }) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

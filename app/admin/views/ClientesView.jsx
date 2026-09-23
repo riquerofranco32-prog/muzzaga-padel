@@ -140,58 +140,56 @@ export default function ClientesView({
 
   return (
     <div>
-      <div className="admin-view-toolbar">
-        <div
-          className="admin-segmented"
-          role="group"
-          aria-label="Segmento de clientes"
-        >
-          {SEGMENTS.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              aria-pressed={segment === s.id}
-              onClick={() => setSegment(s.id)}
-            >
-              {s.label} ({counts[s.id]})
-            </button>
-          ))}
-        </div>
-        <div className="admin-view-toolbar-actions">
-          <div className="admin-search-wrap">
-            <Search {...ICON} />
-            <input
-              type="search"
-              className="admin-search-input"
-              placeholder="Nombre o teléfono"
-              aria-label="Buscar cliente"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            {searchInput && (
-              <button
-                type="button"
-                className="admin-search-clear"
-                onClick={() => setSearchInput("")}
-                aria-label="Limpiar búsqueda"
-              >
-                <X size={14} strokeWidth={1.75} aria-hidden />
-              </button>
-            )}
+      {/* 3 KPI Cards Superiores Estilo Kravio */}
+      <div className="admin-kpis-3" style={{ marginBottom: 20 }}>
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">Total Padelistas</span>
+            <Users size={17} style={{ color: "#ea580c" }} />
           </div>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={exportCsv}
-            disabled={visible.length === 0}
-          >
-            <Download {...ICON} /> CSV
-          </button>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: "#111827" }}>
+                {list.length}
+              </div>
+              <span className="admin-cell-sub">Registrados en la base del club</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">Frecuentes & VIP</span>
+            <Users size={17} style={{ color: "#15803d" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: "#15803d" }}>
+                {counts.vip + counts.frecuente}
+              </div>
+              <span className="admin-cell-sub">{counts.vip} VIP · {counts.frecuente} habituales</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-kravio-kpi-card">
+          <div className="admin-kravio-kpi-header">
+            <span className="admin-kravio-kpi-title">Inactivos a Recuperar</span>
+            <Users size={17} style={{ color: "#d97706" }} />
+          </div>
+          <div className="admin-kravio-kpi-content">
+            <div className="admin-kravio-kpi-left">
+              <div className="admin-kravio-kpi-number" style={{ color: "#d97706" }}>
+                {counts.inactivo}
+              </div>
+              <span className="admin-cell-sub">+{INACTIVE_AFTER_DAYS} días sin reservar</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {segment === "inactivo" && inactiveWithPhone.length > 0 && (
-        <div className="admin-callout">
+        <div className="admin-callout" style={{ marginBottom: 16 }}>
           <span>
             {plural(
               inactiveWithPhone.length,
@@ -210,7 +208,62 @@ export default function ClientesView({
         </div>
       )}
 
-      <div className="admin-table-wrapper">
+      {/* Kravio Table Card */}
+      <div className="admin-kravio-table-card">
+        <div className="admin-kravio-table-toolbar">
+          <div
+            className="admin-segmented"
+            role="group"
+            aria-label="Segmento de clientes"
+          >
+            {SEGMENTS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                aria-pressed={segment === s.id}
+                onClick={() => setSegment(s.id)}
+              >
+                {s.label} ({counts[s.id]})
+              </button>
+            ))}
+          </div>
+
+          <div className="admin-kravio-table-tools">
+            <div className="admin-kravio-search-field">
+              <Search size={14} style={{ color: "#9ca3af" }} aria-hidden />
+              <input
+                type="text"
+                className="admin-search-input"
+                placeholder="Nombre o teléfono…"
+                aria-label="Buscar cliente"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  style={{ border: "none", background: "transparent", cursor: "pointer", color: "#9ca3af" }}
+                  onClick={() => setSearchInput("")}
+                  aria-label="Limpiar búsqueda"
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="admin-kravio-filter-btn"
+              onClick={exportCsv}
+              disabled={visible.length === 0}
+              title="Exportar a CSV"
+            >
+              <Download size={13} /> CSV
+            </button>
+          </div>
+        </div>
+
+        <div className="admin-table-wrapper">
         <table className="admin-table admin-table-clickable">
           <thead>
             <tr>
@@ -338,6 +391,7 @@ export default function ClientesView({
           </tbody>
         </table>
       </div>
+    </div>
 
       {openClient && (
         <ClientDrawer

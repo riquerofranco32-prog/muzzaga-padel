@@ -76,127 +76,202 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
       : `${plural(d.turnos, "turno", "turnos")} · ${formatPct(d.ocupacionPct ?? 0)} ocupado · ${formatARS(d.cobrado)} cobrado`;
 
   return (
-    <div>
-      <div className="admin-view-toolbar">
-        <div className="admin-calendar-nav">
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => changeMonth(-1)}
-            aria-label="Mes anterior"
-          >
-            <ChevronLeft size={18} strokeWidth={1.75} aria-hidden />
-          </button>
-          <strong aria-live="polite">
-            {MONTH_NAMES[month - 1]} {year}
-          </strong>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => changeMonth(1)}
-            aria-label="Mes siguiente"
-          >
-            <ChevronRight size={18} strokeWidth={1.75} aria-hidden />
-          </button>
-          {!isCurrentMonth && (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* 3 KPI CARDS KRAVIO MENSUAL */}
+      {monthStats && (
+        <div className="admin-kpis-3">
+          <div className="admin-kravio-kpi-card">
+            <div className="admin-kravio-kpi-header">
+              <span className="admin-kravio-kpi-title">Ocupación Mensual</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#ea580c" }}>%</span>
+            </div>
+            <div className="admin-kravio-kpi-content">
+              <div className="admin-kravio-kpi-left">
+                <div className="admin-kravio-kpi-number" style={{ color: "#ea580c" }}>
+                  {formatPct(monthStats.ocupacionPct)}
+                </div>
+                <span className="admin-cell-sub">
+                  Promedio en {MONTH_NAMES[month - 1]} {year}
+                </span>
+              </div>
+              <div className="admin-kravio-sparkline">
+                <svg viewBox="0 0 100 36">
+                  <path d="M 0,28 Q 25,24 45,14 T 75,10 T 100,5" fill="none" stroke="#ea580c" strokeWidth="2.5" />
+                  <path d="M 0,28 Q 25,24 45,14 T 75,10 T 100,5 L 100,36 L 0,36 Z" fill="rgba(234, 88, 12, 0.08)" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="admin-kravio-kpi-card">
+            <div className="admin-kravio-kpi-header">
+              <span className="admin-kravio-kpi-title">Turnos en el Mes</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#15803d" }}>🎾</span>
+            </div>
+            <div className="admin-kravio-kpi-content">
+              <div className="admin-kravio-kpi-left">
+                <div className="admin-kravio-kpi-number" style={{ color: "#15803d" }}>
+                  {monthStats.totals.turnos} {monthStats.totals.turnos === 1 ? "Turno" : "Turnos"}
+                </div>
+                <span className="admin-cell-sub">
+                  Jugados y reservados
+                </span>
+              </div>
+              <div className="admin-kravio-sparkline">
+                <svg viewBox="0 0 100 36">
+                  <path d="M 0,30 Q 30,26 55,16 T 85,8 T 100,6" fill="none" stroke="#15803d" strokeWidth="2.5" />
+                  <path d="M 0,30 Q 30,26 55,16 T 85,8 T 100,6 L 100,36 L 0,36 Z" fill="rgba(21, 128, 61, 0.08)" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="admin-kravio-kpi-card">
+            <div className="admin-kravio-kpi-header">
+              <span className="admin-kravio-kpi-title">Recaudación Cobrada</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#0284c7" }}>$</span>
+            </div>
+            <div className="admin-kravio-kpi-content">
+              <div className="admin-kravio-kpi-left">
+                <div className="admin-kravio-kpi-number" style={{ color: "#0284c7" }}>
+                  {formatARS(monthStats.totals.cobrado)}
+                </div>
+                <span className="admin-cell-sub">
+                  Ingresos de turnos y cantina
+                </span>
+              </div>
+              <div className="admin-kravio-sparkline">
+                <svg viewBox="0 0 100 36">
+                  <path d="M 0,26 Q 25,22 50,14 T 80,10 T 100,4" fill="none" stroke="#0284c7" strokeWidth="2.5" />
+                  <path d="M 0,26 Q 25,22 50,14 T 80,10 T 100,4 L 100,36 L 0,36 Z" fill="rgba(2, 132, 199, 0.08)" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HEATMAP CARD WRAPPER */}
+      <div className="admin-kravio-table-card" style={{ padding: 20 }}>
+        <div className="admin-view-toolbar" style={{ marginBottom: 18, borderBottom: "1px solid var(--border)", paddingBottom: 14 }}>
+          <div className="admin-calendar-nav">
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => {
-                setYear(Number(todayIso.slice(0, 4)));
-                setMonth(Number(todayIso.slice(5, 7)));
-              }}
+              onClick={() => changeMonth(-1)}
+              aria-label="Mes anterior"
             >
-              Hoy
+              <ChevronLeft size={18} strokeWidth={1.75} aria-hidden />
             </button>
-          )}
-        </div>
-        {monthStats && (
-          <span className="admin-field-hint">
-            {plural(monthStats.totals.turnos, "turno", "turnos")} ·{" "}
-            {formatARS(monthStats.totals.cobrado)} cobrado ·{" "}
-            {formatPct(monthStats.ocupacionPct)} de ocupación
-          </span>
-        )}
-      </div>
-
-      <div className={loading && monthStats ? "admin-content-loading" : ""}>
-        {/* Desktop / tablet: heatmap mensual */}
-        <div
-          className="admin-heatmap"
-          role="grid"
-          aria-label={`Ocupación de ${MONTH_NAMES[month - 1]}`}
-        >
-          {WEEKDAYS.map((w) => (
-            <div key={w} className="admin-heatmap-weekday" role="columnheader">
-              {w}
-            </div>
-          ))}
-          {Array.from({ length: firstWeekday }, (_, i) => (
-            <div key={`blank-${i}`} aria-hidden />
-          ))}
-          {!monthStats &&
-            Array.from({ length: 30 }, (_, i) => (
-              <Skeleton key={`sk-${i}`} height={76} radius={8} />
-            ))}
-          {days.map((d) => (
+            <strong aria-live="polite" style={{ fontSize: 16 }}>
+              {MONTH_NAMES[month - 1]} {year}
+            </strong>
             <button
-              key={d.date}
               type="button"
-              role="gridcell"
-              className={`admin-heat-cell${d.date === todayIso ? " is-today" : ""}`}
-              data-heat={d.closed ? "closed" : heatLevel(d.ocupacionPct)}
-              disabled={d.closed}
-              title={describe(d)}
-              aria-label={`${formatDate(d.date, "long")}: ${describe(d)}`}
-              onClick={() => onSelectDate(d.date)}
+              className="btn btn-secondary"
+              onClick={() => changeMonth(1)}
+              aria-label="Mes siguiente"
             >
-              <span className="admin-heat-day">{d.day}</span>
-              {d.closed ? (
-                <span className="admin-heat-closed">Cerrado</span>
-              ) : (
-                <>
-                  <span className="admin-heat-pct">
-                    {d.turnos > 0 ? formatPct(d.ocupacionPct) : "—"}
-                  </span>
-                  {(d.turnos > 0 || d.cobrado > 0) && (
-                    <span className="admin-heat-meta">
-                      {d.turnos}t · {shortK(d.cobrado)}
-                    </span>
-                  )}
-                </>
-              )}
+              <ChevronRight size={18} strokeWidth={1.75} aria-hidden />
             </button>
-          ))}
-        </div>
-
-        {/* Mobile: lista de días */}
-        <ul className="admin-calendar-list">
-          {days.map((d) => (
-            <li key={d.date}>
+            {!isCurrentMonth && (
               <button
                 type="button"
-                className={d.date === todayIso ? "is-today" : undefined}
+                className="btn btn-secondary"
+                onClick={() => {
+                  setYear(Number(todayIso.slice(0, 4)));
+                  setMonth(Number(todayIso.slice(5, 7)));
+                }}
+              >
+                Hoy
+              </button>
+            )}
+          </div>
+          {monthStats && (
+            <span className="admin-field-hint">
+              Hacé click en cualquier día para abrir directamente la agenda de esa fecha.
+            </span>
+          )}
+        </div>
+
+        <div className={loading && monthStats ? "admin-content-loading" : ""}>
+          {/* Desktop / tablet: heatmap mensual */}
+          <div
+            className="admin-heatmap"
+            role="grid"
+            aria-label={`Ocupación de ${MONTH_NAMES[month - 1]}`}
+          >
+            {WEEKDAYS.map((w) => (
+              <div key={w} className="admin-heatmap-weekday" role="columnheader">
+                {w}
+              </div>
+            ))}
+            {Array.from({ length: firstWeekday }, (_, i) => (
+              <div key={`blank-${i}`} aria-hidden />
+            ))}
+            {!monthStats &&
+              Array.from({ length: 30 }, (_, i) => (
+                <Skeleton key={`sk-${i}`} height={76} radius={8} />
+              ))}
+            {days.map((d) => (
+              <button
+                key={d.date}
+                type="button"
+                role="gridcell"
+                className={`admin-heat-cell${d.date === todayIso ? " is-today" : ""}`}
                 data-heat={d.closed ? "closed" : heatLevel(d.ocupacionPct)}
                 disabled={d.closed}
+                title={describe(d)}
+                aria-label={`${formatDate(d.date, "long")}: ${describe(d)}`}
                 onClick={() => onSelectDate(d.date)}
               >
-                <span className="admin-heat-swatch" aria-hidden />
-                <strong>{formatDate(d.date, "long")}</strong>
-                <span className="admin-cell-sub">{describe(d)}</span>
+                <span className="admin-heat-day">{d.day}</span>
+                {d.closed ? (
+                  <span className="admin-heat-closed">Cerrado</span>
+                ) : (
+                  <>
+                    <span className="admin-heat-pct">
+                      {d.turnos > 0 ? formatPct(d.ocupacionPct) : "—"}
+                    </span>
+                    {(d.turnos > 0 || d.cobrado > 0) && (
+                      <span className="admin-heat-meta">
+                        {d.turnos}t · {shortK(d.cobrado)}
+                      </span>
+                    )}
+                  </>
+                )}
               </button>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
 
-        <div className="admin-heat-legend" aria-hidden>
-          <span>Menos</span>
-          {[0, 1, 2, 3, 4].map((l) => (
-            <span key={l} className="admin-heat-swatch" data-heat={l} />
-          ))}
-          <span>Más ocupado</span>
-          <span className="admin-heat-swatch" data-heat="closed" />{" "}
-          <span>Cerrado</span>
+          {/* Mobile: lista de días */}
+          <ul className="admin-calendar-list">
+            {days.map((d) => (
+              <li key={d.date}>
+                <button
+                  type="button"
+                  className={d.date === todayIso ? "is-today" : undefined}
+                  data-heat={d.closed ? "closed" : heatLevel(d.ocupacionPct)}
+                  disabled={d.closed}
+                  onClick={() => onSelectDate(d.date)}
+                >
+                  <span className="admin-heat-swatch" aria-hidden />
+                  <strong>{formatDate(d.date, "long")}</strong>
+                  <span className="admin-cell-sub">{describe(d)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="admin-heat-legend" aria-hidden style={{ marginTop: 16 }}>
+            <span>Menos ocupado</span>
+            {[0, 1, 2, 3, 4].map((l) => (
+              <span key={l} className="admin-heat-swatch" data-heat={l} />
+            ))}
+            <span>Casi lleno</span>
+            <span className="admin-heat-swatch" data-heat="closed" style={{ marginLeft: 12 }} />{" "}
+            <span>Cerrado</span>
+          </div>
         </div>
       </div>
     </div>

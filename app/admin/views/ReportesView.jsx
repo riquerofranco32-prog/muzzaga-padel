@@ -320,70 +320,103 @@ export default function ReportesView({ onExpiredSession }) {
             {formatDate(report.previous.to)}.
           </p>
 
-          <div className="admin-kpis-grid admin-kpis-4">
-            <div className="admin-kpi-card">
-              <span className="admin-kpi-label">Cobrado</span>
-              <div className="admin-kpi-val">
-                {formatARS(t.cobrado)}
+          <div className="admin-kpis-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", marginBottom: 20 }}>
+            <div className="admin-kravio-kpi-card">
+              <div className="admin-kravio-kpi-header">
+                <span className="admin-kravio-kpi-title">Total Cobrado</span>
                 <Delta current={t.cobrado} previous={p.cobrado} />
               </div>
-              <span className="admin-kpi-sub">
-                Turnos {formatARS(t.cobradoTurnos)} · Cantina{" "}
-                {formatARS(t.cantina)}
-              </span>
+              <div className="admin-kravio-kpi-content">
+                <div className="admin-kravio-kpi-left">
+                  <div className="admin-kravio-kpi-number" style={{ color: "#15803d" }}>
+                    {formatARS(t.cobrado)}
+                  </div>
+                  <span className="admin-cell-sub">
+                    Turnos {formatARS(t.cobradoTurnos)} · Cantina {formatARS(t.cantina)}
+                  </span>
+                </div>
+                <div className="admin-kravio-sparkline">
+                  <svg viewBox="0 0 100 36">
+                    <path d="M 0,28 Q 25,24 50,14 T 80,10 T 100,4" fill="none" stroke="#15803d" strokeWidth="2.5" />
+                    <path d="M 0,28 Q 25,24 50,14 T 80,10 T 100,4 L 100,36 L 0,36 Z" fill="rgba(21, 128, 61, 0.08)" />
+                  </svg>
+                </div>
+              </div>
             </div>
-            <div className="admin-kpi-card">
-              <span className="admin-kpi-label">Turnos jugados</span>
-              <div className="admin-kpi-val">
-                {t.turnos}
+
+            <div className="admin-kravio-kpi-card">
+              <div className="admin-kravio-kpi-header">
+                <span className="admin-kravio-kpi-title">Turnos Jugados</span>
                 <Delta current={t.turnos} previous={p.turnos} />
               </div>
-              <span className="admin-kpi-sub">
-                Facturado {formatARS(t.facturadoTurnos)}
-              </span>
-            </div>
-            <div className="admin-kpi-card">
-              <span className="admin-kpi-label">Por cobrar</span>
-              <div
-                className="admin-kpi-val"
-                style={{
-                  color: t.porCobrar > 0 ? "var(--warning)" : "var(--text)",
-                }}
-              >
-                {formatARS(t.porCobrar)}
-                <Delta
-                  current={t.porCobrar}
-                  previous={p.porCobrar}
-                  goodWhenDown
-                />
+              <div className="admin-kravio-kpi-content">
+                <div className="admin-kravio-kpi-left">
+                  <div className="admin-kravio-kpi-number" style={{ color: "#ea580c" }}>
+                    {t.turnos}
+                  </div>
+                  <span className="admin-cell-sub">
+                    Facturado {formatARS(t.facturadoTurnos)}
+                  </span>
+                </div>
+                <div className="admin-kravio-sparkline">
+                  <svg viewBox="0 0 100 36">
+                    <path d="M 0,30 Q 30,26 55,16 T 85,8 T 100,6" fill="none" stroke="#ea580c" strokeWidth="2.5" />
+                    <path d="M 0,30 Q 30,26 55,16 T 85,8 T 100,6 L 100,36 L 0,36 Z" fill="rgba(234, 88, 12, 0.08)" />
+                  </svg>
+                </div>
               </div>
-              <span className="admin-kpi-sub">
-                {t.pagadosSinCobro > 0
-                  ? plural(
-                      t.pagadosSinCobro,
-                      "turno pagado sin cobro cargado",
-                      "turnos pagados sin cobro cargado",
-                    )
-                  : "Turnos + consumos a cuenta"}
-              </span>
             </div>
-            <div className="admin-kpi-card">
-              <span className="admin-kpi-label">Ocupación</span>
-              <div className="admin-kpi-val">
-                {formatPct(t.ocupacionPct)}
-                <Delta
-                  current={t.ocupacionPct}
-                  previous={p.ocupacionPct}
-                  points
-                />
+
+            <div className="admin-kravio-kpi-card">
+              <div className="admin-kravio-kpi-header">
+                <span className="admin-kravio-kpi-title">Por Cobrar</span>
+                <Delta current={t.porCobrar} previous={p.porCobrar} goodWhenDown />
               </div>
-              <span className="admin-kpi-sub">Días abiertos hasta hoy</span>
+              <div className="admin-kravio-kpi-content">
+                <div className="admin-kravio-kpi-left">
+                  <div className="admin-kravio-kpi-number" style={{ color: t.porCobrar > 0 ? "#ea580c" : "var(--color-ink)" }}>
+                    {formatARS(t.porCobrar)}
+                  </div>
+                  <span className="admin-cell-sub">
+                    {t.pagadosSinCobro > 0 ? plural(t.pagadosSinCobro, "turno sin cobro", "turnos sin cobro") : "Saldos pendientes"}
+                  </span>
+                </div>
+                <div className="admin-kravio-sparkline">
+                  <svg viewBox="0 0 100 36">
+                    <path d="M 0,22 Q 25,26 50,18 T 80,12 T 100,8" fill="none" stroke="#f59e0b" strokeWidth="2.5" />
+                    <path d="M 0,22 Q 25,26 50,18 T 80,12 T 100,8 L 100,36 L 0,36 Z" fill="rgba(245, 158, 11, 0.08)" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-kravio-kpi-card">
+              <div className="admin-kravio-kpi-header">
+                <span className="admin-kravio-kpi-title">Ocupación Canchas</span>
+                <Delta current={t.ocupacionPct} previous={p.ocupacionPct} points />
+              </div>
+              <div className="admin-kravio-kpi-content">
+                <div className="admin-kravio-kpi-left">
+                  <div className="admin-kravio-kpi-number" style={{ color: "#0284c7" }}>
+                    {formatPct(t.ocupacionPct)}
+                  </div>
+                  <span className="admin-cell-sub">
+                    Días abiertos hasta hoy
+                  </span>
+                </div>
+                <div className="admin-kravio-sparkline">
+                  <svg viewBox="0 0 100 36">
+                    <path d="M 0,26 Q 30,22 60,14 T 90,8 T 100,6" fill="none" stroke="#0284c7" strokeWidth="2.5" />
+                    <path d="M 0,26 Q 30,22 60,14 T 90,8 T 100,6 L 100,36 L 0,36 Z" fill="rgba(2, 132, 199, 0.08)" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
 
           <section className="admin-report-section">
             <h3 className="admin-section-title">Recaudación diaria</h3>
-            <div className="admin-settings-card">
+            <div className="admin-kravio-table-card" style={{ padding: 20 }}>
               <DailyChart days={report.days} />
             </div>
           </section>
@@ -402,7 +435,7 @@ export default function ReportesView({ onExpiredSession }) {
                 />
               </div>
             ) : (
-              <div className="admin-table-wrapper admin-heat-table-wrap">
+              <div className="admin-kravio-table-card admin-heat-table-wrap" style={{ padding: 16 }}>
                 <table className="admin-heat-table">
                   <thead>
                     <tr>
@@ -458,7 +491,7 @@ export default function ReportesView({ onExpiredSession }) {
           <div className="admin-report-grid">
             <section className="admin-report-section">
               <h3 className="admin-section-title">Métodos de pago</h3>
-              <div className="admin-settings-card">
+              <div className="admin-kravio-table-card" style={{ padding: 20 }}>
                 {mixTotal === 0 ? (
                   <p className="admin-field-hint">Sin cobros en el período.</p>
                 ) : (
@@ -494,28 +527,30 @@ export default function ReportesView({ onExpiredSession }) {
 
             <section className="admin-report-section">
               <h3 className="admin-section-title">Top productos de cantina</h3>
-              <div className="admin-table-wrapper">
-                <table className="admin-table">
+              <div className="admin-kravio-table-card" style={{ overflow: "hidden" }}>
+                <table className="admin-kravio-table" style={{ margin: 0 }}>
                   <thead>
                     <tr>
                       <th>Producto</th>
                       <th>Unidades</th>
-                      <th>Vendido</th>
+                      <th style={{ textAlign: "right" }}>Vendido</th>
                     </tr>
                   </thead>
                   <tbody>
                     {report.topProducts.length === 0 ? (
                       <tr>
-                        <td colSpan="3" className="admin-field-hint">
+                        <td colSpan="3" className="admin-field-hint" style={{ textAlign: "center", padding: 20 }}>
                           Sin ventas en el período.
                         </td>
                       </tr>
                     ) : (
                       report.topProducts.map((row) => (
                         <tr key={row.name}>
-                          <td data-label="Producto">{row.name}</td>
-                          <td data-label="Unidades">{row.qty}</td>
-                          <td data-label="Vendido">{formatARS(row.revenue)}</td>
+                          <td data-label="Producto"><strong>{row.name}</strong></td>
+                          <td data-label="Unidades">{row.qty} un.</td>
+                          <td data-label="Vendido" style={{ textAlign: "right", fontWeight: 700, color: "#15803d" }}>
+                            {formatARS(row.revenue)}
+                          </td>
                         </tr>
                       ))
                     )}
@@ -526,28 +561,28 @@ export default function ReportesView({ onExpiredSession }) {
 
             <section className="admin-report-section">
               <h3 className="admin-section-title">Top clientes</h3>
-              <div className="admin-table-wrapper">
-                <table className="admin-table">
+              <div className="admin-kravio-table-card" style={{ overflow: "hidden" }}>
+                <table className="admin-kravio-table" style={{ margin: 0 }}>
                   <thead>
                     <tr>
                       <th>Cliente</th>
                       <th>Turnos</th>
-                      <th>Facturado</th>
+                      <th style={{ textAlign: "right" }}>Facturado</th>
                     </tr>
                   </thead>
                   <tbody>
                     {report.topClients.length === 0 ? (
                       <tr>
-                        <td colSpan="3" className="admin-field-hint">
+                        <td colSpan="3" className="admin-field-hint" style={{ textAlign: "center", padding: 20 }}>
                           Sin turnos en el período.
                         </td>
                       </tr>
                     ) : (
                       report.topClients.map((row) => (
                         <tr key={row.key}>
-                          <td data-label="Cliente">{row.name}</td>
-                          <td data-label="Turnos">{row.turnos}</td>
-                          <td data-label="Facturado">
+                          <td data-label="Cliente"><strong>{row.name}</strong></td>
+                          <td data-label="Turnos">{row.turnos} turnos</td>
+                          <td data-label="Facturado" style={{ textAlign: "right", fontWeight: 700, color: "var(--color-ink)" }}>
                             {formatARS(row.facturado)}
                           </td>
                         </tr>
