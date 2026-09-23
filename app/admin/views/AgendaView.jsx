@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { COURTS, nextDays, priceForSlot } from "../../../lib/booking";
 import { toWhatsappNumber } from "../../../lib/phone";
 import {
@@ -34,6 +35,38 @@ export default function AgendaView({
   onStatusChange,
   onCancel,
 }) {
+  const [statusFilter, setStatusFilter] = useState("all"); // "all" | "pending_payment" | "confirmed" | "cancelled"
+
+  const allBookings = dayData?.bookings || [];
+  const pendingCount = allBookings.filter(
+    (b) => b.status !== "cancelado" && pendingAmount(b) > 0,
+  ).length;
+  const confirmedCount = allBookings.filter(
+    (b) =>
+      b.status === "confirmado" ||
+      (b.status !== "cancelado" && pendingAmount(b) === 0),
+  ).length;
+  const cancelledCount = allBookings.filter(
+    (b) => b.status === "cancelado",
+  ).length;
+
+  function bookingMatchesStatus(b) {
+    if (!b) return false;
+    if (statusFilter === "pending_payment") {
+      return b.status !== "cancelado" && pendingAmount(b) > 0;
+    }
+    if (statusFilter === "confirmed") {
+      return (
+        b.status === "confirmado" ||
+        (b.status !== "cancelado" && pendingAmount(b) === 0)
+      );
+    }
+    if (statusFilter === "cancelled") {
+      return b.status === "cancelado";
+    }
+    return true;
+  }
+
   function bookingMatchesSearch(b) {
     if (!searchQuery || !b) return true;
     const q = searchQuery.toLowerCase();
@@ -45,8 +78,9 @@ export default function AgendaView({
     );
   }
 
-  const filteredBookings =
-    dayData?.bookings?.filter(bookingMatchesSearch) || [];
+  const filteredBookings = allBookings.filter(
+    (b) => bookingMatchesStatus(b) && bookingMatchesSearch(b),
+  );
 
   const totalPendingToday = (dayData?.bookings || [])
     .filter((b) => b.status !== "cancelado")
@@ -303,7 +337,9 @@ export default function AgendaView({
                       const b = slot.booking;
                       const isTaken = slot.isTaken;
                       const isDimmed =
-                        searchQuery && isTaken && !bookingMatchesSearch(b);
+                        isTaken &&
+                        ((searchQuery && !bookingMatchesSearch(b)) ||
+                          (statusFilter !== "all" && !bookingMatchesStatus(b)));
 
                       return (
                         <div
@@ -488,6 +524,108 @@ export default function AgendaView({
             <h2 className="admin-section-title" style={{ marginBottom: 0 }}>
               Listado de Reservas del Día ({filteredBookings.length})
             </h2>
+
+            <div
+              style={{
+                display: "inline-flex",
+                background: "var(--surface-muted, #f1f5f9)",
+                padding: 3,
+                borderRadius: 8,
+                gap: 2,
+              }}
+            >
+              <button
+                type="button"
+                className={`btn-secondary${statusFilter === "all" ? " active" : ""}`}
+                style={{
+                  padding: "4px 10px",
+                  fontSize: 12,
+                  borderRadius: 6,
+                  background:
+                    statusFilter === "all"
+                      ? "var(--surface, #fff)"
+                      : "transparent",
+                  boxShadow:
+                    statusFilter === "all"
+                      ? "0 1px 2px rgba(0,0,0,0.08)"
+                      : "none",
+                  fontWeight: statusFilter === "all" ? 600 : 400,
+                }}
+                onClick={() => setStatusFilter("all")}
+              >
+                Todos ({allBookings.length})
+              </button>
+              <button
+                type="button"
+                className={`btn-secondary${statusFilter === "pending_payment" ? " active" : ""}`}
+                style={{
+                  padding: "4px 10px",
+                  fontSize: 12,
+                  borderRadius: 6,
+                  background:
+                    statusFilter === "pending_payment"
+                      ? "var(--surface, #fff)"
+                      : "transparent",
+                  boxShadow:
+                    statusFilter === "pending_payment"
+                      ? "0 1px 2px rgba(0,0,0,0.08)"
+                      : "none",
+                  fontWeight: statusFilter === "pending_payment" ? 600 : 400,
+                  color:
+                    pendingCount > 0
+                      ? "var(--color-primary-orange, #ff5722)"
+                      : "inherit",
+                }}
+                onClick={() => setStatusFilter("pending_payment")}
+              >
+                ⚠️ Con Saldo Pendiente ({pendingCount})
+              </button>
+              <button
+                type="button"
+                className={`btn-secondary${statusFilter === "confirmed" ? " active" : ""}`}
+                style={{
+                  padding: "4px 10px",
+                  fontSize: 12,
+                  borderRadius: 6,
+                  background:
+                    statusFilter === "confirmed"
+                      ? "var(--surface, #fff)"
+                      : "transparent",
+                  boxShadow:
+                    statusFilter === "confirmed"
+                      ? "0 1px 2px rgba(0,0,0,0.08)"
+                      : "none",
+                  fontWeight: statusFilter === "confirmed" ? 600 : 400,
+                }}
+                onClick={() => setStatusFilter("confirmed")}
+              >
+                ✓ Confirmados ({confirmedCount})
+              </button>
+              {cancelledCount > 0 && (
+                <button
+                  type="button"
+                  className={`btn-secondary${statusFilter === "cancelled" ? " active" : ""}`}
+                  style={{
+                    padding: "4px 10px",
+                    fontSize: 12,
+                    borderRadius: 6,
+                    background:
+                      statusFilter === "cancelled"
+                        ? "var(--surface, #fff)"
+                        : "transparent",
+                    boxShadow:
+                      statusFilter === "cancelled"
+                        ? "0 1px 2px rgba(0,0,0,0.08)"
+                        : "none",
+                    fontWeight: statusFilter === "cancelled" ? 600 : 400,
+                    color: "var(--color-muted)",
+                  }}
+                  onClick={() => setStatusFilter("cancelled")}
+                >
+                  Cancelados ({cancelledCount})
+                </button>
+              )}
+            </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <button

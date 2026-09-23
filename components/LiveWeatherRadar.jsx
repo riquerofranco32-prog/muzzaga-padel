@@ -46,6 +46,12 @@ export default function LiveWeatherRadar() {
             : "Canchas 1 y 2: Cristales Panorámicos"}
         </span>
       </div>
+
+      <div className="radar-divider" />
+
+      <div className="radar-status-item" style={{ color: "#0F7B4F", fontWeight: 600 }}>
+        <span>🛡️ Pistas Cubiertas · Cero Viento</span>
+      </div>
     </div>
   );
 }

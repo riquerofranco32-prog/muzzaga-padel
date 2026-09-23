@@ -642,6 +642,7 @@ export default function AdminPage() {
       {detailBooking && (
         <BookingDetailModal
           booking={detailBooking}
+          clients={clients}
           paymentForm={paymentForm}
           setPaymentForm={setPaymentForm}
           paymentSubmitting={paymentSubmitting}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { COURTS, PRICE_PER_PLAYER } from "../../lib/booking";
 import { toWhatsappNumber } from "../../lib/phone";
+import { categorizeClient } from "../../lib/clientsExport";
 import { adminMoveBooking } from "./actions";
 import {
   IconClose,
@@ -28,6 +29,7 @@ const AVAILABLE_TIMES = [
 
 export default function BookingDetailModal({
   booking,
+  clients = [],
   paymentForm,
   setPaymentForm,
   paymentSubmitting,
@@ -78,6 +80,15 @@ export default function BookingDetailModal({
     }
   }
 
+  const clientData = (clients || []).find(
+    (c) =>
+      (booking.playerPhone && c.phone && c.phone === booking.playerPhone) ||
+      (booking.playerName &&
+        c.name &&
+        c.name.toLowerCase() === booking.playerName.toLowerCase()),
+  );
+  const clientCat = clientData ? categorizeClient(clientData.count) : null;
+
   return (
     <div className="admin-modal-backdrop" onClick={onClose}>
       <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -101,7 +112,68 @@ export default function BookingDetailModal({
           <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
             Organizador
           </div>
-          <strong style={{ fontSize: 15 }}>{booking.playerName}</strong>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginTop: 2,
+              flexWrap: "wrap",
+            }}
+          >
+            <strong style={{ fontSize: 16 }}>{booking.playerName}</strong>
+            {clientCat && clientCat.category === "VIP" && (
+              <span
+                style={{
+                  background: "rgba(245, 158, 11, 0.15)",
+                  color: "#b45309",
+                  border: "1px solid rgba(245, 158, 11, 0.35)",
+                  borderRadius: 12,
+                  padding: "2px 8px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  whiteSpace: "nowrap",
+                }}
+                title={`${clientData.count} turnos jugados en Muzzaga`}
+              >
+                ⭐ VIP ({clientData.count} turnos)
+              </span>
+            )}
+            {clientCat && clientCat.category === "Frecuente" && (
+              <span
+                style={{
+                  background: "rgba(59, 130, 246, 0.1)",
+                  color: "#2563eb",
+                  border: "1px solid rgba(59, 130, 246, 0.25)",
+                  borderRadius: 12,
+                  padding: "2px 8px",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                }}
+                title={`${clientData.count} turnos jugados`}
+              >
+                🎾 Frecuente ({clientData.count})
+              </span>
+            )}
+            {clientCat && clientCat.category === "Nuevo" && (
+              <span
+                style={{
+                  background: "rgba(16, 185, 129, 0.08)",
+                  color: "#059669",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
+                  borderRadius: 12,
+                  padding: "2px 8px",
+                  fontSize: 11,
+                  fontWeight: 500,
+                  whiteSpace: "nowrap",
+                }}
+                title="Primer turno en el club"
+              >
+                🌱 1er turno
+              </span>
+            )}
+          </div>
           {booking.playerPhone && (
             <div
               style={{
