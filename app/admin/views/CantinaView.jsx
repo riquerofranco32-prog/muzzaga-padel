@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ShoppingCart } from "lucide-react";
+import { EmptyState, SkeletonRows } from "../ui/states";
 import { formatARS } from "../../../lib/format";
 import {
   adminAddCantinaSale,
@@ -13,7 +15,7 @@ import { todayInClub } from "../../../lib/booking";
 import { computeDailyCash } from "../../../lib/metrics";
 import { IconTrash, PAYMENT_METHODS } from "../adminHelpers";
 
-export default function CantinaView({ onExpiredSession }) {
+export default function CantinaView({ onExpiredSession, onToast }) {
   const [date, setDate] = useState(todayInClub);
   const [selectedCat, setSelectedCat] = useState("all");
   const [cart, setCart] = useState([]); // [{name, price, qty}]
@@ -65,10 +67,25 @@ export default function CantinaView({ onExpiredSession }) {
     const res = await adminAddCantinaSale({ date, items: cart, method });
     setSubmitting(false);
     if (res.ok) {
+      const total = cartTotal;
       setCart([]);
       loadSales();
+      onToast?.(`Venta registrada · ${formatARS(total)}`, {
+        action: {
+          label: "Deshacer",
+          onClick: async () => {
+            const undo = await adminDeleteCantinaSale(res.saleId);
+            if (!undo.ok) {
+              onToast?.(undo.error || "No se pudo deshacer la venta.", { tone: "error" });
+              return;
+            }
+            loadSales();
+            onToast?.("Venta deshecha");
+          },
+        },
+      });
     } else if (!onExpiredSession?.(res)) {
-      alert(res.error || "No se pudo registrar la venta.");
+      onToast?.(res.error || "No se pudo registrar la venta.", { tone: "error" });
     }
   }
 
@@ -77,8 +94,9 @@ export default function CantinaView({ onExpiredSession }) {
     const res = await adminDeleteCantinaSale(saleId);
     if (res.ok) {
       loadSales();
+      onToast?.("Venta eliminada");
     } else if (!onExpiredSession?.(res)) {
-      alert(res.error || "No se pudo eliminar la venta.");
+      onToast?.(res.error || "No se pudo eliminar la venta.", { tone: "error" });
     }
   }
 
@@ -95,8 +113,9 @@ export default function CantinaView({ onExpiredSession }) {
     const res = await adminSetTestFlag("cantinaSales", sale.id, !sale.isTest);
     if (res.ok) {
       loadSales();
+      onToast?.(sale.isTest ? "La venta vuelve a sumar" : "Marcada como prueba · ya no suma");
     } else if (!onExpiredSession?.(res)) {
-      alert(res.error || "No se pudo actualizar la venta.");
+      onToast?.(res.error || "No se pudo actualizar la venta.", { tone: "error" });
     }
   }
 
@@ -113,10 +132,11 @@ export default function CantinaView({ onExpiredSession }) {
         }}
       >
         <h2 className="admin-section-title" style={{ marginBottom: 0 }}>
-          Cantina
+          Punto de venta
         </h2>
         <input
           type="date"
+          aria-label="Fecha de las ventas"
           className="admin-input-field"
           style={{ width: 170 }}
           value={date}
@@ -239,7 +259,9 @@ export default function CantinaView({ onExpiredSession }) {
         <div
           className={`admin-cantina-sales-list ${loading ? "admin-content-loading" : ""}`}
         >
-          {sales.length > 0 ? (
+          {loading && sales.length === 0 ? (
+            <SkeletonRows count={3} />
+          ) : sales.length > 0 ? (
             sales.map((s) => (
               <div key={s.id} className="admin-cantina-sale-row">
                 <span>
@@ -281,9 +303,11 @@ export default function CantinaView({ onExpiredSession }) {
               </div>
             ))
           ) : (
-            <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
-              Todavía no hay ventas registradas para este día.
-            </p>
+            <EmptyState
+              icon={ShoppingCart}
+              title="Todavía no hay ventas este día"
+              text="Tocá productos arriba para armar la venta y registrala con el método de pago."
+            />
           )}
         </div>
       </div>

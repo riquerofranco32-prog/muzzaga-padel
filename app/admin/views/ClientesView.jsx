@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Download, Repeat, Sprout, Star, Users } from "lucide-react";
 import { toWhatsappNumber } from "../../../lib/phone";
-import { plural } from "../../../lib/format";
+import { normalizeSearch, plural } from "../../../lib/format";
+import { EmptyState } from "../ui/states";
 import {
   categorizeClient,
   getClientsMetrics,
@@ -10,8 +12,10 @@ import {
 } from "../../../lib/clientsExport";
 import { IconClose, IconSearch, WhatsAppMiniIcon } from "../adminHelpers";
 
-export default function ClientesView({ clients = [] }) {
-  const [clientSearch, setClientSearch] = useState("");
+const SEGMENT_ICON = { size: 13, strokeWidth: 1.75, "aria-hidden": true };
+
+export default function ClientesView({ clients = [], initialSearch = "" }) {
+  const [clientSearch, setClientSearch] = useState(initialSearch);
   const [segmentFilter, setSegmentFilter] = useState("all"); // "all" | "vip" | "frecuente" | "nuevo"
 
   const metrics = useMemo(() => getClientsMetrics(clients), [clients]);
@@ -27,12 +31,10 @@ export default function ClientesView({ clients = [] }) {
       result = result.filter((c) => (c.count || 0) === 1);
     }
 
-    if (clientSearch.trim()) {
-      const q = clientSearch.toLowerCase();
-      result = result.filter(
-        (c) =>
-          (c.name || "").toLowerCase().includes(q) ||
-          (c.phone || "").includes(q),
+    const q = normalizeSearch(clientSearch);
+    if (q) {
+      result = result.filter((c) =>
+        normalizeSearch(`${c.name || ""} ${c.phone || ""}`).includes(q),
       );
     }
 
@@ -93,7 +95,8 @@ export default function ClientesView({ clients = [] }) {
           }}
           title="Descargar listado completo de clientes en Excel / CSV"
         >
-          <span>📥</span> Exportar Clientes (CSV)
+          <Download size={16} strokeWidth={1.75} aria-hidden /> Exportar
+          CSV
         </button>
       </div>
 
@@ -119,7 +122,7 @@ export default function ClientesView({ clients = [] }) {
               fontSize: 11,
               color: "var(--text-muted)",
               textTransform: "uppercase",
-              fontWeight: 700,
+              fontWeight: 500,
             }}
           >
             Total Jugadores
@@ -158,16 +161,19 @@ export default function ClientesView({ clients = [] }) {
               fontSize: 11,
               color: "#b45309",
               textTransform: "uppercase",
-              fontWeight: 700,
+              fontWeight: 500,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
             }}
           >
-            ⭐ Jugadores VIP
+            <Star {...SEGMENT_ICON} /> Jugadores VIP
           </div>
           <div
             style={{
               fontSize: 22,
               fontWeight: 800,
-              color: "#d97706",
+              color: "var(--text)",
               marginTop: 4,
             }}
           >
@@ -195,18 +201,21 @@ export default function ClientesView({ clients = [] }) {
           <div
             style={{
               fontSize: 11,
-              color: "#2563eb",
+              color: "#1d4ed8",
               textTransform: "uppercase",
-              fontWeight: 700,
+              fontWeight: 500,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
             }}
           >
-            🎾 Frecuentes
+            <Repeat {...SEGMENT_ICON} /> Frecuentes
           </div>
           <div
             style={{
               fontSize: 22,
               fontWeight: 800,
-              color: "#3b82f6",
+              color: "var(--text)",
               marginTop: 4,
             }}
           >
@@ -234,18 +243,21 @@ export default function ClientesView({ clients = [] }) {
           <div
             style={{
               fontSize: 11,
-              color: "#059669",
+              color: "#15803d",
               textTransform: "uppercase",
-              fontWeight: 700,
+              fontWeight: 500,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
             }}
           >
-            🌱 Nuevos
+            <Sprout {...SEGMENT_ICON} /> Nuevos
           </div>
           <div
             style={{
               fontSize: 22,
               fontWeight: 800,
-              color: "#10b981",
+              color: "var(--text)",
               marginTop: 4,
             }}
           >
@@ -341,7 +353,7 @@ export default function ClientesView({ clients = [] }) {
             }}
             onClick={() => setSegmentFilter("vip")}
           >
-            ⭐ VIP ({metrics.vipCount})
+            VIP ({metrics.vipCount})
           </button>
           <button
             type="button"
@@ -362,7 +374,7 @@ export default function ClientesView({ clients = [] }) {
             }}
             onClick={() => setSegmentFilter("frecuente")}
           >
-            🎾 Frecuentes ({metrics.frequentCount})
+            Frecuentes ({metrics.frequentCount})
           </button>
           <button
             type="button"
@@ -383,7 +395,7 @@ export default function ClientesView({ clients = [] }) {
             }}
             onClick={() => setSegmentFilter("nuevo")}
           >
-            🌱 Nuevos ({metrics.newCount})
+            Nuevos ({metrics.newCount})
           </button>
         </div>
       </div>
@@ -405,7 +417,7 @@ export default function ClientesView({ clients = [] }) {
                 const cat = categorizeClient(c.count);
                 return (
                   <tr key={c.phone || c.name}>
-                    <td>
+                    <td data-label="Cliente">
                       <div
                         style={{
                           display: "flex",
@@ -427,14 +439,14 @@ export default function ClientesView({ clients = [] }) {
                               whiteSpace: "nowrap",
                             }}
                           >
-                            ⭐ VIP
+                            VIP
                           </span>
                         )}
                         {cat.category === "Frecuente" && (
                           <span
                             style={{
                               background: "rgba(59, 130, 246, 0.1)",
-                              color: "#2563eb",
+                              color: "#1d4ed8",
                               border: "1px solid rgba(59, 130, 246, 0.25)",
                               borderRadius: 12,
                               padding: "2px 8px",
@@ -443,14 +455,14 @@ export default function ClientesView({ clients = [] }) {
                               whiteSpace: "nowrap",
                             }}
                           >
-                            🎾 Frecuente
+                            Frecuente
                           </span>
                         )}
                         {cat.category === "Nuevo" && (
                           <span
                             style={{
                               background: "rgba(16, 185, 129, 0.08)",
-                              color: "#059669",
+                              color: "#15803d",
                               border: "1px solid rgba(16, 185, 129, 0.2)",
                               borderRadius: 12,
                               padding: "2px 8px",
@@ -459,20 +471,18 @@ export default function ClientesView({ clients = [] }) {
                               whiteSpace: "nowrap",
                             }}
                           >
-                            🌱 1er turno
+                            1er turno
                           </span>
                         )}
                       </div>
                     </td>
                     <td
-                      style={{
-                        color: "var(--text-secondary)",
-                        fontFamily: "var(--font-mono)",
-                      }}
+                      data-label="Teléfono"
+                      style={{ color: "var(--text-secondary)" }}
                     >
                       {c.phone || "-"}
                     </td>
-                    <td>
+                    <td data-label="Turnos">
                       <span
                         style={{
                           fontWeight: c.count >= 4 ? 700 : 500,
@@ -482,11 +492,11 @@ export default function ClientesView({ clients = [] }) {
                               : "inherit",
                         }}
                       >
-                        {c.count} {c.count === 1 ? "turno" : "turnos"}
+                        {plural(c.count, "turno", "turnos")}
                       </span>
                     </td>
-                    <td>{c.lastDate || "-"}</td>
-                    <td>
+                    <td data-label="Último turno">{c.lastDate || "-"}</td>
+                    <td data-label="Contacto">
                       {c.phone && (
                         <a
                           href={`https://wa.me/${toWhatsappNumber(c.phone)}`}
@@ -504,17 +514,27 @@ export default function ClientesView({ clients = [] }) {
               })
             ) : (
               <tr>
-                <td
-                  colSpan="5"
-                  style={{
-                    textAlign: "center",
-                    padding: "32px",
-                    color: "var(--text-muted)",
-                  }}
-                >
-                  {clientSearch
-                    ? `No hay clientes que coincidan con "${clientSearch}".`
-                    : "No hay clientes en este segmento."}
+                <td colSpan="5">
+                  {clientSearch ? (
+                    <EmptyState
+                      icon={Users}
+                      title={`Nadie coincide con “${clientSearch}”`}
+                      text="Probá con otra parte del nombre o del teléfono."
+                      action={{ label: "Limpiar búsqueda", onClick: () => setClientSearch("") }}
+                    />
+                  ) : clients.length === 0 ? (
+                    <EmptyState
+                      icon={Users}
+                      title="Todavía no hay clientes"
+                      text="Se arman solos con cada reserva que se carga: nombre y teléfono del organizador."
+                    />
+                  ) : (
+                    <EmptyState
+                      icon={Users}
+                      title="No hay clientes en este segmento"
+                      action={{ label: "Ver todos", onClick: () => setSegmentFilter("all") }}
+                    />
+                  )}
                 </td>
               </tr>
             )}

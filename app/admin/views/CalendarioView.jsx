@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Skeleton } from "../ui/states";
 import { formatARS, formatPct, plural } from "../../../lib/format";
 import { adminGetMonthStats } from "../actions";
 import { todayInClub } from "../../../lib/booking";
@@ -83,8 +85,9 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
             className="btn btn-secondary"
             style={{ height: 32, padding: "0 10px" }}
             onClick={() => changeMonth(-1)}
+            aria-label="Mes anterior"
           >
-            ←
+            <ChevronLeft size={18} strokeWidth={1.75} aria-hidden />
           </button>
           <strong>
             {MONTH_NAMES[month - 1]} {year}
@@ -94,8 +97,9 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
             className="btn btn-secondary"
             style={{ height: 32, padding: "0 10px" }}
             onClick={() => changeMonth(1)}
+            aria-label="Mes siguiente"
           >
-            →
+            <ChevronRight size={18} strokeWidth={1.75} aria-hidden />
           </button>
         </div>
       </div>
@@ -111,6 +115,11 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
           {leadingBlanks.map((_, i) => (
             <div key={`blank-${i}`} className="admin-calendar-cell is-empty" />
           ))}
+
+          {!monthStats &&
+            Array.from({ length: 30 }, (_, i) => (
+              <Skeleton key={`sk-${i}`} height={72} radius={8} />
+            ))}
 
           {monthStats?.days.map((d) => {
             const isClosed = d.totalSlots === 0;

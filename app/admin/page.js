@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ExternalLink, LogOut, Search, Tv } from "lucide-react";
 import {
   adminAddPayment,
   adminCancelBooking,
@@ -25,7 +26,7 @@ import {
   todayInClub,
 } from "../../lib/booking";
 import { getClubStatus } from "../../data/horarios";
-import { formatPct, formatTime } from "../../lib/format";
+import { formatARS, formatDate, formatPct, formatTime } from "../../lib/format";
 import { IconAlert, IconPlus, isExpiredSessionError } from "./adminHelpers";
 import AgendaView from "./views/AgendaView";
 import ClientesView from "./views/ClientesView";
@@ -37,17 +38,10 @@ import CajaView from "./views/CajaView";
 import ConfiguracionView from "./views/ConfiguracionView";
 import CreateBookingModal from "./CreateBookingModal";
 import BookingDetailModal from "./BookingDetailModal";
-
-const NAV_ITEMS = [
-  { id: "agenda", label: "📅 Agenda" },
-  { id: "calendario", label: "🗓️ Calendario" },
-  { id: "clientes", label: "👥 Clientes" },
-  { id: "caja", label: "💵 Caja & Cierre Z" },
-  { id: "cantina", label: "🍕 Cantina" },
-  { id: "torneos", label: "🏆 Torneos" },
-  { id: "reportes", label: "📊 Reportes" },
-  { id: "configuracion", label: "⚙️ Configuración" },
-];
+import { ICON_PROPS, NAV_ITEMS, findNavItem } from "./nav";
+import { Toaster, useToasts } from "./ui/Toaster";
+import CommandPalette from "./ui/CommandPalette";
+import MobileNav from "./ui/MobileNav";
 
 const CLUB_PILL_CLASS = {
   abierto: "is-open",
@@ -56,8 +50,18 @@ const CLUB_PILL_CLASS = {
   bloqueado: "is-closed",
 };
 
+/** El foco está en un campo editable: los atajos de una letra no aplican. */
+function isTypingTarget(el) {
+  return Boolean(
+    el &&
+    (el.isContentEditable ||
+      ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName)),
+  );
+}
+
 function greetingWord() {
   const h = Number(nowInClubTimezone().hhmm.slice(0, 2));
+  if (h < 6) return "Buenas noches";
   if (h < 12) return "Buenos días";
   if (h < 20) return "Buenas tardes";
   return "Buenas noches";
@@ -77,7 +81,6 @@ export default function AdminPage() {
   const [activeDate, setActiveDate] = useState(todayInClub);
   const [dayData, setDayData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [actionMessage, setActionMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Modal de creación de turno
@@ -114,6 +117,12 @@ export default function AdminPage() {
     amount: "",
   });
   const [paymentSubmitting, setPaymentSubmitting] = useState(false);
+
+  const { toasts, show: showToast, dismiss: dismissToast } = useToasts();
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  // Búsqueda que llega desde el command palette a Clientes. La key fuerza a
+  // la vista a arrancar con esa búsqueda aunque ya estuviera montada.
+  const [clientesSearch, setClientesSearch] = useState({ query: "", key: 0 });
 
   // La sesión vive en una cookie httpOnly firmada: el cliente no puede leerla
   // ni falsearla, así que le preguntamos al servidor si sigue vigente.
@@ -165,6 +174,37 @@ export default function AdminPage() {
     return () => clearInterval(id);
   }, [isAuthenticated]);
 
+  // Atajos: Ctrl/⌘+K abre el buscador, N abre "Nueva reserva".
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    function onKeyDown(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setIsPaletteOpen((open) => !open);
+        return;
+      }
+      if (e.key === "Escape" && !isPaletteOpen) {
+        if (detailBooking) setDetailBooking(null);
+        else if (isModalOpen) setIsModalOpen(false);
+        return;
+      }
+      const isBusy = isModalOpen || isPaletteOpen || detailBooking;
+      if (
+        e.key.toLowerCase() === "n" &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey &&
+        !isBusy &&
+        !isTypingTarget(e.target)
+      ) {
+        e.preventDefault();
+        openCreateModal();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isAuthenticated, isModalOpen, isPaletteOpen, detailBooking]);
+
   // Si el modal de detalle está abierto y llega dayData nuevo (por ej. tras
   // registrar un cobro), lo refrescamos para que el saldo no quede viejo.
   useEffect(() => {
@@ -196,7 +236,9 @@ export default function AdminPage() {
     if (res.ok) {
       setDayData(res);
     } else if (!handleExpiredSession(res)) {
-      setActionMessage("⚠️ " + (res.error || "Error al cargar datos"));
+      showToast(res.error || "No se pudieron cargar los datos del día.", {
+        tone: "error",
+      });
     }
   }
 
@@ -222,16 +264,36 @@ export default function AdminPage() {
     setPinInput("");
   }
 
-  async function handleStatusChange(bookingId, newStatus) {
-    const res = await adminUpdateStatus(bookingId, newStatus);
-    if (res.ok) {
-      setActionMessage("✓ Estado actualizado");
-      loadDayData(activeDate);
-      loadWeekStats();
-      setTimeout(() => setActionMessage(""), 2000);
-    } else if (!handleExpiredSession(res)) {
-      alert(res.error || "No se pudo actualizar el estado.");
+  function showError(res, fallback) {
+    if (!handleExpiredSession(res)) {
+      showToast(res?.error || fallback, { tone: "error" });
     }
+  }
+
+  function refreshMoney() {
+    loadDayData(activeDate);
+    loadWeekStats();
+  }
+
+  async function handleStatusChange(
+    bookingId,
+    newStatus,
+    { isUndo = false } = {},
+  ) {
+    const previous = dayData?.bookings.find((b) => b.id === bookingId)?.status;
+    const res = await adminUpdateStatus(bookingId, newStatus);
+    if (!res.ok) return showError(res, "No se pudo actualizar el estado.");
+    refreshMoney();
+    const canUndo = !isUndo && previous && previous !== newStatus;
+    showToast(isUndo ? "Cambio deshecho" : "Estado actualizado", {
+      action: canUndo
+        ? {
+            label: "Deshacer",
+            onClick: () =>
+              handleStatusChange(bookingId, previous, { isUndo: true }),
+          }
+        : undefined,
+    });
   }
 
   async function handleCancel(bookingId, courtId, startTime) {
@@ -247,14 +309,9 @@ export default function AdminPage() {
       courtId,
       startTime,
     );
-    if (res.ok) {
-      setActionMessage("✓ Turno cancelado y horario liberado");
-      loadDayData(activeDate);
-      loadWeekStats();
-      setTimeout(() => setActionMessage(""), 2500);
-    } else if (!handleExpiredSession(res)) {
-      alert(res.error || "No se pudo cancelar el turno.");
-    }
+    if (!res.ok) return showError(res, "No se pudo cancelar el turno.");
+    refreshMoney();
+    showToast(`Turno de las ${startTime} cancelado · horario liberado`);
   }
 
   async function loadClients() {
@@ -272,13 +329,14 @@ export default function AdminPage() {
 
   async function handleToggleTest(booking) {
     const res = await adminSetTestFlag("bookings", booking.id, !booking.isTest);
-    if (res.ok) {
-      loadDayData(activeDate);
-      loadWeekStats();
-      loadClients();
-    } else if (!handleExpiredSession(res)) {
-      alert(res.error || "No se pudo actualizar el turno.");
-    }
+    if (!res.ok) return showError(res, "No se pudo actualizar el turno.");
+    refreshMoney();
+    loadClients();
+    showToast(
+      booking.isTest
+        ? "El turno vuelve a contar como real"
+        : "Marcado como dato de prueba · ya no suma en totales",
+    );
   }
 
   function openDetail(booking) {
@@ -296,24 +354,29 @@ export default function AdminPage() {
       paymentForm.amount,
     );
     setPaymentSubmitting(false);
-    if (res.ok) {
-      setPaymentForm({ method: paymentForm.method, amount: "" });
-      loadDayData(activeDate);
-      loadWeekStats();
-    } else if (!handleExpiredSession(res)) {
-      alert(res.error || "No se pudo registrar el cobro.");
-    }
+    if (!res.ok) return showError(res, "No se pudo registrar el cobro.");
+    const bookingId = detailBooking.id;
+    setPaymentForm({ method: paymentForm.method, amount: "" });
+    refreshMoney();
+    showToast(`Cobro registrado · ${formatARS(paymentForm.amount)}`, {
+      action: {
+        label: "Deshacer",
+        onClick: async () => {
+          const undo = await adminRemovePayment(bookingId, res.paymentId);
+          if (!undo.ok) return showError(undo, "No se pudo deshacer el cobro.");
+          refreshMoney();
+          showToast("Cobro deshecho");
+        },
+      },
+    });
   }
 
   async function handleRemovePayment(paymentId) {
     if (!detailBooking || !confirm("¿Eliminar este cobro?")) return;
     const res = await adminRemovePayment(detailBooking.id, paymentId);
-    if (res.ok) {
-      loadDayData(activeDate);
-      loadWeekStats();
-    } else if (!handleExpiredSession(res)) {
-      alert(res.error || "No se pudo eliminar el cobro.");
-    }
+    if (!res.ok) return showError(res, "No se pudo eliminar el cobro.");
+    refreshMoney();
+    showToast("Cobro eliminado");
   }
 
   function openCreateModal(courtId, startTime) {
@@ -341,16 +404,13 @@ export default function AdminPage() {
       endTime: addMinutes(modalForm.startTime, SLOT_DURATION_MIN),
     });
     setModalSubmitting(false);
-    if (res.ok) {
-      setIsModalOpen(false);
-      setActionMessage("✓ Reserva creada exitosamente");
-      loadDayData(activeDate);
-      loadClients();
-      loadWeekStats();
-      setTimeout(() => setActionMessage(""), 2500);
-    } else if (!handleExpiredSession(res)) {
-      alert(res.error || "Error al crear la reserva");
-    }
+    if (!res.ok) return showError(res, "No se pudo crear la reserva.");
+    setIsModalOpen(false);
+    refreshMoney();
+    loadClients();
+    showToast(
+      `Reserva creada · ${modalForm.playerName.trim() || "Reserva manual"} · ${modalForm.startTime}`,
+    );
   }
 
   /** Autocompletar teléfono si el nombre tipeado coincide con un cliente ya cargado. */
@@ -385,9 +445,22 @@ export default function AdminPage() {
       text += `\n`;
     });
 
-    navigator.clipboard.writeText(text);
-    setActionMessage("✓ Planilla del día copiada para WhatsApp");
-    setTimeout(() => setActionMessage(""), 2500);
+    navigator.clipboard
+      .writeText(text)
+      .then(() => showToast("Planilla del día copiada para WhatsApp"))
+      .catch(() =>
+        showToast("No se pudo copiar la planilla.", { tone: "error" }),
+      );
+  }
+
+  function navigate(id) {
+    setView(id);
+    window.scrollTo({ top: 0 });
+  }
+
+  function openClientFromPalette(client) {
+    setClientesSearch((prev) => ({ query: client.name, key: prev.key + 1 }));
+    navigate("clientes");
   }
 
   function handleSelectCalendarDate(date) {
@@ -415,7 +488,15 @@ export default function AdminPage() {
       <div className="admin-login-wrapper">
         <div className="admin-login-card">
           <div className="admin-login-header">
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 16,
+                marginBottom: 12,
+              }}
+            >
               <img
                 src="/img/logo_badge.png"
                 alt="Muzzaga Pádel"
@@ -540,14 +621,16 @@ export default function AdminPage() {
           </div>
 
           <nav className="admin-sidebar-nav">
-            {NAV_ITEMS.map((item) => (
+            {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
               <button
-                key={item.id}
+                key={id}
                 type="button"
-                className={`admin-sidebar-link${view === item.id ? " active" : ""}`}
-                onClick={() => setView(item.id)}
+                className={`admin-sidebar-link${view === id ? " active" : ""}`}
+                aria-current={view === id ? "page" : undefined}
+                onClick={() => navigate(id)}
               >
-                {item.label}
+                <Icon {...ICON_PROPS} />
+                {label}
               </button>
             ))}
           </nav>
@@ -571,25 +654,39 @@ export default function AdminPage() {
               height={54}
               style={{ objectFit: "contain", flexShrink: 0 }}
             />
-            <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.25 }}>
-              <strong style={{ color: "var(--text-primary)", display: "block" }}>Staff Muzzaga</strong>
+            <div
+              style={{
+                fontSize: 12,
+                color: "var(--text-secondary)",
+                lineHeight: 1.25,
+              }}
+            >
+              <strong
+                style={{ color: "var(--text-primary)", display: "block" }}
+              >
+                Staff Muzzaga
+              </strong>
               Panel de Control
             </div>
           </div>
 
           <div className="admin-sidebar-footer">
-            <Link href="/admin/monitor" target="_blank" className="admin-sidebar-link">
-              📺 Monitor TV Pistas
+            <Link
+              href="/admin/monitor"
+              target="_blank"
+              className="admin-sidebar-link"
+            >
+              <Tv {...ICON_PROPS} /> Monitor TV Pistas
             </Link>
             <Link href="/" target="_blank" className="admin-sidebar-link">
-              ↗ Ver Web
+              <ExternalLink {...ICON_PROPS} /> Ver Web
             </Link>
             <button
               type="button"
               className="admin-sidebar-link"
               onClick={handleLogout}
             >
-              ⏻ Salir
+              <LogOut {...ICON_PROPS} /> Salir
             </button>
           </div>
         </aside>
@@ -597,13 +694,18 @@ export default function AdminPage() {
         {/* CONTENIDO */}
         <main className="admin-main">
           <div className="admin-main-inner">
-            <div className="admin-main-header">
+            <header className="admin-main-header">
               <div>
-                <h1 className="admin-greeting-title">
-                  {greetingWord()}, Muzzaga 👋
+                {/* El saludo solo en Agenda; el resto muestra el título de la sección. */}
+                <h1 className="admin-page-title">
+                  {view === "agenda"
+                    ? `${greetingWord()}, Muzzaga`
+                    : findNavItem(view).label}
                 </h1>
                 <div className="admin-greeting-sub">
-                  <span>{nowLabel} en Catriel</span>
+                  <span>
+                    {formatDate(todayInClub(), "long")} · {nowLabel}
+                  </span>
                   <span
                     className={`admin-live-pill ${CLUB_PILL_CLASS[clubStatus.state]}`}
                   >
@@ -611,44 +713,61 @@ export default function AdminPage() {
                   </span>
                   {!isOnline ? (
                     <span className="admin-live-pill is-offline" role="status">
-                      <IconAlert size={11} /> Sin conexión — lo que cargues
+                      <IconAlert size={12} /> Sin conexión — lo que cargues
                       ahora no se va a guardar
                     </span>
                   ) : (
                     dayData?.firebaseOk === false && (
-                      <span className="admin-live-pill is-offline" role="status">
-                        <IconAlert size={11} /> No se pudo leer la base — los
+                      <span
+                        className="admin-live-pill is-offline"
+                        role="status"
+                      >
+                        <IconAlert size={12} /> No se pudo leer la base — los
                         datos pueden no estar actualizados
                       </span>
                     )
-                  )}
-                  {actionMessage && (
-                    <span className="admin-toast-badge">{actionMessage}</span>
                   )}
                 </div>
               </div>
 
               <div className="admin-quick-actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary admin-palette-trigger"
+                  onClick={() => setIsPaletteOpen(true)}
+                  aria-label="Buscar (Ctrl + K)"
+                >
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <Search {...ICON_PROPS} />
+                    <span className="admin-palette-label">Buscar…</span>
+                  </span>
+                  <kbd className="admin-kbd">Ctrl K</kbd>
+                </button>
                 {view === "agenda" && (
                   <button
                     type="button"
                     onClick={copyDaySchedule}
                     className="btn btn-secondary"
-                    style={{ height: 36, padding: "6px 12px", fontSize: 12.5 }}
                   >
-                    Copiar Planilla
+                    Copiar planilla
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={() => openCreateModal()}
-                  className="btn btn-linear-primary"
-                  style={{ height: 36, padding: "6px 14px", fontSize: 13 }}
+                  className="btn btn-linear-primary admin-cta-new"
+                  title="Nueva reserva (N)"
                 >
-                  <IconPlus /> Nueva Reserva
+                  <IconPlus /> Nueva Reserva <kbd className="admin-kbd">N</kbd>
                 </button>
               </div>
-            </div>
+            </header>
 
             {view === "agenda" && (
               <AgendaView
@@ -660,7 +779,7 @@ export default function AdminPage() {
                 setSearchQuery={setSearchQuery}
                 weekStats={weekStats}
                 lastWeekSameDay={lastWeekSameDay}
-                onGoToCaja={() => setView("caja")}
+                onGoToCaja={() => navigate("caja")}
                 onRefresh={() => loadDayData(activeDate)}
                 onOpenCreate={openCreateModal}
                 onOpenDetail={openDetail}
@@ -674,15 +793,25 @@ export default function AdminPage() {
                 onExpiredSession={handleExpiredSession}
               />
             )}
-            {view === "clientes" && <ClientesView clients={clients} />}
+            {view === "clientes" && (
+              <ClientesView
+                key={clientesSearch.key}
+                clients={clients}
+                initialSearch={clientesSearch.query}
+              />
+            )}
             {view === "caja" && (
               <CajaView
                 initialDate={activeDate}
                 onExpiredSession={handleExpiredSession}
+                onToast={showToast}
               />
             )}
             {view === "cantina" && (
-              <CantinaView onExpiredSession={handleExpiredSession} />
+              <CantinaView
+                onExpiredSession={handleExpiredSession}
+                onToast={showToast}
+              />
             )}
             {view === "torneos" && (
               <TorneosView onExpiredSession={handleExpiredSession} />
@@ -696,6 +825,25 @@ export default function AdminPage() {
           </div>
         </main>
       </div>
+
+      <MobileNav
+        view={view}
+        onNavigate={navigate}
+        onNewBooking={() => openCreateModal()}
+        onLogout={handleLogout}
+      />
+
+      {isPaletteOpen && (
+        <CommandPalette
+          clients={clients}
+          onClose={() => setIsPaletteOpen(false)}
+          onNavigate={navigate}
+          onNewBooking={() => openCreateModal()}
+          onOpenClient={openClientFromPalette}
+        />
+      )}
+
+      <Toaster toasts={toasts} onDismiss={dismissToast} />
 
       {/* MODAL PARA CREAR RESERVA MANUAL O BLOQUEO */}
       {isModalOpen && (

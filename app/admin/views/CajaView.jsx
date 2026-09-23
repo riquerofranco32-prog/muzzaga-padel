@@ -1,6 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  ArrowDownRight,
+  Banknote,
+  CreditCard,
+  Landmark,
+  Lock,
+  Receipt,
+  Scale,
+} from "lucide-react";
+import { EmptyState, SkeletonCards } from "../ui/states";
 import { formatARS, formatTime, plural } from "../../../lib/format";
 import {
   adminAddCashExpense,
@@ -10,7 +20,10 @@ import {
 import { todayInClub } from "../../../lib/booking";
 import { CLUB_INFO } from "../../../data/club";
 
-export default function CajaView({ initialDate, onExpiredSession }) {
+const LABEL_ICON = { size: 14, strokeWidth: 1.75, "aria-hidden": true };
+const TITLE_ICON = { size: 18, strokeWidth: 1.75, "aria-hidden": true };
+
+export default function CajaView({ initialDate, onExpiredSession, onToast }) {
   const [date, setDate] = useState(() => initialDate || todayInClub());
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,19 +73,20 @@ export default function CajaView({ initialDate, onExpiredSession }) {
     });
     setAddingExpense(false);
     if (res.ok) {
+      onToast?.(`Egreso cargado · ${concept.trim()} · ${formatARS(-Number(amount))}`);
       setConcept("");
       setAmount("");
       setExpenseNotes("");
       loadSummary();
     } else if (!onExpiredSession?.(res)) {
-      alert(res.error || "No se pudo registrar el egreso.");
+      onToast?.(res.error || "No se pudo registrar el egreso.", { tone: "error" });
     }
   }
 
   async function handleCloseCash(e) {
     e.preventDefault();
     if (!actualCashInput) {
-      alert("Ingresá el monto de efectivo real contado en el cajón.");
+      onToast?.("Ingresá el efectivo que contaste en el cajón.", { tone: "error" });
       return;
     }
     setClosing(true);
@@ -83,9 +97,14 @@ export default function CajaView({ initialDate, onExpiredSession }) {
     });
     setClosing(false);
     if (res.ok) {
+      onToast?.(
+        res.difference
+          ? `Caja cerrada · diferencia ${formatARS(res.difference, { signed: true })}`
+          : "Caja cerrada · cuadra exacto",
+      );
       loadSummary();
     } else if (!onExpiredSession?.(res)) {
-      alert(res.error || "No se pudo cerrar la caja.");
+      onToast?.(res.error || "No se pudo cerrar la caja.", { tone: "error" });
     }
   }
 
@@ -139,23 +158,14 @@ export default function CajaView({ initialDate, onExpiredSession }) {
           marginBottom: 20,
         }}
       >
-        <div>
-          <span
-            className="badge-linear badge-emerald"
-            style={{ marginBottom: 6 }}
-          >
-            Arqueo &amp; Control Financiero
-          </span>
-          <h2
-            style={{ fontSize: 22, margin: "4px 0", color: "var(--color-ink)" }}
-          >
-            Caja Diaria y Cierre Z
-          </h2>
-        </div>
+        <h2 className="admin-section-title" style={{ margin: 0 }}>
+          Arqueo del día
+        </h2>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <input
             type="date"
+            aria-label="Fecha de la caja"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             style={{
@@ -176,18 +186,19 @@ export default function CajaView({ initialDate, onExpiredSession }) {
         </div>
       </div>
 
-      {loading || !summary ? (
-        <div
-          style={{
-            padding: 40,
-            textAlign: "center",
-            color: loadError ? "#b91c1c" : "var(--text-muted)",
-          }}
-        >
-          {loadError || "Calculando balance de caja…"}
-        </div>
+      {!summary ? (
+        loadError ? (
+          <div role="alert" style={{ padding: 24, color: "#b91c1c" }}>
+            {loadError}
+          </div>
+        ) : (
+          <SkeletonCards count={4} />
+        )
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div
+          className={loading ? "admin-content-loading" : ""}
+          style={{ display: "flex", flexDirection: "column", gap: 20 }}
+        >
           {/* BANNER DE CAJA CERRADA */}
           {summary?.closed && (
             <div
@@ -204,10 +215,10 @@ export default function CajaView({ initialDate, onExpiredSession }) {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 26 }}>🔒</span>
+                <Lock size={24} strokeWidth={1.75} aria-hidden color="var(--success)" />
                 <div>
                   <strong
-                    style={{ fontSize: 16, color: "#16a34a", display: "block" }}
+                    style={{ fontSize: 16, color: "var(--success)", display: "block" }}
                   >
                     Caja Cerrada y Sellada
                   </strong>
@@ -253,20 +264,16 @@ export default function CajaView({ initialDate, onExpiredSession }) {
               }}
             >
               <span
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  textTransform: "uppercase",
-                  fontWeight: 700,
-                }}
+                className="admin-kpi-label"
+                style={{ display: "flex", alignItems: "center", gap: 6 }}
               >
-                💵 Efectivo en Cajón (Esperado)
+                <Banknote {...LABEL_ICON} /> Efectivo en cajón (esperado)
               </span>
               <div
                 style={{
                   fontSize: 24,
                   fontWeight: 800,
-                  color: "#16a34a",
+                  color: "var(--success)",
                   fontFamily: "var(--font-jetbrains-mono), monospace",
                   marginTop: 6,
                 }}
@@ -295,14 +302,10 @@ export default function CajaView({ initialDate, onExpiredSession }) {
               }}
             >
               <span
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  textTransform: "uppercase",
-                  fontWeight: 700,
-                }}
+                className="admin-kpi-label"
+                style={{ display: "flex", alignItems: "center", gap: 6 }}
               >
-                🏦 Transferencias Directas
+                <Landmark {...LABEL_ICON} /> Transferencias
               </span>
               <div
                 style={{
@@ -336,20 +339,16 @@ export default function CajaView({ initialDate, onExpiredSession }) {
               }}
             >
               <span
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  textTransform: "uppercase",
-                  fontWeight: 700,
-                }}
+                className="admin-kpi-label"
+                style={{ display: "flex", alignItems: "center", gap: 6 }}
               >
-                💳 Mercado Pago (Online)
+                <CreditCard {...LABEL_ICON} /> Mercado Pago
               </span>
               <div
                 style={{
                   fontSize: 24,
                   fontWeight: 800,
-                  color: "#009ee3",
+                  color: "var(--info)",
                   fontFamily: "var(--font-jetbrains-mono), monospace",
                   marginTop: 6,
                 }}
@@ -377,20 +376,16 @@ export default function CajaView({ initialDate, onExpiredSession }) {
               }}
             >
               <span
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  textTransform: "uppercase",
-                  fontWeight: 700,
-                }}
+                className="admin-kpi-label"
+                style={{ display: "flex", alignItems: "center", gap: 6 }}
               >
-                📉 Egresos de Caja Física
+                <ArrowDownRight {...LABEL_ICON} /> Egresos de caja
               </span>
               <div
                 style={{
                   fontSize: 24,
                   fontWeight: 800,
-                  color: "#dc2626",
+                  color: summary.totalExpenses > 0 ? "var(--danger)" : "var(--text)",
                   fontFamily: "var(--font-jetbrains-mono), monospace",
                   marginTop: 6,
                 }}
@@ -432,14 +427,8 @@ export default function CajaView({ initialDate, onExpiredSession }) {
                 padding: "20px",
               }}
             >
-              <h3
-                style={{
-                  fontSize: 16,
-                  margin: "0 0 14px",
-                  color: "var(--color-ink)",
-                }}
-              >
-                💸 Registrar Salida de Dinero (Egreso)
+              <h3 className="admin-section-title" style={{ margin: "0 0 14px" }}>
+                <Receipt {...TITLE_ICON} /> Registrar egreso
               </h3>
 
               <form
@@ -558,15 +547,11 @@ export default function CajaView({ initialDate, onExpiredSession }) {
                   Egresos de hoy:
                 </span>
                 {summary.expensesList.length === 0 ? (
-                  <p
-                    style={{
-                      fontSize: 12.5,
-                      color: "var(--text-muted)",
-                      margin: "8px 0",
-                    }}
-                  >
-                    No hay egresos registrados en esta fecha.
-                  </p>
+                  <EmptyState
+                    icon={Receipt}
+                    title="Sin egresos este día"
+                    text="Cargá acá lo que sale del cajón (hielo, limpieza, cambio) para que el arqueo cuadre."
+                  />
                 ) : (
                   <div
                     style={{
@@ -626,14 +611,8 @@ export default function CajaView({ initialDate, onExpiredSession }) {
                 padding: "20px",
               }}
             >
-              <h3
-                style={{
-                  fontSize: 16,
-                  margin: "0 0 14px",
-                  color: "var(--color-ink)",
-                }}
-              >
-                ⚖️ Arqueo de Efectivo &amp; Cierre de Jornada
+              <h3 className="admin-section-title" style={{ margin: "0 0 14px" }}>
+                <Scale {...TITLE_ICON} /> Arqueo y cierre de jornada
               </h3>
 
               <form
@@ -750,7 +729,7 @@ export default function CajaView({ initialDate, onExpiredSession }) {
                     ? "Cerrando jornada…"
                     : summary.closed
                       ? "Actualizar Cierre de Caja"
-                      : "🔒 Cerrar Caja del Día"}
+                      : "Cerrar caja del día"}
                 </button>
               </form>
             </div>

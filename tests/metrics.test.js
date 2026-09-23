@@ -179,3 +179,9 @@ test("estado del club sale de SCHEDULE, en hora de Catriel", async () => {
     "bloqueado",
   );
 });
+
+test("normalizeSearch tolera tildes y mayúsculas", async () => {
+  const { normalizeSearch } = await import("../lib/format.js");
+  assert.equal(normalizeSearch("  Martín PÉREZ "), "martin perez");
+  assert.ok(normalizeSearch("Muñoz").includes(normalizeSearch("MUNOZ")));
+});

@@ -59,7 +59,7 @@ export default function CreateBookingModal({
           >
             <IconPlus size={16} /> Cargar Turno Manual / Bloquear
           </h3>
-          <button type="button" className="admin-modal-close" onClick={onClose}>
+          <button type="button" className="admin-modal-close" onClick={onClose} aria-label="Cerrar">
             <IconClose size={14} />
           </button>
         </div>

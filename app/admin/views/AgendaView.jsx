@@ -1,9 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { CalendarDays, CircleCheck, Download, TriangleAlert } from "lucide-react";
+import { EmptyState, SkeletonCards, SkeletonRows } from "../ui/states";
 import { COURTS, nextDays, todayInClub } from "../../../lib/booking";
 import { bookingTotal, trendPct } from "../../../lib/metrics";
-import { formatARS, formatDate, formatPct, plural } from "../../../lib/format";
+import {
+  formatARS,
+  formatDate,
+  formatPct,
+  normalizeSearch,
+  plural,
+} from "../../../lib/format";
 import { toWhatsappNumber } from "../../../lib/phone";
 import {
   IconClose,
@@ -73,13 +81,10 @@ export default function AgendaView({
 
   function bookingMatchesSearch(b) {
     if (!searchQuery || !b) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      b.playerName?.toLowerCase().includes(q) ||
-      b.playerPhone?.includes(q) ||
-      b.bookingCode?.toLowerCase().includes(q) ||
-      b.courtName?.toLowerCase().includes(q)
-    );
+    const q = normalizeSearch(searchQuery);
+    return normalizeSearch(
+      `${b.playerName || ""} ${b.playerPhone || ""} ${b.bookingCode || ""} ${b.courtName || ""}`,
+    ).includes(q);
   }
 
   const filteredBookings = allBookings.filter(
@@ -146,6 +151,13 @@ export default function AgendaView({
           )}
         </button>
       </div>
+
+      {!dayData && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <SkeletonCards count={5} />
+          <SkeletonRows count={6} height={64} />
+        </div>
+      )}
 
       {/* STATS / KPIS ROW */}
       {dayData && (
@@ -245,8 +257,8 @@ export default function AgendaView({
                 </button>
               </div>
               {summary.pagadosSinCobro > 0 && (
-                <p style={{ fontSize: 12, color: "#b45309", marginTop: 8 }}>
-                  ⚠️{" "}
+                <p className="admin-alert">
+                  <TriangleAlert size={14} strokeWidth={1.75} aria-hidden />
                   {plural(
                     summary.pagadosSinCobro,
                     "turno marcado pagado no tiene",
@@ -292,7 +304,7 @@ export default function AgendaView({
         </div>
       )}
 
-      <div className={loading ? "admin-content-loading" : ""}>
+      <div className={loading ? "admin-content-loading" : ""} hidden={!dayData}>
         {/* COURT TIMELINES (CANCHA 1 VS CANCHA 2) */}
         <div style={{ marginTop: 32 }}>
           <h2 className="admin-section-title">
@@ -578,7 +590,7 @@ export default function AgendaView({
                 }}
                 onClick={() => setStatusFilter("pending_payment")}
               >
-                ⚠️ Con Saldo Pendiente ({pendingCount})
+                Con saldo pendiente ({pendingCount})
               </button>
               <button
                 type="button"
@@ -599,7 +611,7 @@ export default function AgendaView({
                 }}
                 onClick={() => setStatusFilter("confirmed")}
               >
-                ✓ Confirmados ({confirmedCount})
+                Confirmados ({confirmedCount})
               </button>
               {cancelledCount > 0 && (
                 <button
@@ -635,7 +647,8 @@ export default function AgendaView({
                 style={{ height: 36, fontSize: 12.5, padding: "0 12px", gap: 6 }}
                 title="Descargar listado de reservas del día en CSV para Excel"
               >
-                📥 Exportar CSV
+                <Download size={16} strokeWidth={1.75} aria-hidden />{" "}
+                Exportar CSV
               </button>
 
               <div className="admin-search-wrap">
@@ -680,36 +693,26 @@ export default function AgendaView({
                 {filteredBookings.length > 0 ? (
                   filteredBookings.map((b) => (
                     <tr key={b.id}>
-                      <td>
+                      <td data-label="Código">
                         <code style={{ color: "#0369a1", fontWeight: 600 }}>
                           {b.bookingCode}
                         </code>
                       </td>
-                      <td>{b.courtName}</td>
-                      <td>
+                      <td data-label="Cancha">{b.courtName}</td>
+                      <td data-label="Horario">
                         <strong>{b.startTime}</strong>–{b.endTime}
                       </td>
-                      <td>
+                      <td data-label="Cliente">
                         <strong>{b.playerName}</strong>
                         {b.isTest && <TestBadge />}
                       </td>
-                      <td>
-                        <span
-                          style={{
-                            color: "var(--text-secondary)",
-                            fontFamily: "var(--font-mono)",
-                          }}
-                        >
+                      <td data-label="Teléfono">
+                        <span style={{ color: "var(--text-secondary)" }}>
                           {b.playerPhone || "-"}
                         </span>
                       </td>
-                      <td>
-                        <strong
-                          style={{
-                            color: "#047857",
-                            fontFamily: "var(--font-mono)",
-                          }}
-                        >
+                      <td data-label="Monto">
+                        <strong style={{ color: "var(--success)" }}>
                           {formatARS(bookingTotal(b))}
                         </strong>
                         {pendingAmount(b) > 0 && (
@@ -718,11 +721,12 @@ export default function AgendaView({
                           </div>
                         )}
                       </td>
-                      <td>
+                      <td data-label="Estado">
                         <select
                           className="admin-mini-select"
                           data-status={statusClass(b.status)}
                           value={b.status}
+                          aria-label={`Estado del turno de ${b.playerName}`}
                           onChange={(e) =>
                             e.target.value === "cancelado"
                               ? onCancel(b.id, b.courtId, b.startTime)
@@ -736,13 +740,14 @@ export default function AgendaView({
                           ))}
                         </select>
                       </td>
-                      <td>
+                      <td data-label="Acciones">
                         <div style={{ display: "flex", gap: 6 }}>
                           <button
                             type="button"
                             className="admin-table-action-btn"
                             onClick={() => onOpenDetail(b)}
                             title="Ver detalle y cobros"
+                            aria-label={`Cobros de ${b.playerName}`}
                           >
                             $
                           </button>
@@ -764,6 +769,7 @@ export default function AgendaView({
                               onCancel(b.id, b.courtId, b.startTime)
                             }
                             title="Cancelar reserva"
+                            aria-label={`Cancelar reserva de ${b.playerName}`}
                           >
                             <IconTrash />
                           </button>
@@ -773,31 +779,36 @@ export default function AgendaView({
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan="8"
-                      style={{
-                        textAlign: "center",
-                        padding: "32px",
-                        color: "var(--text-muted)",
-                      }}
-                    >
+                    <td colSpan="8">
                       {searchQuery ? (
-                        <>
-                          No hay reservas que coincidan con "{searchQuery}".{" "}
-                          <button
-                            type="button"
-                            onClick={() => setSearchQuery("")}
-                            style={{
-                              color: "var(--color-accent-orange)",
-                              fontWeight: 600,
-                              textDecoration: "underline",
-                            }}
-                          >
-                            Limpiar búsqueda
-                          </button>
-                        </>
+                        <EmptyState
+                          icon={CalendarDays}
+                          title={`Ninguna reserva coincide con “${searchQuery}”`}
+                          text="Buscá por nombre, teléfono o código de reserva."
+                          action={{
+                            label: "Limpiar búsqueda",
+                            onClick: () => setSearchQuery(""),
+                          }}
+                        />
+                      ) : statusFilter !== "all" ? (
+                        <EmptyState
+                          icon={CircleCheck}
+                          title="No hay reservas con ese filtro"
+                          action={{
+                            label: "Ver todas",
+                            onClick: () => setStatusFilter("all"),
+                          }}
+                        />
                       ) : (
-                        "No hay reservas registradas para esta fecha."
+                        <EmptyState
+                          icon={CalendarDays}
+                          title="Sin reservas para este día"
+                          text="Cuando alguien reserve desde la web o cargues un turno a mano, aparece acá."
+                          action={{
+                            label: "Nueva reserva",
+                            onClick: () => onOpenCreate(),
+                          }}
+                        />
                       )}
                     </td>
                   </tr>

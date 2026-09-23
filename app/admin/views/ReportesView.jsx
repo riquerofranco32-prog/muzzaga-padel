@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BarChart3, TriangleAlert } from "lucide-react";
+import { EmptyState, SkeletonCards, SkeletonRows } from "../ui/states";
 import { formatARS, formatDate, formatPct, plural } from "../../../lib/format";
 import { todayInClub } from "../../../lib/booking";
 import { adminGetMonthStats } from "../actions";
@@ -118,6 +120,7 @@ export default function ReportesView({ onExpiredSession }) {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <select
             className="admin-modal-select"
+            aria-label="Mes"
             value={month}
             onChange={(e) => setMonth(Number(e.target.value))}
           >
@@ -129,6 +132,7 @@ export default function ReportesView({ onExpiredSession }) {
           </select>
           <select
             className="admin-modal-select"
+            aria-label="Año"
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
           >
@@ -149,6 +153,13 @@ export default function ReportesView({ onExpiredSession }) {
           </button>
         </div>
       </div>
+
+      {!monthStats && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <SkeletonCards count={4} />
+          <SkeletonRows count={5} />
+        </div>
+      )}
 
       <div className={loading ? "admin-content-loading" : ""}>
         {monthStats && (
@@ -194,8 +205,8 @@ export default function ReportesView({ onExpiredSession }) {
             </div>
 
             {totals.pagadosSinCobro > 0 && (
-              <p style={{ fontSize: 13, color: "#b45309", margin: "0 0 16px" }}>
-                ⚠️{" "}
+              <p className="admin-alert" style={{ margin: "0 0 16px" }}>
+                <TriangleAlert size={14} strokeWidth={1.75} aria-hidden />
                 {plural(
                   totals.pagadosSinCobro,
                   "turno marcado pagado no tiene",
@@ -205,16 +216,7 @@ export default function ReportesView({ onExpiredSession }) {
               </p>
             )}
 
-            <h3
-              style={{
-                fontSize: 15,
-                fontWeight: 700,
-                color: "var(--color-ink)",
-                marginBottom: 12,
-              }}
-            >
-              Mejores Días del Mes
-            </h3>
+            <h3 className="admin-section-title">Mejores días del mes</h3>
             <div className="admin-table-wrapper">
               <table className="admin-table">
                 <thead>
@@ -229,17 +231,14 @@ export default function ReportesView({ onExpiredSession }) {
                   {topDays.length > 0 ? (
                     topDays.map((d) => (
                       <tr key={d.date}>
-                        <td>
+                        <td data-label="Fecha">
                           <strong>{formatDate(d.date)}</strong>
                         </td>
-                        <td>{d.turnos}</td>
-                        <td>{formatPct(d.ocupacionPct)}</td>
+                        <td data-label="Turnos">{d.turnos}</td>
+                        <td data-label="Ocupación">{formatPct(d.ocupacionPct)}</td>
                         <td
-                          style={{
-                            color: "#047857",
-                            fontFamily: "var(--font-mono)",
-                            fontWeight: 600,
-                          }}
+                          data-label="Cobrado"
+                          style={{ color: "var(--success)", fontWeight: 600 }}
                         >
                           {formatARS(d.cobrado)}
                         </td>
@@ -247,15 +246,12 @@ export default function ReportesView({ onExpiredSession }) {
                     ))
                   ) : (
                     <tr>
-                      <td
-                        colSpan="4"
-                        style={{
-                          textAlign: "center",
-                          padding: "24px",
-                          color: "var(--text-muted)",
-                        }}
-                      >
-                        Sin turnos registrados en este mes.
+                      <td colSpan="4">
+                        <EmptyState
+                          icon={BarChart3}
+                          title="Sin movimiento en este mes"
+                          text="Cuando haya turnos o ventas de cantina, acá aparecen los mejores días."
+                        />
                       </td>
                     </tr>
                   )}

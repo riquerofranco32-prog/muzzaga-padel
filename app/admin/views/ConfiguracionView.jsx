@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CalendarX, CircleCheck, CreditCard, Tag, X } from "lucide-react";
+
+const TITLE_ICON = { size: 18, strokeWidth: 1.75, "aria-hidden": true };
 import { adminGetClubConfig, adminSaveClubConfig } from "../actions";
 
 export default function ConfiguracionView({ onExpiredSession }) {
@@ -103,7 +106,7 @@ export default function ConfiguracionView({ onExpiredSession }) {
             fontWeight: 600,
           }}
         >
-          <span>✓</span> ¡Configuración guardada y sincronizada con éxito!
+          <CircleCheck size={16} strokeWidth={1.75} aria-hidden /> Configuración guardada
         </div>
       )}
 
@@ -117,8 +120,8 @@ export default function ConfiguracionView({ onExpiredSession }) {
             padding: "20px 22px",
           }}
         >
-          <h3 style={{ fontSize: 16, margin: "0 0 16px", color: "var(--color-ink)" }}>
-            🎾 Precios y Duración de Canchas
+          <h3 className="admin-section-title" style={{ margin: "0 0 16px" }}>
+            <Tag {...TITLE_ICON} /> Precios y duración de canchas
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
@@ -198,8 +201,8 @@ export default function ConfiguracionView({ onExpiredSession }) {
             padding: "20px 22px",
           }}
         >
-          <h3 style={{ fontSize: 16, margin: "0 0 16px", color: "var(--color-ink)" }}>
-            💳 Datos Bancarios para Seña y Transferencias
+          <h3 className="admin-section-title" style={{ margin: "0 0 16px" }}>
+            <CreditCard {...TITLE_ICON} /> Datos bancarios para seña y transferencias
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
@@ -291,8 +294,8 @@ export default function ConfiguracionView({ onExpiredSession }) {
             padding: "20px 22px",
           }}
         >
-          <h3 style={{ fontSize: 16, margin: "0 0 16px", color: "var(--color-ink)" }}>
-            🗓️ Días de Cierre Extraordinario (Mantenimiento / Feriados)
+          <h3 className="admin-section-title" style={{ margin: "0 0 16px" }}>
+            <CalendarX {...TITLE_ICON} /> Días de cierre extraordinario (mantenimiento / feriados)
           </h3>
 
           <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
@@ -352,8 +355,9 @@ export default function ConfiguracionView({ onExpiredSession }) {
                       padding: 0,
                     }}
                     title="Desbloquear día"
+                    aria-label={`Desbloquear ${d}`}
                   >
-                    ✕
+                    <X size={14} strokeWidth={1.75} aria-hidden />
                   </button>
                 </span>
               ))}
@@ -368,7 +372,7 @@ export default function ConfiguracionView({ onExpiredSession }) {
           disabled={saving}
           style={{ height: 46, fontSize: 15, justifyContent: "center" }}
         >
-          {saving ? "Guardando cambios…" : "💾 Guardar Configuración del Club"}
+          {saving ? "Guardando cambios…" : "Guardar configuración"}
         </button>
       </form>
     </div>

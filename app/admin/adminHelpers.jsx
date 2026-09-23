@@ -1,4 +1,15 @@
-// Iconos SVG y helpers compartidos entre las vistas del admin. Vivían todos
+import {
+  ClipboardList,
+  Phone,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+  TriangleAlert,
+  X,
+} from "lucide-react";
+
+// Iconos y helpers compartidos entre las vistas del admin. Vivían todos
 // inline en page.js; con 6 vistas ahora, cada una los necesita por separado.
 
 export const STATUS_OPTIONS = [
@@ -39,91 +50,21 @@ export function isExpiredSessionError(res) {
   return Boolean(res?.error?.startsWith("Sesión expirada"));
 }
 
-const ICON_PROPS = {
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 2,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-};
+// Íconos del admin: lucide-react con trazo 1.75. Se mantienen los nombres
+// viejos (IconPlus, IconTrash…) para no tocar cada vista.
+const lucide = (Icon, defaultSize) =>
+  function AdminIcon({ size = defaultSize }) {
+    return <Icon size={size} strokeWidth={1.75} aria-hidden />;
+  };
 
-export function IconRefresh({ size = 14 }) {
-  return (
-    <svg width={size} height={size} {...ICON_PROPS}>
-      <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-      <path d="M21 3v6h-6" />
-    </svg>
-  );
-}
-
-export function IconClipboard({ size = 14 }) {
-  return (
-    <svg width={size} height={size} {...ICON_PROPS}>
-      <rect x="8" y="2" width="8" height="4" rx="1" />
-      <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2" />
-      <path d="M9 12h6" />
-      <path d="M9 16h6" />
-    </svg>
-  );
-}
-
-export function IconPlus({ size = 14 }) {
-  return (
-    <svg width={size} height={size} {...ICON_PROPS}>
-      <path d="M12 5v14" />
-      <path d="M5 12h14" />
-    </svg>
-  );
-}
-
-export function IconClose({ size = 14 }) {
-  return (
-    <svg width={size} height={size} {...ICON_PROPS}>
-      <path d="M18 6 6 18" />
-      <path d="M6 6l12 12" />
-    </svg>
-  );
-}
-
-export function IconTrash({ size = 14 }) {
-  return (
-    <svg width={size} height={size} {...ICON_PROPS}>
-      <path d="M3 6h18" />
-      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-      <path d="M10 11v6" />
-      <path d="M14 11v6" />
-    </svg>
-  );
-}
-
-export function IconPhone({ size = 12 }) {
-  return (
-    <svg width={size} height={size} {...ICON_PROPS}>
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-  );
-}
-
-export function IconSearch({ size = 14 }) {
-  return (
-    <svg width={size} height={size} {...ICON_PROPS}>
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.35-4.35" />
-    </svg>
-  );
-}
-
-export function IconAlert({ size = 12 }) {
-  return (
-    <svg width={size} height={size} {...ICON_PROPS}>
-      <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-      <path d="M12 9v4" />
-      <path d="M12 17h.01" />
-    </svg>
-  );
-}
+export const IconRefresh = lucide(RefreshCw, 14);
+export const IconClipboard = lucide(ClipboardList, 14);
+export const IconPlus = lucide(Plus, 14);
+export const IconClose = lucide(X, 14);
+export const IconTrash = lucide(Trash2, 14);
+export const IconPhone = lucide(Phone, 12);
+export const IconSearch = lucide(Search, 14);
+export const IconAlert = lucide(TriangleAlert, 12);
 
 export function WhatsAppMiniIcon({ size = 13 }) {
   return (

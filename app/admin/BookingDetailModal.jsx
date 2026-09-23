@@ -108,7 +108,7 @@ export default function BookingDetailModal({
             Turno {formatDate(booking.date)} · {booking.startTime}
             {booking.isTest && " · PRUEBA"}
           </h3>
-          <button type="button" className="admin-modal-close" onClick={onClose}>
+          <button type="button" className="admin-modal-close" onClick={onClose} aria-label="Cerrar">
             <IconClose size={14} />
           </button>
         </div>
@@ -141,14 +141,14 @@ export default function BookingDetailModal({
                 }}
                 title={`${plural(clientData.count, "turno jugado", "turnos jugados")} en Muzzaga`}
               >
-                ⭐ VIP ({plural(clientData.count, "turno", "turnos")})
+                VIP ({plural(clientData.count, "turno", "turnos")})
               </span>
             )}
             {clientCat && clientCat.category === "Frecuente" && (
               <span
                 style={{
                   background: "rgba(59, 130, 246, 0.1)",
-                  color: "#2563eb",
+                  color: "#1d4ed8",
                   border: "1px solid rgba(59, 130, 246, 0.25)",
                   borderRadius: 12,
                   padding: "2px 8px",
@@ -162,14 +162,14 @@ export default function BookingDetailModal({
                   "turnos jugados",
                 )}
               >
-                🎾 Frecuente ({clientData.count})
+                Frecuente ({clientData.count})
               </span>
             )}
             {clientCat && clientCat.category === "Nuevo" && (
               <span
                 style={{
                   background: "rgba(16, 185, 129, 0.08)",
-                  color: "#059669",
+                  color: "#15803d",
                   border: "1px solid rgba(16, 185, 129, 0.2)",
                   borderRadius: 12,
                   padding: "2px 8px",
@@ -179,7 +179,7 @@ export default function BookingDetailModal({
                 }}
                 title="Primer turno en el club"
               >
-                🌱 1er turno
+                1er turno
               </span>
             )}
           </div>
@@ -235,7 +235,7 @@ export default function BookingDetailModal({
                 }}
                 title="Enviar recordatorio con saldo pendiente"
               >
-                📩 Recordatorio
+                Recordatorio
               </a>
               <a
                 href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildDepositRequestMessage(booking))}`}
@@ -250,7 +250,7 @@ export default function BookingDetailModal({
                 }}
                 title="Pedir seña con Alias bancario"
               >
-                💳 Pedir Seña
+                Pedir seña
               </a>
               <a
                 href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildConfirmationMessage(booking))}`}
@@ -265,7 +265,7 @@ export default function BookingDetailModal({
                 }}
                 title="Enviar confirmación de turno"
               >
-                ✓ Confirmar
+                Confirmar
               </a>
             </div>
           )}
@@ -308,7 +308,7 @@ export default function BookingDetailModal({
             }}
           >
             <span style={{ fontSize: 13, fontWeight: 600 }}>
-              🔄 Reprogramar / Mover Cancha
+              Reprogramar / mover de cancha
             </span>
             <button
               type="button"
@@ -347,7 +347,7 @@ export default function BookingDetailModal({
                     marginBottom: 10,
                   }}
                 >
-                  ⚠️ {moveError}
+                  {moveError}
                 </div>
               )}
 

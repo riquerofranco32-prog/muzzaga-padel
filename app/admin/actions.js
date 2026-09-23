@@ -307,7 +307,7 @@ export async function adminAddPayment(bookingId, method, amount) {
       amount: amt,
       createdAt: Date.now(),
     });
-    return { ok: true };
+    return { ok: true, paymentId: paymentRef.key };
   } catch (error) {
     return { ok: false, error: "No se pudo registrar el cobro." };
   }
