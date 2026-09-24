@@ -83,25 +83,16 @@ body {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero-court-lines path {
-    stroke-dasharray: 1400;
-    stroke-dashoffset: 1400;
-    animation: courtDraw var(--t-entrada) var(--ease) 0.3s forwards;
-  }
-  .hero-court-lines path:nth-child(2) {
-    animation-delay: 0.6s;
-  }
-  .hero-court-lines path:nth-child(3) {
-    animation-delay: 0.8s;
-  }
-  .hero-court-lines path:nth-child(4) {
-    animation-delay: 1s;
+  /* Antes se trazaba cada línea animando stroke-dashoffset: ahora entra el
+     SVG entero con opacidad. */
+  .hero-court-lines {
+    animation: courtDraw var(--t-entrada) var(--ease) 0.3s both;
   }
 }
 
 @keyframes courtDraw {
-  to {
-    stroke-dashoffset: 0;
+  from {
+    opacity: 0;
   }
 }
 
@@ -219,10 +210,7 @@ body {
   box-shadow:
     0 10px 30px -6px var(--orange-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition:
-    transform var(--t-hover) var(--ease),
-    box-shadow var(--t-hover) var(--ease),
-    background var(--t-hover) var(--ease);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -263,9 +251,6 @@ body {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition:
-    background var(--t-hover) var(--ease),
-    border-color var(--t-hover) var(--ease);
 }
 
 .hero-btn-ghost span {
@@ -535,12 +520,10 @@ body {
   from {
     opacity: 0;
     transform: translateY(0.4em);
-    clip-path: inset(0 0 100% 0);
   }
   to {
     opacity: 1;
     transform: none;
-    clip-path: inset(0 0 -20% 0);
   }
 }
 
@@ -844,10 +827,7 @@ body {
   cursor: pointer;
   text-align: left;
   color: inherit;
-  transition:
-    transform var(--t-hover) var(--ease),
-    border-color var(--t-hover) var(--ease),
-    box-shadow var(--t-hover) var(--ease);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .flash-chip:hover {
@@ -877,9 +857,6 @@ body {
   background: var(--color-accent-orange-subtle);
   padding: 4px 8px;
   border-radius: 6px;
-  transition:
-    background var(--t-hover) var(--ease),
-    color var(--t-hover) var(--ease);
 }
 
 .flash-chip:hover .flash-chip-cta {
@@ -923,10 +900,7 @@ body {
   border-radius: 20px;
   padding: 28px 26px 22px;
   overflow: hidden;
-  transition:
-    transform var(--t-hover) var(--ease),
-    border-color var(--t-hover) var(--ease),
-    box-shadow var(--t-hover) var(--ease);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .testimonial-card::before {
@@ -1018,10 +992,6 @@ body {
   font-size: 12.5px;
   font-weight: 500;
   cursor: pointer;
-  transition:
-    background var(--t-hover) var(--ease),
-    color var(--t-hover) var(--ease),
-    box-shadow var(--t-hover) var(--ease);
 }
 
 .spec-tab:hover {
@@ -1133,10 +1103,7 @@ body {
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline-strong);
   overflow: hidden;
-  transition:
-    transform var(--t-hover) var(--ease),
-    border-color var(--t-hover) var(--ease),
-    box-shadow var(--t-hover) var(--ease);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .club-tool-card::after {
@@ -1217,10 +1184,6 @@ body {
   color: var(--color-ink);
   background: var(--color-canvas-soft);
   border: 1px solid var(--color-hairline);
-  transition:
-    background var(--t-hover) var(--ease),
-    color var(--t-hover) var(--ease),
-    border-color var(--t-hover) var(--ease);
 }
 
 .club-tool-link::after {
@@ -1276,10 +1239,7 @@ body {
 
 .info-link-card {
   border-radius: 18px;
-  transition:
-    transform var(--t-hover) var(--ease),
-    border-color var(--t-hover) var(--ease),
-    box-shadow var(--t-hover) var(--ease);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .info-link-card:hover {
@@ -1327,10 +1287,6 @@ body {
    -------------------------------------------------------------------------- */
 .faq-card {
   border-radius: 16px;
-  transition:
-    border-color var(--t-hover) var(--ease),
-    box-shadow var(--t-hover) var(--ease),
-    background var(--t-hover) var(--ease);
 }
 
 .faq-card:hover {
@@ -1578,7 +1534,6 @@ body {
   color: var(--color-ink);
   border: 1px solid var(--color-hairline-strong);
   background: var(--color-surface-card);
-  transition: border-color var(--t-hover) var(--ease), background var(--t-hover) var(--ease), color var(--t-hover) var(--ease);
 }
 
 .section-more-link span {
@@ -1706,7 +1661,7 @@ body {
   font-weight: 700;
   font-size: 14px;
   white-space: nowrap;
-  transition: transform var(--t-hover) var(--ease), background var(--t-hover) var(--ease);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .next-event-cta:hover {

@@ -237,11 +237,13 @@ export default function FeatureCarousel() {
                     scale: isActive ? 1 : isPrev || isNext ? 0.85 : 0.7,
                     opacity: isActive ? 1 : isPrev || isNext ? 0.4 : 0,
                     rotate: isPrev ? -3 : isNext ? 3 : 0,
+                  }}
+                  style={{
                     zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0,
                     pointerEvents: isActive ? "auto" : "none",
                   }}
                   transition={MOVE}
-                  className="fc-stage-card"
+                  className={`fc-stage-card${isActive ? " is-active" : ""}`}
                 >
                   <img
                     src={feature.image}

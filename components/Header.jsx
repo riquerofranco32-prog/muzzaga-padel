@@ -145,7 +145,6 @@ export default function Header() {
                         borderRadius: "var(--radius-sm)",
                         textDecoration: "none",
                         color: "var(--text-primary)",
-                        transition: "background var(--t-hover) var(--ease)",
                       }}
                     >
                       <strong style={{ display: "block", fontSize: 13 }}>{tool.label}</strong>

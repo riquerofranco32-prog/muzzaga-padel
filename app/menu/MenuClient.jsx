@@ -215,7 +215,7 @@ export default function MenuClient() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 gap: 12,
-                transition: "all var(--t-hover) var(--ease)",
+                transition: "transform var(--t-hover) var(--ease), opacity var(--t-hover) var(--ease)",
               }}
             >
               <div>
