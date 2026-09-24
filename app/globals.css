@@ -284,7 +284,7 @@ select:focus-visible,
 @media (prefers-reduced-motion: no-preference) {
   .reveal-up {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(16px);
     transition:
       opacity var(--t-entrada) var(--ease),
       transform var(--t-entrada) var(--ease);
@@ -295,29 +295,8 @@ select:focus-visible,
     transform: none;
   }
 
-  /* Stagger: sin esto, todas las cards de una misma grilla cruzan el umbral
-     de scroll casi al mismo tiempo y aparecen juntas en vez de en cascada. */
-  .open-cards-grid .reveal-up:nth-child(2) {
-    transition-delay: 0.08s;
-  }
-  .faq-list .faq-card:nth-child(2) {
-    transition-delay: 0.05s;
-  }
-  .faq-list .faq-card:nth-child(3) {
-    transition-delay: 0.1s;
-  }
-  .faq-list .faq-card:nth-child(4) {
-    transition-delay: 0.15s;
-  }
-  .faq-list .faq-card:nth-child(5) {
-    transition-delay: 0.2s;
-  }
-  .faq-list .faq-card:nth-child(6) {
-    transition-delay: 0.25s;
-  }
-  .faq-list .faq-card:nth-child(7) {
-    transition-delay: 0.3s;
-  }
+  /* El escalonado (60 ms entre hermanos) lo pone landing.css con --i, que
+     setea ScrollReveal. */
 }
 
 .scroll-progress-track {

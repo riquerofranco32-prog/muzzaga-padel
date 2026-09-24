@@ -454,43 +454,43 @@ body {
     animation: heroRise var(--t-entrada) var(--ease) both;
   }
   .hero-night-copy > :nth-child(1) {
-    animation-delay: 0.05s;
+    animation-delay: 0s;
   }
   .hero-night-copy > :nth-child(2) {
-    animation-delay: 0.12s;
+    animation-delay: 0.06s;
   }
   .hero-night-copy > :nth-child(3) {
-    animation-delay: 0.2s;
+    animation-delay: 0.12s;
   }
   .hero-night-copy > :nth-child(4) {
-    animation-delay: 0.32s;
+    animation-delay: 0.18s;
   }
   .hero-night-copy > :nth-child(5) {
-    animation-delay: 0.42s;
+    animation-delay: 0.24s;
   }
   .hero-night-copy > :nth-child(6) {
-    animation-delay: 0.52s;
+    animation-delay: 0.3s;
   }
   .hero-night-visual {
     animation-name: heroPop;
     animation-duration: var(--t-entrada);
-    animation-delay: 0.25s;
+    animation-delay: 0.12s;
   }
   .hero-stats {
-    animation-delay: 0.65s;
+    animation-delay: 0.36s;
   }
 
   .hero-line {
     animation: lineUp var(--t-entrada) var(--ease) both;
   }
   .hero-line:nth-child(1) {
-    animation-delay: 0.15s;
+    animation-delay: 0.12s;
   }
   .hero-line:nth-child(2) {
-    animation-delay: 0.24s;
+    animation-delay: 0.18s;
   }
   .hero-line:nth-child(3) {
-    animation-delay: 0.36s;
+    animation-delay: 0.24s;
   }
 }
 
@@ -647,7 +647,7 @@ body {
 
 @media (prefers-reduced-motion: no-preference) {
   .section-header-row.in-view .mascot-section-img {
-    animation: mascotWave var(--t-entrada) var(--ease-mascota) 0.2s both;
+    animation: mascotWave var(--t-entrada) var(--ease-mascota) 0.12s both;
   }
 }
 
@@ -1306,16 +1306,14 @@ body {
    SCROLL REVEAL con escalonado (ScrollReveal setea --i por hermano)
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: no-preference) {
+  /* Una sola vez (ScrollReveal deja de observar) y 60 ms entre hermanos,
+     hasta 6: la séptima tarjeta no espera más de 360 ms. */
   .reveal-up {
-    transform: translateY(28px);
+    transform: translateY(16px);
     transition:
       opacity var(--t-entrada) var(--ease),
       transform var(--t-entrada) var(--ease);
-    transition-delay: calc(var(--i, 0) * 80ms);
-  }
-
-  .reveal-up.in-view {
-    transition-delay: calc(var(--i, 0) * 80ms);
+    transition-delay: calc(var(--i, 0) * 60ms);
   }
 }
 
