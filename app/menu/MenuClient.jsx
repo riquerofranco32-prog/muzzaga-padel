@@ -146,7 +146,8 @@ export default function MenuClient() {
         <div style={{ maxWidth: 440 }}>
           <input
             type="search"
-            placeholder="Buscar por producto (ej. Pizza, Corona, Sin TACC)..."
+            placeholder="Buscar: pizza, Corona, sin TACC…"
+            aria-label="Buscar en la carta"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
