@@ -1134,6 +1134,10 @@ select:focus-visible,
   color: var(--color-ink);
 }
 
+.booking-date-btn.active .booking-date-weekend-badge {
+  color: #ff9a5a;
+}
+
 .booking-date-btn.active .booking-date-num {
   color: var(--color-accent-orange);
 }
@@ -6036,18 +6040,25 @@ input[type="range"]::-webkit-slider-thumb:hover {
     --color-accent-orange-text: #ff9a5a;
   }
 
-  .whatsapp-text,
-  .btn-secondary-whatsapp {
+  /* Sin las zonas que quedan en claro también en modo oscuro (pizarra,
+     categorías, admin): ahí siguen los tonos oscuros. */
+  .whatsapp-text:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *),
+  .btn-secondary-whatsapp:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *) {
     color: #34d399;
   }
 
-  .maps-text {
+  .maps-text:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *) {
     color: #ff8a80;
   }
 
   .booking-date-weekend-badge,
-  .fixture-round-badge {
+  .fixture-round-badge:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *) {
     color: #ff9a5a;
+  }
+
+  /* El día elegido es una píldora clara en modo oscuro. */
+  .booking-date-btn.active .booking-date-weekend-badge {
+    color: #a8501a;
   }
 
   body::before {
@@ -6123,6 +6134,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
     --color-accent-orange-subtle: #fdf6f0;
     --color-accent-orange-border: #f2cbb4;
+    --color-accent-orange-text: #c2410c;
 
     background: #ffffff;
     color-scheme: light;
