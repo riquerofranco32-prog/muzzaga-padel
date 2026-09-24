@@ -87,7 +87,7 @@ export default function MenuClient() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22 }}>📍</span>
             <div>
-              <div style={{ fontSize: 11, textTransform: "uppercase", fontWeight: 700, color: "var(--color-accent-orange)" }}>
+              <div style={{ fontSize: 11, textTransform: "uppercase", fontWeight: 700, color: "var(--color-accent-orange-text)" }}>
                 Entrega Directa Activada
               </div>
               <strong style={{ fontSize: 15, color: "var(--color-ink)" }}>

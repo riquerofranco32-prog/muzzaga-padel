@@ -223,7 +223,7 @@ export default function CategoriesExplorer() {
               </div>
 
               <div className="cat-info-block" style={{ background: "var(--color-accent-orange-subtle)", borderColor: "var(--color-accent-orange-border)" }}>
-                <span className="cat-info-tag" style={{ color: "var(--color-accent-orange)" }}>Matchmaking en Catriel</span>
+                <span className="cat-info-tag" style={{ color: "var(--color-accent-orange-text)" }}>Matchmaking en Catriel</span>
                 <p style={{ fontSize: 13, color: "var(--color-text-link)", margin: "4px 0 0", lineHeight: 1.5 }}>
                   ¿Buscás pareja o rivales de {current.name}? Tenemos grupos activos organizados por nivel.
                 </p>

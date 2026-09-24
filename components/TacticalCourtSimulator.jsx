@@ -1048,7 +1048,7 @@ export default function TacticalCourtSimulator() {
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
-                        color: "var(--color-accent-orange)",
+                        color: "var(--color-accent-orange-text)",
                         fontWeight: 600,
                         fontSize: 12.5,
                         marginBottom: 2,
