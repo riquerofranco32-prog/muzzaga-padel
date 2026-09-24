@@ -1578,18 +1578,11 @@ body {
   translate: -50% 0;
 }
 
+/* En celu la mascota tapaba la columna de la Cancha 2 en la grilla de
+   turnos, y lo que ofrece (WhatsApp, menú) ya está en la barra inferior. */
 @media (max-width: 768px) {
   .mascot-float {
-    bottom: calc(var(--bottom-bar-h) + env(safe-area-inset-bottom, 0px) + 10px);
-    right: 10px;
-  }
-
-  .mascot-float img {
-    width: 62px !important;
-  }
-
-  .mascot-float .pulse-badge-live {
-    display: none !important;
+    display: none;
   }
 }
 
@@ -1911,5 +1904,52 @@ body {
 
   .menu-board-list {
     grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   GRILLA DE TURNOS: `1fr` no baja del ancho mínimo del contenido del slot
+   (y en celu globals.css le fija 168px al slot), así que las dos canchas sumaban más que la pantalla y la
+   Cancha 2 quedaba cortada. minmax(0, 1fr) deja que las columnas se achiquen.
+   -------------------------------------------------------------------------- */
+.booking-matrix-header,
+.booking-matrix-row {
+  grid-template-columns: 90px repeat(var(--court-columns, 2), minmax(0, 1fr));
+}
+
+.booking-matrix-row > * {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .booking-matrix-header,
+  .booking-matrix-row {
+    grid-template-columns: 56px repeat(var(--court-columns, 2), minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .booking-matrix-time-col strong {
+    font-size: 13px;
+  }
+
+  /* globals.css fija .booking-slot a 168px para el carrusel horizontal
+     (.booking-slots-grid); dentro de la grilla hora x cancha tiene que
+     ocupar su columna. */
+  .booking-matrix-row .booking-slot {
+    width: auto;
+  }
+
+  .booking-court-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .booking-court-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .booking-court-tab {
+    flex-shrink: 0;
   }
 }
