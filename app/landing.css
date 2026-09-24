@@ -1514,6 +1514,14 @@ body {
   }
 }
 
+/* Celular horizontal: también está la barra inferior, y el popup del
+   ayudante no entraba en 390 px de alto. */
+@media (max-width: 1180px) and (max-height: 500px) {
+  .mascot-float {
+    display: none;
+  }
+}
+
 /* --------------------------------------------------------------------------
    "VER MÁS" al pie de sección (reemplaza los botones duplicados arriba/abajo)
    -------------------------------------------------------------------------- */

@@ -120,7 +120,9 @@ export default function TodayFlashSlots() {
           <div className="flash-head">
             <div className="flash-head-left">
               <span className="flash-live">Disponible ya</span>
-              <strong className="flash-title">Turnos libres · {dateLabel}</strong>
+              <strong className="flash-title">
+                {loading ? `Turnos · ${dateLabel}` : `Turnos libres · ${dateLabel}`}
+              </strong>
             </div>
             {loading ? (
               <span className="flash-meta flash-skeleton-text" aria-hidden="true">
