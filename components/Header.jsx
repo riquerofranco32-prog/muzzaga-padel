@@ -220,7 +220,7 @@ export default function Header() {
         ))}
 
         <div style={{ borderTop: "1px solid var(--color-hairline)", margin: "10px 0", paddingTop: 10 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em", padding: "0 12px" }}>
+          <span style={{ display: "block", fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em", padding: "8px 14px 4px" }}>
             Herramientas del Club
           </span>
           {TOOLS_LINKS.map((tool) => (

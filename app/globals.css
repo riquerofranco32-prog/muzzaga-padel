@@ -645,6 +645,11 @@ select:focus-visible,
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   padding: 8px;
   z-index: 200;
+  /* Con los links de herramientas en columna el panel es más alto: en un
+     celular horizontal scrollea adentro en vez de salirse de la pantalla. */
+  max-height: calc(100dvh - 92px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   transform: translateY(-12px);
   opacity: 0;
   pointer-events: none;
@@ -660,6 +665,9 @@ select:focus-visible,
 }
 
 .mobile-nav-link {
+  /* Sin display los links de herramientas (que no son hijos directos del
+     panel flex) quedaban en línea, uno pegado al otro. */
+  display: block;
   padding: 12px 14px;
   font-size: 14px;
   font-weight: 500;
