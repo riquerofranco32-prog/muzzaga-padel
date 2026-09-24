@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Portal from "./Portal";
+import useDialogFocus from "../lib/useDialogFocus";
 
 // Antes esta pantalla mostraba un CBU y un alias inventados (placeholder de
 // ejemplo) como si fueran los datos reales del club, con botón "Copiar" y
@@ -26,6 +27,7 @@ export default function BookingPassModal({
   const [shareSuccess, setShareSuccess] = useState(false);
   const [payingMp, setPayingMp] = useState(false);
   const [mpMessage, setMpMessage] = useState(null);
+  const dialogRef = useDialogFocus(Boolean(booking), onClose);
 
   // Guardar pase en localStorage para consulta offline (Sprint 2.4)
   useEffect(() => {
@@ -133,8 +135,16 @@ export default function BookingPassModal({
 
   return (
     <Portal>
-    <div className="admin-modal-backdrop" onClick={onClose}>
-      <div className="digital-pass-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="admin-modal-backdrop" onClick={onClose} style={{ zIndex: 1001 }}>
+      <div
+        className="digital-pass-modal"
+        onClick={(e) => e.stopPropagation()}
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Pase digital de tu reserva"
+        tabIndex={-1}
+      >
         {/* CONFIRMATION BANNER */}
         <div
           style={{

@@ -117,7 +117,7 @@ export default function BookingCalendar({ serverToday }) {
     formRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     const firstInput = formRef.current.querySelector("input");
     firstInput?.focus({ preventScroll: true });
-  }, [selected]);
+  }, [selected, isDrawer]);
 
   useEffect(() => {
     let cancelled = false;
@@ -414,7 +414,14 @@ export default function BookingCalendar({ serverToday }) {
             if (e.target === e.currentTarget) setSelected(null);
           }}
         >
-          <form className="booking-form" ref={formRef} onSubmit={handleConfirm}>
+          <form
+            className="booking-form"
+            ref={formRef}
+            onSubmit={handleConfirm}
+            role={isDrawer ? "dialog" : undefined}
+            aria-modal={isDrawer || undefined}
+            aria-label="Confirmar reserva"
+          >
             <div className="booking-form-header">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div>

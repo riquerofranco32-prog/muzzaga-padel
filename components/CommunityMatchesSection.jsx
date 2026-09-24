@@ -8,6 +8,7 @@ import {
 } from "../app/open-matches/actions";
 import { PRECIO_POR_JUGADOR } from "../data/pricing";
 import Portal from "./Portal";
+import useDialogFocus from "../lib/useDialogFocus";
 
 const WHATSAPP = "5492995974176";
 
@@ -24,6 +25,8 @@ export default function CommunityMatchesSection() {
 
   // Create Modal State
   const [createModal, setCreateModal] = useState(false);
+  const joinDialogRef = useDialogFocus(Boolean(joinModal), () => setJoinModal(null));
+  const createDialogRef = useDialogFocus(createModal, () => setCreateModal(false));
   const [createForm, setCreateForm] = useState({
     category: "6ta Categoría (3.0 - 3.9)",
     courtName: "Cancha 1 · Cristal",
@@ -364,6 +367,11 @@ export default function CommunityMatchesSection() {
           <div
             className="admin-modal-card"
             onClick={(e) => e.stopPropagation()}
+            ref={joinDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Sumarme al partido abierto"
+            tabIndex={-1}
           >
             <div
               style={{
@@ -458,6 +466,11 @@ export default function CommunityMatchesSection() {
           <div
             className="admin-modal-card"
             onClick={(e) => e.stopPropagation()}
+            ref={createDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Publicar partido abierto"
+            tabIndex={-1}
           >
             <div
               style={{
