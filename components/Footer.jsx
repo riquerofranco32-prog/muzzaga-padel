@@ -47,27 +47,15 @@ export default function Footer() {
               profesionales, torneos y cantina propia.
             </p>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                marginTop: 12,
-                padding: "8px 12px",
-                background: "var(--color-surface-2, rgba(255,255,255,0.05))",
-                borderRadius: 12,
-                border: "1px solid var(--color-hairline, rgba(255,255,255,0.1))",
-                maxWidth: 360,
-              }}
-            >
+            <div className="footer-mascot-box">
               <img
                 src="/img/mascotas/muzzaguito-mochila-pulgar.webp"
                 alt="Muzzaguito con su mochila haciendo pulgar arriba"
-                width={85}
-                height={85}
-                style={{ width: 85, height: "auto", objectFit: "contain", flexShrink: 0, filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.25))" }}
+                width={180}
+                height={168}
+                className="footer-mascot"
               />
-              <span style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.35 }}>
+              <span className="footer-mascot-text">
                 ¡Nos vemos en la pista! 🎾 Muzzaguito te acompaña en cada partido.
               </span>
             </div>

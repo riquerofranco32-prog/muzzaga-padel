@@ -101,20 +101,20 @@ export default function CommunityMatchesSection() {
     <section id="canchas-abiertas" className="section-community">
       <div className="container">
         <div className="section-header-row" style={{ alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <div>
-              <span
-                className="badge-linear badge-amber"
-                style={{ marginBottom: 6 }}
-              >
-                En Vivo · Matchmaking &amp; Comunidad
-              </span>
-              <h2 className="section-title">Canchas Abiertas en Catriel</h2>
-              <p className="section-desc">
-                Sumate a partidos con lugares libres o publicá tu propia
-                convocatoria. Jugá con rivales de tu mismo nivel.
-              </p>
-            </div>
+          <div>
+            <span
+              className="badge-linear badge-amber"
+              style={{ marginBottom: 6 }}
+            >
+              En Vivo · Matchmaking &amp; Comunidad
+            </span>
+            <h2 className="section-title">Canchas Abiertas en Catriel</h2>
+            <p className="section-desc">
+              Sumate a partidos con lugares libres o publicá tu propia
+              convocatoria. Jugá con rivales de tu mismo nivel.
+            </p>
+          </div>
+          <div className="header-aside">
             <div className="mascot-section-badge">
               <img
                 src="/img/mascotas/muzzaguito-pizza-good-vibes.webp"
@@ -124,14 +124,14 @@ export default function CommunityMatchesSection() {
                 className="mascot-section-img"
               />
             </div>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setCreateModal(true)}
+            >
+              + Publicar Partido Abierto
+            </button>
           </div>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => setCreateModal(true)}
-          >
-            + Publicar Partido Abierto
-          </button>
         </div>
 
         {/* CATEGORY FILTER PILLS */}

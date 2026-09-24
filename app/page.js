@@ -17,6 +17,7 @@ import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
 import ScrollProgress from "../components/ScrollProgress";
 import StatCounter from "../components/StatCounter";
+import HeroMascot from "../components/HeroMascot";
 import "./landing.css";
 
 import { getClubConfig } from "../lib/clubConfigServer";
@@ -130,13 +131,7 @@ export default async function Home() {
 
           <div className="hero-night-visual" aria-hidden="true">
             <div className="hero-mascot-ring" />
-            <img
-              src="/img/mascotas/muzzaguito-lentes-paleta.webp"
-              alt=""
-              width={420}
-              height={420}
-              className="hero-mascot"
-            />
+            <HeroMascot src="/img/mascotas/muzzaguito-lentes-paleta.webp" width={720} height={671} />
             <div className="hero-float-card hero-float-price">
               <span className="hero-float-label">{priceFrom ? "Turno desde" : "Turno"} · {config.slotDurationMin} min</span>
               <strong>${pricing.total.toLocaleString("es-AR")}</strong>
@@ -147,9 +142,7 @@ export default async function Home() {
               Cristal 10 mm · LED
             </div>
           </div>
-        </div>
 
-        <div className="container">
           <dl className="hero-stats">
             <div className="hero-stat">
               <dt>Canchas de cristal</dt>
@@ -169,6 +162,7 @@ export default async function Home() {
             </div>
           </dl>
         </div>
+
       </section>
 
       <div className="ticker" aria-hidden="true">
