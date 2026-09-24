@@ -4,6 +4,7 @@ import {
   BarChart3,
   Calendar,
   CalendarDays,
+  History,
   Settings,
   Trophy,
   Users,
@@ -20,6 +21,7 @@ export const NAV_ITEMS = [
   { id: "torneos", label: "Torneos", icon: Trophy },
   { id: "reportes", label: "Reportes", icon: BarChart3 },
   { id: "configuracion", label: "Configuración", icon: Settings },
+  { id: "actividad", label: "Actividad del equipo", shortLabel: "Actividad", icon: History },
 ];
 
 export const NAV_GROUPS = [
@@ -49,6 +51,7 @@ export const NAV_GROUPS = [
     title: "Sistema",
     items: [
       { id: "configuracion", label: "Configuración", icon: Settings },
+      { id: "actividad", label: "Actividad del equipo", icon: History },
     ],
   },
 ];

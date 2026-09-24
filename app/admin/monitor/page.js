@@ -1,516 +1,360 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { getAdminDayData, checkAdminSession } from "../actions";
-import { todayInClub, COURTS, nowInClubTimezone } from "../../../lib/booking";
+import {
+  adminGetClubConfig,
+  checkAdminSession,
+  getAdminDayData,
+} from "../actions";
+import {
+  COURTS,
+  isoAddDays,
+  nowInClubTimezone,
+  todayInClub,
+} from "../../../lib/booking";
 import { getClubTimeString } from "../../../data/horarios";
+import { isExpiredSessionError } from "../adminHelpers";
+import { courtSchedule, liveAndNext, toMinutes } from "./schedule";
+import "./monitor.css";
+
+const REFRESH_MS = 30000;
+const STALE_AFTER_MIN = 2;
+// Después de esta hora ya no queda nada de ayer en pista.
+const LATE_NIGHT_UNTIL = "06:00";
+const WARN_MIN = 5;
+
+function playTurnChime(freq = 587.33) {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.7);
+  } catch {
+    // El navegador puede bloquear el audio sin interacción previa.
+  }
+}
+
+function timerTone(remaining) {
+  if (remaining <= 10) return "#ef4444";
+  if (remaining <= 20) return "#f59e0b";
+  return "#22c55e";
+}
 
 export default function MonitorPage() {
   const [authorized, setAuthorized] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [dayData, setDayData] = useState(null);
+  const [yesterdayBookings, setYesterdayBookings] = useState([]);
+  const [slotDuration, setSlotDuration] = useState(null);
+  const [loadError, setLoadError] = useState(null); // null | "expired" | "offline"
+  const [lastUpdated, setLastUpdated] = useState(null);
   const [currentTime, setCurrentTime] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
-
-  function playTurnChime(freq = 587.33) {
-    if (!soundEnabled || typeof window === "undefined") return;
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.7);
-    } catch (e) {
-      // Audio autoplay policy handled silently
-    }
-  }
+  const firedChimes = useRef(new Set());
 
   useEffect(() => {
     checkAdminSession().then((res) => {
-      if (res.ok) setAuthorized(true);
+      setAuthorized(res.ok);
+      setSessionChecked(true);
     });
   }, []);
 
   useEffect(() => {
-    updateClock();
-    const clockTimer = setInterval(updateClock, 1000);
-    return () => clearInterval(clockTimer);
+    const tick = () => setCurrentTime(getClubTimeString());
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const sync = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
   }, []);
 
   useEffect(() => {
     if (!authorized) return;
+    adminGetClubConfig().then((res) => {
+      if (res.ok) setSlotDuration(res.config.slotDurationMin);
+    });
     loadData();
-    const dataTimer = setInterval(loadData, 30000); // Refresco cada 30s
-    return () => clearInterval(dataTimer);
+    const id = setInterval(loadData, REFRESH_MS);
+    return () => clearInterval(id);
   }, [authorized]);
-
-  function updateClock() {
-    setCurrentTime(getClubTimeString());
-  }
 
   async function loadData() {
     const today = todayInClub();
-    const res = await getAdminDayData(today);
-    if (res.ok) {
+    const isLateNight = nowInClubTimezone().hhmm < LATE_NIGHT_UNTIL;
+    try {
+      const [res, prev] = await Promise.all([
+        getAdminDayData(today),
+        isLateNight ? getAdminDayData(isoAddDays(today, -1)) : null,
+      ]);
+      if (!res.ok) {
+        setLoadError(isExpiredSessionError(res) ? "expired" : "offline");
+        return;
+      }
       setDayData(res);
+      setYesterdayBookings(prev?.ok ? prev.bookings : []);
+      setLoadError(null);
+      setLastUpdated(Date.now());
+    } catch {
+      setLoadError("offline");
     }
   }
 
   function toggleFullscreen() {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen().catch(() => {});
-      setIsFullscreen(false);
     }
+  }
+
+  const now = nowInClubTimezone();
+  const currentMinutes = toMinutes(now.hhmm);
+  const courts = dayData?.courts || COURTS;
+  const schedules = courts.map((court) => {
+    const schedule = courtSchedule(
+      court.id,
+      dayData?.bookings,
+      yesterdayBookings,
+    );
+    return { court, schedule, ...liveAndNext(schedule, currentMinutes) };
+  });
+
+  // Aviso sonoro a 5 min del final y al terminar, una vez por turno. Se
+  // marcan aunque el sonido esté apagado para que al prenderlo no suenen
+  // avisos viejos de golpe.
+  useEffect(() => {
+    schedules.forEach(({ schedule }) =>
+      schedule.forEach(({ booking, end }) => {
+        const remaining = end - currentMinutes;
+        const key = `${booking.id}-${booking.date}`;
+        if (
+          remaining > 0 &&
+          remaining <= WARN_MIN &&
+          !firedChimes.current.has(`${key}-warn`)
+        ) {
+          firedChimes.current.add(`${key}-warn`);
+          if (soundEnabled) playTurnChime(587.33);
+        }
+        if (
+          remaining <= 0 &&
+          remaining > -2 &&
+          !firedChimes.current.has(`${key}-end`)
+        ) {
+          firedChimes.current.add(`${key}-end`);
+          if (soundEnabled) {
+            playTurnChime(880);
+            setTimeout(() => playTurnChime(659.25), 350);
+          }
+        }
+      }),
+    );
+  }, [currentMinutes, dayData, yesterdayBookings, soundEnabled]);
+
+  if (!sessionChecked) {
+    return <div className="mon-center">Verificando sesión…</div>;
   }
 
   if (!authorized) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#0c0d0e",
-          color: "#fff",
-          padding: 20,
-          textAlign: "center",
-        }}
-      >
-        <h2>Acceso Restringido</h2>
-        <p style={{ color: "#9ca3af", maxWidth: 400 }}>
-          Iniciá sesión en el panel de administración antes de abrir el monitor de recepción.
+      <div className="mon-center">
+        <h2>Acceso restringido</h2>
+        <p>
+          Iniciá sesión en el panel de administración antes de abrir el monitor
+          de recepción.
         </p>
-        <Link href="/admin" className="btn btn-linear-primary" style={{ marginTop: 14 }}>
-          Ir al Login de Admin →
+        <Link
+          href="/admin"
+          className="btn btn-linear-primary"
+          style={{ marginTop: 14 }}
+        >
+          Ir al login del admin →
         </Link>
       </div>
     );
   }
 
-  const now = nowInClubTimezone();
-  const currentMinutes = parseInt(now.hhmm.split(":")[0], 10) * 60 + parseInt(now.hhmm.split(":")[1], 10);
+  const minutesSinceUpdate = lastUpdated
+    ? Math.floor((Date.now() - lastUpdated) / 60000)
+    : null;
+  const isStale =
+    minutesSinceUpdate != null && minutesSinceUpdate >= STALE_AFTER_MIN;
+  const durationLabel = slotDuration ? `${slotDuration} minutos` : "el horario";
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0a0a09",
-        color: "#ffffff",
-        fontFamily: "system-ui, -apple-system, sans-serif",
-        padding: "24px 32px",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {/* HEADER MONITOR */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-          paddingBottom: 18,
-          marginBottom: 28,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <img
-            src="/img/logo_badge.png"
-            alt="Muzzaga"
-            style={{ width: 44, height: 44, objectFit: "contain" }}
-          />
+    <div className="mon-root">
+      {loadError === "expired" && (
+        <div className="mon-overlay" role="alert">
+          <h2>Sesión vencida</h2>
+          <p>Los datos de esta pantalla dejaron de actualizarse.</p>
+          <p>Volvé a ingresar al panel para reactivar el monitor.</p>
+          <Link href="/admin" className="btn btn-linear-primary">
+            Ir al panel →
+          </Link>
+        </div>
+      )}
+
+      <header className="mon-header">
+        <div className="mon-brand">
+          <img src="/img/logo_badge.png" alt="Muzzaga" />
           <div>
-            <h1 style={{ fontSize: 24, margin: 0, fontWeight: 800, letterSpacing: "0.04em" }}>
-              MUZZAGA PÁDEL · MONITOR DE PISTAS
-            </h1>
-            <span style={{ fontSize: 13, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Panel de Recepción &amp; Cantina en Tiempo Real
-            </span>
+            <h1>MUZZAGA PÁDEL · MONITOR DE PISTAS</h1>
+            <span>Recepción en tiempo real</span>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div
-            style={{
-              fontSize: 32,
-              fontWeight: 900,
-              fontFamily: "var(--font-jetbrains-mono), monospace",
-              color: "#e8722a",
-              background: "rgba(232, 114, 42, 0.1)",
-              border: "1px solid rgba(232, 114, 42, 0.3)",
-              padding: "6px 18px",
-              borderRadius: 12,
-            }}
-          >
-            {currentTime || now.hhmm}
-          </div>
+        <div className="mon-tools">
+          {loadError === "offline" ? (
+            <span className="mon-status is-error" role="status">
+              Sin conexión con la base · reintentando
+              {minutesSinceUpdate != null &&
+                ` · últimos datos de hace ${minutesSinceUpdate} min`}
+            </span>
+          ) : (
+            lastUpdated && (
+              <span
+                className={`mon-status${isStale ? " is-stale" : ""}`}
+                role="status"
+              >
+                {minutesSinceUpdate === 0
+                  ? "Actualizado recién"
+                  : `Actualizado hace ${minutesSinceUpdate} min`}
+              </span>
+            )
+          )}
+
+          <div className="mon-clock mon-mono">{currentTime || now.hhmm}</div>
 
           <button
             type="button"
+            className={`mon-btn${soundEnabled ? " is-on" : ""}`}
             onClick={() => {
               const next = !soundEnabled;
               setSoundEnabled(next);
               if (next) playTurnChime(659.25);
             }}
-            style={{
-              background: soundEnabled ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.1)",
-              border: soundEnabled ? "1px solid #10b981" : "1px solid rgba(255, 255, 255, 0.2)",
-              color: soundEnabled ? "#34d399" : "#d1d5db",
-              padding: "8px 14px",
-              borderRadius: 8,
-              cursor: "pointer",
-              fontSize: 13,
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}
-            title="Activar o silenciar aviso sonoro cuando faltan 5 min y al terminar el turno"
+            aria-pressed={soundEnabled}
+            title="Aviso sonoro cuando faltan 5 min y al terminar cada turno"
           >
-            {soundEnabled ? "🔔 Sonido Activo" : "🔕 Sonido Desactivado"}
+            {soundEnabled ? "🔔 Sonido activo" : "🔕 Sonido apagado"}
           </button>
 
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            style={{
-              background: "rgba(255, 255, 255, 0.1)",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-              color: "#fff",
-              padding: "8px 14px",
-              borderRadius: 8,
-              cursor: "pointer",
-              fontSize: 13,
-            }}
-          >
-            {isFullscreen ? "Salir Pantalla Completa" : "⛶ Pantalla Completa"}
+          <button type="button" className="mon-btn" onClick={toggleFullscreen}>
+            {isFullscreen
+              ? "Salir de pantalla completa"
+              : "⛶ Pantalla completa"}
           </button>
 
-          <Link
-            href="/admin"
-            style={{
-              color: "#9ca3af",
-              fontSize: 13,
-              textDecoration: "none",
-            }}
-          >
-            ← Volver al Admin
+          <Link href="/admin" className="mon-back">
+            ← Volver al admin
           </Link>
         </div>
-      </div>
+      </header>
 
-      {/* GRID DE CANCHAS */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(450px, 100%), 1fr))",
-          gap: 24,
-          flex: 1,
-        }}
-      >
-        {(dayData?.courts || COURTS).map((court) => {
-          // Filtrar reservas del día para esta cancha
-          const courtBookings = (dayData?.bookings || [])
-            .filter((b) => b.courtId === court.id && b.status !== "cancelado")
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-          // Encontrar partido en juego actualmente
-          const currentMatch = courtBookings.find((b) => {
-            const [sh, sm] = b.startTime.split(":").map(Number);
-            const [eh, em] = b.endTime.split(":").map(Number);
-            const startM = sh * 60 + sm;
-            const endM = eh * 60 + em;
-            return currentMinutes >= startM && currentMinutes < endM;
-          });
-
-          // Encontrar próximo partido
-          const nextMatch = courtBookings.find((b) => {
-            const [sh, sm] = b.startTime.split(":").map(Number);
-            const startM = sh * 60 + sm;
-            return startM > currentMinutes;
-          });
-
-          // Calcular minutos restantes si hay partido en juego
-          let remainingMinutes = null;
-          let elapsedMinutes = null;
-          let progressPct = 0;
-          if (currentMatch) {
-            const [sh, sm] = currentMatch.startTime.split(":").map(Number);
-            const [eh, em] = currentMatch.endTime.split(":").map(Number);
-            const startM = sh * 60 + sm;
-            const endM = eh * 60 + em;
-            const totalM = Math.max(1, endM - startM);
-            remainingMinutes = Math.max(0, endM - currentMinutes);
-            elapsedMinutes = Math.max(0, currentMinutes - startM);
-            progressPct = Math.min(100, Math.max(0, Math.round((elapsedMinutes / totalM) * 100)));
-          }
-
-          const matchTone =
-            remainingMinutes <= 10 ? "#ef4444" : remainingMinutes <= 20 ? "#f59e0b" : "#22c55e";
+      <div className="mon-grid">
+        {schedules.map(({ court, live, next }) => {
+          const match = live?.booking;
+          const remaining = live ? Math.max(0, live.end - currentMinutes) : 0;
+          const elapsed = live ? Math.max(0, currentMinutes - live.start) : 0;
+          const total = live ? Math.max(1, live.end - live.start) : 1;
+          const progress = Math.min(100, Math.round((elapsed / total) * 100));
+          const tone = { "--tone": timerTone(remaining) };
 
           return (
-            <div
+            <section
               key={court.id}
-              style={{
-                background: currentMatch
-                  ? "linear-gradient(180deg, #161c18 0%, #111412 100%)"
-                  : "linear-gradient(180deg, #161719 0%, #111214 100%)",
-                border: currentMatch
-                  ? "2px solid #22c55e"
-                  : "1px solid rgba(255, 255, 255, 0.12)",
-                borderRadius: 20,
-                padding: 28,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                boxShadow: currentMatch
-                  ? "0 0 35px rgba(34, 197, 94, 0.2), inset 0 0 20px rgba(34, 197, 94, 0.05)"
-                  : "0 8px 30px rgba(0, 0, 0, 0.3)",
-                transition: "all 0.3s ease",
-              }}
+              className={`mon-court${match ? " is-live" : ""}`}
             >
-              {/* ENCABEZADO DE CANCHA */}
               <div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 20,
-                  }}
-                >
+                <div className="mon-court-head">
                   <div>
-                    <h2 style={{ fontSize: 28, margin: 0, fontWeight: 900 }}>
-                      {court.name}
-                    </h2>
-                    <span style={{ fontSize: 13, color: "#9ca3af" }}>
-                      Pista Oficial de Cristal · 10mm Templado
-                    </span>
+                    <h2>{court.name}</h2>
+                    {court.type && <span>{court.type}</span>}
                   </div>
-
-                  {currentMatch ? (
-                    <div
-                      style={{
-                        background: "rgba(34, 197, 94, 0.15)",
-                        border: "1px solid #22c55e",
-                        color: "#22c55e",
-                        padding: "6px 14px",
-                        borderRadius: 20,
-                        fontWeight: 700,
-                        fontSize: 13,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          background: "#22c55e",
-                          display: "inline-block",
-                        }}
-                      />
-                      EN JUEGO
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        background: "rgba(255, 255, 255, 0.08)",
-                        color: "#9ca3af",
-                        padding: "6px 14px",
-                        borderRadius: 20,
-                        fontSize: 13,
-                      }}
-                    >
-                      LIBRE AHORA
-                    </div>
-                  )}
+                  <div className={`mon-pill${match ? " is-live" : ""}`}>
+                    {match ? "EN JUEGO" : "LIBRE AHORA"}
+                  </div>
                 </div>
 
-                {/* TURNO EN JUEGO */}
-                <div
-                  style={{
-                    background: "rgba(255, 255, 255, 0.04)",
-                    borderRadius: 14,
-                    padding: 20,
-                    marginBottom: 20,
-                  }}
-                >
-                  <div style={{ fontSize: 12, color: "#9ca3af", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.06em" }}>
-                    Partido en Curso
-                  </div>
-
-                  {currentMatch ? (
-                    <div style={{ marginTop: 10 }}>
-                      <div style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>
-                        {currentMatch.playerName}
-                      </div>
-                      <div style={{ fontSize: 14, color: "#38bdf8", marginTop: 4 }}>
-                        {currentMatch.startTime} a {currentMatch.endTime} hs ({currentMatch.playersCount || 4} jugadores)
+                <div className="mon-match">
+                  <div className="mon-label">Partido en curso</div>
+                  {match ? (
+                    <>
+                      <div className="mon-player">{match.playerName}</div>
+                      <div className="mon-slot">
+                        {match.startTime} a {match.endTime} hs ·{" "}
+                        {match.playersCount || 4} jugadores
                       </div>
 
-                      {/* TIMER REGRESIVO */}
-                      <div
-                        style={{
-                          marginTop: 16,
-                          padding: "12px 16px",
-                          background: remainingMinutes <= 10 ? "rgba(239, 68, 68, 0.15)" : remainingMinutes <= 20 ? "rgba(245, 158, 11, 0.15)" : "rgba(34, 197, 94, 0.1)",
-                          border: `1px solid ${matchTone}`,
-                          borderRadius: 10,
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <span style={{ fontSize: 13, color: "#d1d5db" }}>
-                          Tiempo restante en pista:
-                        </span>
-                        <strong
-                          style={{
-                            fontSize: 22,
-                            fontFamily: "var(--font-jetbrains-mono), monospace",
-                            color: matchTone,
-                          }}
-                        >
-                          ⏳ {remainingMinutes} min
-                        </strong>
+                      <div className="mon-timer" style={tone}>
+                        <span>Tiempo restante en pista</span>
+                        <strong className="mon-mono">⏳ {remaining} min</strong>
                       </div>
 
-                      {/* BARRA DE PROGRESO DE PARTIDO */}
-                      <div style={{ marginTop: 12 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#9ca3af", marginBottom: 5 }}>
-                          <span>Progreso de turno ({elapsedMinutes} min jugados)</span>
-                          <span style={{ fontWeight: 700, color: matchTone }}>{progressPct}%</span>
+                      <div className="mon-progress" style={tone}>
+                        <div className="mon-progress-meta">
+                          <span>
+                            {elapsed} de {total} min jugados
+                          </span>
+                          <strong>{progress}%</strong>
                         </div>
-                        <div style={{ width: "100%", height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden" }}>
+                        <div className="mon-progress-track">
                           <div
-                            style={{
-                              width: `${progressPct}%`,
-                              height: "100%",
-                              background: matchTone,
-                              borderRadius: 3,
-                              transition: "width 1s ease",
-                            }}
+                            className="mon-progress-fill"
+                            style={{ width: `${progress}%` }}
                           />
                         </div>
                       </div>
-                    </div>
+                    </>
                   ) : (
-                    <div style={{ fontSize: 15, color: "#6b7280", marginTop: 8, fontStyle: "italic" }}>
-                      No hay partido disputándose en este momento.
+                    <div className="mon-empty">
+                      No hay partido en este momento.
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* PRÓXIMO TURNO */}
-              <div
-                style={{
-                  background: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.06)",
-                  borderRadius: 12,
-                  padding: "14px 18px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
+              <div className="mon-next">
                 <div>
-                  <span style={{ fontSize: 11, color: "#9ca3af", textTransform: "uppercase", fontWeight: 700 }}>
-                    Próximo Turno
-                  </span>
-                  <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2 }}>
-                    {nextMatch ? nextMatch.playerName : "Sin reserva siguiente"}
+                  <span className="mon-next-label">Próximo turno</span>
+                  <div className="mon-next-name">
+                    {next ? next.booking.playerName : "Sin reserva siguiente"}
                   </div>
                 </div>
-
-                <div
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 800,
-                    fontFamily: "var(--font-jetbrains-mono), monospace",
-                    color: "#e8722a",
-                  }}
-                >
-                  {nextMatch ? `${nextMatch.startTime} hs` : "—"}
+                <div className="mon-next-time mon-mono">
+                  {next ? `${next.booking.startTime} hs` : "—"}
                 </div>
               </div>
-            </div>
+            </section>
           );
         })}
       </div>
 
-      {/* TICKER MARQUEE ROTATIVO PARA TV DE RECEPCIÓN */}
-      <div
-        style={{
-          marginTop: 24,
-          background: "rgba(17, 24, 39, 0.95)",
-          border: "1px solid rgba(234, 88, 12, 0.35)",
-          borderRadius: 12,
-          padding: "10px 16px",
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
-        }}
-      >
-        <div
-          style={{
-            background: "#ea580c",
-            color: "#ffffff",
-            fontSize: 11,
-            fontWeight: 800,
-            padding: "3px 10px",
-            borderRadius: 6,
-            letterSpacing: "0.08em",
-            flexShrink: 0,
-          }}
-        >
-          MUZZAGA TV
-        </div>
-        <div
-          style={{
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            width: "100%",
-          }}
-        >
-          <div
-            style={{
-              display: "inline-block",
-              paddingLeft: "100%",
-              animation: "marqueeScroll 38s linear infinite",
-              fontSize: 13,
-              fontWeight: 600,
-              color: "#e5e7eb",
-              letterSpacing: "0.02em",
-            }}
-          >
-            🎾 RECORDATORIO: Respetar los 90 minutos de juego para asegurar la puntualidad del turno siguiente &nbsp;·&nbsp; 🥤 CANTINA: Bebidas isotónicas, agua fresca, cervezas y buffet abierto &nbsp;·&nbsp; 🏆 TORNEOS: Abierta la inscripción para el Torneo Americano del fin de semana en recepción &nbsp;·&nbsp; 📱 RESERVAS ONLINE: Turnos disponibles las 24hs en muzzagapadel.com.ar
+      <div className="mon-ticker">
+        <div className="mon-ticker-tag">MUZZAGA TV</div>
+        <div className="mon-ticker-window">
+          <div className="mon-ticker-text">
+            🎾 Cada turno dura {durationLabel}: terminá a horario para que el
+            turno siguiente arranque puntual &nbsp;·&nbsp; 🥤 Cantina abierta:
+            consultá en recepción &nbsp;·&nbsp; 🏆 Preguntá en recepción por los
+            próximos torneos &nbsp;·&nbsp; 📱 Reservá tu turno online en
+            muzzagapadel.com.ar
           </div>
         </div>
-        <style>{`
-          @keyframes marqueeScroll {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(-100%, 0); }
-          }
-        `}</style>
       </div>
     </div>
   );

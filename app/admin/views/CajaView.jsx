@@ -1,9 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Coins, Download, Lock, Receipt, Scale, Send, Trash2, X } from "lucide-react";
+import {
+  Coins,
+  Download,
+  Lock,
+  LockOpen,
+  Receipt,
+  Scale,
+  Send,
+  Trash2,
+} from "lucide-react";
 import { EmptyState, SkeletonCards, SkeletonRows } from "../ui/states";
 import StaffPinModal from "../ui/StaffPinModal";
+import KpiCard, { KpiGrid } from "../ui/KpiCard";
 import { formatARS, formatDate, formatTime, plural } from "../../../lib/format";
 import { cashDiffTone } from "../../../lib/metrics";
 import {
@@ -12,6 +22,7 @@ import {
   adminDeleteCashExpense,
   adminGetCashHistory,
   adminGetDailyCashSummary,
+  adminReopenDailyCash,
 } from "../actions";
 import { todayInClub, isoAddDays } from "../../../lib/booking";
 import { CLUB_INFO } from "../../../data/club";
@@ -31,7 +42,7 @@ const DIFF_TEXT = {
   minor: "Diferencia chica",
   major: "Diferencia grande: revisá antes de cerrar",
 };
-const CLOSED_BY_KEY = "muzzaga_admin_closed_by";
+const EMPTY_BILLS = Object.fromEntries(BILL_DENOMINATIONS.map((d) => [d, ""]));
 
 function diffLabel(diff) {
   if (!diff) return "$0";
@@ -72,19 +83,10 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
 
   const [counted, setCounted] = useState("");
   const [showBillCalc, setShowBillCalc] = useState(false);
-  const [billCounts, setBillCounts] = useState({
-    20000: "",
-    10000: "",
-    2000: "",
-    1000: "",
-    500: "",
-    200: "",
-    100: "",
-  });
+  const [billCounts, setBillCounts] = useState(EMPTY_BILLS);
   const [closingNotes, setClosingNotes] = useState("");
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [closedBy, setClosedBy] = useState("");
-  const [closing, setClosing] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isReopening, setIsReopening] = useState(false);
 
   function handleBillChange(denom, val) {
     const nextCounts = { ...billCounts, [denom]: val };
@@ -96,17 +98,16 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
     setCounted(total > 0 ? String(total) : "");
   }
 
+  // Al cambiar de día, el conteo y las notas del día anterior no aplican.
   useEffect(() => {
+    setBillCounts(EMPTY_BILLS);
+    setShowBillCalc(false);
+    setClosingNotes("");
     loadSummary();
   }, [date]);
 
   useEffect(() => {
     loadHistory();
-    try {
-      setClosedBy(localStorage.getItem(CLOSED_BY_KEY) || "");
-    } catch {
-      // Almacenamiento bloqueado: se tipea cada vez.
-    }
   }, []);
 
   async function loadSummary() {
@@ -149,28 +150,33 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
     }
   }
 
-  async function handleClose() {
-    setClosing(true);
+  async function handleClose({ pin, notes }) {
     const res = await adminCloseDailyCash({
       date,
       actualCash: counted,
-      notes: closingNotes,
-      closedBy,
+      notes,
+      pin,
     });
-    setClosing(false);
-    if (res.ok) {
-      try {
-        localStorage.setItem(CLOSED_BY_KEY, closedBy.trim());
-      } catch {
-        // sin persistencia local, no pasa nada
-      }
-      setIsConfirmOpen(false);
-      onToast?.(`Caja cerrada · ${diffLabel(res.difference)}`);
-      loadSummary();
-      loadHistory();
-    } else if (!onExpiredSession?.(res)) {
-      onToast?.(res.error || "No se pudo cerrar la caja.", { tone: "error" });
+    if (!res.ok) {
+      if (onExpiredSession?.(res)) return;
+      throw new Error(res.error || "No se pudo cerrar la caja.");
     }
+    setIsClosing(false);
+    onToast?.(`Caja cerrada por ${res.staff} · ${diffLabel(res.difference)}`);
+    loadSummary();
+    loadHistory();
+  }
+
+  async function handleReopen({ pin, reason }) {
+    const res = await adminReopenDailyCash({ date, pin, reason });
+    if (!res.ok) {
+      if (onExpiredSession?.(res)) return;
+      throw new Error(res.error || "No se pudo reabrir la caja.");
+    }
+    setIsReopening(false);
+    onToast?.(`Caja reabierta por ${res.staff}`);
+    loadSummary();
+    loadHistory();
   }
 
   function shareWhatsApp() {
@@ -218,23 +224,21 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
 
   const header = (
     <div className="admin-view-toolbar">
-      <h2 className="admin-section-title" style={{ margin: 0 }}>
+      <h2 className="admin-section-title admin-m0">
         Arqueo del {formatDate(date, "long")}
       </h2>
       <div className="admin-view-toolbar-actions">
         <button
           type="button"
-          className="btn btn-secondary"
+          className="btn btn-secondary admin-btn-sm"
           onClick={() => setDate(isoAddDays(todayInClub(), -1))}
-          style={{ height: 32, fontSize: 12, padding: "0 10px" }}
         >
           Ayer
         </button>
         <button
           type="button"
-          className={`btn ${date === todayInClub() ? "btn-linear-primary" : "btn-secondary"}`}
+          className={`btn admin-btn-sm ${date === todayInClub() ? "btn-linear-primary" : "btn-secondary"}`}
           onClick={() => setDate(todayInClub())}
-          style={{ height: 32, fontSize: 12, padding: "0 10px" }}
         >
           Hoy
         </button>
@@ -244,7 +248,7 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
           value={date}
           max={todayInClub()}
           onChange={(e) => e.target.value && setDate(e.target.value)}
-          style={{ height: 32, fontSize: 12 }}
+          className="admin-date-sm"
         />
       </div>
     </div>
@@ -255,12 +259,15 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
       <div>
         {header}
         {loadError ? (
-          <div
-            role="alert"
-            className="admin-settings-card"
-            style={{ color: "#b91c1c" }}
-          >
-            {loadError}
+          <div role="alert" className="admin-settings-card admin-error-card">
+            <span>{loadError}</span>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={loadSummary}
+            >
+              Reintentar
+            </button>
           </div>
         ) : (
           <SkeletonCards count={4} />
@@ -288,83 +295,73 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
             </strong>
             <span>
               Contado {formatARS(summary.actualCash || 0)} ·{" "}
-              {diffLabel(summary.difference ?? 0)}. El día queda en solo
-              lectura.
+              {diffLabel(summary.difference ?? 0)}. El día queda bloqueado: no
+              se pueden cargar ni borrar cobros, ventas ni egresos. Para
+              corregir algo, reabrí la caja con PIN de encargado.
             </span>
           </div>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={shareWhatsApp}
-          >
-            <Send {...ICON} /> Enviar por WhatsApp
-          </button>
+          <div className="admin-closed-banner-actions">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={shareWhatsApp}
+            >
+              <Send {...ICON} /> WhatsApp
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setIsReopening(true)}
+            >
+              <LockOpen {...ICON} /> Reabrir caja
+            </button>
+          </div>
         </div>
       )}
 
-      {/* 4 KPI Cards de Caja Estilo Kravio */}
-      <div className="admin-kpis-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", marginBottom: 20 }}>
-        <div className="admin-kravio-kpi-card">
-          <div className="admin-kravio-kpi-header">
-            <span className="admin-kravio-kpi-title">Efectivo Turnos</span>
-            <Coins size={17} style={{ color: "#15803d" }} />
-          </div>
-          <div className="admin-kravio-kpi-content">
-            <div className="admin-kravio-kpi-left">
-              <div className="admin-kravio-kpi-number" style={{ color: "#15803d" }}>
-                {formatARS(summary.cashTurnos)}
-              </div>
-              <span className="admin-cell-sub">Cobrado en mano por turnos</span>
-            </div>
-          </div>
+      {!isClosed && summary.reopenedBy && (
+        <div className="admin-reopen-banner" role="status">
+          <LockOpen {...ICON} />
+          <span>
+            Caja reabierta por <strong>{summary.reopenedBy}</strong>
+            {summary.reopenedAt ? ` a las ${formatTime(summary.reopenedAt)}` : ""}
+            {summary.reopenReason ? ` · ${summary.reopenReason}` : ""}. Volvé a
+            cerrarla cuando termines la corrección.
+          </span>
         </div>
+      )}
 
-        <div className="admin-kravio-kpi-card">
-          <div className="admin-kravio-kpi-header">
-            <span className="admin-kravio-kpi-title">Efectivo Cantina</span>
-            <Receipt size={17} style={{ color: "#ea580c" }} />
-          </div>
-          <div className="admin-kravio-kpi-content">
-            <div className="admin-kravio-kpi-left">
-              <div className="admin-kravio-kpi-number" style={{ color: "#ea580c" }}>
-                {formatARS(summary.cashCantina)}
-              </div>
-              <span className="admin-cell-sub">Ventas tercer tiempo</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="admin-kravio-kpi-card">
-          <div className="admin-kravio-kpi-header">
-            <span className="admin-kravio-kpi-title">Egresos / Gastos</span>
-            <Receipt size={17} style={{ color: summary.totalExpenses > 0 ? "#dc2626" : "#6b7280" }} />
-          </div>
-          <div className="admin-kravio-kpi-content">
-            <div className="admin-kravio-kpi-left">
-              <div className="admin-kravio-kpi-number" style={{ color: summary.totalExpenses > 0 ? "#dc2626" : "#111827" }}>
-                {formatARS(-summary.totalExpenses)}
-              </div>
-              <span className="admin-cell-sub">Hielo, limpieza y mantenimiento</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="admin-kravio-kpi-card" style={{ background: "#111827", borderColor: "#1f2937", color: "#ffffff" }}>
-          <div className="admin-kravio-kpi-header">
-            <span className="admin-kravio-kpi-title" style={{ color: "#9ca3af" }}>Esperado en Cajón</span>
-            <Scale size={17} style={{ color: "#f97316" }} />
-          </div>
-          <div className="admin-kravio-kpi-content">
-            <div className="admin-kravio-kpi-left">
-              <div className="admin-kravio-kpi-number" style={{ color: "#ffffff" }}>
-                {formatARS(summary.expectedCash)}
-              </div>
-              <span style={{ fontSize: 12, color: "#cbd5e1" }}>Efectivo físico a controlar</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <p className="admin-field-hint" style={{ margin: "8px 0 20px" }}>
+      <KpiGrid>
+        <KpiCard
+          title="Efectivo turnos"
+          icon={Coins}
+          tone="success"
+          value={formatARS(summary.cashTurnos)}
+          sub="Cobrado en mano por turnos"
+        />
+        <KpiCard
+          title="Efectivo cantina"
+          icon={Receipt}
+          tone="brand"
+          value={formatARS(summary.cashCantina)}
+          sub="Ventas del tercer tiempo"
+        />
+        <KpiCard
+          title="Egresos"
+          icon={Receipt}
+          tone={summary.totalExpenses > 0 ? "danger" : "default"}
+          value={formatARS(-summary.totalExpenses)}
+          sub="Hielo, limpieza y mantenimiento"
+        />
+        <KpiCard
+          title="Esperado en cajón"
+          icon={Scale}
+          tone="dark"
+          value={formatARS(summary.expectedCash)}
+          sub="Efectivo físico a controlar"
+        />
+      </KpiGrid>
+      <p className="admin-field-hint admin-cash-outside">
         Fuera del cajón: Transferencias{" "}
         {formatARS(summary.transferTurnos + summary.transferCantina)} · Mercado
         Pago {formatARS(summary.mpTurnos + summary.mpCantina)}
@@ -452,23 +449,22 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
           ) : (
             <ul className="admin-expense-list">
               {summary.expensesList.map((x) => (
-                <li key={x.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+                <li key={x.id} className="admin-expense-row">
+                  <div className="admin-expense-main">
                     <span className="admin-tag">{categoryLabel(x.category)}</span>
-                    <span className="admin-expense-concept" style={{ flex: 1, minWidth: 0 }}>
+                    <span className="admin-expense-concept">
                       {x.concept}
                       {x.notes && <small> · {x.notes}</small>}
                     </span>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div className="admin-expense-side">
                     <strong className="is-negative">
                       {formatARS(-x.amount)}
                     </strong>
                     {!isClosed && (
                       <button
                         type="button"
-                        className="btn-icon"
-                        style={{ color: "#9ca3af", padding: 4, cursor: "pointer", background: "none", border: "none" }}
+                        className="admin-icon-btn-ghost"
                         title="Eliminar egreso (requiere PIN)"
                         aria-label={`Eliminar egreso ${x.concept}`}
                         onClick={() => setDeletingExpense(x)}
@@ -504,82 +500,44 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
               onChange={(e) => setCounted(e.target.value)}
             />
             {!isClosed && (
-              <div style={{ marginTop: 8 }}>
+              <div className="admin-bill-calc-wrap">
                 <button
                   type="button"
-                  className="btn btn-secondary"
-                  style={{
-                    fontSize: 12,
-                    padding: "4px 10px",
-                    height: 28,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
+                  className="btn btn-secondary admin-btn-xs"
+                  aria-expanded={showBillCalc}
                   onClick={() => setShowBillCalc((v) => !v)}
                 >
-                  <Coins size={14} />
+                  <Coins size={14} aria-hidden />
                   <span>
-                    {showBillCalc ? "Ocultar desglose" : "Contar por billetes ($20k, $10k, $2k...)"}
+                    {showBillCalc
+                      ? "Ocultar desglose"
+                      : "Contar por billetes ($20k, $10k, $2k…)"}
                   </span>
                 </button>
 
                 {showBillCalc && (
-                  <div
-                    style={{
-                      marginTop: 10,
-                      padding: 12,
-                      background: "rgba(0, 0, 0, 0.03)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 8,
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
-                      gap: 8,
-                    }}
-                  >
+                  <div className="admin-bill-calc">
                     {BILL_DENOMINATIONS.map((denom) => (
-                      <div key={denom} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                        <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)" }}>
-                          ${denom >= 1000 ? `${denom / 1000}k` : denom} ({formatARS(denom)})
-                        </span>
+                      <label key={denom} className="admin-bill-field">
+                        <span>{formatARS(denom)}</span>
                         <input
                           type="number"
                           min={0}
+                          inputMode="numeric"
                           placeholder="Cant."
                           value={billCounts[denom]}
-                          onChange={(e) => handleBillChange(denom, e.target.value)}
-                          style={{
-                            height: 28,
-                            fontSize: 12,
-                            padding: "2px 8px",
-                            borderRadius: 6,
-                            border: "1px solid var(--border)",
-                            background: "#fff",
-                          }}
+                          onChange={(e) =>
+                            handleBillChange(denom, e.target.value)
+                          }
                         />
-                      </div>
+                      </label>
                     ))}
-                    <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
+                    <div className="admin-bill-calc-foot">
                       <button
                         type="button"
-                        style={{
-                          background: "none",
-                          border: "none",
-                          fontSize: 11,
-                          color: "#dc2626",
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                        }}
+                        className="admin-link-danger"
                         onClick={() => {
-                          setBillCounts({
-                            20000: "",
-                            10000: "",
-                            2000: "",
-                            1000: "",
-                            500: "",
-                            200: "",
-                            100: "",
-                          });
+                          setBillCounts(EMPTY_BILLS);
                           setCounted("");
                         }}
                       >
@@ -622,7 +580,7 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
                 type="button"
                 className="btn btn-linear-primary admin-btn-block"
                 disabled={counted === ""}
-                onClick={() => setIsConfirmOpen(true)}
+                onClick={() => setIsClosing(true)}
               >
                 <Lock {...ICON} /> Cerrar caja del día
               </button>
@@ -632,9 +590,9 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
       </div>
 
       {/* HISTORIAL */}
-      <section style={{ marginTop: 28 }}>
+      <section className="admin-cash-history">
         <div className="admin-view-toolbar">
-          <h2 className="admin-section-title" style={{ margin: 0 }}>
+          <h2 className="admin-section-title admin-m0">
             Cierres anteriores
           </h2>
           <button
@@ -713,31 +671,16 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
         )}
       </section>
 
-      {isConfirmOpen && (
-        <div
-          className="admin-modal-backdrop"
-          onClick={() => !closing && setIsConfirmOpen(false)}
-        >
-          <div
-            className="admin-modal-card"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="close-cash-title"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="admin-modal-head">
-              <h3 id="close-cash-title">
-                Cerrar caja del {formatDate(date, "long")}
-              </h3>
-              <button
-                type="button"
-                className="admin-modal-close"
-                onClick={() => setIsConfirmOpen(false)}
-                aria-label="Cerrar"
-              >
-                <X size={16} strokeWidth={1.75} aria-hidden />
-              </button>
-            </div>
+      {isClosing && (
+        <StaffPinModal
+          isOpen={isClosing}
+          onClose={() => setIsClosing(false)}
+          title={`Cerrar caja del ${formatDate(date, "long")}`}
+          confirmButtonText="Confirmar cierre Z"
+          confirmButtonTone="primary"
+          reasonLabel="Observaciones del cierre (opcional)"
+          reasonPlaceholder={closingNotes || "ej. Quedaron $10.000 de cambio"}
+          description={
             <dl className="admin-summary-list">
               <div>
                 <dt>Esperado en cajón</dt>
@@ -763,43 +706,28 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
                 </dd>
               </div>
             </dl>
-            <div className="admin-field">
-              <label className="admin-field-label" htmlFor="closed-by">
-                ¿Quién cierra?
-              </label>
-              <input
-                id="closed-by"
-                type="text"
-                maxLength={40}
-                placeholder="Tu nombre"
-                value={closedBy}
-                onChange={(e) => setClosedBy(e.target.value)}
-                autoFocus
-              />
-            </div>
-            <p className="admin-field-hint">
-              Una vez cerrada, la caja de este día queda en solo lectura.
-            </p>
-            <div className="admin-modal-actions">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setIsConfirmOpen(false)}
-                disabled={closing}
-              >
-                Volver
-              </button>
-              <button
-                type="button"
-                className="btn btn-linear-primary"
-                onClick={handleClose}
-                disabled={closing || !closedBy.trim()}
-              >
-                {closing ? "Cerrando…" : "Confirmar cierre"}
-              </button>
-            </div>
-          </div>
-        </div>
+          }
+          onConfirm={({ pin, reason }) =>
+            handleClose({
+              pin,
+              notes: [closingNotes.trim(), reason].filter(Boolean).join(" · "),
+            })
+          }
+        />
+      )}
+
+      {isReopening && (
+        <StaffPinModal
+          isOpen={isReopening}
+          onClose={() => setIsReopening(false)}
+          title={`Reabrir caja del ${formatDate(date, "long")}`}
+          description="Solo un Administrador o Encargado puede reabrirla. El cierre anterior queda guardado en el registro de actividad."
+          confirmButtonText="Reabrir caja"
+          confirmButtonTone="danger"
+          requireReason
+          reasonPlaceholder="ej. Faltó cargar un cobro por transferencia"
+          onConfirm={handleReopen}
+        />
       )}
 
       {deletingExpense && (
@@ -808,23 +736,23 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
           onClose={() => setDeletingExpense(null)}
           title="Eliminar egreso de caja"
           description={`¿Seguro que querés eliminar el egreso "${deletingExpense.concept}" por ${formatARS(-deletingExpense.amount)}?`}
-          actionLabel="Eliminar egreso"
-          confirmTone="danger"
-          requireReason={false}
-          onConfirm={async ({ pin, staff, reason }) => {
+          targetName={deletingExpense.concept}
+          confirmButtonText="Eliminar egreso"
+          confirmButtonTone="danger"
+          onConfirm={async ({ pin, reason }) => {
             const res = await adminDeleteCashExpense({
               date,
               expenseId: deletingExpense.id,
               pin,
               reason,
             });
-            if (res.ok) {
-              onToast?.(`Egreso eliminado por ${staff.name}`);
-              setDeletingExpense(null);
-              loadSummary();
-            } else {
-              throw new Error(res.error || "No se pudo eliminar el egreso");
+            if (!res.ok) {
+              if (onExpiredSession?.(res)) return;
+              throw new Error(res.error || "No se pudo eliminar el egreso.");
             }
+            onToast?.(`Egreso eliminado por ${res.staff}`);
+            setDeletingExpense(null);
+            loadSummary();
           }}
         />
       )}

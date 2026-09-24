@@ -33,37 +33,51 @@ export function useToasts() {
   return { toasts, show, dismiss };
 }
 
-export function Toaster({ toasts, onDismiss }) {
+function ToastItem({ toast: t, onDismiss }) {
+  const Icon = t.tone === "error" ? CircleAlert : CircleCheck;
   return (
-    <div className="admin-toaster" role="status" aria-live="polite">
-      {toasts.map((t) => {
-        const Icon = t.tone === "error" ? CircleAlert : CircleCheck;
-        return (
-          <div key={t.id} className="admin-toast" data-tone={t.tone}>
-            <Icon size={18} strokeWidth={1.75} aria-hidden />
-            <span className="admin-toast-msg">{t.message}</span>
-            {t.action && (
-              <button
-                type="button"
-                className="admin-toast-action"
-                onClick={() => {
-                  onDismiss(t.id);
-                  t.action.onClick();
-                }}
-              >
-                {t.action.label}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => onDismiss(t.id)}
-              aria-label="Cerrar aviso"
-            >
-              <X size={16} strokeWidth={1.75} aria-hidden />
-            </button>
-          </div>
-        );
-      })}
+    <div className="admin-toast" data-tone={t.tone}>
+      <Icon size={18} strokeWidth={1.75} aria-hidden />
+      <span className="admin-toast-msg">{t.message}</span>
+      {t.action && (
+        <button
+          type="button"
+          className="admin-toast-action"
+          onClick={() => {
+            onDismiss(t.id);
+            t.action.onClick();
+          }}
+        >
+          {t.action.label}
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => onDismiss(t.id)}
+        aria-label="Cerrar aviso"
+      >
+        <X size={16} strokeWidth={1.75} aria-hidden />
+      </button>
+    </div>
+  );
+}
+
+/** Los errores van en una región role="alert" para que el lector los anuncie ya. */
+export function Toaster({ toasts, onDismiss }) {
+  const errors = toasts.filter((t) => t.tone === "error");
+  const others = toasts.filter((t) => t.tone !== "error");
+  return (
+    <div className="admin-toaster">
+      <div role="alert" style={{ display: "contents" }}>
+        {errors.map((t) => (
+          <ToastItem key={t.id} toast={t} onDismiss={onDismiss} />
+        ))}
+      </div>
+      <div role="status" aria-live="polite" style={{ display: "contents" }}>
+        {others.map((t) => (
+          <ToastItem key={t.id} toast={t} onDismiss={onDismiss} />
+        ))}
+      </div>
     </div>
   );
 }

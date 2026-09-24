@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, LogOut, MoreHorizontal, Plus, Tv } from "lucide-react";
 import { ICON_PROPS, MOBILE_PRIMARY_IDS, NAV_ITEMS } from "../nav";
@@ -21,6 +21,15 @@ export default function MobileNav({
   );
   const secondary = NAV_ITEMS.filter((n) => !MOBILE_PRIMARY_IDS.includes(n.id));
   const isSecondaryActive = secondary.some((n) => n.id === view);
+
+  useEffect(() => {
+    if (!isMoreOpen) return;
+    function onKey(e) {
+      if (e.key === "Escape") setIsMoreOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isMoreOpen]);
 
   function go(id) {
     setIsMoreOpen(false);
@@ -93,7 +102,13 @@ export default function MobileNav({
               <ExternalLink {...ICON_PROPS} />
               Ver web
             </Link>
-            <button type="button" onClick={onLogout}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsMoreOpen(false);
+                onLogout();
+              }}
+            >
               <LogOut {...ICON_PROPS} />
               Salir
             </button>
