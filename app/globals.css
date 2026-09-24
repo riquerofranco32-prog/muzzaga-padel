@@ -5765,6 +5765,43 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 }
 
+/* ==========================================================================
+   CONTROLES TÁCTILES: 44 PX MÍNIMO
+   min-height le gana a los `height` inline de 28 a 42 px que tenían varios
+   botones, así que alcanza con fijarlo acá. El panel /admin queda afuera:
+   es una herramienta de escritorio con tablas densas.
+   ========================================================================== */
+:where(
+  .btn,
+  .brand-group,
+  .nav-link,
+  .fc-pill,
+  .spec-tab,
+  .booking-court-tab,
+  .player-count-btn,
+  .americano-count-btn,
+  .americano-input,
+  .back-link,
+  select,
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="hidden"])
+):not(.admin-dashboard-layout *, .admin-login-wrapper *) {
+  min-height: 44px;
+}
+
+.nav-link,
+.back-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Links del pie: cada uno ocupa su renglón de 44 px (antes 22 px + 8 de
+   separación). */
+.app-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 .mobile-swipe-hint {
   display: none;
 }

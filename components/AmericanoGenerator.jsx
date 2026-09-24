@@ -210,12 +210,12 @@ export default function AmericanoGenerator() {
                           }
                           placeholder="0"
                           style={{
-                            width: 32,
-                            height: 28,
+                            width: 44,
+                            height: 44,
                             textAlign: "center",
-                            fontSize: 13,
+                            fontSize: 16,
                             fontWeight: 700,
-                            borderRadius: 4,
+                            borderRadius: 8,
                             border: "1px solid var(--border)",
                             background: "var(--surface)",
                             color: "var(--text-primary)",
@@ -236,12 +236,12 @@ export default function AmericanoGenerator() {
                           }
                           placeholder="0"
                           style={{
-                            width: 32,
-                            height: 28,
+                            width: 44,
+                            height: 44,
                             textAlign: "center",
-                            fontSize: 13,
+                            fontSize: 16,
                             fontWeight: 700,
-                            borderRadius: 4,
+                            borderRadius: 8,
                             border: "1px solid var(--border)",
                             background: "var(--surface)",
                             color: "var(--text-primary)",

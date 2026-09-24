@@ -252,7 +252,7 @@ export default function CommunityMatchesSection() {
                       style={{
                         fontSize: 14,
                         color: "var(--text-secondary)",
-                        minHeight: 40,
+                        minHeight: 44,
                       }}
                     >
                       {match.desc}

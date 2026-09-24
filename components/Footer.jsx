@@ -83,7 +83,8 @@ export default function Footer() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 8,
+                  alignItems: "flex-start",
+                  gap: 0,
                   fontSize: 14,
                 }}
               >
@@ -128,7 +129,8 @@ export default function Footer() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 8,
+                  alignItems: "flex-start",
+                  gap: 0,
                   fontSize: 14,
                 }}
               >

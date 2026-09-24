@@ -340,7 +340,7 @@ export default function SplitCostCalculator() {
                 style={{
                   width: "100%",
                   justifyContent: "center",
-                  minHeight: 38,
+                  minHeight: 44,
                   fontSize: 13,
                 }}
                 onClick={handleCopySummary}

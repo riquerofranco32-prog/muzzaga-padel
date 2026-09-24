@@ -344,7 +344,7 @@ export default function RatingCalculator() {
             style={{
               width: "100%",
               justifyContent: "center",
-              minHeight: 42,
+              minHeight: 44,
               fontSize: 13.5,
               textDecoration: "none",
             }}

@@ -17,7 +17,7 @@ export default function AmericanoPage() {
       <main style={{ paddingTop: 90, minHeight: "80vh" }}>
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
-            <Link href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
+            <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
               ← Volver al Inicio
             </Link>
             <span>/</span>
