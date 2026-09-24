@@ -2341,3 +2341,42 @@ body {
   45% { translate: 0 0; rotate: 0deg; }
   100% { translate: 0 -24px; rotate: 5deg; }
 }
+
+/* Celu: la mascota del hero XL tapaba stats y la tarjeta de turnos. Acá va
+   en una fila compacta (precio a la izquierda, mascota a la derecha), sin
+   anillo, sin chip flotante y sin el efecto de scroll que la bajaba. */
+@media (max-width: 768px) {
+  .hero-night-visual {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 8px;
+    margin: 18px 0 -44px;
+  }
+
+  .hero-mascot-ring,
+  .hero-float-glass,
+  .hero-night-visual::after {
+    display: none;
+  }
+
+  .hero-float-price {
+    position: static;
+    align-self: center;
+    margin-bottom: 44px;
+    animation: none;
+  }
+
+  .hero-mascot-tilt {
+    animation: none;
+    transform: none;
+  }
+
+  .hero-mascot {
+    width: 170px;
+  }
+
+  .flash-wrap {
+    margin-top: 64px;
+  }
+}
