@@ -244,42 +244,13 @@ export default async function Home() {
                 Av. Cacique Catriel y Córdoba, Catriel, Río Negro. Lunes a Sábado de 14:00 a 00:30 hs.
               </p>
             </div>
-            <a
-              href={CLUB_INFO.mapsUrl}
-              target="_blank"
-              rel="noopener"
-              className="btn btn-secondary-maps"
-              style={{ gap: 8 }}
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
-                <path
-                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                  fill="#EA4335"
-                />
-                <circle cx="12" cy="9" r="2.8" fill="#ffffff" />
-              </svg>
-              <span className="maps-text">Abrir en Google Maps →</span>
-            </a>
-          </div>
-
-          <div className="map-frame-wrap">
-            <iframe
-              title="Mapa de Muzzaga Pádel en Catriel"
-              src="https://maps.google.com/maps?q=-37.8832905,-67.8005469&hl=es&z=16&output=embed"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-            <div className="map-overlay-actions">
+            <div className="map-header-actions">
               <a
                 href={CLUB_INFO.mapsUrl}
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary-maps"
-                
+                style={{ gap: 8 }}
               >
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
                   <path
@@ -295,7 +266,6 @@ export default async function Home() {
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary"
-                
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -312,6 +282,19 @@ export default async function Home() {
                 Navegar con Waze
               </a>
             </div>
+          </div>
+
+          <div className="map-frame-wrap">
+            <iframe
+              title="Mapa de Muzzaga Pádel en Catriel"
+              src="https://maps.google.com/maps?q=-37.8832905,-67.8005469&hl=es&z=16&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
           </div>
 
           <div className="contact-grid">

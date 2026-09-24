@@ -1302,20 +1302,26 @@ body {
   overflow: hidden;
 }
 
-.map-overlay-actions {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  right: 16px;
+/* Maps y Waze juntos en el encabezado de la sección. Antes iban también
+   superpuestos al mapa: duplicaban el botón de arriba y en celular tapaban la
+   atribución de Google. */
+.map-header-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  pointer-events: none;
 }
 
-.map-overlay-actions > * {
-  pointer-events: auto;
-  height: 38px;
+@media (max-width: 768px) {
+  .map-header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .map-header-actions > .btn {
+    width: 100%;
+    height: 46px;
+    justify-content: center;
+  }
 }
 
 .contact-grid {
