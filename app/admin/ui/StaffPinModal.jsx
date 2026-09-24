@@ -1,268 +1,226 @@
 "use client";
 
-import { useState } from "react";
-import { KeyRound, ShieldAlert, X, CheckCircle, UserCheck } from "lucide-react";
-import { DEFAULT_STAFF } from "../../../lib/staff";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Delete, KeyRound, ShieldAlert, X } from "lucide-react";
+
+const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"];
+const MAX_PIN = 6;
 
 /**
- * Modal de confirmación con PIN de seguridad para identificar
- * al integrante del equipo que ejecuta una acción crítica (eliminaciones, etc).
+ * Confirmación con PIN personal: identifica en el servidor a quién hace una
+ * acción crítica (borrar, cancelar, cerrar caja). El PIN nunca se muestra ni
+ * se valida en el navegador.
+ *
+ * Se monta en un portal sobre document.body para que Esc y los clics no
+ * lleguen a los modales que tenga abajo.
+ *
+ * @param {{
+ *   isOpen: boolean,
+ *   title?: string,
+ *   description?: import("react").ReactNode,
+ *   targetName?: string,
+ *   confirmButtonText?: string,
+ *   confirmButtonTone?: "danger" | "primary",
+ *   requireReason?: boolean,
+ *   reasonLabel?: string,
+ *   reasonPlaceholder?: string,
+ *   onConfirm: (input: { pin: string, reason: string }) => Promise<void>,
+ *   onClose: () => void,
+ * }} props onConfirm tiene que lanzar un Error con el mensaje si falla.
  */
 export default function StaffPinModal({
   isOpen,
-  title = "Autorización de Equipo",
+  title = "Autorización del equipo",
   description,
   targetName,
-  confirmButtonText = "Eliminar definitivamente",
-  confirmButtonTone = "danger", // 'danger' | 'primary'
-  onConfirm, // async ({ pin, reason, staff }) => void
+  confirmButtonText = "Confirmar",
+  confirmButtonTone = "danger",
+  requireReason = false,
+  reasonLabel,
+  reasonPlaceholder = "ej. Cargado por error, pedido del cliente",
+  onConfirm,
   onClose,
 }) {
   const [pin, setPin] = useState("");
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const pinRef = useRef(null);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) pinRef.current?.focus();
+  }, [isOpen]);
+
+  if (!isOpen || typeof document === "undefined") return null;
+
+  const isDanger = confirmButtonTone === "danger";
+  const canSubmit =
+    pin.length >= 4 && (!requireReason || reason.trim()) && !loading;
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!pin.trim()) {
-      setError("Ingresá tu PIN de personal.");
+    if (!canSubmit) {
+      setError(
+        pin.length < 4
+          ? "Ingresá tu PIN (4 a 6 números)."
+          : "Indicá el motivo.",
+      );
       return;
     }
     setError("");
     setLoading(true);
     try {
-      await onConfirm({ pin: pin.trim(), reason: reason.trim() });
+      await onConfirm({ pin, reason: reason.trim() });
     } catch (err) {
-      setError(err?.message || "Error al procesar la autorización.");
+      setError(err?.message || "No se pudo completar la acción.");
+      setPin("");
+      pinRef.current?.focus();
+    } finally {
       setLoading(false);
     }
   }
 
-  function handleSelectQuickStaff(member) {
-    setPin(member.pin);
+  function press(key) {
     setError("");
+    if (key === "del") setPin((p) => p.slice(0, -1));
+    else if (key) setPin((p) => (p.length < MAX_PIN ? p + key : p));
   }
 
-  return (
+  function handleKeyDown(e) {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      if (!loading) onClose();
+    }
+  }
+
+  return createPortal(
     <div
-      className="admin-modal-backdrop"
-      style={{
-        zIndex: 1000,
-        background: "rgba(0, 0, 0, 0.65)",
-        backdropFilter: "blur(4px)",
+      className="admin-root admin-pin-backdrop"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !loading) onClose();
       }}
-      onClick={onClose}
+      onKeyDown={handleKeyDown}
+      data-admin-modal
     >
       <div
-        className="admin-modal-card"
+        className={`admin-pin-card${isDanger ? " is-danger" : ""}`}
         role="dialog"
         aria-modal="true"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          maxWidth: 440,
-          borderRadius: 16,
-          overflow: "hidden",
-          border: "1px solid rgba(234, 88, 12, 0.25)",
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4)",
-        }}
+        aria-labelledby="staff-pin-title"
       >
-        <div
-          className="admin-modal-head"
-          style={{
-            background: confirmButtonTone === "danger" ? "#fff1f2" : "#fff7ed",
-            borderBottom: "1px solid #fed7aa",
-            padding: "16px 20px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {confirmButtonTone === "danger" ? (
-              <ShieldAlert size={20} style={{ color: "#dc2626" }} />
-            ) : (
-              <KeyRound size={20} style={{ color: "#ea580c" }} />
-            )}
-            <div>
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: confirmButtonTone === "danger" ? "#991b1b" : "#9a3412",
-                }}
-              >
-                {title}
-              </h3>
-              <span style={{ fontSize: 12, color: "#6b7280" }}>
-                Identificación de operador Muzzaga
-              </span>
-            </div>
+        <div className="admin-pin-head">
+          <span className="admin-pin-head-icon" aria-hidden>
+            {isDanger ? <ShieldAlert size={18} /> : <KeyRound size={18} />}
+          </span>
+          <div>
+            <h3 id="staff-pin-title">{title}</h3>
+            <span>Tu PIN deja registrado quién hizo este cambio</span>
           </div>
           <button
             type="button"
-            className="admin-modal-close"
+            className="admin-pin-close"
             onClick={onClose}
+            disabled={loading}
             aria-label="Cerrar"
           >
             <X size={16} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ padding: "20px" }}>
-          {description && (
-            <div
-              style={{
-                fontSize: 13,
-                color: "var(--color-ink)",
-                marginBottom: 14,
-                lineHeight: 1.45,
-              }}
-            >
-              {description}
-            </div>
-          )}
-
+        <form onSubmit={handleSubmit} className="admin-pin-body">
+          {description && <div className="admin-pin-desc">{description}</div>}
           {targetName && (
-            <div
-              style={{
-                background: "rgba(0, 0, 0, 0.04)",
-                border: "1px solid var(--border)",
-                borderRadius: 8,
-                padding: "8px 12px",
-                marginBottom: 16,
-                fontSize: 13,
-              }}
-            >
-              <strong style={{ color: "#111827" }}>Elemento:</strong>{" "}
-              <span>{targetName}</span>
+            <div className="admin-pin-target">
+              <span>Elemento</span>
+              <strong>{targetName}</strong>
             </div>
           )}
 
-          {/* Accesos rápidos de equipo para recepción */}
-          <div style={{ marginBottom: 14 }}>
-            <label
-              style={{
-                fontSize: 11.5,
-                fontWeight: 600,
-                color: "var(--text-muted)",
-                display: "block",
-                marginBottom: 6,
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              Seleccioná tu usuario o escribí tu PIN:
-            </label>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {DEFAULT_STAFF.map((member) => (
+          <label className="admin-field-label" htmlFor="staff-pin-input">
+            PIN personal
+          </label>
+          <input
+            id="staff-pin-input"
+            ref={pinRef}
+            type="password"
+            inputMode="numeric"
+            autoComplete="off"
+            maxLength={MAX_PIN}
+            className="admin-pin-input"
+            placeholder="••••"
+            value={pin}
+            onChange={(e) => {
+              setPin(e.target.value.replace(/\D/g, "").slice(0, MAX_PIN));
+              setError("");
+            }}
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? "staff-pin-error" : undefined}
+          />
+
+          <div className="admin-pin-keypad" aria-hidden="true">
+            {KEYS.map((k, i) =>
+              k ? (
                 <button
-                  key={member.id}
+                  key={k}
                   type="button"
-                  onClick={() => handleSelectQuickStaff(member)}
-                  className="btn btn-secondary"
-                  style={{
-                    padding: "3px 8px",
-                    height: 26,
-                    fontSize: 11,
-                    borderRadius: 14,
-                    background: pin === member.pin ? "#ea580c" : "#ffffff",
-                    color: pin === member.pin ? "#ffffff" : "#374151",
-                    borderColor: pin === member.pin ? "#c2410c" : "var(--border)",
-                  }}
+                  tabIndex={-1}
+                  onClick={() => press(k)}
+                  disabled={loading}
+                  className={k === "del" ? "is-del" : undefined}
                 >
-                  {member.name.split(" ")[0]} ({member.pin})
+                  {k === "del" ? <Delete size={16} /> : k}
                 </button>
-              ))}
-            </div>
+              ) : (
+                <span key={`gap-${i}`} />
+              ),
+            )}
           </div>
 
-          <div className="admin-field" style={{ marginBottom: 14 }}>
-            <label className="admin-field-label" htmlFor="staff-pin-input">
-              PIN de Personal (4 dígitos) *
-            </label>
-            <input
-              id="staff-pin-input"
-              type="password"
-              inputMode="numeric"
-              maxLength={6}
-              autoFocus
-              required
-              className="admin-input-field"
-              placeholder="••••"
-              style={{
-                fontSize: 20,
-                letterSpacing: "0.3em",
-                textAlign: "center",
-                height: 44,
-                fontFamily: "monospace",
-              }}
-              value={pin}
-              onChange={(e) => {
-                setPin(e.target.value);
-                setError("");
-              }}
-            />
-          </div>
-
-          <div className="admin-field" style={{ marginBottom: 16 }}>
-            <label className="admin-field-label" htmlFor="staff-reason-input">
-              Motivo del cambio / eliminación (opcional)
-            </label>
-            <input
-              id="staff-reason-input"
-              type="text"
-              className="admin-input-field"
-              placeholder="ej. Cargado por error, solicitud del cliente"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-            />
-          </div>
+          <label className="admin-field-label" htmlFor="staff-reason-input">
+            {reasonLabel ||
+              (requireReason ? "Motivo (obligatorio)" : "Motivo (opcional)")}
+          </label>
+          <input
+            id="staff-reason-input"
+            type="text"
+            maxLength={120}
+            className="admin-input-field"
+            placeholder={reasonPlaceholder}
+            value={reason}
+            onChange={(e) => {
+              setReason(e.target.value);
+              setError("");
+            }}
+            required={requireReason}
+          />
 
           {error && (
-            <div
-              role="alert"
-              style={{
-                background: "#fef2f2",
-                border: "1px solid #fecaca",
-                color: "#b91c1c",
-                padding: "8px 12px",
-                borderRadius: 8,
-                fontSize: 12.5,
-                marginBottom: 16,
-              }}
-            >
+            <div id="staff-pin-error" role="alert" className="admin-pin-error">
               {error}
             </div>
           )}
 
-          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <div className="admin-pin-actions">
             <button
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
               disabled={loading}
-              style={{ height: 38 }}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="btn"
-              disabled={loading || !pin}
-              style={{
-                height: 38,
-                background: confirmButtonTone === "danger" ? "#dc2626" : "#ea580c",
-                color: "#ffffff",
-                border: "none",
-                fontWeight: 600,
-              }}
+              className={`btn admin-pin-submit${isDanger ? " is-danger" : ""}`}
+              disabled={!canSubmit}
             >
-              {loading ? "Verificando..." : confirmButtonText}
+              {loading ? "Verificando…" : confirmButtonText}
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

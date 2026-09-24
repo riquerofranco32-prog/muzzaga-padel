@@ -5,6 +5,7 @@ import {
   addMinutes,
   isoAddDays,
   isoWeekday,
+  nowInClubTimezone,
   slotKey,
   todayInClub,
 } from "../../lib/booking";
@@ -23,7 +24,9 @@ import {
   dayOccupancy,
   isCountableBooking,
   isTestRecord,
+  onAccountTotal,
   paidAmount,
+  pendingAmount,
   periodOccupancy,
   sumSummaries,
   summarizeRecords,
@@ -49,7 +52,101 @@ import {
   clearLoginAttempts,
   registerFailedLogin,
 } from "../../lib/adminRateLimit";
-import { verifyStaffPin, getStaffList } from "../../lib/staff";
+import {
+  STAFF_PIN,
+  STAFF_ROLES,
+  isPinTaken,
+  makeStaffRecord,
+  publicStaff,
+  verifyStaffPin,
+} from "../../lib/staff";
+
+// Ids de push de RTDB. Validarlos evita que un id como "/" o "a/b" apunte a
+// otra ruta (un remove sobre `cantinaSales/` borraría la colección entera).
+const RECORD_ID = /^[A-Za-z0-9_-]{1,64}$/;
+const isId = (v) => typeof v === "string" && RECORD_ID.test(v);
+const clip = (v, n) =>
+  String(v ?? "")
+    .trim()
+    .slice(0, n);
+const INVALID = { ok: false, error: "Registro inválido." };
+const SESSION_STAFF = {
+  id: "session",
+  name: "Sesión admin",
+  role: "Administrador",
+};
+
+async function loadStaffMembers(db) {
+  return snapToList(await db.ref("staffMembers").once("value"));
+}
+
+/** Verifica un PIN de staff con límite de intentos. → { staff } | { error } */
+async function authorizeStaff(pin) {
+  if (!isFirebaseConfigured()) {
+    return { error: "Firebase no está configurado." };
+  }
+  const gate = await checkLoginAllowed("pin");
+  if (!gate.allowed) return { error: gate.error };
+  const members = await loadStaffMembers(getDb());
+  if (!members.some((m) => m.active !== false)) {
+    return {
+      error:
+        "Todavía no hay equipo cargado. Creá los PINs en Configuración → Equipo.",
+    };
+  }
+  const res = verifyStaffPin(pin, members);
+  if (!res.valid) {
+    return {
+      error: await registerFailedLogin(gate.key, "PIN de equipo incorrecto"),
+    };
+  }
+  await clearLoginAttempts(gate.key);
+  return { staff: res.staff };
+}
+
+/** Con PIN lo exige válido; sin PIN (ej. "Deshacer" inmediato) queda a nombre de la sesión. */
+async function optionalStaff(pin) {
+  return pin ? authorizeStaff(pin) : { staff: SESSION_STAFF };
+}
+
+async function audit(db, staff, action, target, details, extra = {}) {
+  await db
+    .ref("auditLog")
+    .push()
+    .set({
+      action,
+      target: clip(target, 160),
+      staffId: staff.id,
+      staffName: staff.name,
+      staffRole: staff.role,
+      details: clip(details, 240),
+      timestamp: Date.now(),
+      ...extra,
+    });
+}
+
+/** Libera el lock del horario solo si sigue siendo de este turno. */
+async function releaseClaim(db, booking, bookingId) {
+  if (!booking?.date || !booking.courtId || !booking.startTime) return;
+  await db
+    .ref(
+      `slotClaims/${booking.date}/${slotKey(booking.courtId, booking.startTime)}`,
+    )
+    .transaction((current) => (current === bookingId ? null : current));
+}
+
+/** Error listo para devolver si la caja de `date` ya tiene Cierre Z. */
+async function closedDayError(db, date) {
+  if (!date || !(await isCashClosed(db, date))) return null;
+  return {
+    ok: false,
+    error: `La caja del ${date} ya está cerrada. Reabrila desde Caja (con PIN) para modificar ese día.`,
+  };
+}
+
+async function readRecord(db, path) {
+  return (await db.ref(path).once("value")).val();
+}
 
 export async function verifyAdminPassword(password) {
   const gate = await checkLoginAllowed();
@@ -213,8 +310,35 @@ export async function adminCreateManualBooking(input) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
+  const date = input?.date;
+
+  if (!isFirebaseConfigured()) {
+    return {
+      ok: false,
+      error: "Firebase no está configurado en las variables de entorno.",
+    };
+  }
+  if (!ISO_DATE.test(date || ""))
+    return { ok: false, error: "Fecha inválida." };
+
+  try {
+    const config = await getClubConfig();
+    const res = await createBookingAt(getDb(), config, date, input);
+    return res.ok ? { ok: true, bookingId: res.bookingId } : res;
+  } catch (error) {
+    return {
+      ok: false,
+      error: "No se pudo guardar la reserva en la base de datos.",
+    };
+  }
+}
+
+const CREATABLE_STATUSES = ["confirmado", "señado", "pagado", "bloqueado"];
+const MAX_RECURRING_WEEKS = 26;
+
+/** Toma el lock del horario y guarda el turno. Lo comparten el alta simple y el turno fijo. */
+async function createBookingAt(db, config, date, input) {
   const {
-    date,
     courtId,
     startTime,
     playerName,
@@ -223,9 +347,8 @@ export async function adminCreateManualBooking(input) {
     fullCourt,
     status,
     notes,
+    recurringId,
   } = input;
-
-  const config = await getClubConfig();
   const court = findCourtIn(config, courtId);
   if (!court) return { ok: false, error: "Cancha inválida." };
   if (!isValidSlotFor(config, date, courtId, startTime)) {
@@ -235,60 +358,87 @@ export async function adminCreateManualBooking(input) {
         "Ese horario no existe en la grilla de ese día (¿día cerrado o bloqueado?).",
     };
   }
-  const endTime = addMinutes(startTime, config.slotDurationMin);
 
-  if (!isFirebaseConfigured()) {
+  const bookingRef = db.ref("bookings").push();
+  const claim = await db
+    .ref(`slotClaims/${date}/${slotKey(courtId, startTime)}`)
+    .transaction((current) => (current ? undefined : bookingRef.key));
+  if (!claim.committed) {
+    return { ok: false, error: "Ese horario ya se encuentra ocupado." };
+  }
+
+  const players = Math.min(8, Math.max(1, Number(playersCount) || 4));
+  const slotPricing = priceFor(config, date, startTime);
+  await bookingRef.set({
+    courtId,
+    courtName: courtLabel(court),
+    date,
+    startTime,
+    endTime: addMinutes(startTime, config.slotDurationMin),
+    playerName: clip(playerName, 60) || "Reserva Manual",
+    playerPhone: clip(playerPhone, 30),
+    playersCount: players,
+    fullCourt: fullCourt !== false,
+    total:
+      fullCourt !== false ? slotPricing.total : players * slotPricing.perPlayer,
+    priceBand: slotPricing.band,
+    status: CREATABLE_STATUSES.includes(status) ? status : "confirmado",
+    notes: clip(notes, 300),
+    createdFromAdmin: true,
+    ...(recurringId ? { recurringId } : {}),
+    createdAt: Date.now(),
+  });
+  return { ok: true, bookingId: bookingRef.key };
+}
+
+/**
+ * Turno fijo: el mismo horario y cancha durante `weeks` semanas desde `date`.
+ * Las semanas ocupadas o cerradas se saltean y se informan, no frenan el resto.
+ */
+export async function adminCreateRecurringBookings(input) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const { date, weeks } = input || {};
+  const count = Math.round(Number(weeks));
+  if (!ISO_DATE.test(date || ""))
+    return { ok: false, error: "Fecha inválida." };
+  if (!Number.isFinite(count) || count < 2 || count > MAX_RECURRING_WEEKS) {
     return {
       ok: false,
-      error: "Firebase no está configurado en las variables de entorno.",
+      error: `Elegí entre 2 y ${MAX_RECURRING_WEEKS} semanas.`,
     };
+  }
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
   }
 
   try {
     const db = getDb();
-    const claimRef = db.ref(
-      `slotClaims/${date}/${slotKey(courtId, startTime)}`,
-    );
-    const bookingRef = db.ref("bookings").push();
-
-    const claim = await claimRef.transaction((current) => {
-      if (current) return;
-      return bookingRef.key;
-    });
-
-    if (!claim.committed) {
-      return { ok: false, error: "Ese horario ya se encuentra ocupado." };
+    const config = await getClubConfig();
+    const recurringId = db.ref("bookings").push().key;
+    const created = [];
+    const skipped = [];
+    for (let i = 0; i < count; i += 1) {
+      const day = isoAddDays(date, i * 7);
+      const res = await createBookingAt(db, config, day, {
+        ...input,
+        recurringId,
+      });
+      if (res.ok) created.push(day);
+      else skipped.push({ date: day, reason: res.error });
     }
-
-    const slotPricing = priceFor(config, date, startTime);
-    const booking = {
-      courtId,
-      courtName: courtLabel(court),
-      date,
-      startTime,
-      endTime,
-      playerName: (playerName || "Reserva Manual").trim(),
-      playerPhone: (playerPhone || "").trim(),
-      playersCount: Number(playersCount) || 4,
-      fullCourt: fullCourt !== false,
-      total:
-        fullCourt !== false
-          ? slotPricing.total
-          : (Number(playersCount) || 4) * slotPricing.perPlayer,
-      priceBand: slotPricing.band,
-      status: status || "confirmado", // 'confirmado' | 'señado' | 'pagado' | 'bloqueado'
-      notes: (notes || "").trim(),
-      createdFromAdmin: true,
-      createdAt: Date.now(),
-    };
-
-    await bookingRef.set(booking);
-    return { ok: true, bookingId: bookingRef.key };
+    if (created.length === 0) {
+      return {
+        ok: false,
+        error:
+          "No se pudo crear ninguna semana: todas estaban ocupadas o cerradas.",
+        skipped,
+      };
+    }
+    return { ok: true, recurringId, created, skipped };
   } catch (error) {
-    return {
-      ok: false,
-      error: "No se pudo guardar la reserva en la base de datos.",
-    };
+    return { ok: false, error: "No se pudo crear el turno fijo." };
   }
 }
 
@@ -304,12 +454,17 @@ export async function adminUpdateStatus(bookingId, newStatus) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!bookingId) return { ok: false, error: "ID de reserva inválido." };
+  if (!isId(bookingId)) return { ok: false, error: "ID de reserva inválido." };
   if (!BOOKING_STATUSES.includes(newStatus)) {
     return { ok: false, error: "Estado inválido." };
   }
   try {
     const db = getDb();
+    const booking = await readRecord(db, `bookings/${bookingId}`);
+    if (!booking) return { ok: false, error: "El turno no existe." };
+    // Cancelar/bloquear saca los cobros del turno de la caja del día.
+    const closed = await closedDayError(db, booking.date);
+    if (closed) return closed;
     await db.ref(`bookings/${bookingId}`).update({
       status: newStatus,
       updatedAt: Date.now(),
@@ -320,31 +475,41 @@ export async function adminUpdateStatus(bookingId, newStatus) {
   }
 }
 
-export async function adminCancelBooking(bookingId, date, courtId, startTime) {
+/** Cancela un turno y libera el horario. Pide PIN para dejar registrado quién fue. */
+export async function adminCancelBooking({ bookingId, pin, reason } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
+  if (!isId(bookingId)) return { ok: false, error: "Turno inválido." };
 
-  if (!bookingId || !date || !courtId || !startTime) {
-    return { ok: false, error: "Faltan datos para cancelar el turno." };
-  }
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
 
   try {
     const db = getDb();
-    if (await isCashClosed(db, date)) {
-      return {
-        ok: false,
-        error:
-          "La caja de ese día ya está cerrada. No se puede cancelar el turno.",
-      };
+    const booking = await readRecord(db, `bookings/${bookingId}`);
+    if (!booking) return { ok: false, error: "El turno no existe." };
+    if (booking.status === "cancelado") {
+      return { ok: false, error: "Ese turno ya estaba cancelado." };
     }
-    // Liberar lock de horario
-    await db.ref(`slotClaims/${date}/${slotKey(courtId, startTime)}`).remove();
-    // Marcar como cancelado
+    const closed = await closedDayError(db, booking.date);
+    if (closed) return closed;
+
+    await releaseClaim(db, booking, bookingId);
     await db.ref(`bookings/${bookingId}`).update({
       status: "cancelado",
       cancelledAt: Date.now(),
+      cancelledBy: auth.staff.name,
+      ...(reason ? { cancelReason: clip(reason, 120) } : {}),
     });
-    return { ok: true };
+    await audit(
+      db,
+      auth.staff,
+      "CANCELAR_TURNO",
+      `${booking.playerName || "Turno"} · ${booking.date} ${booking.startTime}`,
+      reason ? `Motivo: ${reason}` : "Turno cancelado y horario liberado",
+      { courtName: booking.courtName || null },
+    );
+    return { ok: true, staff: auth.staff.name };
   } catch (error) {
     console.error("Error al cancelar reserva en admin", error);
     return { ok: false, error: "No se pudo cancelar el turno." };
@@ -352,70 +517,62 @@ export async function adminCancelBooking(bookingId, date, courtId, startTime) {
 }
 
 /** Elimina definitivamente una reserva de la base, requiriendo PIN de staff. */
-export async function adminDeleteBooking({ bookingId, pin, reason }) {
+export async function adminDeleteBooking({ bookingId, pin, reason } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
+  if (!isId(bookingId)) return { ok: false, error: "Turno inválido." };
 
-  const staffAuth = verifyStaffPin(pin);
-  if (!staffAuth.valid) {
-    return { ok: false, error: "PIN de equipo incorrecto." };
-  }
-
-  if (!bookingId) return { ok: false, error: "Turno inválido." };
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
 
   try {
     const db = getDb();
-    const snap = await db.ref(`bookings/${bookingId}`).once("value");
-    const booking = snap.val();
+    const booking = await readRecord(db, `bookings/${bookingId}`);
     if (!booking) return { ok: false, error: "El turno no existe." };
+    const closed = await closedDayError(db, booking.date);
+    if (closed) return closed;
 
-    if (booking.date && (await isCashClosed(db, booking.date))) {
-      return {
-        ok: false,
-        error: "La caja de ese día ya está cerrada. No se puede eliminar el turno.",
-      };
-    }
-
-    if (booking.date && booking.courtId && booking.startTime) {
-      await db
-        .ref(`slotClaims/${booking.date}/${slotKey(booking.courtId, booking.startTime)}`)
-        .remove();
-    }
-
+    await releaseClaim(db, booking, bookingId);
     await db.ref(`bookings/${bookingId}`).remove();
-
-    const auditRef = db.ref("auditLog").push();
-    await auditRef.set({
-      action: "ELIMINAR_TURNO",
-      target: `${booking.playerName || "Turno"} · ${booking.date} ${booking.startTime}`,
-      courtName: booking.courtName,
-      staffName: staffAuth.staff.name,
-      staffRole: staffAuth.staff.role,
-      details: reason ? `Motivo: ${reason}` : "Turno eliminado definitivamente de la base",
-      timestamp: Date.now(),
-    });
-
-    return { ok: true, staff: staffAuth.staff.name };
+    await audit(
+      db,
+      auth.staff,
+      "ELIMINAR_TURNO",
+      `${booking.playerName || "Turno"} · ${booking.date} ${booking.startTime}`,
+      reason ? `Motivo: ${reason}` : "Turno eliminado definitivamente de la base",
+      { courtName: booking.courtName || null, amount: bookingTotal(booking) },
+    );
+    return { ok: true, staff: auth.staff.name };
   } catch (error) {
     return { ok: false, error: "No se pudo eliminar el turno." };
   }
 }
+
+const PAYMENT_METHODS = ["efectivo", "transferencia", "mercadopago"];
+const MAX_PAYMENT = 10_000_000;
 
 /** Registra un cobro parcial o total sobre una reserva (seña, efectivo, etc). */
 export async function adminAddPayment(bookingId, method, amount) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const amt = Number(amount);
-  if (!bookingId || !amt || amt <= 0) {
+  const amt = Math.round(Number(amount));
+  if (!isId(bookingId) || !Number.isFinite(amt) || amt <= 0 || amt > MAX_PAYMENT) {
     return { ok: false, error: "Ingresá un monto válido." };
   }
 
   try {
     const db = getDb();
+    const booking = await readRecord(db, `bookings/${bookingId}`);
+    if (!booking) return { ok: false, error: "El turno no existe." };
+    if (!isCountableBooking(booking)) {
+      return { ok: false, error: "No se puede cobrar un turno cancelado o bloqueado." };
+    }
+    const closed = await closedDayError(db, booking.date);
+    if (closed) return closed;
     const paymentRef = db.ref(`bookings/${bookingId}/payments`).push();
     await paymentRef.set({
-      method: method || "efectivo",
+      method: PAYMENT_METHODS.includes(method) ? method : "efectivo",
       amount: amt,
       createdAt: Date.now(),
     });
@@ -425,16 +582,30 @@ export async function adminAddPayment(bookingId, method, amount) {
   }
 }
 
-export async function adminRemovePayment(bookingId, paymentId) {
+/** Borra un cobro. Con PIN queda a nombre del integrante; sin PIN (Deshacer) a nombre de la sesión. */
+export async function adminRemovePayment(bookingId, paymentId, pin) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!bookingId || !paymentId) {
-    return { ok: false, error: "Datos inválidos." };
-  }
+  if (!isId(bookingId) || !isId(paymentId)) return INVALID;
+  const auth = await optionalStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
   try {
     const db = getDb();
+    const booking = await readRecord(db, `bookings/${bookingId}`);
+    const payment = booking?.payments?.[paymentId];
+    if (!payment) return { ok: false, error: "Ese cobro ya no existe." };
+    const closed = await closedDayError(db, booking.date);
+    if (closed) return closed;
     await db.ref(`bookings/${bookingId}/payments/${paymentId}`).remove();
+    await audit(
+      db,
+      auth.staff,
+      "ELIMINAR_COBRO",
+      `${booking.playerName || "Turno"} · ${booking.date} ${booking.startTime}`,
+      `Cobro de $${payment.amount} (${payment.method || "efectivo"}) eliminado`,
+      { amount: Number(payment.amount) || 0 },
+    );
     return { ok: true };
   } catch (error) {
     return { ok: false, error: "No se pudo eliminar el cobro." };
@@ -497,8 +668,12 @@ export async function adminGetClients() {
       db.ref("deletedClients").get(),
     ]);
 
-    const deletedKeys = new Set(
-      deletedSnap.exists() ? Object.keys(deletedSnap.val()) : [],
+    // Borrar un cliente oculta su historial hasta ese momento: si vuelve a
+    // reservar después, reaparece con los turnos nuevos.
+    const deletedAt = new Map(
+      Object.entries(deletedSnap.exists() ? deletedSnap.val() : {}).map(
+        ([k, v]) => [k, Number(v?.deletedAt) || Infinity],
+      ),
     );
     const byKey = new Map();
 
@@ -507,7 +682,7 @@ export async function adminGetClients() {
       const phone = (b.playerPhone || "").trim();
       const name = (b.playerName || "Sin nombre").trim();
       const key = clientKey(phone, name);
-      if (deletedKeys.has(key)) return; // Excluir clientes eliminados
+      if (deletedAt.has(key) && (b.createdAt || 0) <= deletedAt.get(key)) return;
 
       const date = b.date || "";
       const existing = byKey.get(key);
@@ -543,43 +718,32 @@ export async function adminGetClients() {
 }
 
 /** Elimina a un cliente del CRM y listados, requiriendo PIN del personal para auditoría. */
-export async function adminDeleteClient({ key, pin, reason }) {
+export async function adminDeleteClient({ key, name, pin, reason } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
-
-  const staffAuth = verifyStaffPin(pin);
-  if (!staffAuth.valid) {
-    return { ok: false, error: "PIN de equipo incorrecto." };
-  }
-
   if (!CLIENT_KEY.test(key || "")) {
     return { ok: false, error: "Cliente inválido." };
   }
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
 
   try {
     const db = getDb();
     await db.ref(`deletedClients/${key}`).set({
       deletedAt: Date.now(),
-      deletedBy: staffAuth.staff.name,
-      staffRole: staffAuth.staff.role,
-      reason: (reason || "").trim(),
+      deletedBy: auth.staff.name,
+      staffRole: auth.staff.role,
+      reason: clip(reason, 120),
     });
-
-    // Limpiar notas
     await db.ref(`clientNotes/${key}`).remove();
-
-    // Log de auditoría
-    const auditRef = db.ref("auditLog").push();
-    await auditRef.set({
-      action: "ELIMINAR_CLIENTE",
-      target: key,
-      staffName: staffAuth.staff.name,
-      staffRole: staffAuth.staff.role,
-      details: reason ? `Motivo: ${reason}` : "Cliente eliminado del sistema",
-      timestamp: Date.now(),
-    });
-
-    return { ok: true, staff: staffAuth.staff.name };
+    await audit(
+      db,
+      auth.staff,
+      "ELIMINAR_CLIENTE",
+      name ? `${clip(name, 60)} (${key})` : key,
+      reason ? `Motivo: ${reason}` : "Cliente eliminado del listado",
+    );
+    return { ok: true, staff: auth.staff.name };
   } catch (error) {
     return { ok: false, error: "No se pudo eliminar el cliente." };
   }
@@ -850,7 +1014,7 @@ export async function adminAddCantinaSale({
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!Array.isArray(items) || items.length === 0) {
+  if (!Array.isArray(items) || items.length === 0 || items.length > 60) {
     return { ok: false, error: "Agregá al menos un producto a la venta." };
   }
   const saleDate = date || todayInClub();
@@ -862,8 +1026,8 @@ export async function adminAddCantinaSale({
   const cleanItems = items
     .map((it) => ({
       name: String(it.name || "").slice(0, 80),
-      price: Number(it.price) || 0,
-      qty: Math.max(1, Math.round(Number(it.qty) || 1)),
+      price: Math.min(MAX_PAYMENT, Math.max(0, Number(it.price) || 0)),
+      qty: Math.min(99, Math.max(1, Math.round(Number(it.qty) || 1))),
     }))
     .filter((it) => it.name && it.price > 0);
   const total = cleanItems.reduce((sum, it) => sum + it.price * it.qty, 0);
@@ -874,9 +1038,14 @@ export async function adminAddCantinaSale({
   try {
     const db = getDb();
     const isOnAccount = method === "cuenta";
+    // A cuenta no entra a la caja del día, así que no depende del cierre.
+    if (!isOnAccount) {
+      const closed = await closedDayError(db, saleDate);
+      if (closed) return closed;
+    }
     if (isOnAccount) {
-      const booking = chargeTo
-        ? (await db.ref(`bookings/${chargeTo}`).once("value")).val()
+      const booking = isId(chargeTo)
+        ? await readRecord(db, `bookings/${chargeTo}`)
         : null;
       if (!booking || booking.status === "cancelado") {
         return {
@@ -896,7 +1065,7 @@ export async function adminAddCantinaSale({
           ? method
           : "efectivo",
       ...(isOnAccount ? { chargeTo } : {}),
-      notes: (notes || "").trim(),
+      notes: clip(notes, 200),
       createdAt: Date.now(),
     });
     return { ok: true, saleId: ref.key, total };
@@ -928,25 +1097,35 @@ export async function adminGetCantinaSales(date) {
   }
 }
 
-/** Anula una venta con motivo: queda en el historial pero deja de sumar. */
-export async function adminVoidCantinaSale(saleId, reason) {
+/**
+ * Anula una venta con motivo: queda en el historial pero deja de sumar.
+ * Con PIN queda a nombre del integrante; sin PIN (Deshacer inmediato) a nombre de la sesión.
+ */
+export async function adminVoidCantinaSale({ saleId, reason, pin } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const why = (reason || "").trim();
-  if (!saleId) return { ok: false, error: "Venta inválida." };
+  const why = clip(reason, 120);
+  if (!isId(saleId)) return { ok: false, error: "Venta inválida." };
   if (!why) return { ok: false, error: "Indicá el motivo de la anulación." };
+  const auth = await optionalStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
   try {
-    const ref = getDb().ref(`cantinaSales/${saleId}`);
+    const db = getDb();
+    const current = await readRecord(db, `cantinaSales/${saleId}`);
+    if (!current) return { ok: false, error: "Esa venta no existe." };
+    const closed = await closedDayError(db, current.date);
+    if (closed) return closed;
     // RTDB llama primero con el valor en caché (null si no hay): devolver
     // null hace que reintente con el valor real del server en vez de abortar.
-    const result = await ref.transaction((sale) => {
+    const result = await db.ref(`cantinaSales/${saleId}`).transaction((sale) => {
       if (sale === null) return null;
       if (sale.voided) return; // ya anulada: aborta
       return {
         ...sale,
         voided: true,
-        voidReason: why.slice(0, 120),
+        voidReason: why,
+        voidedBy: auth.staff.name,
         voidedAt: Date.now(),
       };
     });
@@ -954,6 +1133,14 @@ export async function adminVoidCantinaSale(saleId, reason) {
       return { ok: false, error: "Esa venta ya estaba anulada." };
     if (!result.snapshot.exists())
       return { ok: false, error: "Esa venta no existe." };
+    await audit(
+      db,
+      auth.staff,
+      "ANULAR_VENTA_CANTINA",
+      `Venta #${saleId.slice(-6)} ($${current.total})`,
+      `Motivo: ${why}`,
+      { amount: Number(current.total) || 0 },
+    );
     return { ok: true };
   } catch (error) {
     return { ok: false, error: "No se pudo anular la venta." };
@@ -961,37 +1148,31 @@ export async function adminVoidCantinaSale(saleId, reason) {
 }
 
 /** Elimina definitivamente una venta de cantina, requiriendo PIN de staff. */
-export async function adminDeleteCantinaSale({ saleId, pin, reason }) {
+export async function adminDeleteCantinaSale({ saleId, pin, reason } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
+  if (!isId(saleId)) return { ok: false, error: "Venta inválida." };
 
-  const staffAuth = verifyStaffPin(pin);
-  if (!staffAuth.valid) {
-    return { ok: false, error: "PIN de equipo incorrecto." };
-  }
-
-  if (!saleId) return { ok: false, error: "Venta inválida." };
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
 
   try {
     const db = getDb();
-    const snap = await db.ref(`cantinaSales/${saleId}`).once("value");
-    const sale = snap.val();
+    const sale = await readRecord(db, `cantinaSales/${saleId}`);
     if (!sale) return { ok: false, error: "La venta no existe." };
+    const closed = await closedDayError(db, sale.date);
+    if (closed) return closed;
 
     await db.ref(`cantinaSales/${saleId}`).remove();
-
-    const auditRef = db.ref("auditLog").push();
-    await auditRef.set({
-      action: "ELIMINAR_PEDIDO_CANTINA",
-      target: `Pedido #${saleId.slice(-6)} ($${sale.total})`,
-      amount: sale.total,
-      staffName: staffAuth.staff.name,
-      staffRole: staffAuth.staff.role,
-      details: reason ? `Motivo: ${reason}` : "Pedido eliminado definitivamente",
-      timestamp: Date.now(),
-    });
-
-    return { ok: true, staff: staffAuth.staff.name };
+    await audit(
+      db,
+      auth.staff,
+      "ELIMINAR_PEDIDO_CANTINA",
+      `Pedido #${saleId.slice(-6)} ($${sale.total})`,
+      reason ? `Motivo: ${reason}` : "Pedido eliminado definitivamente",
+      { amount: Number(sale.total) || 0 },
+    );
+    return { ok: true, staff: auth.staff.name };
   } catch (error) {
     return { ok: false, error: "No se pudo eliminar la venta." };
   }
@@ -1002,12 +1183,16 @@ export async function adminSettleCantinaSale(saleId, method) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!saleId || !CANTINA_PAYMENT_METHODS.includes(method)) {
+  if (!isId(saleId) || !CANTINA_PAYMENT_METHODS.includes(method)) {
     return { ok: false, error: "Elegí cómo se cobró." };
   }
   try {
-    const ref = getDb().ref(`cantinaSales/${saleId}`);
-    const result = await ref.transaction((sale) => {
+    const db = getDb();
+    const current = await readRecord(db, `cantinaSales/${saleId}`);
+    if (!current) return { ok: false, error: "Esa venta no existe." };
+    const closed = await closedDayError(db, current.date);
+    if (closed) return closed;
+    const result = await db.ref(`cantinaSales/${saleId}`).transaction((sale) => {
       if (sale === null) return null; // ver adminVoidCantinaSale
       if (sale.voided || sale.method !== "cuenta") return;
       return { ...sale, method, settledAt: Date.now() };
@@ -1057,13 +1242,14 @@ export async function adminGetTopProducts(limit = 8) {
  * TorneosGallery en la landing), esto le da un lugar donde llevar esa lista
  * con quién pagó en vez de un cuaderno o un chat.
  */
-export async function adminCreateTournament({ name, date, category, price }) {
+export async function adminCreateTournament({ name, date, category, price } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!name?.trim()) {
+  if (!clip(name, 80)) {
     return { ok: false, error: "Ingresá un nombre para el torneo." };
   }
+  if (date && !ISO_DATE.test(date)) return { ok: false, error: "Fecha inválida." };
   if (!isFirebaseConfigured()) {
     return { ok: false, error: "Firebase no está configurado." };
   }
@@ -1072,11 +1258,11 @@ export async function adminCreateTournament({ name, date, category, price }) {
     const db = getDb();
     const ref = db.ref("tournaments").push();
     await ref.set({
-      name: name.trim(),
+      name: clip(name, 80),
       date: date || "",
-      category: (category || "").trim(),
-      price: Number(price) || 0,
-      status: "abierto", // 'abierto' | 'cerrado' | 'finalizado'
+      category: clip(category, 40),
+      price: Math.min(MAX_PAYMENT, Math.max(0, Math.round(Number(price) || 0))),
+      status: "abierto",
       createdAt: Date.now(),
     });
     return { ok: true, tournamentId: ref.key };
@@ -1111,29 +1297,44 @@ export async function adminGetTournaments() {
   }
 }
 
+const TOURNAMENT_STATUSES = ["abierto", "cerrado", "finalizado"];
+
 export async function adminUpdateTournamentStatus(tournamentId, status) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!tournamentId) return { ok: false, error: "Torneo inválido." };
+  if (!isId(tournamentId) || !TOURNAMENT_STATUSES.includes(status)) {
+    return INVALID;
+  }
   try {
-    const db = getDb();
-    await db.ref(`tournaments/${tournamentId}`).update({ status });
+    await getDb().ref(`tournaments/${tournamentId}`).update({ status });
     return { ok: true };
   } catch (error) {
     return { ok: false, error: "No se pudo actualizar el torneo." };
   }
 }
 
-export async function adminDeleteTournament(tournamentId) {
+/** Borra el torneo con todas sus parejas: pide PIN y queda en auditoría. */
+export async function adminDeleteTournament({ tournamentId, pin, reason } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
+  if (!isId(tournamentId)) return { ok: false, error: "Torneo inválido." };
 
-  if (!tournamentId) return { ok: false, error: "Torneo inválido." };
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
   try {
     const db = getDb();
+    const t = await readRecord(db, `tournaments/${tournamentId}`);
+    if (!t) return { ok: false, error: "El torneo no existe." };
     await db.ref(`tournaments/${tournamentId}`).remove();
-    return { ok: true };
+    await audit(
+      db,
+      auth.staff,
+      "ELIMINAR_TORNEO",
+      `${t.name} (${Object.keys(t.players || {}).length} inscriptos)`,
+      reason ? `Motivo: ${reason}` : "Torneo eliminado con sus inscriptos",
+    );
+    return { ok: true, staff: auth.staff.name };
   } catch (error) {
     return { ok: false, error: "No se pudo eliminar el torneo." };
   }
@@ -1144,16 +1345,15 @@ export async function adminAddTournamentPlayer(tournamentId, input) {
   if (denied) return denied;
 
   const { name, phone, partner } = input || {};
-  if (!tournamentId || !name?.trim()) {
+  if (!isId(tournamentId) || !clip(name, 60)) {
     return { ok: false, error: "Ingresá el nombre del jugador." };
   }
   try {
-    const db = getDb();
-    const ref = db.ref(`tournaments/${tournamentId}/players`).push();
+    const ref = getDb().ref(`tournaments/${tournamentId}/players`).push();
     await ref.set({
-      name: name.trim(),
-      phone: (phone || "").trim(),
-      partner: (partner || "").trim(),
+      name: clip(name, 60),
+      phone: clip(phone, 30),
+      partner: clip(partner, 60),
       paid: false,
       createdAt: Date.now(),
     });
@@ -1163,17 +1363,24 @@ export async function adminAddTournamentPlayer(tournamentId, input) {
   }
 }
 
-export async function adminTogglePlayerPaid(tournamentId, playerId, paid) {
+/** Marca la inscripción como paga (con método y fecha) o la vuelve a pendiente. */
+export async function adminTogglePlayerPaid(tournamentId, playerId, paid, method) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!tournamentId || !playerId)
-    return { ok: false, error: "Datos inválidos." };
+  if (!isId(tournamentId) || !isId(playerId)) return INVALID;
   try {
-    const db = getDb();
-    await db
+    await getDb()
       .ref(`tournaments/${tournamentId}/players/${playerId}`)
-      .update({ paid: Boolean(paid) });
+      .update(
+        paid
+          ? {
+              paid: true,
+              paidMethod: PAYMENT_METHODS.includes(method) ? method : "efectivo",
+              paidAt: Date.now(),
+            }
+          : { paid: false, paidMethod: null, paidAt: null },
+      );
     return { ok: true };
   } catch (error) {
     return { ok: false, error: "No se pudo actualizar el pago." };
@@ -1184,11 +1391,11 @@ export async function adminRemoveTournamentPlayer(tournamentId, playerId) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!tournamentId || !playerId)
-    return { ok: false, error: "Datos inválidos." };
+  if (!isId(tournamentId) || !isId(playerId)) return INVALID;
   try {
-    const db = getDb();
-    await db.ref(`tournaments/${tournamentId}/players/${playerId}`).remove();
+    await getDb()
+      .ref(`tournaments/${tournamentId}/players/${playerId}`)
+      .remove();
     return { ok: true };
   } catch (error) {
     return { ok: false, error: "No se pudo quitar el jugador." };
@@ -1292,39 +1499,33 @@ export async function adminAddCashExpense({
 }
 
 /** Elimina un egreso de caja cargado por error, requiriendo PIN de staff. */
-export async function adminDeleteCashExpense({ date, expenseId, pin, reason }) {
+export async function adminDeleteCashExpense({ date, expenseId, pin, reason } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
-
-  const staffAuth = verifyStaffPin(pin);
-  if (!staffAuth.valid) {
-    return { ok: false, error: "PIN de equipo incorrecto." };
+  if (!ISO_DATE.test(date || "") || !isId(expenseId)) {
+    return { ok: false, error: "Egreso inválido." };
   }
 
-  if (!date || !expenseId) return { ok: false, error: "Egreso inválido." };
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
 
   try {
     const db = getDb();
-    if (await isCashClosed(db, date)) {
-      return { ok: false, error: "La caja de ese día ya está cerrada." };
-    }
-
-    const snap = await db.ref(`cashExpenses/${date}/${expenseId}`).once("value");
-    const expense = snap.val();
+    const closed = await closedDayError(db, date);
+    if (closed) return closed;
+    const expense = await readRecord(db, `cashExpenses/${date}/${expenseId}`);
+    if (!expense) return { ok: false, error: "Ese egreso ya no existe." };
 
     await db.ref(`cashExpenses/${date}/${expenseId}`).remove();
-
-    const auditRef = db.ref("auditLog").push();
-    await auditRef.set({
-      action: "ELIMINAR_EGRESO_CAJA",
-      target: expense ? `${expense.concept} ($${expense.amount})` : expenseId,
-      staffName: staffAuth.staff.name,
-      staffRole: staffAuth.staff.role,
-      details: reason ? `Motivo: ${reason}` : "Egreso eliminado",
-      timestamp: Date.now(),
-    });
-
-    return { ok: true, staff: staffAuth.staff.name };
+    await audit(
+      db,
+      auth.staff,
+      "ELIMINAR_EGRESO_CAJA",
+      `${expense.concept} ($${expense.amount}) · ${date}`,
+      reason ? `Motivo: ${reason}` : "Egreso eliminado",
+      { amount: Number(expense.amount) || 0 },
+    );
+    return { ok: true, staff: auth.staff.name };
   } catch (error) {
     return { ok: false, error: "No se pudo eliminar el egreso." };
   }
@@ -1368,6 +1569,9 @@ export async function adminGetDailyCashSummary(isoDate) {
       difference: session?.difference ?? null,
       notes: session?.notes || null,
       closedBy: session?.closedBy || null,
+      reopenedBy: session?.reopenedBy || null,
+      reopenedAt: session?.reopenedAt ?? null,
+      reopenReason: session?.reopenReason || null,
     },
   };
 }
@@ -1382,40 +1586,36 @@ export async function adminSetTestFlag(collection, id, isTest) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!TEST_FLAG_COLLECTIONS.includes(collection) || !id) {
-    return { ok: false, error: "Registro inválido." };
-  }
+  if (!TEST_FLAG_COLLECTIONS.includes(collection) || !isId(id)) return INVALID;
   try {
-    await getDb()
-      .ref(`${collection}/${id}/isTest`)
-      .set(isTest ? true : null);
+    const db = getDb();
+    const record = await readRecord(db, `${collection}/${id}`);
+    if (!record) return { ok: false, error: "El registro no existe." };
+    const closed = await closedDayError(db, record.date);
+    if (closed) return closed;
+    await db.ref(`${collection}/${id}/isTest`).set(isTest ? true : null);
     return { ok: true };
   } catch (err) {
     return { ok: false, error: "No se pudo actualizar el registro." };
   }
 }
 
-export async function adminCloseDailyCash({
-  date,
-  actualCash,
-  notes,
-  closedBy,
-}) {
+/** Cierre Z: el PIN identifica a quien contó el cajón. */
+export async function adminCloseDailyCash({ date, actualCash, notes, pin } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   if (!ISO_DATE.test(date || ""))
     return { ok: false, error: "Fecha inválida." };
-  const who = (closedBy || "").trim();
-  if (!who) return { ok: false, error: "Indicá quién cierra la caja." };
   const actual = Number(actualCash);
-  if (!Number.isFinite(actual) || actual < 0) {
+  if (!Number.isFinite(actual) || actual < 0 || actual > MAX_PAYMENT * 10) {
     return { ok: false, error: "Ingresá el efectivo contado." };
   }
-
   if (!isFirebaseConfigured()) {
     return { ok: false, error: "Firebase no está configurado." };
   }
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
 
   try {
     const summaryRes = await adminGetDailyCashSummary(date);
@@ -1426,15 +1626,17 @@ export async function adminCloseDailyCash({
     const session = {
       closed: true,
       closedAt: Date.now(),
-      closedBy: who.slice(0, 40),
+      closedBy: auth.staff.name,
+      closedById: auth.staff.id,
       expectedCash,
       actualCash: actual,
       difference,
-      notes: (notes || "").trim(),
+      notes: clip(notes, 300),
     };
 
     // Transacción: dos personas cerrando a la vez no pisan un cierre ya hecho.
-    const result = await getDb()
+    const db = getDb();
+    const result = await db
       .ref(`dailyCashSessions/${date}`)
       .transaction((current) => (current?.closed ? undefined : session));
     if (!result.committed) {
@@ -1443,9 +1645,61 @@ export async function adminCloseDailyCash({
         error: "Esa caja ya se cerró. Recargá para ver el cierre.",
       };
     }
-    return { ok: true, difference };
+    await audit(
+      db,
+      auth.staff,
+      "CIERRE_CAJA",
+      `Caja ${date}`,
+      `Contado $${actual} · esperado $${expectedCash} · diferencia $${difference}`,
+      { amount: actual },
+    );
+    return { ok: true, difference, staff: auth.staff.name };
   } catch (err) {
     return { ok: false, error: "No se pudo cerrar la caja." };
+  }
+}
+
+/** Reabre un Cierre Z para corregir un error. Motivo obligatorio y queda auditado. */
+export async function adminReopenDailyCash({ date, pin, reason } = {}) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!ISO_DATE.test(date || "")) return { ok: false, error: "Fecha inválida." };
+  const why = clip(reason, 160);
+  if (!why) return { ok: false, error: "Indicá por qué se reabre la caja." };
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
+  if (!MANAGER_ROLES.includes(auth.staff.role)) {
+    return {
+      ok: false,
+      error: "Solo un Administrador o Encargado puede reabrir una caja cerrada.",
+    };
+  }
+
+  try {
+    const db = getDb();
+    const ref = db.ref(`dailyCashSessions/${date}`);
+    const previous = (await ref.once("value")).val();
+    if (!previous?.closed) {
+      return { ok: false, error: "Esa caja no está cerrada." };
+    }
+    await ref.set({
+      closed: false,
+      reopenedAt: Date.now(),
+      reopenedBy: auth.staff.name,
+      reopenReason: why,
+      previousClose: previous,
+    });
+    await audit(
+      db,
+      auth.staff,
+      "REABRIR_CAJA",
+      `Caja ${date}`,
+      `Motivo: ${why} · cierre anterior de ${previous.closedBy || "—"} (dif. $${previous.difference ?? 0})`,
+    );
+    return { ok: true, staff: auth.staff.name };
+  } catch (err) {
+    return { ok: false, error: "No se pudo reabrir la caja." };
   }
 }
 
@@ -1475,22 +1729,27 @@ export async function adminGetCashHistory(limit = 30) {
    REPROGRAMACIÓN Y CAMBIO RÁPIDO DE CANCHA (FASE 3)
    ========================================================================== */
 
+/**
+ * Mueve un turno a otro día/horario/cancha. El origen se lee de la base (no
+ * del cliente) para no liberar por error el horario de otra reserva.
+ */
 export async function adminMoveBooking({
   bookingId,
-  oldDate,
-  oldCourtId,
-  oldStartTime,
   newDate,
   newCourtId,
   newStartTime,
-}) {
+} = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!bookingId || !newDate || !newCourtId || !newStartTime) {
+  if (
+    !isId(bookingId) ||
+    !ISO_DATE.test(newDate || "") ||
+    !newCourtId ||
+    !newStartTime
+  ) {
     return { ok: false, error: "Faltan datos del nuevo turno." };
   }
-
   if (!isFirebaseConfigured()) {
     return { ok: false, error: "Firebase no está configurado." };
   }
@@ -1505,26 +1764,25 @@ export async function adminMoveBooking({
     };
   }
 
+  const db = getDb();
+  const newClaimRef = db.ref(
+    `slotClaims/${newDate}/${slotKey(newCourtId, newStartTime)}`,
+  );
   try {
-    const db = getDb();
-    if (oldDate && (await isCashClosed(db, oldDate))) {
-      return {
-        ok: false,
-        error:
-          "La caja del día de origen ya está cerrada. No se puede mover el turno.",
-      };
+    const booking = await readRecord(db, `bookings/${bookingId}`);
+    if (!booking || booking.status === "cancelado") {
+      return { ok: false, error: "Ese turno no existe o está cancelado." };
+    }
+    const closedOrigin = await closedDayError(db, booking.date);
+    if (closedOrigin) return closedOrigin;
+    if (newDate !== booking.date) {
+      const closedTarget = await closedDayError(db, newDate);
+      if (closedTarget) return closedTarget;
     }
 
-    const newClaimRef = db.ref(
-      `slotClaims/${newDate}/${slotKey(newCourtId, newStartTime)}`,
+    const claimResult = await newClaimRef.transaction((current) =>
+      current ? undefined : bookingId,
     );
-
-    // 1. Intentar tomar el nuevo slot atómicamente
-    const claimResult = await newClaimRef.transaction((current) => {
-      if (current) return; // Ya ocupado
-      return bookingId;
-    });
-
     if (!claimResult.committed) {
       return {
         ok: false,
@@ -1532,56 +1790,318 @@ export async function adminMoveBooking({
       };
     }
 
-    // 2. Liberar el slot anterior
-    await db
-      .ref(`slotClaims/${oldDate}/${slotKey(oldCourtId, oldStartTime)}`)
-      .remove();
-
-    // 3. Actualizar la reserva conservando pagos y cliente
-    await db.ref(`bookings/${bookingId}`).update({
-      courtId: newCourtId,
-      courtName: courtLabel(court),
-      date: newDate,
-      startTime: newStartTime,
-      endTime: addMinutes(newStartTime, config.slotDurationMin),
-      reprogrammedAt: Date.now(),
-    });
-
+    try {
+      await db.ref(`bookings/${bookingId}`).update({
+        courtId: newCourtId,
+        courtName: courtLabel(court),
+        date: newDate,
+        startTime: newStartTime,
+        endTime: addMinutes(newStartTime, config.slotDurationMin),
+        reprogrammedAt: Date.now(),
+        previousSlot: `${booking.date} ${booking.startTime} · ${booking.courtName || booking.courtId}`,
+      });
+    } catch (err) {
+      // Si no se pudo mover, el horario nuevo no puede quedar tomado.
+      await newClaimRef.transaction((current) =>
+        current === bookingId ? null : current,
+      );
+      throw err;
+    }
+    await releaseClaim(db, booking, bookingId);
     return { ok: true };
   } catch (err) {
-    return { ok: false, error: err.message || "Error al mover la reserva." };
+    return { ok: false, error: "No se pudo mover la reserva." };
   }
 }
 
-/** Valida un PIN de staff contra el equipo oficial de Muzzaga Pádel. */
+/* ==========================================================================
+   EQUIPO (PINs), AUDITORÍA Y ALERTAS
+   ========================================================================== */
+
+const MANAGER_ROLES = ["Administrador", "Encargado"];
+
+/** Valida un PIN de staff y devuelve quién es (sin datos del PIN). */
 export async function adminVerifyStaffPinAction(pin) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const res = verifyStaffPin(pin);
-  if (!res.valid) {
-    return { ok: false, error: "PIN de equipo incorrecto." };
-  }
-  return { ok: true, staff: res.staff };
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
+  return { ok: true, staff: auth.staff };
 }
 
-/** Obtiene los registros recientes de auditoría de acciones del personal. */
-export async function adminGetAuditLog(limit = 40) {
+export async function adminGetStaff() {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  if (!isFirebaseConfigured()) return { ok: true, staff: [], needsSetup: true };
+  try {
+    const members = await loadStaffMembers(getDb());
+    const staff = publicStaff(members).sort(
+      (a, b) =>
+        Number(b.active) - Number(a.active) || a.name.localeCompare(b.name),
+    );
+    return { ok: true, staff, needsSetup: !staff.some((m) => m.active) };
+  } catch (err) {
+    return { ok: false, error: "No se pudo cargar el equipo." };
+  }
+}
+
+/** true si después del cambio sigue habiendo alguien que pueda administrar el equipo. */
+function keepsAManager(members, changedId, next) {
+  const after = changedId
+    ? members.map((m) => (m.id === changedId ? { ...m, ...next } : m))
+    : [...members, next];
+  return after.some(
+    (m) => m.active !== false && MANAGER_ROLES.includes(m.role),
+  );
+}
+
+/**
+ * Alta o edición de un integrante. Con el equipo vacío, la sesión de admin
+ * alcanza para crear el primero (tiene que ser Administrador); después,
+ * cualquier cambio lo autoriza el PIN de un Administrador o Encargado.
+ */
+export async function adminSaveStaffMember({
+  id,
+  name,
+  role,
+  pin,
+  authPin,
+} = {}) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
+  }
+
+  const cleanName = clip(name, 40);
+  const cleanPin = String(pin || "").trim();
+  if (!cleanName) return { ok: false, error: "Ingresá el nombre." };
+  if (id && !isId(id)) return INVALID;
+  if (!STAFF_ROLES.includes(role)) return { ok: false, error: "Elegí un rol." };
+  if ((!id || cleanPin) && !STAFF_PIN.test(cleanPin)) {
+    return { ok: false, error: "El PIN tiene que tener de 4 a 6 números." };
+  }
+
+  try {
+    const db = getDb();
+    const members = await loadStaffMembers(db);
+    const hasTeam = members.some((m) => m.active !== false);
+    let actor = SESSION_STAFF;
+    if (hasTeam) {
+      const auth = await authorizeStaff(authPin);
+      if (auth.error) return { ok: false, error: auth.error };
+      if (!MANAGER_ROLES.includes(auth.staff.role)) {
+        return {
+          ok: false,
+          error: "Solo un Administrador o Encargado puede modificar el equipo.",
+        };
+      }
+      actor = auth.staff;
+    } else if (role !== "Administrador") {
+      return {
+        ok: false,
+        error: "El primer integrante tiene que ser Administrador.",
+      };
+    }
+
+    const existing = id ? members.find((m) => m.id === id) : null;
+    if (id && !existing) return { ok: false, error: "Ese integrante no existe." };
+    if (cleanPin && isPinTaken(cleanPin, members, id || null)) {
+      return { ok: false, error: "Ese PIN ya lo usa otra persona. Elegí otro." };
+    }
+
+    const record = cleanPin
+      ? makeStaffRecord({ name: cleanName, role, pin: cleanPin })
+      : { name: cleanName, role };
+    if (!keepsAManager(members, id || null, { ...record, active: true })) {
+      return {
+        ok: false,
+        error: "Tiene que quedar al menos un Administrador o Encargado activo.",
+      };
+    }
+
+    let memberId = id;
+    if (existing) {
+      await db
+        .ref(`staffMembers/${id}`)
+        .update({ ...record, updatedAt: Date.now() });
+    } else {
+      const ref = db.ref("staffMembers").push();
+      memberId = ref.key;
+      await ref.set({ ...record, active: true, createdAt: Date.now() });
+    }
+    await audit(
+      db,
+      actor,
+      existing ? "EQUIPO_EDITAR" : "EQUIPO_ALTA",
+      `${record.name} (${record.role})`,
+      existing
+        ? cleanPin
+          ? "Datos y PIN actualizados"
+          : "Datos actualizados"
+        : "Nuevo integrante con PIN",
+    );
+    return { ok: true, id: memberId };
+  } catch (err) {
+    return { ok: false, error: "No se pudo guardar el integrante." };
+  }
+}
+
+/** Da de baja (o reactiva) a un integrante: su PIN deja de valer pero el historial queda. */
+export async function adminSetStaffActive({ id, active, authPin } = {}) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  if (!isId(id)) return INVALID;
+
+  const auth = await authorizeStaff(authPin);
+  if (auth.error) return { ok: false, error: auth.error };
+  if (!MANAGER_ROLES.includes(auth.staff.role)) {
+    return {
+      ok: false,
+      error: "Solo un Administrador o Encargado puede modificar el equipo.",
+    };
+  }
+  try {
+    const db = getDb();
+    const members = await loadStaffMembers(db);
+    const member = members.find((m) => m.id === id);
+    if (!member) return { ok: false, error: "Ese integrante no existe." };
+    if (!active && !keepsAManager(members, id, { active: false })) {
+      return {
+        ok: false,
+        error: "Tiene que quedar al menos un Administrador o Encargado activo.",
+      };
+    }
+    await db.ref(`staffMembers/${id}/active`).set(Boolean(active));
+    await audit(
+      db,
+      auth.staff,
+      active ? "EQUIPO_REACTIVAR" : "EQUIPO_BAJA",
+      `${member.name} (${member.role})`,
+      active ? "PIN reactivado" : "PIN dado de baja",
+    );
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: "No se pudo actualizar el integrante." };
+  }
+}
+
+/** Registro de acciones del equipo, del más nuevo al más viejo. */
+export async function adminGetAuditLog(limit = 100) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   if (!isFirebaseConfigured()) return { ok: true, logs: [] };
 
   try {
-    const db = getDb();
-    const snap = await db
+    const snap = await getDb()
       .ref("auditLog")
       .orderByChild("timestamp")
-      .limitToLast(Math.min(100, Math.max(1, Number(limit) || 40)))
+      .limitToLast(Math.min(500, Math.max(1, Number(limit) || 100)))
       .once("value");
-    const logs = snapToList(snap).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    const logs = snapToList(snap).sort(
+      (a, b) => (b.timestamp || 0) - (a.timestamp || 0),
+    );
     return { ok: true, logs };
   } catch (error) {
     return { ok: false, error: "No se pudo cargar el registro de auditoría." };
+  }
+}
+
+const OPEN_ACCOUNT_DAYS = 14;
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+const ars = (n) => `$${Math.round(n).toLocaleString("es-AR")}`;
+
+/**
+ * Alertas operativas reales para la campana del header: lo que el personal
+ * tiene que resolver hoy. Cada una dice a qué vista llevar.
+ * @returns {Promise<{ ok: true, alerts: Array<{id:string,tone:"danger"|"warning"|"info",title:string,detail:string,view:string}> }>}
+ */
+export async function adminGetAlerts() {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  if (!isFirebaseConfigured()) return { ok: true, alerts: [] };
+
+  try {
+    const db = getDb();
+    const { isoDate: today, hhmm } = nowInClubTimezone();
+    const yesterday = isoAddDays(today, -1);
+    const [day, prev, recentSales, members] = await Promise.all([
+      loadDayRecords(db, today),
+      loadDayRecords(db, yesterday),
+      loadByDateRange(
+        db,
+        "cantinaSales",
+        isoAddDays(today, -OPEN_ACCOUNT_DAYS),
+        today,
+      ),
+      loadStaffMembers(db),
+    ]);
+    const alerts = [];
+
+    if (!members.some((m) => m.active !== false)) {
+      alerts.push({
+        id: "staff-setup",
+        tone: "danger",
+        title: "Falta configurar el equipo",
+        detail: "Sin PINs no se puede cancelar, borrar ni cerrar caja.",
+        view: "configuracion",
+      });
+    }
+
+    const prevCash = computeDailyCash(prev);
+    if (
+      (prevCash.cobrado > 0 || prevCash.totalExpenses > 0) &&
+      !prev.session?.closed
+    ) {
+      alerts.push({
+        id: "yesterday-open",
+        tone: "danger",
+        title: "La caja de ayer no se cerró",
+        detail: `Hubo movimientos el ${yesterday} y falta el Cierre Z.`,
+        view: "caja",
+      });
+    }
+
+    const overdue = day.bookings.filter(
+      (b) =>
+        isCountableBooking(b) && b.startTime <= hhmm && pendingAmount(b) > 0,
+    );
+    if (overdue.length) {
+      alerts.push({
+        id: "overdue",
+        tone: "warning",
+        title: `${plural(overdue.length, "turno")} en juego o terminado con saldo`,
+        detail: `Falta cobrar ${ars(overdue.reduce((s, b) => s + pendingAmount(b), 0))}`,
+        view: "agenda",
+      });
+    }
+
+    const { pagadosSinCobro } = summarizeRecords(day);
+    if (pagadosSinCobro) {
+      alerts.push({
+        id: "paid-no-payment",
+        tone: "warning",
+        title: `${plural(pagadosSinCobro, "turno")} "pagado" sin cobro cargado`,
+        detail: "No aparecen en caja hasta que se registre el cobro.",
+        view: "agenda",
+      });
+    }
+
+    const open = onAccountTotal(recentSales);
+    if (open > 0) {
+      alerts.push({
+        id: "on-account",
+        tone: "info",
+        title: "Consumos de cantina a cuenta",
+        detail: `${ars(open)} sin cobrar en los últimos ${OPEN_ACCOUNT_DAYS} días`,
+        view: "cantina",
+      });
+    }
+
+    return { ok: true, alerts };
+  } catch (error) {
+    return { ok: false, error: "No se pudieron calcular las alertas." };
   }
 }

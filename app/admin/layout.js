@@ -3,6 +3,7 @@ import "./admin.css";
 import "./agenda.css";
 import "./views.css";
 import "./insights.css";
+import "./ui/ui.css";
 
 // Una sola sans para todo el admin (inputs, montos, placeholders). La web
 // pública sigue con Poppins: esta fuente y admin.css solo aplican dentro de

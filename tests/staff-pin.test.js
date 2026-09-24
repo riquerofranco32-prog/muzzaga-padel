@@ -1,40 +1,54 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { verifyStaffPin, getStaffList, DEFAULT_STAFF } from "../lib/staff.js";
+import {
+  verifyStaffPin,
+  makeStaffRecord,
+  publicStaff,
+  isPinTaken,
+} from "../lib/staff.js";
 
-test("verifyStaffPin matches valid team PINs", () => {
-  const franco = verifyStaffPin("1234");
-  assert.equal(franco.valid, true);
-  assert.equal(franco.staff.name, "Franco");
-  assert.equal(franco.staff.id, "franco");
-
-  const recep = verifyStaffPin("1111");
-  assert.equal(recep.valid, true);
-  assert.equal(recep.staff.name, "Recepción Mañana");
-
-  const invalid = verifyStaffPin("0000");
-  assert.equal(invalid.valid, false);
-  assert.equal(invalid.staff, null);
-
-  const empty = verifyStaffPin("");
-  assert.equal(empty.valid, false);
+const member = (id, pin, extra = {}) => ({
+  id,
+  ...makeStaffRecord({ name: `Staff ${id}`, role: "Recepción", pin }),
+  ...extra,
 });
 
-test("verifyStaffPin supports custom staff list", () => {
-  const custom = [{ id: "profe", name: "Profe Nico", pin: "5555", role: "Profesor" }];
-  const res = verifyStaffPin("5555", custom);
+test("hashed records verify without storing the PIN", () => {
+  const nico = member("nico", "5555");
+  assert.equal(nico.pin, undefined);
+  assert.ok(nico.pinHash && nico.salt);
+  const res = verifyStaffPin("5555", [nico]);
   assert.equal(res.valid, true);
-  assert.equal(res.staff.name, "Profe Nico");
-
-  // Old PIN fails when using custom list
-  assert.equal(verifyStaffPin("1234", custom).valid, false);
+  assert.equal(res.staff.id, "nico");
+  assert.equal(verifyStaffPin("5556", [nico]).valid, false);
 });
 
-test("getStaffList returns safe staff info", () => {
-  const list = getStaffList();
-  assert.equal(list.length, DEFAULT_STAFF.length);
-  assert.ok(list[0].name);
-  assert.ok(list[0].role);
-  assert.ok(list[0].pinHint);
-  assert.equal(list[0].pin, undefined); // PIN is not leaked
+test("rejects malformed PINs and empty teams", () => {
+  const team = [member("a", "4821")];
+  assert.equal(verifyStaffPin("", team).valid, false);
+  assert.equal(verifyStaffPin("12a4", team).valid, false);
+  assert.equal(verifyStaffPin("123", team).valid, false);
+  assert.equal(verifyStaffPin("4821", []).valid, false);
+});
+
+test("inactive members cannot authorize", () => {
+  const team = [member("x", "4444", { active: false })];
+  assert.equal(verifyStaffPin("4444", team).valid, false);
+});
+
+test("isPinTaken detects duplicates except for the same member", () => {
+  const team = [member("a", "7070"), member("b", "8080")];
+  assert.equal(isPinTaken("7070", team), true);
+  assert.equal(isPinTaken("7070", team, "a"), false);
+  assert.equal(isPinTaken("9090", team), false);
+  // Un PIN de alguien dado de baja tampoco se reutiliza.
+  assert.equal(isPinTaken("6060", [member("c", "6060", { active: false })]), true);
+});
+
+test("publicStaff never leaks PIN material", () => {
+  publicStaff([member("a", "7070")]).forEach((m) => {
+    assert.equal(m.pinHash, undefined);
+    assert.equal(m.salt, undefined);
+    assert.equal(m.active, true);
+  });
 });

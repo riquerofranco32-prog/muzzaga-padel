@@ -1,0 +1,288 @@
+/* ==========================================================================
+   Componentes compartidos del admin (ui/*). Usan solo los tokens de
+   admin.css. El modal de PIN vive en un portal sobre <body>, por eso
+   repite .admin-root y redefine los tokens que usa.
+   ========================================================================== */
+
+/* ---------- KPI cards (KpiCard.jsx) ---------- */
+.admin-root .admin-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--kpi-min, 210px)), 1fr)
+  );
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-root .admin-kravio-kpi-card.is-clickable {
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  width: 100%;
+}
+
+.admin-root .admin-kravio-kpi-card.is-clickable:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+}
+
+.admin-root .admin-kpi-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.admin-root .admin-kpi-sub-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.admin-root .admin-kpi-tone-success .admin-kravio-kpi-number,
+.admin-root .admin-kpi-tone-success .admin-kpi-icon {
+  color: var(--success);
+}
+.admin-root .admin-kpi-tone-brand .admin-kravio-kpi-number,
+.admin-root .admin-kpi-tone-brand .admin-kpi-icon {
+  color: var(--accent-orange);
+}
+.admin-root .admin-kpi-tone-danger .admin-kravio-kpi-number,
+.admin-root .admin-kpi-tone-danger .admin-kpi-icon {
+  color: var(--danger);
+}
+.admin-root .admin-kpi-tone-warning .admin-kravio-kpi-number,
+.admin-root .admin-kpi-tone-warning .admin-kpi-icon {
+  color: var(--warning);
+}
+.admin-root .admin-kpi-tone-info .admin-kravio-kpi-number,
+.admin-root .admin-kpi-tone-info .admin-kpi-icon {
+  color: var(--info);
+}
+.admin-root .admin-kpi-tone-dark {
+  background: var(--accent-strong);
+  border-color: var(--accent);
+}
+.admin-root .admin-kpi-tone-dark .admin-kravio-kpi-number {
+  color: #ffffff;
+}
+.admin-root .admin-kpi-tone-dark .admin-kravio-kpi-title,
+.admin-root .admin-kpi-tone-dark .admin-kpi-sub-text {
+  color: #cbd5e1;
+}
+.admin-root .admin-kpi-tone-dark .admin-kpi-icon {
+  color: var(--accent-orange);
+}
+
+/* ---------- Modal de PIN (StaffPinModal.jsx) ---------- */
+.admin-root.admin-pin-backdrop {
+  --surface: #ffffff;
+  --surface-muted: #f9fafb;
+  --border: #e5e7eb;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --accent-orange: #e8651a;
+  --danger: #dc2626;
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(4px);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  color: var(--text);
+  animation: modalFadeIn 0.18s ease-out;
+}
+
+.admin-pin-card {
+  width: 100%;
+  max-width: 400px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+  animation: modalScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.admin-pin-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  background: #fff7ed;
+}
+.admin-pin-card.is-danger .admin-pin-head {
+  background: #fef2f2;
+}
+.admin-pin-head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.admin-pin-head > div {
+  flex: 1;
+  min-width: 0;
+}
+.admin-pin-head > div span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.admin-pin-head-icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: var(--accent-orange);
+  flex-shrink: 0;
+}
+.admin-pin-card.is-danger .admin-pin-head-icon {
+  color: var(--danger);
+}
+.admin-pin-close {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+}
+.admin-pin-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.admin-pin-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+.admin-pin-desc {
+  font-size: 13px;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+.admin-pin-target {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+.admin-pin-target span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.admin-pin-input {
+  height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 26px;
+  letter-spacing: 0.5em;
+  text-align: center;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  background: var(--surface-muted);
+  color: var(--text);
+  outline: none;
+  padding-left: 0.5em;
+}
+.admin-pin-input:focus {
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 0 3px rgba(232, 101, 26, 0.15);
+}
+.admin-pin-input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.admin-pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+.admin-pin-keypad button {
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.12s,
+    transform 0.08s;
+}
+.admin-pin-keypad button:hover {
+  background: var(--surface-muted);
+}
+.admin-pin-keypad button:active {
+  transform: scale(0.96);
+}
+.admin-pin-keypad button.is-del {
+  color: var(--text-muted);
+}
+
+.admin-pin-error {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.admin-pin-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.admin-pin-actions .btn {
+  height: 40px;
+}
+.admin-pin-submit {
+  background: var(--accent-orange);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+}
+.admin-pin-submit.is-danger {
+  background: var(--danger);
+}
+.admin-pin-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Keypad de pantalla solo donde no hay teclado físico. */
+@media (hover: hover) and (pointer: fine) {
+  .admin-pin-keypad {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-root.admin-pin-backdrop,
+  .admin-pin-card {
+    animation: none;
+  }
+}
