@@ -7,6 +7,7 @@ import {
   joinOpenMatch,
 } from "../app/open-matches/actions";
 import { PRECIO_POR_JUGADOR } from "../data/pricing";
+import Portal from "./Portal";
 
 const WHATSAPP = "5492995974176";
 
@@ -353,6 +354,7 @@ export default function CommunityMatchesSection() {
 
       {/* MODAL PARA SUMARSE A UN SLOT */}
       {joinModal && (
+        <Portal>
         <div
           className="admin-modal-backdrop"
           onClick={() => setJoinModal(null)}
@@ -441,10 +443,12 @@ export default function CommunityMatchesSection() {
             </form>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* MODAL PARA CREAR CONVOCATORIA */}
       {createModal && (
+        <Portal>
         <div
           className="admin-modal-backdrop"
           onClick={() => setCreateModal(false)}
@@ -616,6 +620,7 @@ export default function CommunityMatchesSection() {
             </form>
           </div>
         </div>
+        </Portal>
       )}
     </section>
   );

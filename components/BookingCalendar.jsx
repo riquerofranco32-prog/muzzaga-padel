@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createBooking } from "../app/actions";
 import BookingPassModal from "./BookingPassModal";
+import { MaybePortal } from "./Portal";
+import useMediaQuery from "../lib/useMediaQuery";
 import { COURTS, nextDays, priceForSlot, todayInClub } from "../lib/booking";
 import { PICK_SLOT_EVENT } from "../lib/pickSlot";
 import { toWhatsappNumber } from "../lib/phone";
@@ -41,6 +43,9 @@ export default function BookingCalendar({ serverToday }) {
   const [courts, setCourts] = useState(COURTS);
   const [loadError, setLoadError] = useState(null);
   const [selected, setSelected] = useState(null); // { courtId, start, end }
+  // Hasta 768 el formulario es un drawer fijo sobre la página: va a <body> para
+  // no quedar debajo del header y la barra inferior. En notebook va en línea.
+  const isDrawer = useMediaQuery("(max-width: 768px)");
   const [form, setForm] = useState({
     playerName: "",
     playerPhone: "",
@@ -402,6 +407,7 @@ export default function BookingCalendar({ serverToday }) {
       )}
 
       {selected && selectedPricing && (
+        <MaybePortal enabled={isDrawer}>
         <div
           className="booking-drawer-backdrop"
           onClick={(e) => {
@@ -587,6 +593,7 @@ export default function BookingCalendar({ serverToday }) {
             </button>
           </form>
         </div>
+        </MaybePortal>
       )}
 
       {confirmed && (

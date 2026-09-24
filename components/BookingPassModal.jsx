@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Portal from "./Portal";
 
 // Antes esta pantalla mostraba un CBU y un alias inventados (placeholder de
 // ejemplo) como si fueran los datos reales del club, con botón "Copiar" y
@@ -130,6 +131,7 @@ export default function BookingPassModal({
   if (!booking) return null;
 
   return (
+    <Portal>
     <div className="admin-modal-backdrop" onClick={onClose}>
       <div className="digital-pass-modal" onClick={(e) => e.stopPropagation()}>
         {/* CONFIRMATION BANNER */}
@@ -440,6 +442,6 @@ export default function BookingPassModal({
         </div>
       </div>
     </div>
+    </Portal>
   );
 }
-
