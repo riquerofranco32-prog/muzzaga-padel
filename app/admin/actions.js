@@ -49,6 +49,7 @@ import {
   clearLoginAttempts,
   registerFailedLogin,
 } from "../../lib/adminRateLimit";
+import { verifyStaffPin, getStaffList } from "../../lib/staff";
 
 export async function verifyAdminPassword(password) {
   const gate = await checkLoginAllowed();
@@ -350,6 +351,56 @@ export async function adminCancelBooking(bookingId, date, courtId, startTime) {
   }
 }
 
+/** Elimina definitivamente una reserva de la base, requiriendo PIN de staff. */
+export async function adminDeleteBooking({ bookingId, pin, reason }) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const staffAuth = verifyStaffPin(pin);
+  if (!staffAuth.valid) {
+    return { ok: false, error: "PIN de equipo incorrecto." };
+  }
+
+  if (!bookingId) return { ok: false, error: "Turno inválido." };
+
+  try {
+    const db = getDb();
+    const snap = await db.ref(`bookings/${bookingId}`).once("value");
+    const booking = snap.val();
+    if (!booking) return { ok: false, error: "El turno no existe." };
+
+    if (booking.date && (await isCashClosed(db, booking.date))) {
+      return {
+        ok: false,
+        error: "La caja de ese día ya está cerrada. No se puede eliminar el turno.",
+      };
+    }
+
+    if (booking.date && booking.courtId && booking.startTime) {
+      await db
+        .ref(`slotClaims/${booking.date}/${slotKey(booking.courtId, booking.startTime)}`)
+        .remove();
+    }
+
+    await db.ref(`bookings/${bookingId}`).remove();
+
+    const auditRef = db.ref("auditLog").push();
+    await auditRef.set({
+      action: "ELIMINAR_TURNO",
+      target: `${booking.playerName || "Turno"} · ${booking.date} ${booking.startTime}`,
+      courtName: booking.courtName,
+      staffName: staffAuth.staff.name,
+      staffRole: staffAuth.staff.role,
+      details: reason ? `Motivo: ${reason}` : "Turno eliminado definitivamente de la base",
+      timestamp: Date.now(),
+    });
+
+    return { ok: true, staff: staffAuth.staff.name };
+  } catch (error) {
+    return { ok: false, error: "No se pudo eliminar el turno." };
+  }
+}
+
 /** Registra un cobro parcial o total sobre una reserva (seña, efectivo, etc). */
 export async function adminAddPayment(bookingId, method, amount) {
   const denied = await requireAdmin();
@@ -440,7 +491,15 @@ export async function adminGetClients() {
   if (!isFirebaseConfigured()) return { ok: true, clients: [] };
 
   try {
-    const snap = await getDb().ref("bookings").get();
+    const db = getDb();
+    const [snap, deletedSnap] = await Promise.all([
+      db.ref("bookings").get(),
+      db.ref("deletedClients").get(),
+    ]);
+
+    const deletedKeys = new Set(
+      deletedSnap.exists() ? Object.keys(deletedSnap.val()) : [],
+    );
     const byKey = new Map();
 
     snapToList(snap).forEach((b) => {
@@ -448,6 +507,8 @@ export async function adminGetClients() {
       const phone = (b.playerPhone || "").trim();
       const name = (b.playerName || "Sin nombre").trim();
       const key = clientKey(phone, name);
+      if (deletedKeys.has(key)) return; // Excluir clientes eliminados
+
       const date = b.date || "";
       const existing = byKey.get(key);
       if (existing) {
@@ -478,6 +539,49 @@ export async function adminGetClients() {
     return { ok: true, clients };
   } catch (error) {
     return { ok: false, error: "No se pudo cargar el listado de clientes." };
+  }
+}
+
+/** Elimina a un cliente del CRM y listados, requiriendo PIN del personal para auditoría. */
+export async function adminDeleteClient({ key, pin, reason }) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const staffAuth = verifyStaffPin(pin);
+  if (!staffAuth.valid) {
+    return { ok: false, error: "PIN de equipo incorrecto." };
+  }
+
+  if (!CLIENT_KEY.test(key || "")) {
+    return { ok: false, error: "Cliente inválido." };
+  }
+
+  try {
+    const db = getDb();
+    await db.ref(`deletedClients/${key}`).set({
+      deletedAt: Date.now(),
+      deletedBy: staffAuth.staff.name,
+      staffRole: staffAuth.staff.role,
+      reason: (reason || "").trim(),
+    });
+
+    // Limpiar notas
+    await db.ref(`clientNotes/${key}`).remove();
+
+    // Log de auditoría
+    const auditRef = db.ref("auditLog").push();
+    await auditRef.set({
+      action: "ELIMINAR_CLIENTE",
+      target: key,
+      staffName: staffAuth.staff.name,
+      staffRole: staffAuth.staff.role,
+      details: reason ? `Motivo: ${reason}` : "Cliente eliminado del sistema",
+      timestamp: Date.now(),
+    });
+
+    return { ok: true, staff: staffAuth.staff.name };
+  } catch (error) {
+    return { ok: false, error: "No se pudo eliminar el cliente." };
   }
 }
 
@@ -856,6 +960,43 @@ export async function adminVoidCantinaSale(saleId, reason) {
   }
 }
 
+/** Elimina definitivamente una venta de cantina, requiriendo PIN de staff. */
+export async function adminDeleteCantinaSale({ saleId, pin, reason }) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const staffAuth = verifyStaffPin(pin);
+  if (!staffAuth.valid) {
+    return { ok: false, error: "PIN de equipo incorrecto." };
+  }
+
+  if (!saleId) return { ok: false, error: "Venta inválida." };
+
+  try {
+    const db = getDb();
+    const snap = await db.ref(`cantinaSales/${saleId}`).once("value");
+    const sale = snap.val();
+    if (!sale) return { ok: false, error: "La venta no existe." };
+
+    await db.ref(`cantinaSales/${saleId}`).remove();
+
+    const auditRef = db.ref("auditLog").push();
+    await auditRef.set({
+      action: "ELIMINAR_PEDIDO_CANTINA",
+      target: `Pedido #${saleId.slice(-6)} ($${sale.total})`,
+      amount: sale.total,
+      staffName: staffAuth.staff.name,
+      staffRole: staffAuth.staff.role,
+      details: reason ? `Motivo: ${reason}` : "Pedido eliminado definitivamente",
+      timestamp: Date.now(),
+    });
+
+    return { ok: true, staff: staffAuth.staff.name };
+  } catch (error) {
+    return { ok: false, error: "No se pudo eliminar la venta." };
+  }
+}
+
 /** Cobra un consumo que estaba a cuenta de un turno. */
 export async function adminSettleCantinaSale(saleId, method) {
   const denied = await requireAdmin();
@@ -1150,6 +1291,45 @@ export async function adminAddCashExpense({
   }
 }
 
+/** Elimina un egreso de caja cargado por error, requiriendo PIN de staff. */
+export async function adminDeleteCashExpense({ date, expenseId, pin, reason }) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const staffAuth = verifyStaffPin(pin);
+  if (!staffAuth.valid) {
+    return { ok: false, error: "PIN de equipo incorrecto." };
+  }
+
+  if (!date || !expenseId) return { ok: false, error: "Egreso inválido." };
+
+  try {
+    const db = getDb();
+    if (await isCashClosed(db, date)) {
+      return { ok: false, error: "La caja de ese día ya está cerrada." };
+    }
+
+    const snap = await db.ref(`cashExpenses/${date}/${expenseId}`).once("value");
+    const expense = snap.val();
+
+    await db.ref(`cashExpenses/${date}/${expenseId}`).remove();
+
+    const auditRef = db.ref("auditLog").push();
+    await auditRef.set({
+      action: "ELIMINAR_EGRESO_CAJA",
+      target: expense ? `${expense.concept} ($${expense.amount})` : expenseId,
+      staffName: staffAuth.staff.name,
+      staffRole: staffAuth.staff.role,
+      details: reason ? `Motivo: ${reason}` : "Egreso eliminado",
+      timestamp: Date.now(),
+    });
+
+    return { ok: true, staff: staffAuth.staff.name };
+  } catch (error) {
+    return { ok: false, error: "No se pudo eliminar el egreso." };
+  }
+}
+
 export async function adminGetDailyCashSummary(isoDate) {
   const denied = await requireAdmin();
   if (denied) return denied;
@@ -1370,5 +1550,38 @@ export async function adminMoveBooking({
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err.message || "Error al mover la reserva." };
+  }
+}
+
+/** Valida un PIN de staff contra el equipo oficial de Muzzaga Pádel. */
+export async function adminVerifyStaffPinAction(pin) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const res = verifyStaffPin(pin);
+  if (!res.valid) {
+    return { ok: false, error: "PIN de equipo incorrecto." };
+  }
+  return { ok: true, staff: res.staff };
+}
+
+/** Obtiene los registros recientes de auditoría de acciones del personal. */
+export async function adminGetAuditLog(limit = 40) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) return { ok: true, logs: [] };
+
+  try {
+    const db = getDb();
+    const snap = await db
+      .ref("auditLog")
+      .orderByChild("timestamp")
+      .limitToLast(Math.min(100, Math.max(1, Number(limit) || 40)))
+      .once("value");
+    const logs = snapToList(snap).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    return { ok: true, logs };
+  } catch (error) {
+    return { ok: false, error: "No se pudo cargar el registro de auditoría." };
   }
 }

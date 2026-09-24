@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarDays, UtensilsCrossed, X } from "lucide-react";
-import { adminGetClientDetail, adminSaveClientNote } from "../../actions";
+import { CalendarDays, UtensilsCrossed, X, Trash2 } from "lucide-react";
+import {
+  adminGetClientDetail,
+  adminSaveClientNote,
+  adminDeleteClient,
+} from "../../actions";
 import {
   formatARS,
   formatDate,
@@ -14,6 +18,7 @@ import { todayInClub } from "../../../../lib/booking";
 import { categorizeClient } from "../../../../lib/clientsExport";
 import { EmptyState, SkeletonRows } from "../../ui/states";
 import { WhatsAppMiniIcon } from "../../adminHelpers";
+import StaffPinModal from "../../ui/StaffPinModal";
 
 const STATUS_LABEL = {
   confirmado: "Confirmado",
@@ -33,11 +38,12 @@ export function initials(name) {
 }
 
 /** Panel lateral con historial, consumo en cantina, notas y WhatsApp. */
-export default function ClientDrawer({ client, onClose, onToast }) {
+export default function ClientDrawer({ client, onClose, onToast, onDeleted }) {
   const [detail, setDetail] = useState(null);
   const [note, setNote] = useState("");
   const [savedNote, setSavedNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const today = todayInClub();
 
   useEffect(() => {
@@ -265,7 +271,60 @@ export default function ClientDrawer({ client, onClose, onToast }) {
             </p>
           )}
         </section>
+
+        {/* Zona de peligro: eliminar cliente */}
+        <section
+          className="admin-drawer-section"
+          style={{
+            borderTop: "1px solid var(--border)",
+            paddingTop: 16,
+            marginTop: 10,
+          }}
+        >
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={{
+              width: "100%",
+              color: "#dc2626",
+              borderColor: "#fca5a5",
+              background: "#fff1f2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              fontSize: 13,
+              fontWeight: 600,
+            }}
+            onClick={() => setIsPinModalOpen(true)}
+          >
+            <Trash2 size={15} /> Eliminar cliente del sistema
+          </button>
+        </section>
       </aside>
+
+      {isPinModalOpen && (
+        <StaffPinModal
+          isOpen={isPinModalOpen}
+          title="Eliminar Cliente"
+          description={`¿Confirmás que querés eliminar al cliente ${client.name}? Esta acción requiere autorización por PIN y removerá al cliente del CRM.`}
+          targetName={`${client.name} (${client.phone || "Sin teléfono"})`}
+          confirmButtonText="Eliminar Cliente"
+          confirmButtonTone="danger"
+          onClose={() => setIsPinModalOpen(false)}
+          onConfirm={async ({ pin, reason }) => {
+            const res = await adminDeleteClient({ key: client.key, pin, reason });
+            if (res.ok) {
+              setIsPinModalOpen(false);
+              onToast?.(`Cliente eliminado por ${res.staff}`);
+              onDeleted?.(client.key);
+              onClose();
+            } else {
+              throw new Error(res.error || "No se pudo eliminar el cliente.");
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

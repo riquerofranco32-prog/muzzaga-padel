@@ -27,9 +27,11 @@ import {
   adminSetTestFlag,
   adminSettleCantinaSale,
   adminVoidCantinaSale,
+  adminDeleteCantinaSale,
   getAdminDayData,
 } from "../actions";
 import { MENU_CATEGORIES, MENU_ITEMS } from "../../../data/menu";
+import StaffPinModal from "../ui/StaffPinModal";
 import { todayInClub } from "../../../lib/booking";
 import {
   computeDailyCash,
@@ -69,6 +71,7 @@ export default function CantinaView({ onExpiredSession, onToast }) {
   const [isCartOpen, setIsCartOpen] = useState(false); // bottom sheet en mobile
   const [voiding, setVoiding] = useState(null); // venta a anular
   const [voidReason, setVoidReason] = useState("");
+  const [deletingSale, setDeletingSale] = useState(null);
   const searchRef = useRef(null);
 
   useEffect(() => {
@@ -684,12 +687,22 @@ export default function CantinaView({ onExpiredSession, onToast }) {
                         </button>
                         <button
                           type="button"
-                          className="admin-table-action-btn delete"
+                          className="admin-table-action-btn"
                           onClick={() => setVoiding(s)}
                           aria-label="Anular venta"
-                          title="Anular venta"
+                          title="Anular venta (queda en historial)"
                         >
                           <Ban {...ICON} />
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-table-action-btn delete"
+                          onClick={() => setDeletingSale(s)}
+                          aria-label="Eliminar venta definitivamente"
+                          title="Eliminar definitivamente con PIN"
+                          style={{ color: "#dc2626" }}
+                        >
+                          <Trash2 {...ICON} />
                         </button>
                       </>
                     )}
@@ -780,6 +793,32 @@ export default function CantinaView({ onExpiredSession, onToast }) {
             </div>
           </div>
         </div>
+      )}
+
+      {deletingSale && (
+        <StaffPinModal
+          isOpen={Boolean(deletingSale)}
+          title="Eliminar Pedido de Cantina"
+          description="¿Confirmás que querés eliminar definitivamente esta venta? Se borrará el registro de la base de datos."
+          targetName={`Ticket #${deletingSale.id.slice(-6)} · ${formatARS(deletingSale.total)} (${deletingSale.items?.map((it) => `${it.qty}× ${it.name}`).join(", ")})`}
+          confirmButtonText="Eliminar Pedido"
+          confirmButtonTone="danger"
+          onClose={() => setDeletingSale(null)}
+          onConfirm={async ({ pin, reason }) => {
+            const res = await adminDeleteCantinaSale({
+              saleId: deletingSale.id,
+              pin,
+              reason,
+            });
+            if (res.ok) {
+              setDeletingSale(null);
+              loadSales();
+              onToast?.(`Pedido eliminado por ${res.staff}`);
+            } else {
+              throw new Error(res.error || "No se pudo eliminar el pedido.");
+            }
+          }}
+        />
       )}
       </div>
     </div>

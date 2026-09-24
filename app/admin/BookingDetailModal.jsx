@@ -5,9 +5,14 @@ import { depositFor, slotTimesFor } from "../../lib/clubConfig";
 import { formatARS } from "../../lib/format";
 import { toWhatsappNumber } from "../../lib/phone";
 import { categorizeClient } from "../../lib/clientsExport";
-import { adminMoveBooking, adminSettleCantinaSale } from "./actions";
+import {
+  adminMoveBooking,
+  adminSettleCantinaSale,
+  adminDeleteBooking,
+} from "./actions";
 import { onAccountTotal } from "../../lib/metrics";
 import { formatDate, plural } from "../../lib/format";
+import StaffPinModal from "./ui/StaffPinModal";
 import {
   IconClose,
   IconTrash,
@@ -34,11 +39,13 @@ export default function BookingDetailModal({
   onCancel,
   onToggleTest,
   onMoved,
+  onDeletedBooking,
   sales = [],
   onSalesChanged,
   onToast,
 }) {
   const [isMoving, setIsMoving] = useState(false);
+  const [isDeletePinOpen, setIsDeletePinOpen] = useState(false);
   const [moveCourtId, setMoveCourtId] = useState(booking.courtId || "cancha-1");
   const [moveDate, setMoveDate] = useState(booking.date || "");
   const [moveStartTime, setMoveStartTime] = useState(
@@ -647,6 +654,23 @@ export default function BookingDetailModal({
           </button>
         )}
 
+        <button
+          type="button"
+          className="admin-table-action-btn delete"
+          style={{
+            width: "auto",
+            padding: "6px 12px",
+            fontSize: 12.5,
+            color: "#dc2626",
+            borderColor: "#fca5a5",
+            marginLeft: 8,
+          }}
+          onClick={() => setIsDeletePinOpen(true)}
+          title="Elimina el turno definitivamente de la base requiriendo PIN"
+        >
+          <IconTrash size={12} /> Eliminar definitivamente
+        </button>
+
         {onToggleTest && (
           <button
             type="button"
@@ -666,6 +690,33 @@ export default function BookingDetailModal({
           </button>
         )}
       </div>
+
+      {isDeletePinOpen && (
+        <StaffPinModal
+          isOpen={isDeletePinOpen}
+          title="Eliminar Turno Definitivamente"
+          description={`¿Confirmás que querés eliminar definitivamente el turno de ${booking.playerName}? Se liberará el horario de la cancha y se borrará el registro de la base.`}
+          targetName={`${booking.playerName} · ${booking.courtName} (${booking.date} ${booking.startTime} hs)`}
+          confirmButtonText="Eliminar Turno"
+          confirmButtonTone="danger"
+          onClose={() => setIsDeletePinOpen(false)}
+          onConfirm={async ({ pin, reason }) => {
+            const res = await adminDeleteBooking({
+              bookingId: booking.id,
+              pin,
+              reason,
+            });
+            if (res.ok) {
+              setIsDeletePinOpen(false);
+              onToast?.(`Turno eliminado por ${res.staff}`);
+              onDeletedBooking?.();
+              onClose();
+            } else {
+              throw new Error(res.error || "No se pudo eliminar el turno.");
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

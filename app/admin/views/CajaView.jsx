@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Coins, Download, Lock, Receipt, Scale, Send, X } from "lucide-react";
+import { Coins, Download, Lock, Receipt, Scale, Send, Trash2, X } from "lucide-react";
 import { EmptyState, SkeletonCards, SkeletonRows } from "../ui/states";
+import StaffPinModal from "../ui/StaffPinModal";
 import { formatARS, formatDate, formatTime, plural } from "../../../lib/format";
 import { cashDiffTone } from "../../../lib/metrics";
 import {
   adminAddCashExpense,
   adminCloseDailyCash,
+  adminDeleteCashExpense,
   adminGetCashHistory,
   adminGetDailyCashSummary,
 } from "../actions";
@@ -66,6 +68,7 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
     notes: "",
   });
   const [addingExpense, setAddingExpense] = useState(false);
+  const [deletingExpense, setDeletingExpense] = useState(null);
 
   const [counted, setCounted] = useState("");
   const [showBillCalc, setShowBillCalc] = useState(false);
@@ -449,15 +452,31 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
           ) : (
             <ul className="admin-expense-list">
               {summary.expensesList.map((x) => (
-                <li key={x.id}>
-                  <span className="admin-tag">{categoryLabel(x.category)}</span>
-                  <span className="admin-expense-concept">
-                    {x.concept}
-                    {x.notes && <small> · {x.notes}</small>}
-                  </span>
-                  <strong className="is-negative">
-                    {formatARS(-x.amount)}
-                  </strong>
+                <li key={x.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+                    <span className="admin-tag">{categoryLabel(x.category)}</span>
+                    <span className="admin-expense-concept" style={{ flex: 1, minWidth: 0 }}>
+                      {x.concept}
+                      {x.notes && <small> · {x.notes}</small>}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <strong className="is-negative">
+                      {formatARS(-x.amount)}
+                    </strong>
+                    {!isClosed && (
+                      <button
+                        type="button"
+                        className="btn-icon"
+                        style={{ color: "#9ca3af", padding: 4, cursor: "pointer", background: "none", border: "none" }}
+                        title="Eliminar egreso (requiere PIN)"
+                        aria-label={`Eliminar egreso ${x.concept}`}
+                        onClick={() => setDeletingExpense(x)}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -781,6 +800,33 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
             </div>
           </div>
         </div>
+      )}
+
+      {deletingExpense && (
+        <StaffPinModal
+          isOpen={Boolean(deletingExpense)}
+          onClose={() => setDeletingExpense(null)}
+          title="Eliminar egreso de caja"
+          description={`¿Seguro que querés eliminar el egreso "${deletingExpense.concept}" por ${formatARS(-deletingExpense.amount)}?`}
+          actionLabel="Eliminar egreso"
+          confirmTone="danger"
+          requireReason={false}
+          onConfirm={async ({ pin, staff, reason }) => {
+            const res = await adminDeleteCashExpense({
+              date,
+              expenseId: deletingExpense.id,
+              pin,
+              reason,
+            });
+            if (res.ok) {
+              onToast?.(`Egreso eliminado por ${staff.name}`);
+              setDeletingExpense(null);
+              loadSummary();
+            } else {
+              throw new Error(res.error || "No se pudo eliminar el egreso");
+            }
+          }}
+        />
       )}
     </div>
   );

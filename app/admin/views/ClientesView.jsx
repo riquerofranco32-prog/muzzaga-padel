@@ -9,6 +9,7 @@ import {
   Send,
   Users,
   X,
+  Trash2,
 } from "lucide-react";
 import {
   formatARS,
@@ -27,6 +28,8 @@ import {
 import { EmptyState, SkeletonRows } from "../ui/states";
 import { WhatsAppMiniIcon } from "../adminHelpers";
 import ClientDrawer, { initials } from "./clientes/ClientDrawer";
+import StaffPinModal from "../ui/StaffPinModal";
+import { adminDeleteClient } from "../actions";
 
 const SEARCH_DEBOUNCE_MS = 250;
 const ICON = { size: 16, strokeWidth: 1.75, "aria-hidden": true };
@@ -60,12 +63,14 @@ export default function ClientesView({
   clients = null,
   initialSearch = "",
   onToast,
+  onReloadClients,
 }) {
   const [searchInput, setSearchInput] = useState(initialSearch);
   const [search, setSearch] = useState(initialSearch);
   const [segment, setSegment] = useState("all");
   const [sort, setSort] = useState({ by: "count", dir: "desc" });
   const [openClient, setOpenClient] = useState(null);
+  const [deletingClient, setDeletingClient] = useState(null);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteText, setInviteText] = useState(DEFAULT_INVITE);
   const [invited, setInvited] = useState(() => new Set());
@@ -341,17 +346,28 @@ export default function ClientesView({
                       data-label="Contacto"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {c.phone && (
-                        <a
-                          href={`https://wa.me/${toWhatsappNumber(c.phone)}`}
-                          target="_blank"
-                          rel="noopener"
-                          className="admin-table-action-btn"
-                          aria-label={`WhatsApp a ${c.name}`}
+                      <div style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                        {c.phone && (
+                          <a
+                            href={`https://wa.me/${toWhatsappNumber(c.phone)}`}
+                            target="_blank"
+                            rel="noopener"
+                            className="admin-table-action-btn"
+                            aria-label={`WhatsApp a ${c.name}`}
+                          >
+                            <WhatsAppMiniIcon />
+                          </a>
+                        )}
+                        <button
+                          type="button"
+                          className="admin-table-action-btn delete"
+                          onClick={() => setDeletingClient(c)}
+                          aria-label={`Eliminar cliente ${c.name}`}
+                          title={`Eliminar cliente ${c.name}`}
                         >
-                          <WhatsAppMiniIcon />
-                        </a>
-                      )}
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -398,6 +414,36 @@ export default function ClientesView({
           client={openClient}
           onClose={() => setOpenClient(null)}
           onToast={onToast}
+          onDeleted={() => {
+            setOpenClient(null);
+            onReloadClients?.();
+          }}
+        />
+      )}
+
+      {deletingClient && (
+        <StaffPinModal
+          isOpen={Boolean(deletingClient)}
+          title="Eliminar Cliente"
+          description={`¿Confirmás que querés eliminar al cliente ${deletingClient.name}? Esta acción requiere autorización por PIN y removerá al cliente del CRM.`}
+          targetName={`${deletingClient.name} (${deletingClient.phone || "Sin teléfono"})`}
+          confirmButtonText="Eliminar Cliente"
+          confirmButtonTone="danger"
+          onClose={() => setDeletingClient(null)}
+          onConfirm={async ({ pin, reason }) => {
+            const res = await adminDeleteClient({
+              key: deletingClient.key,
+              pin,
+              reason,
+            });
+            if (res.ok) {
+              setDeletingClient(null);
+              onToast?.(`Cliente eliminado por ${res.staff}`);
+              onReloadClients?.();
+            } else {
+              throw new Error(res.error || "No se pudo eliminar el cliente.");
+            }
+          }}
         />
       )}
 

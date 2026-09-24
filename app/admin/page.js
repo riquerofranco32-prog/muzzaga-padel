@@ -861,6 +861,7 @@ export default function AdminPage() {
                 clients={clientsLoaded ? clients : null}
                 initialSearch={clientesSearch.query}
                 onToast={showToast}
+                onReloadClients={loadClients}
               />
             )}
             {view === "caja" && (
@@ -950,6 +951,12 @@ export default function AdminPage() {
           sales={dayData?.sales || []}
           onSalesChanged={refreshMoney}
           onToast={showToast}
+          onDeletedBooking={() => {
+            loadDayData(activeDate);
+            loadClients();
+            refreshMoney();
+            setDetailBooking(null);
+          }}
           onMoved={() => {
             loadDayData(activeDate);
             setDetailBooking(null);
