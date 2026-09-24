@@ -117,7 +117,12 @@ html {
   font-size: 16px;
   background: var(--color-canvas);
   color-scheme: light;
+  /* clip, no hidden: hidden convierte a html/body en contenedores de scroll y
+     el header deja de quedar pegado (position: sticky necesita que el que
+     scrollea sea el viewport). clip recorta igual el desborde horizontal de la
+     cinta y la mascota XL. hidden queda como respaldo para Safari < 16. */
   overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
 }
 
@@ -130,6 +135,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  overflow-x: clip;
   padding-bottom: calc(var(--bottom-bar-h) + 24px);
   position: relative;
 }
