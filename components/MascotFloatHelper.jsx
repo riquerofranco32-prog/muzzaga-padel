@@ -117,7 +117,6 @@ export default function MascotFloatHelper() {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="pulse-badge-live"
             style={{
               background: "rgba(24, 24, 27, 0.9)",
               backdropFilter: "blur(8px)",

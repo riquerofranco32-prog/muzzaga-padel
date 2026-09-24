@@ -5,7 +5,7 @@
 // íconos son los mismos SVG inline que ya usa AmenitiesSection, y las fotos
 // son las reales del club (public/img), no placeholders de stock.
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 const ICON_PROPS = {
@@ -140,7 +140,6 @@ const FEATURES = [
   },
 ];
 
-const AUTO_PLAY_INTERVAL = 3500;
 // Misma curva que --ease en globals.css: motion no lee variables CSS.
 const EASE = [0.16, 1, 0.3, 1];
 const MOVE = { duration: 0.4, ease: EASE };
@@ -153,23 +152,17 @@ const wrap = (min, max, v) => {
 
 export default function FeatureCarousel() {
   const [step, setStep] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
 
   const currentIndex =
     ((step % FEATURES.length) + FEATURES.length) % FEATURES.length;
-
-  const nextStep = useCallback(() => setStep((prev) => prev + 1), []);
 
   const handleChipClick = (index) => {
     const diff = (index - currentIndex + FEATURES.length) % FEATURES.length;
     if (diff > 0) setStep((s) => s + diff);
   };
 
-  useEffect(() => {
-    if (isPaused) return;
-    const interval = setInterval(nextStep, AUTO_PLAY_INTERVAL);
-    return () => clearInterval(interval);
-  }, [nextStep, isPaused]);
+  // Sin autoplay: pasaba solo cada 3,5 s mientras el texto de al lado se
+  // leía. Ahora avanza cuando lo tocás.
 
   const getCardStatus = (index) => {
     const diff = index - currentIndex;
@@ -214,8 +207,6 @@ export default function FeatureCarousel() {
                   <button
                     type="button"
                     onClick={() => handleChipClick(index)}
-                    onMouseEnter={() => setIsPaused(true)}
-                    onMouseLeave={() => setIsPaused(false)}
                     className={`fc-pill${isActive ? " active" : ""}`}
                   >
                     <span className="fc-pill-icon">
