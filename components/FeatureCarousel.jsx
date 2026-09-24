@@ -262,6 +262,8 @@ export default function FeatureCarousel() {
                   <img
                     src={feature.image}
                     alt={feature.label}
+                    loading="lazy"
+                    decoding="async"
                     className={`fc-stage-img${isActive ? " active" : ""}`}
                   />
 

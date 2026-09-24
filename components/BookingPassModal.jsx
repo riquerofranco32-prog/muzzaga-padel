@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Portal from "./Portal";
 
 // Antes esta pantalla mostraba un CBU y un alias inventados (placeholder de
@@ -157,7 +158,7 @@ export default function BookingPassModal({
         <div className="digital-pass-card">
           <div className="pass-header-row">
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <img
+              <Image
                 src="/img/logo_badge.png"
                 alt="Muzzaga"
                 width={30}

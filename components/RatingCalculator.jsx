@@ -238,6 +238,10 @@ export default function RatingCalculator() {
           <img
             src="/img/mascotas/muzzaguito-enredado-grip.webp"
             alt="Muzzaguito enredado con el grip"
+            width={682}
+            height={720}
+            loading="lazy"
+            decoding="async"
             style={{
               width: 74,
               height: 74,

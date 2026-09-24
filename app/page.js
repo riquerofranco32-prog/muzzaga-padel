@@ -80,7 +80,10 @@ export default async function Home() {
             alt=""
             fill
             priority
-            sizes="100vw"
+            // La foto es 4:3 y en vertical se recorta con object-fit: cover: a 390
+            // de ancho se dibuja a unos 1285 px (330vw), no a 100vw. Con "100vw"
+            // el celular recibía 828 px para cubrir 2570 px de pantalla.
+            sizes="(max-width: 480px) 330vw, (max-width: 900px) 170vw, 100vw"
           />
         </div>
         <svg className="hero-court-lines" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">

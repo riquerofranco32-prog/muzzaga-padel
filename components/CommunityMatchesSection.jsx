@@ -120,8 +120,10 @@ export default function CommunityMatchesSection() {
               <img
                 src="/img/mascotas/muzzaguito-pizza-good-vibes.webp"
                 alt="Muzzaguito compartiendo pizza con la comunidad"
-                width={150}
-                height={150}
+                width={720}
+                height={612}
+                loading="lazy"
+                decoding="async"
                 className="mascot-section-img"
               />
             </div>

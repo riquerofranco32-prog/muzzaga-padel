@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const NAV_LINKS = [
   { href: "/#turnos", label: "Turnos" },
@@ -59,11 +60,13 @@ export default function Header() {
             className="brand-group"
             aria-label="Muzzaga Pádel Catriel"
           >
-            <img
+            {/* next/image: el PNG original pesa 374 KB y acá se muestra a 34 px. */}
+            <Image
               src="/img/logo_badge.png"
               alt="Muzzaga Pádel"
               width={34}
               height={34}
+              priority
               style={{
                 width: 34,
                 height: 34,

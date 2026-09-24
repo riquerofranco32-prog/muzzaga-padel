@@ -156,8 +156,10 @@ export default function MascotFloatHelper() {
           <img
             src="/img/mascotas/muzzaguito-guino-paleta-pulgar.webp"
             alt="Muzzaguito - Mascota Muzzaga Pádel"
-            width={92}
-            height={92}
+            width={649}
+            height={720}
+            loading="lazy"
+            decoding="async"
             className="mascot-hero-animated"
             style={{
               width: 92,

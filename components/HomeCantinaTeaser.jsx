@@ -31,8 +31,10 @@ export default function HomeCantinaTeaser() {
             <img
               src="/img/mascotas/muzzaguito-pizza-cerveza.webp"
               alt="Muzzaguito con pizza y cerveza en la cantina"
-              width={160}
-              height={160}
+              width={720}
+              height={677}
+              loading="lazy"
+              decoding="async"
               className="mascot-section-img"
             />
           </div>

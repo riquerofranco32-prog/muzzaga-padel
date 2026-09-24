@@ -33,8 +33,9 @@ export default function FaqSection() {
               <Image
                 src="/img/mascotas/muzzaguito-guino-paleta-pulgar.webp"
                 alt="Muzzaguito respondiendo preguntas frecuentes"
-                width={145}
-                height={145}
+                width={649}
+                height={720}
+                sizes="(max-width: 768px) 128px, 230px"
                 className="mascot-section-img"
               />
             </div>

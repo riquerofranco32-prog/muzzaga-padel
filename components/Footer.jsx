@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const GoogleMapsIcon = () => (
   <svg viewBox="0 0 24 24" width="15" height="15" fill="none">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335" />
@@ -25,7 +27,7 @@ export default function Footer() {
                 marginBottom: 8,
               }}
             >
-              <img
+              <Image
                 src="/img/logo_badge.png"
                 alt="Muzzaga Pádel"
                 width={32}
@@ -51,8 +53,10 @@ export default function Footer() {
               <img
                 src="/img/mascotas/muzzaguito-mochila-pulgar.webp"
                 alt="Muzzaguito con su mochila haciendo pulgar arriba"
-                width={180}
-                height={168}
+                width={720}
+                height={672}
+                loading="lazy"
+                decoding="async"
                 className="footer-mascot"
               />
               <span className="footer-mascot-text">

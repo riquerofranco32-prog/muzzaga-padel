@@ -109,8 +109,10 @@ export default function TodayFlashSlots() {
         <img
           src="/img/mascotas/muzzaguito-golpe-pelota.webp"
           alt=""
-          width={140}
-          height={140}
+          width={720}
+          height={600}
+          loading="lazy"
+          decoding="async"
           className="flash-mascot"
         />
 

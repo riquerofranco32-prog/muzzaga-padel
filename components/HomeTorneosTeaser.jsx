@@ -58,8 +58,10 @@ export default function HomeTorneosTeaser() {
             <img
               src="/img/mascotas/muzzaguito-trofeo-bolso.webp"
               alt="Muzzaguito Campeón con Copa de Torneo"
-              width={160}
-              height={160}
+              width={668}
+              height={720}
+              loading="lazy"
+              decoding="async"
               className="mascot-section-img"
             />
           </div>
@@ -89,7 +91,7 @@ export default function HomeTorneosTeaser() {
 
         {/* GRILLA RESUMIDA DE 6 FOTOS */}
         <div className="torneo-thumb-grid torneo-bento">
-          {FEATURED_PHOTOS.slice(0, 5).map((photo) => (
+          {FEATURED_PHOTOS.slice(0, 5).map((photo, i) => (
             <button
               type="button"
               key={photo.src}
@@ -102,7 +104,8 @@ export default function HomeTorneosTeaser() {
                 alt={photo.alt}
                 fill
                 loading="lazy"
-                sizes="(max-width: 640px) 45vw, 360px"
+                // La primera ocupa dos columnas y dos filas del bento.
+                sizes={i === 0 ? "(max-width: 900px) 92vw, 570px" : "(max-width: 900px) 46vw, 280px"}
               />
               <div className="torneo-thumb-badge">
                 <span>{photo.label}</span>

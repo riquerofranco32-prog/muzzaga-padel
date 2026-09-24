@@ -71,8 +71,9 @@ export default function AmenitiesSection() {
             <Image
               src="/img/mascotas/muzzaguito-descanso-mate.webp"
               alt="Muzzaguito descansando con mate y su paletero"
-              width={160}
-              height={160}
+              width={720}
+              height={710}
+              sizes="(max-width: 768px) 136px, 290px"
               className="mascot-section-img"
             />
           </div>
