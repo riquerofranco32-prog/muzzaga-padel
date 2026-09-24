@@ -4,8 +4,14 @@ import { useEffect, useState } from "react";
 import { COURTS, nowInClubTimezone, nextDays } from "../lib/booking";
 import { requestSlotPick } from "../lib/pickSlot";
 
+// Chips de relleno mientras llega la disponibilidad: misma estructura y mismo
+// alto que los reales, así la tarjeta ocupa su lugar desde el primer render y
+// no empuja la página cuando termina el fetch.
+const SKELETON_CHIPS = [0, 1, 2, 3];
+
 export default function TodayFlashSlots() {
-  const [loading, setLoading] = useState(true);
+  // "loading" | "ready" | "error"
+  const [status, setStatus] = useState("loading");
   const [activeDate, setActiveDate] = useState("");
   const [dateLabel, setDateLabel] = useState("Hoy");
   const [availableSlots, setAvailableSlots] = useState([]);
@@ -16,7 +22,7 @@ export default function TodayFlashSlots() {
   }, []);
 
   async function fetchSlots() {
-    setLoading(true);
+    setStatus("loading");
     try {
       const now = nowInClubTimezone();
       let targetDate = now.isoDate;
@@ -39,10 +45,10 @@ export default function TodayFlashSlots() {
       const free = (data.slots || []).filter((s) => s.available && !s.past);
       setAvailableSlots(free);
       if (data.courts?.length) setCourts(data.courts);
+      setStatus("ready");
     } catch (err) {
       console.error("Error loading flash slots", err);
-    } finally {
-      setLoading(false);
+      setStatus("error");
     }
   }
 
@@ -57,11 +63,27 @@ export default function TodayFlashSlots() {
     Infinity,
   );
 
-  if (loading) {
-    return null;
+  // Sin fetch no sabemos si está completo: se dice eso y se manda a la grilla,
+  // en vez de afirmar "Canchas al 100 %".
+  if (status === "error") {
+    return (
+      <div className="container flash-wrap">
+        <div className="flash-card is-full">
+          <div>
+            <strong className="flash-title">Turnos de {dateLabel.toLowerCase()}</strong>
+            <div className="flash-meta">
+              No pudimos cargar los turnos libres. Los ves en la grilla de abajo.
+            </div>
+          </div>
+          <a href="#turnos" className="btn btn-secondary">
+            Ver horarios →
+          </a>
+        </div>
+      </div>
+    );
   }
 
-  if (availableSlots.length === 0) {
+  if (status === "ready" && availableSlots.length === 0) {
     return (
       <div className="container flash-wrap">
         <div className="flash-card is-full">
@@ -79,9 +101,11 @@ export default function TodayFlashSlots() {
     );
   }
 
+  const loading = status === "loading";
+
   return (
     <div className="container flash-wrap">
-      <div className="flash-card">
+      <div className={`flash-card${loading ? " is-loading" : ""}`} aria-busy={loading || undefined}>
         <img
           src="/img/mascotas/muzzaguito-golpe-pelota.webp"
           alt=""
@@ -96,33 +120,49 @@ export default function TodayFlashSlots() {
               <span className="flash-live pulse-badge-live">Disponible ya</span>
               <strong className="flash-title">Turnos libres · {dateLabel}</strong>
             </div>
-            {Number.isFinite(minPerPlayer) && (
-              <span className="flash-meta">
-                Desde <strong>${minPerPlayer.toLocaleString("es-AR")}</strong> por jugador (4p)
+            {loading ? (
+              <span className="flash-meta flash-skeleton-text" aria-hidden="true">
+                Desde $00.000 por jugador (4p)
               </span>
+            ) : (
+              Number.isFinite(minPerPlayer) && (
+                <span className="flash-meta">
+                  Desde <strong>${minPerPlayer.toLocaleString("es-AR")}</strong> por jugador (4p)
+                </span>
+              )
             )}
           </div>
 
           <div className="flash-chips">
-            {availableSlots.map((slot) => {
-              const court = courts.find((c) => c.id === slot.courtId);
-              return (
-                <button
-                  key={`${slot.courtId}-${slot.start}`}
-                  type="button"
-                  onClick={() => handleSelectSlot(slot)}
-                  className="flash-chip"
-                >
-                  <div>
-                    <div className="flash-chip-time">{slot.start}</div>
-                    <div className="flash-chip-court">
-                      {court?.name || "Cancha"} · hasta {slot.end}
+            {loading
+              ? SKELETON_CHIPS.map((i) => (
+                  <div key={i} className="flash-chip is-skeleton" aria-hidden="true">
+                    <div>
+                      <div className="flash-chip-time">00:00</div>
+                      <div className="flash-chip-court">Cancha 1 · hasta 00:00</div>
                     </div>
+                    <span className="flash-chip-cta">Reservar →</span>
                   </div>
-                  <span className="flash-chip-cta">Reservar →</span>
-                </button>
-              );
-            })}
+                ))
+              : availableSlots.map((slot) => {
+                  const court = courts.find((c) => c.id === slot.courtId);
+                  return (
+                    <button
+                      key={`${slot.courtId}-${slot.start}`}
+                      type="button"
+                      onClick={() => handleSelectSlot(slot)}
+                      className="flash-chip"
+                    >
+                      <div>
+                        <div className="flash-chip-time">{slot.start}</div>
+                        <div className="flash-chip-court">
+                          {court?.name || "Cancha"} · hasta {slot.end}
+                        </div>
+                      </div>
+                      <span className="flash-chip-cta">Reservar →</span>
+                    </button>
+                  );
+                })}
           </div>
         </div>
       </div>

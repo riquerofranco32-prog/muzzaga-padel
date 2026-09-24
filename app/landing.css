@@ -943,6 +943,28 @@ body {
   color: #fff;
 }
 
+/* Mientras carga: mismos chips, sin texto. Estático a propósito (sin brillo
+   que se mueva): solo reserva el alto para que la página no salte. */
+.flash-chip.is-skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Todavía no sabemos si hay turnos: el badge guarda su lugar sin afirmarlo. */
+.flash-card.is-loading .flash-live {
+  visibility: hidden;
+}
+
+.flash-chip.is-skeleton .flash-chip-time,
+.flash-chip.is-skeleton .flash-chip-court,
+.flash-chip.is-skeleton .flash-chip-cta,
+.flash-skeleton-text {
+  color: transparent;
+  background: var(--color-hairline-soft);
+  border-radius: 6px;
+  user-select: none;
+}
+
 @media (prefers-color-scheme: dark) {
   .flash-chip-cta {
     color: #ff9a5a;
