@@ -197,17 +197,15 @@ export default function AgendaView({
   const trendDays = days.slice(0, 7).map((d) => {
     const s = (rangeStats || []).find((r) => r.date === d.iso);
     const turnosCount =
-      s?.turnos != null
-        ? s.turnos
-        : d.iso === activeDate
-          ? stats.takenSlots
-          : d.closed
-            ? 0
-            : 15;
+      d.iso === activeDate
+        ? stats.takenSlots
+        : s?.turnos != null
+          ? s.turnos
+          : 0;
     const maxCapacity = stats.totalSlots || 18;
     const height = Math.min(
       95,
-      Math.max(16, Math.round((turnosCount / maxCapacity) * 85)),
+      Math.max(14, Math.round((turnosCount / maxCapacity) * 85)),
     );
     return {
       iso: d.iso,
@@ -224,6 +222,10 @@ export default function AgendaView({
   );
   const activeBar = trendDays[activeBarIndex] || trendDays[0];
   const totalWeekTurnos = trendDays.reduce((acc, d) => acc + (d.value || 0), 0);
+
+  // Variación real vs. mismo día de la semana anterior
+  const lwCount = lastWeek?.bookings?.length ?? 0;
+  const dayDelta = lwCount > 0 ? Math.round(((stats.takenSlots - lwCount) / lwCount) * 100) : null;
 
   // Feed de actividades en español con la realidad del club
   const highlights = [
@@ -466,15 +468,21 @@ export default function AgendaView({
               <>
                 <div className="admin-kravio-trend-stat">
                   <div className="admin-kravio-trend-big" style={{ color: "#111827" }}>
-                    {stats.takenSlots * 7 || 98} <span style={{ fontSize: 16, color: "#6b7280", fontWeight: 400 }}>turnos</span>
+                    {totalWeekTurnos} <span style={{ fontSize: 16, color: "#6b7280", fontWeight: 400 }}>turnos</span>
                   </div>
-                  <span
-                    className="admin-kravio-kpi-delta is-positive"
-                    style={{ fontSize: 12 }}
-                  >
-                    <ArrowUp size={12} strokeWidth={2.5} />
-                    +12% <span>vs sem. ant.</span>
-                  </span>
+                  {dayDelta != null ? (
+                    <span
+                      className={`admin-kravio-kpi-delta ${dayDelta >= 0 ? "is-positive" : "is-negative"}`}
+                      style={{ fontSize: 12 }}
+                    >
+                      {dayDelta >= 0 ? <ArrowUp size={12} strokeWidth={2.5} /> : <ArrowDown size={12} strokeWidth={2.5} />}
+                      {dayDelta >= 0 ? `+${dayDelta}%` : `${dayDelta}%`} <span>vs sem. ant.</span>
+                    </span>
+                  ) : (
+                    <span className="admin-cell-sub" style={{ fontSize: 12 }}>
+                      {days[0]?.dayName} a {days[6]?.dayName}
+                    </span>
+                  )}
                 </div>
 
                 <div className="admin-kravio-chart-container">
