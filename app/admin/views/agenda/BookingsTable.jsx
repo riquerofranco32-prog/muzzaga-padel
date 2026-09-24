@@ -130,6 +130,8 @@ export default function BookingsTable({
     });
   };
 
+  const selectedBookings = bookings.filter((b) => selectedIds.has(b.id));
+
   const getPriority = (b) => {
     if (b.status === "cancelado" || pendingAmount(b) > 0) {
       return { level: "high", label: "Con saldo" };
@@ -439,9 +441,40 @@ export default function BookingsTable({
                               fontSize: 13,
                               fontWeight: 600,
                               color: "#111827",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
                             }}
                           >
-                            {b.playerName}
+                            <span>{b.playerName}</span>
+                            {b.isVip && (
+                              <span
+                                className="admin-tag"
+                                style={{
+                                  background: "#fef3c7",
+                                  color: "#b45309",
+                                  borderColor: "#fde68a",
+                                  fontSize: 10,
+                                  padding: "1px 5px",
+                                }}
+                              >
+                                VIP
+                              </span>
+                            )}
+                            {b.isFirstBooking && (
+                              <span
+                                className="admin-tag"
+                                style={{
+                                  background: "#ecfdf5",
+                                  color: "#047857",
+                                  borderColor: "#a7f3d0",
+                                  fontSize: 10,
+                                  padding: "1px 5px",
+                                }}
+                              >
+                                1er turno
+                              </span>
+                            )}
                           </div>
                           {b.playerPhone && (
                             <div className="admin-cell-sub">
@@ -630,6 +663,61 @@ export default function BookingsTable({
           </tbody>
         </table>
       </div>
+
+      {selectedIds.size > 0 && (
+        <div
+          className="admin-floating-batch-bar"
+          style={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#111827",
+            color: "#ffffff",
+            padding: "10px 20px",
+            borderRadius: 12,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+            zIndex: 100,
+            fontSize: 13,
+            border: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          <span>
+            <strong>{selectedIds.size}</strong> {selectedIds.size === 1 ? "turno seleccionado" : "turnos seleccionados"}
+            {selectedBookings.reduce((sum, b) => sum + pendingAmount(b), 0) > 0 && (
+              <span style={{ color: "#f87171", marginLeft: 6 }}>
+                · Saldo pendiente: {formatARS(selectedBookings.reduce((sum, b) => sum + pendingAmount(b), 0))}
+              </span>
+            )}
+          </span>
+          <button
+            type="button"
+            className="btn btn-linear-primary"
+            style={{ padding: "6px 14px", height: 32, fontSize: 12 }}
+            onClick={() => exportBookingsToCSV(selectedBookings, activeDate)}
+          >
+            Exportar CSV
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={{
+              padding: "6px 14px",
+              height: 32,
+              fontSize: 12,
+              background: "rgba(255,255,255,0.15)",
+              color: "#fff",
+              border: "none",
+            }}
+            onClick={() => setSelectedIds(new Set())}
+          >
+            Deseleccionar
+          </button>
+        </div>
+      )}
     </section>
   );
 }

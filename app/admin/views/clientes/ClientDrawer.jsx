@@ -139,14 +139,36 @@ export default function ClientDrawer({ client, onClose, onToast }) {
         </dl>
 
         <section className="admin-drawer-section">
-          <label className="admin-field-label" htmlFor="client-note">
-            Notas
-          </label>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+            <label className="admin-field-label" htmlFor="client-note" style={{ margin: 0 }}>
+              Notas internas del staff
+            </label>
+            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+              Visible solo para recepción
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+            {["8va", "7ma", "6ta", "5ta", "4ta", "Drive", "Revés"].map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                className="btn btn-secondary"
+                style={{ padding: "2px 8px", height: 24, fontSize: 11, borderRadius: 12 }}
+                onClick={() => {
+                  if (!note.includes(tag)) {
+                    setNote((prev) => (prev.trim() ? `${prev.trim()} · ${tag}` : tag));
+                  }
+                }}
+              >
+                +{tag}
+              </button>
+            ))}
+          </div>
           <textarea
             id="client-note"
             rows={3}
             maxLength={1000}
-            placeholder="Nivel, preferencias, con quién juega, si debe algo…"
+            placeholder="Nivel, preferencias, posición de juego, si debe algo…"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />

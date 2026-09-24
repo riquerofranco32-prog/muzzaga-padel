@@ -15,6 +15,7 @@ import {
 } from "../actions";
 import { toWhatsappNumber } from "../../../lib/phone";
 import { WhatsAppMiniIcon } from "../adminHelpers";
+import TournamentBracket from "../../../components/TournamentBracket";
 
 const STATUS_LABELS = {
   abierto: { label: "Inscripciones Abiertas", tone: "badge-emerald" },
@@ -45,6 +46,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
   const [addingPlayer, setAddingPlayer] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [tournamentTab, setTournamentTab] = useState("inscriptos");
 
   useEffect(() => {
     loadTournaments();
@@ -551,9 +553,33 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                       </button>
                     </div>
 
-                    {/* TABLA ESTILO KRAVIO SLA DE INSCRIPTOS */}
-                    <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
-                      <table className="admin-kravio-table" style={{ margin: 0 }}>
+                    {/* Selector de Solapas: Inscriptos vs Cuadro Fixture */}
+                    <div className="admin-segmented" style={{ marginBottom: 16 }}>
+                      <button
+                        type="button"
+                        aria-pressed={tournamentTab === "inscriptos"}
+                        onClick={() => setTournamentTab("inscriptos")}
+                      >
+                        👥 Parejas e Inscriptos ({totalP})
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={tournamentTab === "bracket"}
+                        onClick={() => setTournamentTab("bracket")}
+                      >
+                        🏆 Cuadro Eliminatorio / Cruces
+                      </button>
+                    </div>
+
+                    {tournamentTab === "bracket" ? (
+                      <div style={{ marginTop: 8 }}>
+                        <TournamentBracket />
+                      </div>
+                    ) : (
+                      <>
+                        {/* TABLA ESTILO KRAVIO SLA DE INSCRIPTOS */}
+                        <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
+                          <table className="admin-kravio-table" style={{ margin: 0 }}>
                         <thead>
                           <tr>
                             <th style={{ width: 44 }}>#</th>
@@ -693,6 +719,8 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                         <Plus size={15} /> {addingPlayer ? "Sumando..." : "Inscribir Pareja"}
                       </button>
                     </form>
+                    </>
+                    )}
                   </div>
                 )}
               </div>

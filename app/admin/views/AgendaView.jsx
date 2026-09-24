@@ -25,6 +25,7 @@ import {
   Zap,
 } from "lucide-react";
 import {
+  isoAddDays,
   nextDays,
   nowInClubTimezone,
   todayInClub,
@@ -149,6 +150,28 @@ export default function AgendaView({
       cancelled = true;
     };
   }, [dayData, todayIso]);
+
+  // Atajos de teclado: flechas izquierda/derecha para navegar días, 't' para hoy
+  useEffect(() => {
+    function handleKeyDown(e) {
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+      if (document.querySelector(".admin-modal-backdrop")) return;
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setActiveDate((d) => isoAddDays(d, -1));
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setActiveDate((d) => isoAddDays(d, 1));
+      } else if (e.key === "t" || e.key === "T") {
+        e.preventDefault();
+        setActiveDate(todayIso);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [todayIso, setActiveDate]);
 
   const strip = (
     <DayStrip

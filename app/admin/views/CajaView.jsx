@@ -11,10 +11,11 @@ import {
   adminGetCashHistory,
   adminGetDailyCashSummary,
 } from "../actions";
-import { todayInClub } from "../../../lib/booking";
+import { todayInClub, isoAddDays } from "../../../lib/booking";
 import { CLUB_INFO } from "../../../data/club";
 
 const ICON = { size: 18, strokeWidth: 1.75, "aria-hidden": true };
+const BILL_DENOMINATIONS = [20000, 10000, 2000, 1000, 500, 200, 100];
 const CATEGORIES = [
   { id: "hielo", label: "Hielo" },
   { id: "limpieza", label: "Limpieza" },
@@ -67,10 +68,30 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
   const [addingExpense, setAddingExpense] = useState(false);
 
   const [counted, setCounted] = useState("");
+  const [showBillCalc, setShowBillCalc] = useState(false);
+  const [billCounts, setBillCounts] = useState({
+    20000: "",
+    10000: "",
+    2000: "",
+    1000: "",
+    500: "",
+    200: "",
+    100: "",
+  });
   const [closingNotes, setClosingNotes] = useState("");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [closedBy, setClosedBy] = useState("");
   const [closing, setClosing] = useState(false);
+
+  function handleBillChange(denom, val) {
+    const nextCounts = { ...billCounts, [denom]: val };
+    setBillCounts(nextCounts);
+    const total = BILL_DENOMINATIONS.reduce((sum, d) => {
+      const qty = parseInt(nextCounts[d], 10) || 0;
+      return sum + d * qty;
+    }, 0);
+    setCounted(total > 0 ? String(total) : "");
+  }
 
   useEffect(() => {
     loadSummary();
@@ -198,22 +219,30 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
         Arqueo del {formatDate(date, "long")}
       </h2>
       <div className="admin-view-toolbar-actions">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => setDate(isoAddDays(todayInClub(), -1))}
+          style={{ height: 32, fontSize: 12, padding: "0 10px" }}
+        >
+          Ayer
+        </button>
+        <button
+          type="button"
+          className={`btn ${date === todayInClub() ? "btn-linear-primary" : "btn-secondary"}`}
+          onClick={() => setDate(todayInClub())}
+          style={{ height: 32, fontSize: 12, padding: "0 10px" }}
+        >
+          Hoy
+        </button>
         <input
           type="date"
           aria-label="Fecha de la caja"
           value={date}
           max={todayInClub()}
           onChange={(e) => e.target.value && setDate(e.target.value)}
+          style={{ height: 32, fontSize: 12 }}
         />
-        {date !== todayInClub() && (
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => setDate(todayInClub())}
-          >
-            Hoy
-          </button>
-        )}
       </div>
     </div>
   );
@@ -455,6 +484,93 @@ export default function CajaView({ initialDate, onExpiredSession, onToast }) {
               readOnly={isClosed}
               onChange={(e) => setCounted(e.target.value)}
             />
+            {!isClosed && (
+              <div style={{ marginTop: 8 }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{
+                    fontSize: 12,
+                    padding: "4px 10px",
+                    height: 28,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                  onClick={() => setShowBillCalc((v) => !v)}
+                >
+                  <Coins size={14} />
+                  <span>
+                    {showBillCalc ? "Ocultar desglose" : "Contar por billetes ($20k, $10k, $2k...)"}
+                  </span>
+                </button>
+
+                {showBillCalc && (
+                  <div
+                    style={{
+                      marginTop: 10,
+                      padding: 12,
+                      background: "rgba(0, 0, 0, 0.03)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 8,
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+                      gap: 8,
+                    }}
+                  >
+                    {BILL_DENOMINATIONS.map((denom) => (
+                      <div key={denom} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)" }}>
+                          ${denom >= 1000 ? `${denom / 1000}k` : denom} ({formatARS(denom)})
+                        </span>
+                        <input
+                          type="number"
+                          min={0}
+                          placeholder="Cant."
+                          value={billCounts[denom]}
+                          onChange={(e) => handleBillChange(denom, e.target.value)}
+                          style={{
+                            height: 28,
+                            fontSize: 12,
+                            padding: "2px 8px",
+                            borderRadius: 6,
+                            border: "1px solid var(--border)",
+                            background: "#fff",
+                          }}
+                        />
+                      </div>
+                    ))}
+                    <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
+                      <button
+                        type="button"
+                        style={{
+                          background: "none",
+                          border: "none",
+                          fontSize: 11,
+                          color: "#dc2626",
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                        }}
+                        onClick={() => {
+                          setBillCounts({
+                            20000: "",
+                            10000: "",
+                            2000: "",
+                            1000: "",
+                            500: "",
+                            200: "",
+                            100: "",
+                          });
+                          setCounted("");
+                        }}
+                      >
+                        Limpiar contador
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {liveDiff != null && (

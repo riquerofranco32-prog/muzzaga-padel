@@ -11,6 +11,7 @@ import {
   ShoppingCart,
   Trash2,
   X,
+  Zap,
 } from "lucide-react";
 import { EmptyState, SkeletonRows } from "../ui/states";
 import {
@@ -35,11 +36,12 @@ import {
   isCountableBooking,
   onAccountTotal,
 } from "../../../lib/metrics";
-import { PAYMENT_METHODS } from "../adminHelpers";
+import { PAYMENT_METHODS, WhatsAppMiniIcon } from "../adminHelpers";
 
 const ICON = { size: 16, strokeWidth: 1.75, "aria-hidden": true };
 const METHODS = [...PAYMENT_METHODS, { value: "cuenta", label: "A cuenta" }];
 const methodLabel = (m) => METHODS.find((x) => x.value === m)?.label || m;
+const QUICK_FAVORITE_IDS = ["agua_500", "gatorade_500", "corona_330", "tubo_pelotas"];
 // Las categorías del menú público traen emoji adelante; en el admin, texto solo.
 const plainLabel = (label) => String(label || "").replace(/^[^\p{L}\p{N}]+/u, "");
 const categoryLabel = (id) =>
@@ -222,6 +224,29 @@ export default function CantinaView({ onExpiredSession, onToast }) {
       onToast?.(res.error || "No se pudo actualizar la venta.", {
         tone: "error",
       });
+  }
+
+  const quickFavoriteItems = useMemo(
+    () => MENU_ITEMS.filter((i) => QUICK_FAVORITE_IDS.includes(i.id)),
+    [],
+  );
+
+  function shareTicketWhatsApp(sale) {
+    const itemsText = (sale.items || [])
+      .map((it) => `• ${it.qty}x ${it.name} (${formatARS(it.price * it.qty)})`)
+      .join("\n");
+    const msg = [
+      `🎾 *MUZZAGA PÁDEL · CANTINA*`,
+      `🧾 *Comprobante de Consumo*`,
+      `📅 Fecha: ${date} ${sale.createdAt ? formatTime(sale.createdAt) : ""}`,
+      "",
+      itemsText,
+      "",
+      `💰 *Total: ${formatARS(sale.total)}* (${methodLabel(sale.method)})`,
+      "",
+      `¡Muchas gracias por elegirnos! 🙌`,
+    ].join("\n");
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
   }
 
   const salesList = sales || [];
@@ -476,6 +501,58 @@ export default function CantinaView({ onExpiredSession, onToast }) {
           />
         </div>
 
+        {/* Barra de favoritos rápidos 1-click */}
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            flexWrap: "wrap",
+            alignItems: "center",
+            marginBottom: 12,
+            padding: "8px 12px",
+            background: "rgba(234, 88, 12, 0.05)",
+            borderRadius: 10,
+            border: "1px solid rgba(234, 88, 12, 0.15)",
+          }}
+        >
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#ea580c",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <Zap size={14} /> Rápidos:
+          </span>
+          {quickFavoriteItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className="btn btn-secondary"
+              style={{
+                padding: "3px 10px",
+                height: 28,
+                fontSize: 12,
+                borderRadius: 20,
+                background: "#ffffff",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+              onClick={() => addToCart(item)}
+            >
+              <Plus size={12} strokeWidth={2.5} style={{ color: "#ea580c" }} />
+              <span>{item.name}</span>
+              <strong style={{ color: "#15803d", fontSize: 11 }}>
+                {formatARS(item.price)}
+              </strong>
+            </button>
+          ))}
+        </div>
+
         <div className="admin-chips" role="group" aria-label="Categorías">
           {MENU_CATEGORIES.map((cat) => (
             <button
@@ -595,6 +672,15 @@ export default function CantinaView({ onExpiredSession, onToast }) {
                           title="Los datos de prueba no suman en caja ni reportes"
                         >
                           {s.isTest ? "Prueba" : "¿Prueba?"}
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-table-action-btn"
+                          onClick={() => shareTicketWhatsApp(s)}
+                          aria-label="Compartir ticket por WhatsApp"
+                          title="Compartir ticket por WhatsApp"
+                        >
+                          <WhatsAppMiniIcon size={14} />
                         </button>
                         <button
                           type="button"

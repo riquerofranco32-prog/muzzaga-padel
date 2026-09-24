@@ -245,11 +245,21 @@ export default function MonitorPage() {
 
           // Calcular minutos restantes si hay partido en juego
           let remainingMinutes = null;
+          let elapsedMinutes = null;
+          let progressPct = 0;
           if (currentMatch) {
+            const [sh, sm] = currentMatch.startTime.split(":").map(Number);
             const [eh, em] = currentMatch.endTime.split(":").map(Number);
+            const startM = sh * 60 + sm;
             const endM = eh * 60 + em;
+            const totalM = Math.max(1, endM - startM);
             remainingMinutes = Math.max(0, endM - currentMinutes);
+            elapsedMinutes = Math.max(0, currentMinutes - startM);
+            progressPct = Math.min(100, Math.max(0, Math.round((elapsedMinutes / totalM) * 100)));
           }
+
+          const matchTone =
+            remainingMinutes <= 10 ? "#ef4444" : remainingMinutes <= 20 ? "#f59e0b" : "#22c55e";
 
           return (
             <div
@@ -359,8 +369,8 @@ export default function MonitorPage() {
                         style={{
                           marginTop: 16,
                           padding: "12px 16px",
-                          background: remainingMinutes <= 10 ? "rgba(239, 68, 68, 0.15)" : "rgba(34, 197, 94, 0.1)",
-                          border: `1px solid ${remainingMinutes <= 10 ? "#ef4444" : "#22c55e"}`,
+                          background: remainingMinutes <= 10 ? "rgba(239, 68, 68, 0.15)" : remainingMinutes <= 20 ? "rgba(245, 158, 11, 0.15)" : "rgba(34, 197, 94, 0.1)",
+                          border: `1px solid ${matchTone}`,
                           borderRadius: 10,
                           display: "flex",
                           justifyContent: "space-between",
@@ -374,11 +384,30 @@ export default function MonitorPage() {
                           style={{
                             fontSize: 22,
                             fontFamily: "var(--font-jetbrains-mono), monospace",
-                            color: remainingMinutes <= 10 ? "#ef4444" : "#22c55e",
+                            color: matchTone,
                           }}
                         >
                           ⏳ {remainingMinutes} min
                         </strong>
+                      </div>
+
+                      {/* BARRA DE PROGRESO DE PARTIDO */}
+                      <div style={{ marginTop: 12 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#9ca3af", marginBottom: 5 }}>
+                          <span>Progreso de turno ({elapsedMinutes} min jugados)</span>
+                          <span style={{ fontWeight: 700, color: matchTone }}>{progressPct}%</span>
+                        </div>
+                        <div style={{ width: "100%", height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden" }}>
+                          <div
+                            style={{
+                              width: `${progressPct}%`,
+                              height: "100%",
+                              background: matchTone,
+                              borderRadius: 3,
+                              transition: "width 1s ease",
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -424,6 +453,64 @@ export default function MonitorPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* TICKER MARQUEE ROTATIVO PARA TV DE RECEPCIÓN */}
+      <div
+        style={{
+          marginTop: 24,
+          background: "rgba(17, 24, 39, 0.95)",
+          border: "1px solid rgba(234, 88, 12, 0.35)",
+          borderRadius: 12,
+          padding: "10px 16px",
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+        }}
+      >
+        <div
+          style={{
+            background: "#ea580c",
+            color: "#ffffff",
+            fontSize: 11,
+            fontWeight: 800,
+            padding: "3px 10px",
+            borderRadius: 6,
+            letterSpacing: "0.08em",
+            flexShrink: 0,
+          }}
+        >
+          MUZZAGA TV
+        </div>
+        <div
+          style={{
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            width: "100%",
+          }}
+        >
+          <div
+            style={{
+              display: "inline-block",
+              paddingLeft: "100%",
+              animation: "marqueeScroll 38s linear infinite",
+              fontSize: 13,
+              fontWeight: 600,
+              color: "#e5e7eb",
+              letterSpacing: "0.02em",
+            }}
+          >
+            🎾 RECORDATORIO: Respetar los 90 minutos de juego para asegurar la puntualidad del turno siguiente &nbsp;·&nbsp; 🥤 CANTINA: Bebidas isotónicas, agua fresca, cervezas y buffet abierto &nbsp;·&nbsp; 🏆 TORNEOS: Abierta la inscripción para el Torneo Americano del fin de semana en recepción &nbsp;·&nbsp; 📱 RESERVAS ONLINE: Turnos disponibles las 24hs en muzzagapadel.com.ar
+          </div>
+        </div>
+        <style>{`
+          @keyframes marqueeScroll {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+          }
+        `}</style>
       </div>
     </div>
   );

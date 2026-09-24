@@ -288,10 +288,30 @@ export default function ReportesView({ onExpiredSession }) {
         </div>
       </div>
 
-      <h2 className="admin-print-only">
-        Reporte Muzzaga Pádel · {formatDate(period.from, "long")} al{" "}
-        {formatDate(period.to, "long")}
-      </h2>
+      {/* Encabezado ejecutivo para impresión PDF */}
+      <div
+        className="admin-print-only"
+        style={{
+          borderBottom: "2px solid #ea580c",
+          paddingBottom: 14,
+          marginBottom: 20,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div>
+            <h1 style={{ fontSize: 20, margin: 0, fontWeight: 800, color: "#111827", letterSpacing: "0.02em" }}>
+              MUZZAGA PÁDEL CLUB · REPORTE EJECUTIVO
+            </h1>
+            <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "#4b5563" }}>
+              Período auditado: {formatDate(period.from, "long")} al {formatDate(period.to, "long")}
+            </p>
+          </div>
+          <div style={{ textAlign: "right", fontSize: 11, color: "#6b7280" }}>
+            <div>Emisión: {formatDate(today, "long")}</div>
+            <div style={{ color: "#ea580c", fontWeight: 600 }}>Sistema Muzzaga Admin</div>
+          </div>
+        </div>
+      </div>
 
       {error && (
         <div
@@ -592,6 +612,48 @@ export default function ReportesView({ onExpiredSession }) {
                 </table>
               </div>
             </section>
+          </div>
+
+          {/* Firmas de auditoría e impresión PDF */}
+          <div
+            className="admin-print-only"
+            style={{
+              marginTop: 40,
+              paddingTop: 24,
+              borderTop: "1px dashed #9ca3af",
+              pageBreakInside: "avoid",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: 40,
+                textAlign: "center",
+              }}
+            >
+              <div>
+                <div style={{ height: 40 }} />
+                <div style={{ borderTop: "1px solid #111827", paddingTop: 6, fontSize: 11, fontWeight: 700 }}>
+                  Administración del Club
+                </div>
+                <span style={{ fontSize: 10, color: "#6b7280" }}>Firma y Sello</span>
+              </div>
+              <div>
+                <div style={{ height: 40 }} />
+                <div style={{ borderTop: "1px solid #111827", paddingTop: 6, fontSize: 11, fontWeight: 700 }}>
+                  Responsable de Turnos &amp; Caja
+                </div>
+                <span style={{ fontSize: 10, color: "#6b7280" }}>Firma y Aclaración</span>
+              </div>
+              <div>
+                <div style={{ height: 40 }} />
+                <div style={{ borderTop: "1px solid #111827", paddingTop: 6, fontSize: 11, fontWeight: 700 }}>
+                  Auditoría General
+                </div>
+                <span style={{ fontSize: 10, color: "#6b7280" }}>Conformidad</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
