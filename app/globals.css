@@ -5804,7 +5804,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
     display: none;
   }
 
-  .booking-slot {
+  /* Solo en el carrusel horizontal: con `.booking-slot` a secas, la grilla
+     hora × cancha heredaba los 168 px y entre 641 y 768 las celdas quedaban
+     sueltas en columnas más anchas. */
+  .booking-slots-grid .booking-slot {
     flex: 0 0 auto;
     width: 168px;
     scroll-snap-align: start;

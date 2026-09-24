@@ -1954,13 +1954,6 @@ body {
     font-size: 13px;
   }
 
-  /* globals.css fija .booking-slot a 168px para el carrusel horizontal
-     (.booking-slots-grid); dentro de la grilla hora x cancha tiene que
-     ocupar su columna. */
-  .booking-matrix-row .booking-slot {
-    width: auto;
-  }
-
   .booking-court-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
