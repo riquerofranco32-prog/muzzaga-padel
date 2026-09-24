@@ -1,4 +1,4 @@
-import { Poppins, JetBrains_Mono } from "next/font/google";
+import { Poppins, JetBrains_Mono, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import LightboxProvider from "../components/LightboxProvider";
 import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
@@ -19,6 +19,15 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-jetbrains-mono",
+  display: "swap",
+});
+
+// Display condensada para titulares de la landing (tono de marcador deportivo).
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  style: ["normal", "italic"],
+  variable: "--font-barlow-condensed",
   display: "swap",
 });
 
@@ -102,7 +111,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className={`${poppins.variable} ${jetbrainsMono.variable}`}>
+    <html lang="es" className={`${poppins.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable}`}>
       <head>
         <script
           type="application/ld+json"

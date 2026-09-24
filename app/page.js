@@ -16,6 +16,8 @@ import BottomNav from "../components/BottomNav";
 import Footer from "../components/Footer";
 import ScrollReveal from "../components/ScrollReveal";
 import ScrollProgress from "../components/ScrollProgress";
+import StatCounter from "../components/StatCounter";
+import "./landing.css";
 
 import { getClubConfig } from "../lib/clubConfigServer";
 import { CLUB_INFO } from "../data/club";
@@ -33,6 +35,16 @@ const faqJsonLd = {
     },
   })),
 };
+
+const TICKER_ITEMS = [
+  "Cristal templado 10 mm",
+  "Iluminación LED",
+  "Turnos de 90 min",
+  "Canchas Abiertas",
+  "Torneos todo el año",
+  "Cantina & tercer tiempo",
+  "Catriel · Río Negro",
+];
 
 // El precio del turno sale de Configuración: la home se regenera cada 5 min
 // para reflejar cambios sin redeploy.
@@ -58,135 +70,120 @@ export default async function Home() {
       <ScrollProgress />
       <Header />
 
-      <div className="glow-ambient glow-hero-top" />
-
-      {/* 1. HERO COMPACTO */}
-      <section id="top" className="animated-marquee-hero" style={{ paddingBottom: 28 }}>
-        <div className="hero-bg-photo" aria-hidden="true">
+      {/* 1. HERO */}
+      <section id="top" className="hero-night">
+        <div className="hero-night-photo" aria-hidden="true">
           <Image
             src="/img/court_glass_night_match.jpg"
-            alt="Partido de pádel nocturno en cancha de cristal con iluminación LED en Muzzaga"
+            alt=""
             fill
             priority
             sizes="100vw"
           />
         </div>
-        <div className="hero-inner-content">
-          <LiveWeatherRadar />
+        <svg className="hero-court-lines" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M150 600 L420 160 L780 160 L1050 600" />
+          <path d="M285 380 L915 380" />
+          <path d="M600 160 L600 600" />
+          <path d="M360 260 L840 260" />
+        </svg>
 
-          <div
-            className="hero-logo-wrap"
-            style={{
-              margin: "14px 0 8px",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
+        <div className="container hero-night-grid">
+          <div className="hero-night-copy">
+            <LiveWeatherRadar />
+
+            <p className="hero-kicker">
+              <span className="hero-kicker-line" /> Club de pádel · Catriel, Río Negro
+            </p>
+
+            <h1 className="hero-night-title">
+              <span className="hero-line">Canchas de pádel</span>{" "}
+              <span className="hero-line">en Catriel.</span>{" "}
+              <span className="hero-line hero-line-accent">Pádel de verdad.</span>
+            </h1>
+
+            <p className="hero-night-lede">
+              {config.courts?.length || 2} canchas oficiales de cristal con iluminación LED, turnos de{" "}
+              {config.slotDurationMin} minutos, Canchas Abiertas comunitarias y cantina para el mejor tercer tiempo.
+            </p>
+
+            <div className="hero-night-ctas">
+              <a href="#turnos" className="hero-btn-primary">
+                <span>Reservar turno</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 5v14M5 12l7 7 7-7" />
+                </svg>
+              </a>
+              <a href="#canchas-abiertas" className="hero-btn-ghost">
+                Canchas Abiertas <span aria-hidden="true">→</span>
+              </a>
+            </div>
+
+            <ul className="hero-trust">
+              <li>Confirmás por WhatsApp</li>
+              <li>Seña por Mercado Pago</li>
+              <li>Cancelás hasta 4 h antes</li>
+              <li>Pistas cubiertas, cero viento</li>
+            </ul>
+          </div>
+
+          <div className="hero-night-visual" aria-hidden="true">
+            <div className="hero-mascot-ring" />
             <img
-              src="/img/logo_full.png"
-              alt="Muzzaga Pádel - Catriel"
-              style={{
-                height: 68,
-                width: "auto",
-                maxWidth: "80vw",
-                objectFit: "contain",
-                display: "block",
-              }}
+              src="/img/mascotas/muzzaguito-lentes-paleta.webp"
+              alt=""
+              width={420}
+              height={420}
+              className="hero-mascot"
             />
-          </div>
-
-          <h1 className="hero-display-title" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", marginBottom: 12 }}>
-            Canchas de Pádel en Catriel.
-            <br />
-            <span className="gradient-accent">Pádel de verdad.</span>
-          </h1>
-
-          <p className="hero-description-text" style={{ maxWidth: 580, margin: "0 auto 16px", fontSize: "15px" }}>
-            2 canchas oficiales de cristal con iluminación LED, turnos de 90 minutos,
-            Canchas Abiertas comunitarias y cantina para el mejor tercer tiempo.
-          </p>
-
-          {/* MASCOTA HERO SPOTLIGHT PROMINENTE */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 16,
-              margin: "14px auto 22px",
-              maxWidth: 540,
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ flexShrink: 0 }}>
-              <img
-                src="/img/mascotas/muzzaguito-lentes-paleta.webp"
-                alt="Muzzaguito, la mascota de Muzzaga, con anteojos y paleta"
-                width={150}
-                height={150}
-                className="mascot-hero-animated"
-                style={{
-                  width: "clamp(120px, 20vw, 160px)",
-                  height: "auto",
-                  objectFit: "contain",
-                  filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.45))",
-                  display: "block",
-                }}
-              />
+            <div className="hero-float-card hero-float-price">
+              <span className="hero-float-label">{priceFrom ? "Turno desde" : "Turno"} · {config.slotDurationMin} min</span>
+              <strong>${pricing.total.toLocaleString("es-AR")}</strong>
+              <span className="hero-float-sub">${pricing.perPlayer.toLocaleString("es-AR")} c/u si son 4</span>
             </div>
-            <div
-              style={{
-                background: "rgba(24, 24, 27, 0.75)",
-                backdropFilter: "blur(12px)",
-                border: "1.5px solid rgba(232, 114, 42, 0.4)",
-                borderRadius: "18px 18px 18px 4px",
-                padding: "12px 18px",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
-                textAlign: "left",
-                maxWidth: 300,
-              }}
-            >
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#e8722a", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>
-                Mascota Oficial Muzzaga
-              </div>
-              <strong style={{ fontSize: 16, color: "#ffffff", display: "block", lineHeight: 1.25 }}>
-                ¡Vení a jugar a Catriel!
-              </strong>
-              <p style={{ fontSize: 12.5, color: "rgba(255,255,255,0.85)", margin: "4px 0 0", lineHeight: 1.35 }}>
-                Canchas de cristal de 10mm, luz LED y el mejor tercer tiempo. ¡Elegí tu turno abajo! 👇
-              </p>
+            <div className="hero-float-card hero-float-glass">
+              <span className="hero-float-dot" />
+              Cristal 10 mm · LED
             </div>
-          </div>
-
-          <div className="hero-cta-buttons" style={{ marginBottom: 12 }}>
-            <a href="#turnos" className="hero-cta-main" style={{ padding: "12px 28px" }}>
-              Reservar Turno ↓
-            </a>
-            <a href="#canchas-abiertas" className="hero-link-canchas" style={{ padding: "12px 22px" }}>
-              Canchas Abiertas →
-            </a>
-          </div>
-
-          {/* Microcopy de confianza */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 12,
-              flexWrap: "wrap",
-              fontSize: 12,
-              color: "rgba(255, 255, 255, 0.8)",
-              marginTop: 10,
-            }}
-          >
-            <span>✓ Confirmás por WhatsApp</span>
-            <span>·</span>
-            <span>✓ Seña fácil por Mercado Pago</span>
-            <span>·</span>
-            <span>✓ Cancelás hasta 4h antes</span>
           </div>
         </div>
+
+        <div className="container">
+          <dl className="hero-stats">
+            <div className="hero-stat">
+              <dt>Canchas de cristal</dt>
+              <dd><StatCounter value={config.courts?.length || 2} /></dd>
+            </div>
+            <div className="hero-stat">
+              <dt>Torneos disputados</dt>
+              <dd><StatCounter value={12} suffix="+" /></dd>
+            </div>
+            <div className="hero-stat">
+              <dt>Jugadores en la comunidad</dt>
+              <dd><StatCounter value={800} prefix="+" /></dd>
+            </div>
+            <div className="hero-stat">
+              <dt>Minutos por turno</dt>
+              <dd><StatCounter value={config.slotDurationMin} /></dd>
+            </div>
+          </dl>
+        </div>
       </section>
+
+      <div className="ticker" aria-hidden="true">
+        <div className="ticker-track">
+          {[0, 1].map((k) => (
+            <div className="ticker-group" key={k}>
+              {TICKER_ITEMS.map((t) => (
+                <span key={t} className="ticker-item">
+                  {t}
+                  <span className="ticker-ball" />
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* WIDGET DISPONIBILIDAD INMEDIATA (HOY / MAÑANA) */}
       <TodayFlashSlots />
@@ -204,22 +201,12 @@ export default async function Home() {
                 Elegí día y horario en tiempo real y confirmá tu turno al instante.
               </p>
             </div>
-            <div
-              style={{
-                fontSize: 13,
-                color: "var(--text-secondary)",
-                background: "var(--bg-card)",
-                border: "1px solid var(--border-subtle)",
-                padding: "8px 16px",
-                borderRadius: "var(--radius-md)",
-                textAlign: "right",
-              }}
-            >
-              <div style={{ fontWeight: 600, color: "var(--color-ink)", fontSize: 14 }}>
+            <div className="price-tag">
+              <div className="price-tag-main">
                 {priceFrom}${pricing.total.toLocaleString("es-AR")} por turno (
                 {config.slotDurationMin} min)
               </div>
-              <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
+              <div className="price-tag-sub">
                 ${pricing.perPlayer.toLocaleString("es-AR")} por jugador si son cuatro
               </div>
             </div>
@@ -228,55 +215,6 @@ export default async function Home() {
           <BookingCalendar />
         </div>
       </section>
-
-      {/* 3. NÚMEROS Y PRUEBA SOCIAL */}
-      <div className="container" style={{ margin: "20px auto 10px" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: 16,
-            background: "var(--color-surface-card)",
-            border: "1px solid var(--color-hairline-strong)",
-            borderRadius: "var(--radius-xl)",
-            padding: "24px 20px",
-            textAlign: "center",
-          }}
-        >
-          <div>
-            <strong style={{ fontSize: 28, color: "var(--color-accent-orange)", display: "block" }}>
-              2 Canchas
-            </strong>
-            <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-              Cristal oficial de 10mm
-            </span>
-          </div>
-          <div>
-            <strong style={{ fontSize: 28, color: "var(--color-accent-orange)", display: "block" }}>
-              12+ Torneos
-            </strong>
-            <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-              Disputados con gran convocatoria
-            </span>
-          </div>
-          <div>
-            <strong style={{ fontSize: 28, color: "var(--color-accent-orange)", display: "block" }}>
-              +800 Jugadores
-            </strong>
-            <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-              En la comunidad de Catriel
-            </span>
-          </div>
-          <div>
-            <strong style={{ fontSize: 28, color: "var(--color-accent-orange)", display: "block" }}>
-              Cantina Propia
-            </strong>
-            <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-              Para el mejor tercer tiempo
-            </span>
-          </div>
-        </div>
-      </div>
 
       <TestimonialsSection />
 
@@ -340,24 +278,13 @@ export default async function Home() {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
-            <div
-              style={{
-                position: "absolute",
-                bottom: 16,
-                left: 16,
-                right: 16,
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 10,
-                pointerEvents: "none",
-              }}
-            >
+            <div className="map-overlay-actions">
               <a
                 href={CLUB_INFO.mapsUrl}
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary-maps"
-                style={{ pointerEvents: "auto", height: 38, gap: 8 }}
+                
               >
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
                   <path
@@ -373,7 +300,7 @@ export default async function Home() {
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary"
-                style={{ pointerEvents: "auto", height: 38, gap: 6 }}
+                
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -392,14 +319,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
-              gap: 16,
-            }}
-          >
+          <div className="contact-grid">
             <a
               href={CLUB_INFO.mapsUrl}
               target="_blank"
@@ -407,17 +327,7 @@ export default async function Home() {
               className="info-link-card"
             >
               <div>
-                <span
-                  style={{
-                    fontSize: 11,
-                    textTransform: "uppercase",
-                    fontWeight: 600,
-                    color: "var(--text-muted)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                  }}
-                >
+                <span className="contact-eyebrow">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none">
                     <path
                       d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
@@ -428,21 +338,14 @@ export default async function Home() {
                   <span style={{ color: "#EA4335" }}>Google Maps</span> ·
                   Ubicación Oficial
                 </span>
-                <div
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                    marginTop: 4,
-                  }}
-                >
+                <div className="contact-title">
                   Muzzaga Pádel
                 </div>
-                <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
+                <span className="contact-sub">
                   Av. Cacique Catriel y Córdoba · Catriel
                 </span>
               </div>
-              <span style={{ fontSize: 18, color: "#EA4335" }}>↗</span>
+              <span className="contact-arrow" style={{ color: "#EA4335" }}>↗</span>
             </a>
 
             <a
@@ -452,17 +355,7 @@ export default async function Home() {
               className="info-link-card"
             >
               <div>
-                <span
-                  style={{
-                    fontSize: 11,
-                    textTransform: "uppercase",
-                    fontWeight: 600,
-                    color: "var(--text-muted)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                  }}
-                >
+                <span className="contact-eyebrow">
                   <svg
                     viewBox="0 0 24 24"
                     width="13"
@@ -473,14 +366,7 @@ export default async function Home() {
                   </svg>
                   <span style={{ color: "#25D366" }}>WhatsApp</span> · Atención Directa
                 </span>
-                <div
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                    marginTop: 4,
-                  }}
-                >
+                <div className="contact-title">
                   WhatsApp del Club
                 </div>
                 <span
@@ -489,7 +375,7 @@ export default async function Home() {
                   {CLUB_INFO.phoneFormatted}
                 </span>
               </div>
-              <span style={{ fontSize: 18, color: "#25D366" }}>↗</span>
+              <span className="contact-arrow" style={{ color: "#25D366" }}>↗</span>
             </a>
           </div>
         </div>

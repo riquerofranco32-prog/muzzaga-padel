@@ -7,6 +7,7 @@ import FeatureCarousel from "./FeatureCarousel";
 const SPECS = [
   {
     id: "cristal",
+    short: "Cristales",
     title: "Cristales Templados 10mm",
     subtitle: "Rebote uniforme y seguridad",
     icon: "💎",
@@ -15,6 +16,7 @@ const SPECS = [
   },
   {
     id: "cesped",
+    short: "Césped",
     title: "Césped Sintético Monofilamento",
     subtitle: "Tracción constante sin resbalones",
     icon: "🌱",
@@ -23,6 +25,7 @@ const SPECS = [
   },
   {
     id: "led",
+    short: "Iluminación",
     title: "Iluminación LED Pro 200W",
     subtitle: "Visibilidad perfecta de noche",
     icon: "💡",
@@ -31,6 +34,7 @@ const SPECS = [
   },
   {
     id: "cantina",
+    short: "Cantina",
     title: "Cantina & Tercer Tiempo",
     subtitle: "El encuentro después de cada set",
     icon: "🍕",
@@ -77,132 +81,39 @@ export default function AmenitiesSection() {
         <FeatureCarousel />
 
         {/* FICHA TÉCNICA INTERACTIVA DE PISTAS */}
-        <div
-          style={{
-            marginTop: 28,
-            background: "var(--color-surface-card, #ffffff)",
-            border: "1px solid var(--color-hairline-strong, #e2e8f0)",
-            borderRadius: "var(--radius-xl, 16px)",
-            padding: "24px 20px",
-            boxShadow: "0 4px 20px -2px rgba(0, 0, 0, 0.04)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 12,
-              marginBottom: 18,
-            }}
-          >
+        <div className="spec-panel">
+          <div className="spec-panel-head">
             <div>
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  color: "var(--color-accent-orange, #e8722a)",
-                }}
-              >
-                Ficha Técnica Oficial
-              </span>
-              <h3 style={{ fontSize: 18, fontWeight: 700, margin: "2px 0 0", color: "var(--color-ink)" }}>
-                Especificaciones de las Pistas de Muzzaga
-              </h3>
+              <span className="spec-eyebrow">Ficha Técnica Oficial</span>
+              <h3 className="spec-heading">Especificaciones de las pistas</h3>
             </div>
 
-            {/* TABS SELECTORAS */}
-            <div
-              style={{
-                display: "flex",
-                gap: 6,
-                background: "var(--color-surface-2, #f4f4f5)",
-                padding: 4,
-                borderRadius: "var(--radius-md, 10px)",
-                flexWrap: "wrap",
-              }}
-            >
+            <div className="spec-tabs" role="tablist" aria-label="Especificaciones">
               {SPECS.map((s) => (
                 <button
                   key={s.id}
                   type="button"
+                  role="tab"
+                  aria-selected={selectedSpec === s.id}
+                  className="spec-tab"
                   onClick={() => setSelectedSpec(s.id)}
-                  style={{
-                    border: "none",
-                    background: selectedSpec === s.id ? "#ffffff" : "transparent",
-                    color: selectedSpec === s.id ? "var(--color-ink)" : "var(--text-secondary)",
-                    fontWeight: selectedSpec === s.id ? 600 : 500,
-                    fontSize: 12.5,
-                    padding: "6px 12px",
-                    borderRadius: 6,
-                    cursor: "pointer",
-                    boxShadow: selectedSpec === s.id ? "0 2px 6px rgba(0,0,0,0.08)" : "none",
-                    transition: "all 0.15s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
                 >
-                  <span>{s.icon}</span>
-                  <span>{s.title.split(" ")[0]} {s.title.split(" ")[1] || ""}</span>
+                  <span aria-hidden="true">{s.icon}</span>
+                  <span>{s.short}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* DETALLE ACTIVO */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "auto 1fr",
-              gap: 16,
-              alignItems: "center",
-              padding: "16px 18px",
-              background: "var(--color-surface-2, #fafafa)",
-              borderRadius: "var(--radius-md, 12px)",
-              border: "1px solid var(--color-hairline, #eee)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 32,
-                width: 56,
-                height: 56,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "#ffffff",
-                borderRadius: "50%",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-              }}
-            >
-              {active.icon}
-            </div>
-
+          {/* key: re-monta el detalle para que la animación de entrada corra en cada cambio */}
+          <div className="spec-detail" key={active.id} role="tabpanel">
+            <div className="spec-icon" aria-hidden="true">{active.icon}</div>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
-                <strong style={{ fontSize: 16, color: "var(--color-ink)" }}>
-                  {active.title}
-                </strong>
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#059669",
-                    background: "rgba(16, 185, 129, 0.1)",
-                    padding: "2px 8px",
-                    borderRadius: 12,
-                  }}
-                >
-                  ✓ {active.tag}
-                </span>
+              <div className="spec-title-row">
+                <strong>{active.title}</strong>
+                <span className="spec-tag">✓ {active.tag}</span>
               </div>
-              <p style={{ fontSize: 13.5, color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
-                {active.desc}
-              </p>
+              <p className="spec-desc">{active.desc}</p>
             </div>
           </div>
         </div>
