@@ -25,7 +25,7 @@ export default function MascotFloatHelper() {
             maxWidth: 270,
             width: "calc(100vw - 48px)",
             position: "relative",
-            animation: "fadeInUp 0.25s ease-out",
+            animation: "fadeInUp 0.25s var(--ease-mascota)",
           }}
         >
           <button
@@ -147,7 +147,7 @@ export default function MascotFloatHelper() {
             border: "none",
             cursor: "pointer",
             padding: 0,
-            transition: "transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            transition: "transform 0.2s var(--ease-mascota)",
             position: "relative",
           }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1) rotate(-4deg)")}

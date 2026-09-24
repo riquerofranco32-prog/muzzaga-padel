@@ -110,7 +110,7 @@ export default function Header() {
                 }}
               >
                 <span>Herramientas</span>
-                <span style={{ fontSize: 10, transition: "transform 0.2s", transform: toolsOpen ? "rotate(180deg)" : "none" }}>
+                <span style={{ fontSize: 10, transition: "transform 0.2s var(--ease)", transform: toolsOpen ? "rotate(180deg)" : "none" }}>
                   ▼
                 </span>
               </button>
@@ -145,7 +145,7 @@ export default function Header() {
                         borderRadius: "var(--radius-sm)",
                         textDecoration: "none",
                         color: "var(--text-primary)",
-                        transition: "background 0.15s ease",
+                        transition: "background 0.15s var(--ease)",
                       }}
                     >
                       <strong style={{ display: "block", fontSize: 13 }}>{tool.label}</strong>

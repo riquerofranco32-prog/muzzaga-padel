@@ -141,6 +141,9 @@ const FEATURES = [
 ];
 
 const AUTO_PLAY_INTERVAL = 3500;
+// Misma curva que --ease en globals.css: motion no lee variables CSS.
+const EASE = [0.16, 1, 0.3, 1];
+const MOVE = { duration: 0.4, ease: EASE };
 const ITEM_HEIGHT = 52;
 
 const wrap = (min, max, v) => {
@@ -205,12 +208,7 @@ export default function FeatureCarousel() {
                     y: wrappedDistance * ITEM_HEIGHT,
                     opacity: 1 - Math.abs(wrappedDistance) * 0.25,
                   }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 90,
-                    damping: 22,
-                    mass: 1,
-                  }}
+                  transition={MOVE}
                   className="fc-nav-item"
                 >
                   <button
@@ -251,12 +249,7 @@ export default function FeatureCarousel() {
                     zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0,
                     pointerEvents: isActive ? "auto" : "none",
                   }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 25,
-                    mass: 0.8,
-                  }}
+                  transition={MOVE}
                   className="fc-stage-card"
                 >
                   <img
@@ -273,6 +266,7 @@ export default function FeatureCarousel() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
+                        transition={MOVE}
                         className="fc-stage-caption"
                       >
                         <span className="fc-stage-tag">

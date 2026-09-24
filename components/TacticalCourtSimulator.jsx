@@ -707,7 +707,7 @@ export default function TacticalCourtSimulator() {
                 <g
                   style={{
                     opacity: isPlayingAnim ? 1 : 0,
-                    transition: "opacity 0.18s ease",
+                    transition: "opacity 0.18s var(--ease)",
                   }}
                 >
                   {/* Trajectory glow path */}
