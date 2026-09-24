@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { COURTS, nowInClubTimezone, nextDays } from "../lib/booking";
-import { PRECIO_POR_JUGADOR } from "../data/pricing";
+import { requestSlotPick } from "../lib/pickSlot";
 
 export default function TodayFlashSlots() {
   const [loading, setLoading] = useState(true);
@@ -47,11 +47,15 @@ export default function TodayFlashSlots() {
   }
 
   function handleSelectSlot(slot) {
-    const el = document.getElementById("turnos");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    document.getElementById("turnos")?.scrollIntoView({ behavior: "smooth" });
+    requestSlotPick({ date: activeDate, courtId: slot.courtId, start: slot.start });
   }
+
+  // Precio por jugador real de cada franja (pico/valle); se anuncia el menor.
+  const minPerPlayer = availableSlots.reduce(
+    (min, s) => Math.min(min, s.price?.perPlayer || Infinity),
+    Infinity,
+  );
 
   if (loading) {
     return null;
@@ -92,9 +96,11 @@ export default function TodayFlashSlots() {
               <span className="flash-live pulse-badge-live">Disponible ya</span>
               <strong className="flash-title">Turnos libres · {dateLabel}</strong>
             </div>
-            <span className="flash-meta">
-              Desde <strong>${PRECIO_POR_JUGADOR.toLocaleString("es-AR")}</strong> por jugador (4p)
-            </span>
+            {Number.isFinite(minPerPlayer) && (
+              <span className="flash-meta">
+                Desde <strong>${minPerPlayer.toLocaleString("es-AR")}</strong> por jugador (4p)
+              </span>
+            )}
           </div>
 
           <div className="flash-chips">

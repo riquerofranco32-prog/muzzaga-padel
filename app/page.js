@@ -21,6 +21,7 @@ import "./landing.css";
 
 import { getClubConfig } from "../lib/clubConfigServer";
 import { CLUB_INFO } from "../data/club";
+import { todayInClub } from "../lib/booking";
 import { FAQS } from "../data/faq";
 
 const faqJsonLd = {
@@ -212,7 +213,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <BookingCalendar />
+          <BookingCalendar serverToday={todayInClub()} />
         </div>
       </section>
 

@@ -37,19 +37,7 @@ export default function HomeCantinaTeaser() {
             />
           </div>
         </div>
-        <Link href="/menu" className="btn btn-secondary" style={{ gap: 6 }}>
-          Ver Menú Completo (60+ productos) →
-        </Link>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
-            gap: 20,
-            marginBottom: 28,
-          }}
-        >
+        <div className="cantina-photos">
           <BentoPhotoCard
             src="/img/cantina_beer_court.jpg"
             alt="Cerveza helada y vista a la pista en la cantina de Muzzaga"
@@ -75,62 +63,29 @@ export default function HomeCantinaTeaser() {
           </BentoPhotoCard>
         </div>
 
-        {/* 6 PRODUCTOS DESTACADOS CON PRECIO */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))",
-            gap: 12,
-            marginBottom: 24,
-          }}
-        >
-          {FEATURED_ITEMS.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                background: "var(--color-surface-card)",
-                border: "1px solid var(--color-hairline-strong)",
-                borderRadius: "var(--radius-md)",
-                padding: "12px 16px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <strong style={{ fontSize: 14, color: "var(--color-ink)" }}>
+        {/* PRODUCTOS DESTACADOS CON PRECIO — pizarra de menú */}
+        <div className="menu-board">
+          <div className="menu-board-head">
+            <span className="menu-board-title">Lo más pedido</span>
+            <span className="menu-board-note">Precios actualizados</span>
+          </div>
+          <ul className="menu-board-list">
+            {FEATURED_ITEMS.map((item) => (
+              <li key={item.id} className="menu-board-item">
+                <span className="menu-board-name">
                   {item.name}
-                </strong>
-                {item.tag && (
-                  <span
-                    className="badge-linear badge-emerald"
-                    style={{ fontSize: 10, marginLeft: 6 }}
-                  >
-                    {item.tag}
-                  </span>
-                )}
-              </div>
-              <span
-                style={{
-                  fontWeight: 700,
-                  fontSize: 14.5,
-                  color: "var(--color-ink)",
-                  fontFamily: "var(--font-jetbrains-mono), monospace",
-                }}
-              >
-                ${item.price.toLocaleString("es-AR")}
-              </span>
-            </div>
-          ))}
+                  {item.tag && <span className="menu-board-tag">{item.tag}</span>}
+                </span>
+                <span className="menu-board-dots" aria-hidden="true" />
+                <span className="menu-board-price">${item.price.toLocaleString("es-AR")}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: 20 }}>
-          <Link
-            href="/menu"
-            className="btn btn-secondary"
-            style={{ padding: "10px 24px" }}
-          >
-            Explorar toda la carta con buscador y filtros →
+        <div className="section-more">
+          <Link href="/menu" className="section-more-link">
+            Ver la carta completa <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>

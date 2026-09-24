@@ -64,33 +64,16 @@ export default function HomeTorneosTeaser() {
             />
           </div>
         </div>
-        <Link href="/torneos" className="btn btn-secondary" style={{ gap: 6 }}>
-          Ver galería completa y fixture →
-        </Link>
-
         {/* CARD PROXIMO TORNEO */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, rgba(232, 114, 42, 0.08) 0%, var(--color-surface-card) 100%)",
-            border: "1px solid var(--color-hairline-strong)",
-            borderRadius: "var(--radius-xl)",
-            padding: "24px 20px",
-            marginBottom: 24,
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
-          <div>
-            <span className="badge-linear badge-amber" style={{ fontSize: 11, marginBottom: 6 }}>
-              Inscripciones Abiertas
-            </span>
-            <h3 style={{ fontSize: 19, color: "var(--color-ink)", margin: "4px 0 6px" }}>
-              Próximo Torneo · Categorías 7ma, 6ta y Suma 12
-            </h3>
-            <p style={{ color: "var(--color-body)", fontSize: 13.5, margin: 0, maxWidth: 540 }}>
+        <div className="next-event">
+          <div className="next-event-date" aria-hidden="true">
+            <span>Próxima</span>
+            <strong>Fecha</strong>
+          </div>
+          <div className="next-event-body">
+            <span className="next-event-tag">Inscripciones abiertas</span>
+            <h3 className="next-event-title">Categorías 7ma, 6ta y Suma 12</h3>
+            <p className="next-event-desc">
               Cupos limitados por categoría. Partidos a 3 sets, tercer tiempo incluido y transmisión de finales.
             </p>
           </div>
@@ -98,38 +81,39 @@ export default function HomeTorneosTeaser() {
             href={`https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent("¡Hola Muzzaga! Quiero información sobre fecha e inscripción para el próximo torneo.")}`}
             target="_blank"
             rel="noopener"
-            className="btn btn-linear-primary"
-            style={{ padding: "10px 20px" }}
+            className="next-event-cta"
           >
-            Anotarme por WhatsApp →
+            Anotarme por WhatsApp <span aria-hidden="true">→</span>
           </a>
         </div>
 
         {/* GRILLA RESUMIDA DE 6 FOTOS */}
-        <div className="torneo-thumb-grid">
-          {FEATURED_PHOTOS.map((photo) => (
-            <div
+        <div className="torneo-thumb-grid torneo-bento">
+          {FEATURED_PHOTOS.slice(0, 5).map((photo) => (
+            <button
+              type="button"
               key={photo.src}
               className="torneo-thumb"
               onClick={() => openLightbox(photo.src, photo.alt)}
+              aria-label={`Ampliar foto: ${photo.label}`}
             >
               <Image
                 src={photo.src}
                 alt={photo.alt}
                 fill
                 loading="lazy"
-                sizes="(max-width: 640px) 45vw, 180px"
+                sizes="(max-width: 640px) 45vw, 360px"
               />
               <div className="torneo-thumb-badge">
                 <span>{photo.label}</span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
 
-        <div style={{ textAlign: "center", marginTop: 24 }}>
-          <Link href="/torneos" className="btn btn-secondary" style={{ padding: "10px 24px" }}>
-            Ver las más de 50 fotos de torneos en la galería oficial →
+        <div className="section-more">
+          <Link href="/torneos" className="section-more-link">
+            Ver galería completa y fixture <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>

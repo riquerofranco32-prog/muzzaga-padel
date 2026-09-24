@@ -11,17 +11,7 @@ export default function MascotFloatHelper() {
   if (dismissed) return null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 24,
-        right: 24,
-        zIndex: 999,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-      }}
-    >
+    <div className="mascot-float">
       {/* POPUP / GREETING CARD */}
       {isOpen && (
         <div

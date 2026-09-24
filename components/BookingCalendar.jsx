@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createBooking } from "../app/actions";
 import BookingPassModal from "./BookingPassModal";
-import { COURTS, nextDays, priceForSlot, toISODate } from "../lib/booking";
+import { COURTS, nextDays, priceForSlot, todayInClub } from "../lib/booking";
+import { PICK_SLOT_EVENT } from "../lib/pickSlot";
 import { toWhatsappNumber } from "../lib/phone";
 import { trackEvent } from "../lib/analytics";
 
-const DAYS = nextDays(14);
+const DAY_COUNT = 14;
 const CLUB_WHATSAPP = "5492995974176";
 
 function buildWhatsappUrl(bookingCode, booking) {
@@ -23,10 +24,18 @@ function buildWhatsappUrl(bookingCode, booking) {
   return `https://wa.me/${CLUB_WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
 
-export default function BookingCalendar() {
-  const [activeDate, setActiveDate] = useState(DAYS[0].iso);
+// serverToday: el "hoy" con el que se renderizó el HTML (la home es ISR). Se
+// usa para el primer render así server y cliente coinciden; después del
+// montaje se corrige si ya cambió el día (ej. HTML cacheado antes de medianoche).
+export default function BookingCalendar({ serverToday }) {
+  const [days, setDays] = useState(() => nextDays(DAY_COUNT, serverToday));
+  const [activeDate, setActiveDate] = useState(days[0].iso);
+  // Turno pedido desde afuera (widget "turnos libres hoy"): se selecciona
+  // cuando llega la disponibilidad de ese día.
+  const [pendingPick, setPendingPick] = useState(null);
   const [courtFilter, setCourtFilter] = useState("all");
   const [slots, setSlots] = useState(null);
+  const [slotsDate, setSlotsDate] = useState(null);
   // Canchas de Configuración (vienen con la disponibilidad); COURTS es el
   // default hasta que responde la API.
   const [courts, setCourts] = useState(COURTS);
@@ -64,6 +73,29 @@ export default function BookingCalendar() {
     }
   }, []);
 
+  useEffect(() => {
+    const today = todayInClub();
+    if (today !== days[0].iso) {
+      setDays(nextDays(DAY_COUNT, today));
+      setActiveDate(today);
+    }
+    // Solo al montar: el día no cambia mientras se renderiza.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    function onPick(e) {
+      const { date, courtId, start } = e.detail || {};
+      if (!date || !courtId || !start) return;
+      setCourtFilter("all");
+      setConfirmed(null);
+      setActiveDate(date);
+      setPendingPick({ date, courtId, start });
+    }
+    window.addEventListener(PICK_SLOT_EVENT, onPick);
+    return () => window.removeEventListener(PICK_SLOT_EVENT, onPick);
+  }, []);
+
   function handleForgetProfile() {
     try {
       localStorage.removeItem("muzzaga_player_profile");
@@ -94,6 +126,7 @@ export default function BookingCalendar() {
       .then((data) => {
         if (cancelled) return;
         setSlots(data.slots);
+        setSlotsDate(activeDate);
         if (data.courts?.length) setCourts(data.courts);
       })
       .catch(() => {
@@ -107,7 +140,21 @@ export default function BookingCalendar() {
     };
   }, [activeDate]);
 
-  const activeDay = DAYS.find((d) => d.iso === activeDate);
+  useEffect(() => {
+    // slotsDate evita elegir sobre la grilla del día anterior mientras carga la nueva.
+    if (!pendingPick || !slots || slotsDate !== pendingPick.date) return;
+    const slot = slots.find(
+      (s) =>
+        s.courtId === pendingPick.courtId &&
+        s.start === pendingPick.start &&
+        s.available,
+    );
+    setPendingPick(null);
+    if (slot) pickSlot(slot);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingPick, slots, slotsDate]);
+
+  const activeDay = days.find((d) => d.iso === activeDate);
 
   const visibleSlots = useMemo(() => {
     if (!slots) return null;
@@ -203,7 +250,7 @@ export default function BookingCalendar() {
   return (
     <div className="booking-calendar">
       <div className="booking-dates" role="tablist" aria-label="Elegí el día">
-        {DAYS.map((day) => (
+        {days.map((day) => (
           <button
             key={day.iso}
             type="button"

@@ -1557,3 +1557,359 @@ body {
     gap: 12px;
   }
 }
+
+/* --------------------------------------------------------------------------
+   FLOTANTES: la mascota ayuda a la derecha, la barra "reservar" al centro
+   (antes las dos iban en bottom/right 24px y se pisaban).
+   -------------------------------------------------------------------------- */
+.mascot-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.floating-live-pill {
+  right: auto;
+  left: 50%;
+  translate: -50% 0;
+}
+
+@media (max-width: 768px) {
+  .mascot-float {
+    bottom: calc(var(--bottom-bar-h) + env(safe-area-inset-bottom, 0px) + 10px);
+    right: 10px;
+  }
+
+  .mascot-float img {
+    width: 62px !important;
+  }
+
+  .mascot-float .pulse-badge-live {
+    display: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   "VER MÁS" al pie de sección (reemplaza los botones duplicados arriba/abajo)
+   -------------------------------------------------------------------------- */
+.section-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.section-more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  border: 1px solid var(--color-hairline-strong);
+  background: var(--color-surface-card);
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.section-more-link span {
+  transition: transform 0.25s var(--ease-out);
+}
+
+.section-more-link:hover {
+  border-color: var(--color-accent-orange);
+  color: var(--color-accent-orange-text);
+}
+
+.section-more-link:hover span {
+  transform: translateX(4px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .section-more-link:hover {
+    color: #ff9a5a;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   TORNEOS: próximo evento tipo afiche + grilla bento
+   -------------------------------------------------------------------------- */
+.next-event {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 24px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  border-radius: 22px;
+  background: var(--night);
+  color: #fff;
+  border: 1px solid rgba(232, 114, 42, 0.35);
+}
+
+.next-event::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 140% at 100% 50%, rgba(232, 114, 42, 0.35), transparent 70%),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.025) 0 12px, transparent 12px 24px);
+  pointer-events: none;
+}
+
+.next-event > * {
+  position: relative;
+}
+
+.next-event-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 18px;
+  background: var(--color-accent-orange);
+  color: #1b1b19;
+  text-transform: uppercase;
+  line-height: 1;
+  box-shadow: 0 12px 28px -10px var(--orange-glow);
+}
+
+.next-event-date span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.next-event-date strong {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.next-event-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #34d399;
+}
+
+.next-event-tag::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
+}
+
+.next-event-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1;
+  margin: 6px 0 6px;
+}
+
+.next-event-desc {
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 520px;
+}
+
+.next-event-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: #fff;
+  color: #1b1b19;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: transform 0.25s var(--ease-out), background 0.2s;
+}
+
+.next-event-cta:hover {
+  background: var(--color-accent-orange);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.torneo-bento {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 200px;
+  gap: 12px;
+}
+
+.torneo-bento .torneo-thumb {
+  aspect-ratio: auto;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.torneo-bento .torneo-thumb:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.torneo-bento .torneo-thumb img {
+  transition: transform 0.6s var(--ease-out);
+}
+
+.torneo-bento .torneo-thumb:hover img {
+  transform: scale(1.06);
+}
+
+.torneo-bento .torneo-thumb-badge {
+  text-align: left;
+  padding: 28px 14px 12px;
+  font-size: 12.5px;
+}
+
+.torneo-bento .torneo-thumb:first-child .torneo-thumb-badge {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   CANTINA: fotos + pizarra de menú
+   -------------------------------------------------------------------------- */
+.cantina-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.menu-board {
+  padding: 22px 26px;
+  border-radius: 22px;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+}
+
+.menu-board-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-ink);
+}
+
+.menu-board-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.menu-board-note {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.menu-board-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 40px;
+}
+
+.menu-board-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.menu-board-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.menu-board-tag {
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-emerald);
+}
+
+.menu-board-dots {
+  flex: 1;
+  min-width: 16px;
+  border-bottom: 2px dotted var(--color-hairline-strong);
+  transform: translateY(-4px);
+}
+
+.menu-board-price {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 19px;
+  color: var(--color-accent-orange);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .next-event {
+    grid-template-columns: auto 1fr;
+  }
+
+  .next-event-cta {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .torneo-bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .next-event {
+    padding: 18px;
+    gap: 16px;
+  }
+
+  .next-event-date {
+    width: 68px;
+    height: 68px;
+  }
+
+  .next-event-date strong {
+    font-size: 24px;
+  }
+
+  .menu-board {
+    padding: 18px 16px;
+  }
+
+  .menu-board-list {
+    grid-template-columns: 1fr;
+  }
+}
