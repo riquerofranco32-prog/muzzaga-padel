@@ -32,7 +32,7 @@ export default function TorneosPage() {
         <div className="container" style={{ marginBottom: 20 }}>
           <div
             style={{
-              background: "linear-gradient(135deg, rgba(232, 114, 42, 0.08) 0%, rgba(255, 255, 255, 0.8) 100%)",
+              background: "linear-gradient(135deg, var(--color-accent-orange-subtle) 0%, var(--color-surface-card) 100%)",
               border: "1px solid var(--color-hairline-strong)",
               borderRadius: "var(--radius-xl)",
               padding: "28px 24px",
