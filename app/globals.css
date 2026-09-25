@@ -611,11 +611,28 @@ select:focus-visible,
   height: 44px;
   min-width: 44px;
   min-height: 44px;
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-hairline-strong);
-  border-radius: var(--radius-md);
+  /* Solo las tres líneas, sin fondo ni contorno: al lado de "Reservar" el
+     recuadro parecía un segundo botón. Sigue midiendo 44 px para el dedo y
+     al tocarlo se marca con un círculo suave. Va 8 px más a la derecha: sin
+     el recuadro, las líneas quedaban más lejos del borde que el logo del
+     otro lado (22,7 contra 15 px). */
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  margin-right: -8px;
   color: var(--color-ink);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-menu-btn:active {
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+
+@media (hover: hover) {
+  .mobile-menu-btn:hover {
+    background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  }
 }
 
 .mobile-menu-btn svg {
