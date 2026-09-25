@@ -75,7 +75,7 @@ const PRESET_TACTICS = [
       },
       {
         phase: "3. Rebote Cristal",
-        desc: "Impacto en el cristal de 10mm a más de 2.5m de altura.",
+        desc: "Impacto en el cristal de fondo a más de 2,5 m de altura.",
       },
       {
         phase: "4. Salida x3",
@@ -516,7 +516,7 @@ export default function TacticalCourtSimulator() {
                 strokeWidth="2.5"
               />
 
-              {/* Padel Glass Walls (Cristal Templado 10mm Muzzaga) */}
+              {/* Paredes de cristal */}
               <rect
                 x="18"
                 y="16"
@@ -883,7 +883,7 @@ export default function TacticalCourtSimulator() {
             </svg>
 
             <div className="court-glass-indicator">
-              Césped de Alta Densidad · Cristales Templados 10mm Muzzaga
+              Césped sintético · Cristal templado
             </div>
           </div>
 

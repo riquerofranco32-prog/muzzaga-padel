@@ -4,42 +4,45 @@ import { useState } from "react";
 import Image from "next/image";
 import FeatureCarousel from "./FeatureCarousel";
 
+// Solo lo que se puede afirmar sin la ficha técnica del club: el espesor
+// del cristal, la homologación, el césped y los proyectores quedan afuera
+// hasta que el club los confirme.
 const SPECS = [
   {
     id: "cristal",
     short: "Cristales",
-    title: "Cristales Templados 10mm",
-    subtitle: "Rebote uniforme y seguridad",
+    title: "Cristal templado",
+    subtitle: "Rebote parejo",
     icon: "💎",
-    tag: "Homologado FAP",
-    desc: "Vidrios templados de alta resistencia con fijaciones perimetrales antivibración. Garantizan un rebote fiel, predecible y continuo tanto en pared de fondo como en ángulos laterales.",
+    tag: "Las dos canchas",
+    desc: "Paredes de cristal templado en las dos canchas: el rebote es parejo en el fondo y en los laterales.",
   },
   {
     id: "cesped",
     short: "Césped",
-    title: "Césped Sintético Monofilamento",
-    subtitle: "Tracción constante sin resbalones",
+    title: "Césped sintético",
+    subtitle: "Buen agarre",
     icon: "🌱",
-    tag: "Arena de Sílice 100%",
-    desc: "Superficie de fibra texturada de 12mm de alta densidad lastrada con arena de sílice calibrada para máxima adherencia en giros bruscos y amortiguación articular en rodillas.",
+    tag: "Las dos canchas",
+    desc: "Césped sintético para frenar, girar y arrancar sin resbalarte.",
   },
   {
     id: "led",
     short: "Iluminación",
-    title: "Iluminación LED Pro 200W",
-    subtitle: "Visibilidad perfecta de noche",
+    title: "Iluminación LED",
+    subtitle: "Para jugar de noche",
     icon: "💡",
-    tag: "8 Proyectores",
-    desc: "Proyectores LED simétricos de alta potencia ubicados a 6 metros de altura. Cobertura uniforme en toda la pista sin conos de sombra ni encandilamiento en globos altos.",
+    tag: "Turnos de noche",
+    desc: "Iluminación LED en las dos canchas para jugar de noche, hasta el último turno.",
   },
   {
     id: "cantina",
     short: "Cantina",
-    title: "Cantina & Tercer Tiempo",
-    subtitle: "El encuentro después de cada set",
+    title: "Cantina y tercer tiempo",
+    subtitle: "Después de cada partido",
     icon: "🍕",
-    tag: "Menú Completo",
-    desc: "Área social con mesas, pantalla grande para seguir partidos y torneos, pizzas caseras, bebidas frías y opciones SIN TACC / veganas para disfrutar el post partido.",
+    tag: "Menú completo",
+    desc: "Mesas, pantalla grande para seguir partidos y torneos, pizzas caseras, bebidas frías y opciones sin TACC para después del partido.",
   },
 ];
 

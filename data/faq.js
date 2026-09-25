@@ -20,7 +20,7 @@ export const FAQS = [
   },
   {
     q: "¿Con cuánta anticipación puedo cancelar o reprogramar?",
-    a: "Podés avisarnos por WhatsApp hasta con 4 horas de anticipación para reprogramar tu turno sin perder la seña para otro día u horario disponible.",
+    a: "Avisanos por WhatsApp lo antes posible y coordinamos la reprogramación de tu turno para otro día u horario disponible.",
   },
   {
     q: "¿Hay clases particulares o entrenamientos?",

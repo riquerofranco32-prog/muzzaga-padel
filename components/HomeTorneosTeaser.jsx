@@ -52,7 +52,7 @@ export default function HomeTorneosTeaser() {
             </span>
             <h2 className="section-title">Torneos en Muzzaga</h2>
             <p className="section-desc">
-              Fechas oficiales por categoría con fase de grupos, copas de oro y plata, trofeos y premios en efectivo.
+              Torneos por categoría todo el año. Mirá las fotos de junio y agosto y anotate para el próximo.
             </p>
           </div>
           <div className="mascot-section-badge">

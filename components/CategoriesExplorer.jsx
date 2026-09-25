@@ -72,7 +72,7 @@ const ALL_CATEGORIES = [
       { name: "Definición / Smash", level: "Traída a campo propio y smash x3 constante", pct: 90 },
     ],
     palaRecom: "Formato Diamante / Lágrima Hard, balance alto, balance pro para máxima aceleración.",
-    tournaments: "Torneo Abierto 3ra/4ta · Suma 8 · Premios en efectivo y palas pro",
+    tournaments: "Torneo Abierto 3ra/4ta · Suma 8",
     whatsappMsg: "¡Hola Muzzaga! Soy jugador de 4ta/3ra. Quiero consultar por torneos de primera categoría y partidos de nivel.",
   },
   {

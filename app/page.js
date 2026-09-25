@@ -38,7 +38,7 @@ const faqJsonLd = {
 };
 
 const TICKER_ITEMS = [
-  "Cristal templado 10 mm",
+  "Cristal templado",
   "Iluminación LED",
   "Turnos de 90 min",
   "Canchas Abiertas",
@@ -107,7 +107,7 @@ export default async function Home() {
             </h1>
 
             <p className="hero-night-lede">
-              {config.courts?.length || 2} canchas oficiales de cristal con iluminación LED, turnos de{" "}
+              {config.courts?.length || 2} canchas de cristal templado con iluminación LED, turnos de{" "}
               {config.slotDurationMin} minutos, Canchas Abiertas comunitarias y cantina para el mejor tercer tiempo.
             </p>
 
@@ -125,7 +125,6 @@ export default async function Home() {
 
             <ul className="hero-trust">
               <li>Confirmás con una seña por WhatsApp</li>
-              <li>Cancelás hasta 4 h antes</li>
               <li>Pistas cubiertas, cero viento</li>
             </ul>
           </div>
@@ -140,7 +139,7 @@ export default async function Home() {
             </div>
             <div className="hero-float-card hero-float-glass">
               <span className="hero-float-dot" />
-              Cristal 10 mm · LED
+              Cristal templado · LED
             </div>
           </div>
 
