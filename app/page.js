@@ -8,7 +8,6 @@ import CommunityMatchesSection from "../components/CommunityMatchesSection";
 import HomeTorneosTeaser from "../components/HomeTorneosTeaser";
 import HomeCantinaTeaser from "../components/HomeCantinaTeaser";
 import ClubToolsSection from "../components/ClubToolsSection";
-import TestimonialsSection from "../components/TestimonialsSection";
 import FaqSection from "../components/FaqSection";
 import FloatingLiveBar from "../components/FloatingLiveBar";
 import MascotFloatHelper from "../components/MascotFloatHelper";
@@ -214,7 +213,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <TestimonialsSection />
+      {/* Testimonios: fuera hasta tener reseñas reales con nombre y foto (o
+          las de Google). El componente queda en components/. */}
 
       {/* 4. INSTALACIONES */}
       <AmenitiesSection />
