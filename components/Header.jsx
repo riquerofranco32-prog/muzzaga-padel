@@ -159,7 +159,7 @@ export default function Header() {
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <a
               href="/#turnos"
-              className="btn btn-linear-primary header-reserve-btn"
+              className="btn btn-orange-primary header-reserve-btn"
               style={{ height: 36, padding: "6px 16px", fontWeight: 700 }}
             >
               Reservar
@@ -203,11 +203,11 @@ export default function Header() {
       >
         <a
           href="/#turnos"
-          className="btn btn-linear-primary"
+          className="btn btn-orange-primary"
           onClick={() => setOpen(false)}
           style={{ width: "100%", height: 42, justifyContent: "center", marginBottom: 12 }}
         >
-          Reservar Cancha →
+          Reservar cancha →
         </a>
 
         {NAV_LINKS.map((link) => (
