@@ -977,6 +977,25 @@ select:focus-visible,
   animation-play-state: paused;
 }
 
+/* Con "reducir movimiento" la tira no corre sola: quedaba cortada y sin
+   forma de ver el resto de las fotos. Se desliza a mano y sin las copias
+   que solo sirven para el loop. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-container {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .marquee-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .marquee-track > [data-dup] {
+    display: none;
+  }
+}
+
 @keyframes marqueeContinuous {
   0% {
     transform: translateX(0);

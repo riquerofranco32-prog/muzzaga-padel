@@ -90,7 +90,7 @@ function JugadoresMarquee({ photos }) {
           <MarqueeCard key={photo.src} {...photo} />
         ))}
         {photos.map((photo) => (
-          <MarqueeCard key={`${photo.src}-dup`} {...photo} aria-hidden="true" />
+          <MarqueeCard key={`${photo.src}-dup`} {...photo} duplicate />
         ))}
       </div>
     </div>

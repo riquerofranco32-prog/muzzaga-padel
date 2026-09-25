@@ -68,7 +68,7 @@ export default function HeroMarquee() {
           <MarqueeCard key={photo.src} {...photo} />
         ))}
         {PHOTOS.map((photo) => (
-          <MarqueeCard key={`${photo.src}-dup`} {...photo} aria-hidden="true" />
+          <MarqueeCard key={`${photo.src}-dup`} {...photo} duplicate />
         ))}
       </div>
     </div>

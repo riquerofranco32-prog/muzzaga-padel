@@ -10,11 +10,20 @@ import { useLightbox } from "./LightboxProvider";
 // los contenedores (.marquee-card, .photo-bento-card) ya son position:relative
 // con overflow:hidden.
 
-/** Marquee card used in the hero gallery strip. */
-export function MarqueeCard({ src, alt, label, caption, priority }) {
+/**
+ * Marquee card used in the hero gallery strip. `duplicate`: la copia que
+ * cierra el loop; se oculta al lector de pantalla y, con "reducir
+ * movimiento", también de la vista.
+ */
+export function MarqueeCard({ src, alt, label, caption, priority, duplicate = false }) {
   const openLightbox = useLightbox();
   return (
-    <div className="marquee-card" onClick={() => openLightbox(src, caption)}>
+    <div
+      className="marquee-card"
+      onClick={() => openLightbox(src, caption)}
+      aria-hidden={duplicate || undefined}
+      data-dup={duplicate || undefined}
+    >
       <Image
         src={src}
         alt={alt}
