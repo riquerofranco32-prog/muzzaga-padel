@@ -48,7 +48,12 @@ export default function CreateBookingModal({
           >
             <IconPlus size={16} /> Cargar Turno Manual / Bloquear
           </h3>
-          <button type="button" className="admin-modal-close" onClick={onClose} aria-label="Cerrar">
+          <button
+            type="button"
+            className="admin-modal-close"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
             <IconClose size={14} />
           </button>
         </div>
@@ -92,7 +97,9 @@ export default function CreateBookingModal({
                   <option key={t} value={t}>
                     {t} a {end}
                     {clubConfig.pricing.picoEnabled &&
-                      (priceFor(clubConfig, activeDate, t).band === "pico" ? " · pico" : " · valle")}
+                      (priceFor(clubConfig, activeDate, t).band === "pico"
+                        ? " · pico"
+                        : " · valle")}
                   </option>
                 ))}
               </select>
@@ -208,12 +215,49 @@ export default function CreateBookingModal({
 
           <div className="admin-modal-hint">
             Se va a guardar de <strong>{modalForm.startTime}</strong> a{" "}
-            <strong>
-              {selectedSlot?.end}
-            </strong>{" "}
-            hs · Total <strong>${modalPrice.toLocaleString("es-AR")}</strong>
+            <strong>{selectedSlot?.end}</strong> hs · Total{" "}
+            <strong>${modalPrice.toLocaleString("es-AR")}</strong>
             {!modalForm.fullCourt &&
               ` (${modalForm.playersCount} × $${perPlayerPrice.toLocaleString("es-AR")})`}
+          </div>
+
+          <div style={{ marginBottom: modalForm.isRecurring ? 12 : 18 }}>
+            <label className="admin-checkbox-row">
+              <input
+                type="checkbox"
+                checked={modalForm.isRecurring}
+                onChange={(e) =>
+                  setModalForm({ ...modalForm, isRecurring: e.target.checked })
+                }
+              />
+              Turno fijo (repetir mismo día y horario todas las semanas)
+            </label>
+            {modalForm.isRecurring && (
+              <div style={{ marginTop: 8 }}>
+                <label className="admin-field-label">
+                  Cantidad de semanas:
+                </label>
+                <input
+                  type="number"
+                  min={2}
+                  max={26}
+                  className="admin-input-field"
+                  style={{ maxWidth: 120 }}
+                  value={modalForm.recurringWeeks}
+                  onChange={(e) =>
+                    setModalForm({
+                      ...modalForm,
+                      recurringWeeks: Number(e.target.value),
+                    })
+                  }
+                />
+                <p className="admin-field-hint">
+                  Empieza el {activeDate}. Si alguna semana ese horario ya está
+                  ocupado o el día está cerrado, se saltea sola y se avisa
+                  cuánto se pudo crear.
+                </p>
+              </div>
+            )}
           </div>
 
           <div style={{ marginBottom: 18 }}>
@@ -237,7 +281,11 @@ export default function CreateBookingModal({
             style={{ width: "100%", height: 44, justifyContent: "center" }}
             disabled={modalSubmitting}
           >
-            {modalSubmitting ? "Guardando..." : "Confirmar y Guardar Turno →"}
+            {modalSubmitting
+              ? "Guardando..."
+              : modalForm.isRecurring
+                ? "Crear Turno Fijo →"
+                : "Confirmar y Guardar Turno →"}
           </button>
         </form>
       </div>

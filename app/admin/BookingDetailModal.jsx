@@ -25,7 +25,6 @@ import {
   buildConfirmationMessage,
 } from "./adminHelpers";
 
-
 export default function BookingDetailModal({
   booking,
   clubConfig,
@@ -37,6 +36,7 @@ export default function BookingDetailModal({
   onAddPayment,
   onRemovePayment,
   onCancel,
+  onCancelSeries,
   onToggleTest,
   onMoved,
   onDeletedBooking,
@@ -120,7 +120,12 @@ export default function BookingDetailModal({
             Turno {formatDate(booking.date)} · {booking.startTime}
             {booking.isTest && " · PRUEBA"}
           </h3>
-          <button type="button" className="admin-modal-close" onClick={onClose} aria-label="Cerrar">
+          <button
+            type="button"
+            className="admin-modal-close"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
             <IconClose size={14} />
           </button>
         </div>
@@ -192,6 +197,23 @@ export default function BookingDetailModal({
                 title="Primer turno en el club"
               >
                 1er turno
+              </span>
+            )}
+            {booking.recurringId && (
+              <span
+                style={{
+                  background: "rgba(124, 58, 237, 0.1)",
+                  color: "#6d28d9",
+                  border: "1px solid rgba(124, 58, 237, 0.25)",
+                  borderRadius: 12,
+                  padding: "2px 8px",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                }}
+                title="Esta semana es una ocurrencia de un turno fijo"
+              >
+                Turno fijo
               </span>
             )}
           </div>
@@ -610,7 +632,11 @@ export default function BookingDetailModal({
             <ul>
               {accountSales.map((sale) => (
                 <li key={sale.id}>
-                  <span>{(sale.items || []).map((it) => `${it.qty}× ${it.name}`).join(", ")}</span>
+                  <span>
+                    {(sale.items || [])
+                      .map((it) => `${it.qty}× ${it.name}`)
+                      .join(", ")}
+                  </span>
                   <strong>{formatARS(sale.total)}</strong>
                   <select
                     aria-label="Cobrar consumo con"
@@ -623,7 +649,10 @@ export default function BookingDetailModal({
                         onToast?.(`Consumo cobrado · ${formatARS(sale.total)}`);
                         onSalesChanged?.();
                       } else {
-                        onToast?.(res.error || "No se pudo cobrar el consumo.", { tone: "error" });
+                        onToast?.(
+                          res.error || "No se pudo cobrar el consumo.",
+                          { tone: "error" },
+                        );
                       }
                     }}
                   >
@@ -651,6 +680,26 @@ export default function BookingDetailModal({
             }}
           >
             <IconTrash size={12} /> Cancelar turno
+          </button>
+        )}
+
+        {booking.recurringId && onCancelSeries && (
+          <button
+            type="button"
+            className="admin-table-action-btn delete"
+            style={{
+              width: "auto",
+              padding: "6px 12px",
+              fontSize: 12.5,
+              marginLeft: 8,
+            }}
+            title="Cancela todas las semanas futuras de este turno fijo"
+            onClick={() => {
+              onCancelSeries(booking.recurringId, booking.playerName);
+              onClose();
+            }}
+          >
+            <IconTrash size={12} /> Cancelar serie completa
           </button>
         )}
 

@@ -517,6 +517,79 @@ export async function adminCancelBooking({ bookingId, pin, reason } = {}) {
   }
 }
 
+/**
+ * Cancela de una sola vez todas las ocurrencias futuras (hoy inclusive) y sin
+ * cancelar de un turno fijo. Las de un día con la caja ya cerrada se saltean
+ * y se informan en `blocked`, no frenan al resto de la serie.
+ */
+export async function adminCancelRecurringSeries({
+  recurringId,
+  pin,
+  reason,
+} = {}) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  if (!isId(recurringId)) return { ok: false, error: "Serie inválida." };
+
+  const auth = await authorizeStaff(pin);
+  if (auth.error) return { ok: false, error: auth.error };
+
+  try {
+    const db = getDb();
+    const today = todayInClub();
+    const all = snapToList(await db.ref("bookings").get());
+    const targets = all.filter(
+      (b) =>
+        b.recurringId === recurringId &&
+        b.status !== "cancelado" &&
+        b.date >= today,
+    );
+    if (targets.length === 0) {
+      return {
+        ok: false,
+        error: "No quedan turnos futuros de esa serie para cancelar.",
+      };
+    }
+
+    let cancelled = 0;
+    const blocked = [];
+    for (const booking of targets) {
+      if (await closedDayError(db, booking.date)) {
+        blocked.push(booking.date);
+        continue;
+      }
+      await releaseClaim(db, booking, booking.id);
+      await db.ref(`bookings/${booking.id}`).update({
+        status: "cancelado",
+        cancelledAt: Date.now(),
+        cancelledBy: auth.staff.name,
+        ...(reason ? { cancelReason: clip(reason, 120) } : {}),
+      });
+      cancelled += 1;
+    }
+    if (cancelled === 0) {
+      return {
+        ok: false,
+        error:
+          "Ningún turno se pudo cancelar: todos tienen la caja de ese día cerrada.",
+      };
+    }
+    await audit(
+      db,
+      auth.staff,
+      "CANCELAR_SERIE_FIJA",
+      `Turno fijo · ${targets[0].playerName || "Serie"} · ${targets[0].courtName || ""}`,
+      reason
+        ? `Motivo: ${reason} · ${cancelled} semanas`
+        : `${cancelled} semanas canceladas`,
+    );
+    return { ok: true, staff: auth.staff.name, cancelled, blocked };
+  } catch (error) {
+    console.error("Error al cancelar serie de turno fijo", error);
+    return { ok: false, error: "No se pudo cancelar la serie." };
+  }
+}
+
 /** Elimina definitivamente una reserva de la base, requiriendo PIN de staff. */
 export async function adminDeleteBooking({ bookingId, pin, reason } = {}) {
   const denied = await requireAdmin();
@@ -540,7 +613,9 @@ export async function adminDeleteBooking({ bookingId, pin, reason } = {}) {
       auth.staff,
       "ELIMINAR_TURNO",
       `${booking.playerName || "Turno"} · ${booking.date} ${booking.startTime}`,
-      reason ? `Motivo: ${reason}` : "Turno eliminado definitivamente de la base",
+      reason
+        ? `Motivo: ${reason}`
+        : "Turno eliminado definitivamente de la base",
       { courtName: booking.courtName || null, amount: bookingTotal(booking) },
     );
     return { ok: true, staff: auth.staff.name };
@@ -558,7 +633,12 @@ export async function adminAddPayment(bookingId, method, amount) {
   if (denied) return denied;
 
   const amt = Math.round(Number(amount));
-  if (!isId(bookingId) || !Number.isFinite(amt) || amt <= 0 || amt > MAX_PAYMENT) {
+  if (
+    !isId(bookingId) ||
+    !Number.isFinite(amt) ||
+    amt <= 0 ||
+    amt > MAX_PAYMENT
+  ) {
     return { ok: false, error: "Ingresá un monto válido." };
   }
 
@@ -567,7 +647,10 @@ export async function adminAddPayment(bookingId, method, amount) {
     const booking = await readRecord(db, `bookings/${bookingId}`);
     if (!booking) return { ok: false, error: "El turno no existe." };
     if (!isCountableBooking(booking)) {
-      return { ok: false, error: "No se puede cobrar un turno cancelado o bloqueado." };
+      return {
+        ok: false,
+        error: "No se puede cobrar un turno cancelado o bloqueado.",
+      };
     }
     const closed = await closedDayError(db, booking.date);
     if (closed) return closed;
@@ -683,7 +766,8 @@ export async function adminGetClients() {
       const phone = (b.playerPhone || "").trim();
       const name = (b.playerName || "Sin nombre").trim();
       const key = clientKey(phone, name);
-      if (deletedAt.has(key) && (b.createdAt || 0) <= deletedAt.get(key)) return;
+      if (deletedAt.has(key) && (b.createdAt || 0) <= deletedAt.get(key))
+        return;
 
       const date = b.date || "";
       const existing = byKey.get(key);
@@ -1064,12 +1148,20 @@ export async function adminAddCantinaSale({
       if (!isId(orderId)) return { ok: false, error: "Pedido inválido." };
       // Primero se reserva el pedido (solo si sigue esperando el pago) y
       // después se guarda la venta: dos pantallas no lo cobran dos veces.
-      const paid = await db.ref(`cantinaOrders/${orderId}`).transaction((order) => {
-        if (order === null) return null; // ver adminVoidCantinaSale
-        if (order.status !== "nuevo") return; // ya cobrado o cancelado: aborta
-        const now = Date.now();
-        return { ...order, status: "preparando", saleId: ref.key, paidAt: now, updatedAt: now };
-      });
+      const paid = await db
+        .ref(`cantinaOrders/${orderId}`)
+        .transaction((order) => {
+          if (order === null) return null; // ver adminVoidCantinaSale
+          if (order.status !== "nuevo") return; // ya cobrado o cancelado: aborta
+          const now = Date.now();
+          return {
+            ...order,
+            status: "preparando",
+            saleId: ref.key,
+            paidAt: now,
+            updatedAt: now,
+          };
+        });
       if (!paid.committed || !paid.snapshot.exists()) {
         return {
           ok: false,
@@ -1157,17 +1249,19 @@ export async function adminVoidCantinaSale({ saleId, reason, pin } = {}) {
     if (closed) return closed;
     // RTDB llama primero con el valor en caché (null si no hay): devolver
     // null hace que reintente con el valor real del server en vez de abortar.
-    const result = await db.ref(`cantinaSales/${saleId}`).transaction((sale) => {
-      if (sale === null) return null;
-      if (sale.voided) return; // ya anulada: aborta
-      return {
-        ...sale,
-        voided: true,
-        voidReason: why,
-        voidedBy: auth.staff.name,
-        voidedAt: Date.now(),
-      };
-    });
+    const result = await db
+      .ref(`cantinaSales/${saleId}`)
+      .transaction((sale) => {
+        if (sale === null) return null;
+        if (sale.voided) return; // ya anulada: aborta
+        return {
+          ...sale,
+          voided: true,
+          voidReason: why,
+          voidedBy: auth.staff.name,
+          voidedAt: Date.now(),
+        };
+      });
     if (!result.committed)
       return { ok: false, error: "Esa venta ya estaba anulada." };
     if (!result.snapshot.exists())
@@ -1231,11 +1325,13 @@ export async function adminSettleCantinaSale(saleId, method) {
     if (!current) return { ok: false, error: "Esa venta no existe." };
     const closed = await closedDayError(db, current.date);
     if (closed) return closed;
-    const result = await db.ref(`cantinaSales/${saleId}`).transaction((sale) => {
-      if (sale === null) return null; // ver adminVoidCantinaSale
-      if (sale.voided || sale.method !== "cuenta") return;
-      return { ...sale, method, settledAt: Date.now() };
-    });
+    const result = await db
+      .ref(`cantinaSales/${saleId}`)
+      .transaction((sale) => {
+        if (sale === null) return null; // ver adminVoidCantinaSale
+        if (sale.voided || sale.method !== "cuenta") return;
+        return { ...sale, method, settledAt: Date.now() };
+      });
     if (!result.committed || !result.snapshot.exists()) {
       return { ok: false, error: "Ese consumo ya no está a cuenta." };
     }
@@ -1263,7 +1359,12 @@ export async function adminGetCantinaOrders(date) {
     // los pedidos abiertos de la víspera y del día siguiente.
     const isOpen = (o) => OPEN_ORDER_STATUSES.includes(o.status);
     const orders = (
-      await loadByDateRange(getDb(), "cantinaOrders", isoAddDays(day, -1), isoAddDays(day, 1))
+      await loadByDateRange(
+        getDb(),
+        "cantinaOrders",
+        isoAddDays(day, -1),
+        isoAddDays(day, 1),
+      )
     ).filter((o) => o.date === day || isOpen(o));
     orders.sort((a, b) =>
       isOpen(a) !== isOpen(b)
@@ -1309,19 +1410,21 @@ export async function adminSetCantinaOrderStatus(orderId, status, saleId) {
   }
   try {
     const db = getDb();
-    const result = await db.ref(`cantinaOrders/${orderId}`).transaction((order) => {
-      if (order === null) return null; // ver adminVoidCantinaSale
-      if (!ORDER_TRANSITIONS[status].includes(order.status)) return; // aborta
-      if (status === "nuevo" && order.saleId !== saleId) return;
-      const now = Date.now();
-      return {
-        ...order,
-        status,
-        updatedAt: now,
-        // Deshecho el cobro, vuelve a esperar el pago.
-        ...(status === "nuevo" ? { saleId: null, paidAt: null } : {}),
-      };
-    });
+    const result = await db
+      .ref(`cantinaOrders/${orderId}`)
+      .transaction((order) => {
+        if (order === null) return null; // ver adminVoidCantinaSale
+        if (!ORDER_TRANSITIONS[status].includes(order.status)) return; // aborta
+        if (status === "nuevo" && order.saleId !== saleId) return;
+        const now = Date.now();
+        return {
+          ...order,
+          status,
+          updatedAt: now,
+          // Deshecho el cobro, vuelve a esperar el pago.
+          ...(status === "nuevo" ? { saleId: null, paidAt: null } : {}),
+        };
+      });
     if (!result.snapshot.exists()) {
       return { ok: false, error: "Ese pedido ya no existe." };
     }
@@ -1374,14 +1477,20 @@ export async function adminGetTopProducts(limit = 8) {
  * TorneosGallery en la landing), esto le da un lugar donde llevar esa lista
  * con quién pagó en vez de un cuaderno o un chat.
  */
-export async function adminCreateTournament({ name, date, category, price } = {}) {
+export async function adminCreateTournament({
+  name,
+  date,
+  category,
+  price,
+} = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   if (!clip(name, 80)) {
     return { ok: false, error: "Ingresá un nombre para el torneo." };
   }
-  if (date && !ISO_DATE.test(date)) return { ok: false, error: "Fecha inválida." };
+  if (date && !ISO_DATE.test(date))
+    return { ok: false, error: "Fecha inválida." };
   if (!isFirebaseConfigured()) {
     return { ok: false, error: "Firebase no está configurado." };
   }
@@ -1447,7 +1556,11 @@ export async function adminUpdateTournamentStatus(tournamentId, status) {
 }
 
 /** Borra el torneo con todas sus parejas: pide PIN y queda en auditoría. */
-export async function adminDeleteTournament({ tournamentId, pin, reason } = {}) {
+export async function adminDeleteTournament({
+  tournamentId,
+  pin,
+  reason,
+} = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
   if (!isId(tournamentId)) return { ok: false, error: "Torneo inválido." };
@@ -1496,7 +1609,12 @@ export async function adminAddTournamentPlayer(tournamentId, input) {
 }
 
 /** Marca la inscripción como paga (con método y fecha) o la vuelve a pendiente. */
-export async function adminTogglePlayerPaid(tournamentId, playerId, paid, method) {
+export async function adminTogglePlayerPaid(
+  tournamentId,
+  playerId,
+  paid,
+  method,
+) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
@@ -1508,7 +1626,9 @@ export async function adminTogglePlayerPaid(tournamentId, playerId, paid, method
         paid
           ? {
               paid: true,
-              paidMethod: PAYMENT_METHODS.includes(method) ? method : "efectivo",
+              paidMethod: PAYMENT_METHODS.includes(method)
+                ? method
+                : "efectivo",
               paidAt: Date.now(),
             }
           : { paid: false, paidMethod: null, paidAt: null },
@@ -1631,7 +1751,12 @@ export async function adminAddCashExpense({
 }
 
 /** Elimina un egreso de caja cargado por error, requiriendo PIN de staff. */
-export async function adminDeleteCashExpense({ date, expenseId, pin, reason } = {}) {
+export async function adminDeleteCashExpense({
+  date,
+  expenseId,
+  pin,
+  reason,
+} = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
   if (!ISO_DATE.test(date || "") || !isId(expenseId)) {
@@ -1733,7 +1858,12 @@ export async function adminSetTestFlag(collection, id, isTest) {
 }
 
 /** Cierre Z: el PIN identifica a quien contó el cajón. */
-export async function adminCloseDailyCash({ date, actualCash, notes, pin } = {}) {
+export async function adminCloseDailyCash({
+  date,
+  actualCash,
+  notes,
+  pin,
+} = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
@@ -1796,7 +1926,8 @@ export async function adminReopenDailyCash({ date, pin, reason } = {}) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!ISO_DATE.test(date || "")) return { ok: false, error: "Fecha inválida." };
+  if (!ISO_DATE.test(date || ""))
+    return { ok: false, error: "Fecha inválida." };
   const why = clip(reason, 160);
   if (!why) return { ok: false, error: "Indicá por qué se reabre la caja." };
   const auth = await authorizeStaff(pin);
@@ -1804,7 +1935,8 @@ export async function adminReopenDailyCash({ date, pin, reason } = {}) {
   if (!MANAGER_ROLES.includes(auth.staff.role)) {
     return {
       ok: false,
-      error: "Solo un Administrador o Encargado puede reabrir una caja cerrada.",
+      error:
+        "Solo un Administrador o Encargado puede reabrir una caja cerrada.",
     };
   }
 
@@ -2038,9 +2170,13 @@ export async function adminSaveStaffMember({
     }
 
     const existing = id ? members.find((m) => m.id === id) : null;
-    if (id && !existing) return { ok: false, error: "Ese integrante no existe." };
+    if (id && !existing)
+      return { ok: false, error: "Ese integrante no existe." };
     if (cleanPin && isPinTaken(cleanPin, members, id || null)) {
-      return { ok: false, error: "Ese PIN ya lo usa otra persona. Elegí otro." };
+      return {
+        ok: false,
+        error: "Ese PIN ya lo usa otra persona. Elegí otro.",
+      };
     }
 
     const record = cleanPin

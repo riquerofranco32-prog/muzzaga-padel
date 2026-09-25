@@ -15,7 +15,9 @@ import {
 import {
   adminAddPayment,
   adminCancelBooking,
+  adminCancelRecurringSeries,
   adminCreateManualBooking,
+  adminCreateRecurringBookings,
   adminGetAlerts,
   adminGetClients,
   adminGetClubConfig,
@@ -80,6 +82,7 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
   const [cancelTarget, setCancelTarget] = useState(null);
+  const [cancelSeriesTarget, setCancelSeriesTarget] = useState(null);
 
   // Vista activa del sidebar
   const [view, setView] = useState("agenda");
@@ -102,6 +105,8 @@ export default function AdminPage() {
     fullCourt: true,
     status: "confirmado",
     notes: "",
+    isRecurring: false,
+    recurringWeeks: 8,
   });
   const [modalSubmitting, setModalSubmitting] = useState(false);
 
@@ -343,6 +348,10 @@ export default function AdminPage() {
     setCancelTarget({ bookingId, courtId, startTime });
   }
 
+  function handleCancelSeries(recurringId, playerName) {
+    setCancelSeriesTarget({ recurringId, playerName });
+  }
+
   async function loadClients() {
     const res = await adminGetClients();
     if (res.ok) {
@@ -420,6 +429,8 @@ export default function AdminPage() {
       fullCourt: true,
       status: "confirmado",
       notes: "",
+      isRecurring: false,
+      recurringWeeks: 8,
     });
     setIsModalOpen(true);
   }
@@ -427,19 +438,33 @@ export default function AdminPage() {
   async function handleCreateSubmit(e) {
     e.preventDefault();
     setModalSubmitting(true);
+    const { isRecurring, recurringWeeks, ...bookingFields } = modalForm;
     // El fin del turno lo calcula el server según la duración configurada.
-    const res = await adminCreateManualBooking({
-      date: activeDate,
-      ...modalForm,
-    });
+    const res = isRecurring
+      ? await adminCreateRecurringBookings({
+          date: activeDate,
+          weeks: recurringWeeks,
+          ...bookingFields,
+        })
+      : await adminCreateManualBooking({ date: activeDate, ...bookingFields });
     setModalSubmitting(false);
     if (!res.ok) return showError(res, "No se pudo crear la reserva.");
     setIsModalOpen(false);
     refreshMoney();
     loadClients();
-    showToast(
-      `Reserva creada · ${modalForm.playerName.trim() || "Reserva manual"} · ${modalForm.startTime}`,
-    );
+    if (isRecurring) {
+      const n = res.skipped?.length || 0;
+      showToast(
+        `Turno fijo creado · ${res.created.length} semana${res.created.length === 1 ? "" : "s"} · ${modalForm.playerName.trim() || "Reserva manual"}` +
+          (n
+            ? ` · ${n} salteada${n === 1 ? "" : "s"} (día cerrado u ocupado)`
+            : ""),
+      );
+    } else {
+      showToast(
+        `Reserva creada · ${modalForm.playerName.trim() || "Reserva manual"} · ${modalForm.startTime}`,
+      );
+    }
   }
 
   /** Autocompletar teléfono si el nombre tipeado coincide con un cliente ya cargado. */
@@ -1033,6 +1058,7 @@ export default function AdminPage() {
           onAddPayment={handleAddPayment}
           onRemovePayment={handleRemovePayment}
           onCancel={handleCancel}
+          onCancelSeries={handleCancelSeries}
           onToggleTest={handleToggleTest}
           sales={dayData?.sales || []}
           onSalesChanged={refreshMoney}
@@ -1074,6 +1100,38 @@ export default function AdminPage() {
               );
             } else {
               throw new Error(res.error || "No se pudo cancelar el turno.");
+            }
+          }}
+        />
+      )}
+
+      {/* PIN de staff para cancelar toda la serie de un turno fijo */}
+      {cancelSeriesTarget && (
+        <StaffPinModal
+          isOpen={Boolean(cancelSeriesTarget)}
+          title="Cancelar Turno Fijo"
+          description={`¿Confirmás cancelar todas las semanas futuras del turno fijo de ${cancelSeriesTarget.playerName}? Se liberan todos esos horarios.`}
+          confirmButtonText="Cancelar Serie"
+          confirmButtonTone="danger"
+          onClose={() => setCancelSeriesTarget(null)}
+          onConfirm={async ({ pin, reason }) => {
+            const res = await adminCancelRecurringSeries({
+              recurringId: cancelSeriesTarget.recurringId,
+              pin,
+              reason,
+            });
+            if (res.ok) {
+              setCancelSeriesTarget(null);
+              refreshMoney();
+              setDetailBooking(null);
+              const blockedNote = res.blocked?.length
+                ? ` · ${res.blocked.length} con la caja ya cerrada, sin tocar`
+                : "";
+              showToast(
+                `Turno fijo cancelado · ${res.cancelled} semana${res.cancelled === 1 ? "" : "s"}${blockedNote}`,
+              );
+            } else {
+              throw new Error(res.error || "No se pudo cancelar la serie.");
             }
           }}
         />
