@@ -8,7 +8,7 @@ export const FAQS = [
   },
   {
     q: "¿Qué medios de pago aceptan?",
-    a: "Aceptamos transferencias bancarias directas, Mercado Pago (alias/CVU) y efectivo en la cantina del club antes de ingresar a la pista.",
+    a: "Aceptamos transferencia y efectivo en la cantina del club, antes de entrar a la cancha. Consultá el alias por WhatsApp o en el mostrador.",
   },
   {
     q: "¿Tienen paletas y pelotas?",

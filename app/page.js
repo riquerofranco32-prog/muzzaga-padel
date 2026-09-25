@@ -124,8 +124,7 @@ export default async function Home() {
             </div>
 
             <ul className="hero-trust">
-              <li>Confirmás por WhatsApp</li>
-              <li>Seña por Mercado Pago</li>
+              <li>Confirmás con una seña por WhatsApp</li>
               <li>Cancelás hasta 4 h antes</li>
               <li>Pistas cubiertas, cero viento</li>
             </ul>
@@ -209,7 +208,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <BookingCalendar serverToday={todayInClub()} />
+          <BookingCalendar serverToday={todayInClub()} mpEnabled={Boolean(process.env.MP_ACCESS_TOKEN)} />
         </div>
       </section>
 

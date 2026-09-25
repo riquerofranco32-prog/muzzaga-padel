@@ -30,7 +30,7 @@ function buildWhatsappUrl(bookingCode, booking) {
 // serverToday: el "hoy" con el que se renderizó el HTML (la home es ISR). Se
 // usa para el primer render así server y cliente coinciden; después del
 // montaje se corrige si ya cambió el día (ej. HTML cacheado antes de medianoche).
-export default function BookingCalendar({ serverToday }) {
+export default function BookingCalendar({ serverToday, mpEnabled = false }) {
   const [days, setDays] = useState(() => nextDays(DAY_COUNT, serverToday));
   const [activeDate, setActiveDate] = useState(days[0].iso);
   // Turno pedido desde afuera (widget "turnos libres hoy"): se selecciona
@@ -670,6 +670,7 @@ export default function BookingCalendar({ serverToday }) {
             booking={confirmed.booking}
             whatsappUrl={confirmed.whatsappUrl}
             onClose={() => setConfirmed(null)}
+            mpEnabled={mpEnabled}
           />
         </>
       )}
