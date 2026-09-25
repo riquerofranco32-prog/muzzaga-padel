@@ -151,13 +151,16 @@ body {
 }
 
 /* Celu: el texto ocupa todo el ancho, así que el velo cubre el bloque
-   entero y se apaga recién debajo de la lista de confianza. */
+   entero y se apaga recién debajo de la lista de confianza. Arriba entra
+   de a poco: si arrancaba en 0,25 de golpe dibujaba una línea recta justo
+   debajo del difuminado del hero. */
 @media (max-width: 768px) {
   .hero-night-copy::before {
     inset: -4% -16px -10%;
     background: linear-gradient(
       180deg,
-      rgba(15, 15, 13, 0.25) 0%,
+      rgba(15, 15, 13, 0) 0,
+      rgba(15, 15, 13, 0.28) 32px,
       rgba(15, 15, 13, 0.5) 35%,
       rgba(15, 15, 13, 0.55) 88%,
       transparent 100%
