@@ -66,8 +66,11 @@ export default function RatingCalculator() {
           className={`rating-tab-btn${mode === "quiz" ? " active" : ""}`}
           onClick={() => setMode("quiz")}
         >
-          Test guiado
-          <span className="rating-tab-extra"> (3 preguntas)</span>
+          {/* Un solo span: como hijos sueltos del botón (flex), el espacio antes
+              de "(3 preguntas)" se perdía. */}
+          <span>
+            Test guiado<span className="rating-tab-extra"> (3 preguntas)</span>
+          </span>
         </button>
         <button
           type="button"
