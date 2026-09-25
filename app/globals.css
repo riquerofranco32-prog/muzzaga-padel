@@ -7028,6 +7028,24 @@ input[type="range"]::-webkit-slider-thumb:hover {
    fondo blanco forzado, invisible. Se las suma al mismo light-lock.
    ========================================================================== */
 @media (prefers-color-scheme: dark) {
+  /* Etiquetas naranjas: #a8501a sobre el marrón oscuro daba 2,9:1. Con el
+     token, dentro de las zonas que quedan claras (admin, pizarra) vuelve al
+     naranja oscuro. */
+  .badge-amber,
+  .badge-indigo {
+    color: var(--color-accent-orange-text);
+  }
+
+  /* La verde era una píldora clara que resaltaba entre las oscuras. Las
+     zonas que quedan claras (pizarra, categorías, admin) y las etiquetas
+     sobre foto la mantienen. Con :where() la exclusión no suma
+     especificidad: la etiqueta numerada de la home ("01 |") sigue ganando. */
+  .badge-emerald:where(:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *, .photo-bento-body *)) {
+    background: rgba(52, 211, 153, 0.12);
+    border-color: rgba(52, 211, 153, 0.35);
+    color: #34d399;
+  }
+
   /* Carrito de la carta: el rojo y el verde pensados para fondo claro daban
      2,6:1 sobre la hoja oscura. */
   .menu-cart-error {
@@ -7073,6 +7091,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
     --text-muted: #9c9886;
 
     --color-accent-orange-subtle: #2a2016;
+    /* El naranja de enlace de modo claro (#a8501a) daba 2,9:1 acá. */
+    --color-text-link: #ff9a5a;
+    --color-text-link-secondary: #ff9a5a;
     --color-accent-orange-border: #4a3420;
     /* Los textos chicos en naranja, verde y rojo oscuros (1.8) no se leen
        sobre fondo oscuro: acá van sus versiones claras. */
@@ -7185,6 +7206,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
     --color-accent-orange-subtle: #fdf6f0;
     --color-accent-orange-border: #f2cbb4;
     --color-accent-orange-text: #c2410c;
+    --color-text-link: #a8501a;
+    --color-text-link-secondary: #a8501a;
 
     background: #ffffff;
     color-scheme: light;
