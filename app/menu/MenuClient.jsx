@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MENU_ITEMS, MENU_CATEGORIES } from "../../data/menu";
@@ -90,6 +90,17 @@ export default function MenuClient() {
     });
 
   const lines = useMemo(() => orderLines(cart, MENU_ITEMS), [cart]);
+  const cartCount = orderCount(lines);
+
+  // Al sacar un producto con el tacho de su tarjeta, el control vuelve a ser
+  // "Agregar": el foco pasa a ese botón en vez de perderse.
+  const addRefs = useRef({});
+  const [refocusAdd, setRefocusAdd] = useState(null);
+  useEffect(() => {
+    if (!refocusAdd) return;
+    addRefs.current[refocusAdd]?.focus();
+    setRefocusAdd(null);
+  }, [refocusAdd]);
 
   const filteredItems = useMemo(() => {
     return MENU_ITEMS.filter((item) => {
@@ -168,19 +179,35 @@ export default function MenuClient() {
           <h1 className="section-title">Menú de la cantina</h1>
           <p className="section-desc">
             Pizzas a la piedra, tostados, sándwiches abundantes, cervezas heladas
-            y kiosco con vista directa a las canchas. Armá tu pedido con el
-            carrito y mandalo por WhatsApp.
+            y kiosco con vista directa a las canchas. Sumá lo que quieras con el
+            carrito y encargalo: la cocina lo empieza cuando está pagado.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleGeneralOrder}
-          className="btn btn-secondary-whatsapp"
-          style={{ gap: 8, height: 42, cursor: "pointer" }}
-        >
-          Consultas por WhatsApp →
-        </button>
+        <div className="menu-header-actions">
+          {/* En celu el pedido vive en una hoja: este botón la abre siempre,
+              también vacía. En compu el pedido ya está a la vista al costado. */}
+          <button
+            type="button"
+            className="btn btn-linear-primary menu-cart-open"
+            onClick={() => setCartOpen(true)}
+          >
+            <ShoppingCart size={18} aria-hidden="true" />
+            Ver mi pedido
+            {cartCount > 0 && <span className="menu-cart-open-count">{cartCount}</span>}
+          </button>
+          <button
+            type="button"
+            onClick={handleGeneralOrder}
+            className="btn btn-secondary-whatsapp"
+            style={{ gap: 8, height: 42, cursor: "pointer" }}
+          >
+            Consultas por WhatsApp →
+          </button>
+        </div>
       </div>
+
+      <div className="menu-layout">
+      <div className="menu-main">
 
       {/* BUSCADOR Y FILTROS */}
       <div
@@ -295,29 +322,44 @@ export default function MenuClient() {
                 >
                   ${item.price.toLocaleString("es-AR")}
                 </span>
-                {qty > 0 ? (
-                  <QtyStepper name={item.name} qty={qty} onChange={(q) => setQty(item.id, q)} />
-                ) : (
-                  <button
-                    type="button"
-                    className="menu-add-btn"
-                    onClick={() => setQty(item.id, 1)}
-                    aria-label={`Agregar ${item.name} al pedido`}
-                    title="Agregar al pedido"
-                  >
-                    <ShoppingCart size={20} aria-hidden="true" />
-                  </button>
-                )}
+                {/* Ancho fijo: al agregar, el "+" pasa a "− 1 +" sin correr el
+                    precio ni hacer crecer la tarjeta. */}
+                <span className="menu-item-control">
+                  {qty > 0 ? (
+                    <QtyStepper
+                      name={item.name}
+                      qty={qty}
+                      onChange={(q) => {
+                        setQty(item.id, q);
+                        if (q <= 0) setRefocusAdd(item.id);
+                      }}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      className="menu-add-btn"
+                      ref={(el) => {
+                        addRefs.current[item.id] = el;
+                      }}
+                      onClick={() => setQty(item.id, 1)}
+                      aria-label={`Agregar ${item.name} al pedido`}
+                      title="Agregar al pedido"
+                    >
+                      <ShoppingCart size={20} aria-hidden="true" />
+                    </button>
+                  )}
+                </span>
               </div>
             </div>
             );
           })}
         </div>
       )}
+      </div>
 
       <CantinaCart
         lines={lines}
-        count={orderCount(lines)}
+        count={cartCount}
         total={orderTotal(lines)}
         onQty={setQty}
         onClear={() => setCart({})}
@@ -326,6 +368,7 @@ export default function MenuClient() {
         onOpen={() => setCartOpen(true)}
         onClose={() => setCartOpen(false)}
       />
+      </div>
 
       {/* FOOTER CALL TO ACTION */}
       <div

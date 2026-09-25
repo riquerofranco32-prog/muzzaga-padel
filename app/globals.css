@@ -6190,9 +6190,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* ==========================================================================
    CARTA: PEDIDO A LA CANTINA (components/CantinaCart.jsx)
-   Cada producto suma al pedido; la barra "Ver pedido" abre el panel y
-   "Enviar" lo manda por WhatsApp y al panel del club.
+   Cada producto suma al pedido. En compu el pedido está siempre a la vista
+   en una columna al costado; en celu, "Ver mi pedido" (arriba) y la barra de
+   abajo abren el mismo panel. Se paga antes de que la cocina lo empiece.
    ========================================================================== */
+.menu-item-control {
+  flex: 0 0 114px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .menu-add-btn {
   flex-shrink: 0;
   display: inline-flex;
@@ -6253,39 +6260,133 @@ input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(0.98);
 }
 
-/* Barra flotante: arriba de la barra de abajo en celu, al pie en compu. */
+/* Encabezado de la carta: "Ver mi pedido" (solo celu y tablet) + consultas. */
+.menu-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn.menu-cart-open {
+  gap: 8px;
+  height: 42px;
+}
+
+.menu-cart-open-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-orange);
+  color: #1b1b19;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* Carta + pedido: una columna en celu; en compu el pedido va al costado y
+   acompaña el scroll. */
+.menu-layout {
+  display: block;
+}
+
+.menu-cart-aside {
+  display: none;
+}
+
+.menu-cart-panel {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-surface-card);
+  color: var(--color-body);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 1024px) {
+  .menu-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .menu-cart-aside {
+    display: block;
+    position: sticky;
+    top: 96px;
+  }
+
+  .menu-cart-aside .menu-cart-panel {
+    max-height: calc(100dvh - 120px);
+  }
+
+  .btn.menu-cart-open {
+    display: none;
+  }
+}
+
+/* Barra flotante (celu y tablet), arriba de la barra de abajo. */
 .menu-cart-bar {
   position: fixed;
   left: 50%;
   translate: -50% 0;
   bottom: 24px;
   z-index: 98;
-  width: min(calc(100% - 32px), 420px);
-  min-height: 56px;
+  width: min(calc(100% - 32px), 440px);
+  min-height: 60px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 20px;
+  gap: 12px;
+  padding: 0 20px 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-pill);
   background: #1b1b19;
   color: #ffffff;
-  font-size: 14px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  font-size: 15px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   animation: cartBarIn var(--t-estado) var(--ease) both;
 }
 
-.menu-cart-bar svg {
+.menu-cart-bar-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
   color: var(--color-accent-orange);
 }
 
-.menu-cart-bar-label {
-  font-weight: 600;
+.menu-cart-bar-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-orange);
+  color: #1b1b19;
+  font-size: 12px;
+  font-weight: 700;
+  animation: cartBadgeBump var(--t-estado) var(--ease-mascota, var(--ease));
 }
 
-.menu-cart-bar-count {
-  color: rgba(255, 255, 255, 0.72);
+.menu-cart-bar-label {
+  font-weight: 700;
 }
 
 .menu-cart-bar-total {
@@ -6301,8 +6402,17 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 }
 
-body.has-cart-bar {
-  padding-bottom: calc(var(--bottom-bar-h) + 24px + 76px);
+/* Cada producto que se suma hace saltar el número: se nota que entró. */
+@keyframes cartBadgeBump {
+  from {
+    transform: scale(1.35);
+  }
+}
+
+@media (max-width: 1023px) {
+  body.has-cart-bar {
+    padding-bottom: calc(var(--bottom-bar-h) + 24px + 80px);
+  }
 }
 
 @media (max-width: 768px), (max-width: 1180px) and (max-height: 500px) {
@@ -6311,7 +6421,13 @@ body.has-cart-bar {
   }
 }
 
-/* Panel del pedido: al costado en compu, hoja desde abajo en celu. */
+@media (min-width: 1024px) {
+  .menu-cart-bar {
+    display: none;
+  }
+}
+
+/* Hoja del pedido (celu y tablet). */
 .menu-cart-backdrop {
   position: fixed;
   inset: 0;
@@ -6328,12 +6444,6 @@ body.has-cart-bar {
   width: 100%;
   max-width: 440px;
   max-height: calc(100dvh - 48px);
-  display: flex;
-  flex-direction: column;
-  background: var(--color-surface-card);
-  color: var(--color-body);
-  border: 1px solid var(--color-hairline-strong);
-  border-radius: var(--radius-xl);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
   animation: passPopIn var(--t-estado) var(--ease);
 }
@@ -6343,18 +6453,42 @@ body.has-cart-bar {
 }
 
 .menu-cart-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 16px 12px 20px;
+  min-height: 60px;
+  padding: 12px 16px 12px 20px;
   border-bottom: 1px solid var(--color-hairline);
+  background: var(--color-surface-card);
+}
+
+.menu-cart-head h2:focus {
+  outline: none;
+}
+
+.menu-cart-head h2:focus-visible {
+  outline: 2px solid var(--color-accent-orange);
+  outline-offset: 2px;
 }
 
 .menu-cart-head h2 {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
   margin: 0;
   font-size: 18px;
   color: var(--color-ink);
+}
+
+.menu-cart-head-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
 }
 
 .menu-cart-close {
@@ -6371,10 +6505,7 @@ body.has-cart-bar {
 }
 
 .menu-cart-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  flex: 1 0 auto;
   padding: 12px 20px 16px;
 }
 
@@ -6415,6 +6546,29 @@ body.has-cart-bar {
   color: var(--color-ink);
 }
 
+/* En la columna de compu (360 px) no entran nombre, cantidad y subtotal en
+   un renglón: el nombre va arriba, igual que en celu. */
+.menu-cart-aside .menu-cart-lines li {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "name name"
+    "qty total";
+  row-gap: 6px;
+}
+
+.menu-cart-aside .menu-cart-line-name {
+  grid-area: name;
+}
+
+.menu-cart-aside .menu-cart-lines .qty-stepper {
+  grid-area: qty;
+  justify-self: start;
+}
+
+.menu-cart-aside .menu-cart-line-total {
+  grid-area: total;
+}
+
 .menu-cart-clear {
   display: inline-flex;
   align-items: center;
@@ -6440,12 +6594,22 @@ body.has-cart-bar {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
-.menu-cart-field > span {
+.menu-cart-field > span,
+.menu-cart-field > legend {
+  padding: 0;
   font-size: 12.5px;
   font-weight: 600;
   color: var(--color-body);
+}
+
+.menu-cart-field > legend {
+  margin-bottom: 6px;
 }
 
 .menu-cart-field em {
@@ -6454,7 +6618,7 @@ body.has-cart-bar {
   color: var(--color-muted);
 }
 
-.menu-cart-field input,
+.menu-cart-field input:not([type="radio"]),
 .menu-cart-field select {
   width: 100%;
   padding: 10px 14px;
@@ -6469,22 +6633,86 @@ body.has-cart-bar {
   border-color: #b42318;
 }
 
+/* "¿Cómo lo pagás?": dos opciones como un control segmentado. */
+.menu-cart-pay-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.menu-cart-pay-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  color: var(--color-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.menu-cart-pay-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.menu-cart-pay-option.is-on {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  font-weight: 600;
+}
+
+.menu-cart-pay-option:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent-orange);
+  outline-offset: 2px;
+}
+
 .menu-cart-error {
   margin: -6px 0 0;
   font-size: 13px;
   color: #b42318;
 }
 
+.menu-cart-foot .menu-cart-error {
+  margin: 0 0 10px;
+}
+
 .menu-cart-foot {
+  position: sticky;
+  bottom: 0;
   padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-hairline);
+  background: var(--color-surface-card);
+}
+
+/* Pantalla baja (celu acostado, notebook chica): el pie pegado dejaba unos
+   60 px para los productos. Ahí todo scrollea junto. */
+@media (max-height: 640px) {
+  .menu-cart-head,
+  .menu-cart-foot {
+    position: static;
+  }
+}
+
+.menu-cart-field input::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
 }
 
 .menu-cart-total {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: var(--color-body);
 }
 
@@ -6494,10 +6722,43 @@ body.has-cart-bar {
   color: var(--color-ink);
 }
 
+/* Aviso de que se paga antes: siempre a la vista, con el tono de marca. */
+.menu-cart-pay-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-accent-orange-border, #f2cbb4);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-orange-subtle);
+  color: var(--color-ink);
+  font-size: 13.5px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.menu-cart-pay-notice svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-accent-orange-text);
+}
+
+.menu-cart-actions {
+  display: grid;
+  gap: 8px;
+}
+
 .btn.menu-cart-send {
   width: 100%;
   min-height: 48px;
   justify-content: center;
+  gap: 8px;
+}
+
+.btn.menu-cart-send:disabled {
+  opacity: 0.6;
+  cursor: progress;
 }
 
 .menu-cart-hint {
@@ -6516,8 +6777,23 @@ body.has-cart-bar {
   text-align: center;
 }
 
+.menu-cart-empty p {
+  margin: 0;
+  max-width: 32ch;
+  color: var(--color-body);
+}
+
+.menu-cart-empty .menu-cart-pay-notice {
+  margin: 8px 0 0;
+}
+
 .menu-cart-sent .pass-festejo {
   margin: 4px auto 0;
+}
+
+.menu-cart-sent .menu-cart-pay-notice {
+  width: 100%;
+  margin: 4px 0;
 }
 
 .menu-cart-sent-code {
@@ -6544,6 +6820,7 @@ body.has-cart-bar {
 .menu-cart-reopen {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   min-height: 44px;
   color: #0b6b43;
   font-weight: 600;
@@ -6560,7 +6837,7 @@ body.has-cart-bar {
 
   .menu-cart-sheet {
     max-width: none;
-    max-height: 90dvh;
+    max-height: 92dvh;
     border-radius: 20px 20px 0 0;
     border-bottom: none;
     animation-name: cartSheetIn;
@@ -6585,6 +6862,11 @@ body.has-cart-bar {
 
   .menu-cart-line-total {
     grid-area: total;
+  }
+
+  .menu-header-actions,
+  .menu-header-actions .btn {
+    width: 100%;
   }
 }
 
@@ -6681,6 +6963,20 @@ body.has-cart-bar {
    fondo blanco forzado, invisible. Se las suma al mismo light-lock.
    ========================================================================== */
 @media (prefers-color-scheme: dark) {
+  /* Carrito de la carta: el rojo y el verde pensados para fondo claro daban
+     2,6:1 sobre la hoja oscura. */
+  .menu-cart-error {
+    color: #ff8a80;
+  }
+
+  .menu-cart-field input[aria-invalid="true"] {
+    border-color: #ff8a80;
+  }
+
+  .menu-cart-reopen {
+    color: #34d399;
+  }
+
   :root {
     --color-canvas: #131310;
     --color-canvas-soft: #1c1c17;

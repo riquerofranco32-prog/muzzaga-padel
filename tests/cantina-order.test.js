@@ -85,8 +85,13 @@ test("validateOrder limpia y rechaza lo que no sirve", () => {
     total: 18000,
     name: "Fede",
     deliverTo: DEFAULT_DELIVERY,
+    payWith: "barra",
     notes: "sin cebolla",
   });
+  const transfer = validateOrder({ code: "K7Q2", items: [{ id: "alfajor", qty: 1 }], name: "Fede", payWith: "transferencia" }, MENU);
+  assert.equal(transfer.order.payWith, "transferencia");
+  const weird = validateOrder({ code: "K7Q2", items: [{ id: "alfajor", qty: 1 }], name: "Fede", payWith: "bitcoin" }, MENU);
+  assert.equal(weird.order.payWith, "barra");
 
   assert.equal(validateOrder({ code: "k7q2", items: [{ id: "alfajor", qty: 1 }], name: "Fede" }, MENU).ok, false);
   assert.equal(validateOrder({ code: "K7Q0", items: [{ id: "alfajor", qty: 1 }], name: "Fede" }, MENU).ok, false);
@@ -108,6 +113,8 @@ test("buildOrderMessage arma el pedido completo para WhatsApp", () => {
   assert.match(msg, /\*Pedido #K7Q2\*/);
   assert.match(msg, /A nombre de: Fede/);
   assert.match(msg, /Entrega: Cancha 1/);
+  assert.match(msg, /Pago: en la barra/);
+  assert.match(buildOrderMessage({ ...order, payWith: "transferencia" }), /Pago: por transferencia, ¿me pasan el alias\?/);
   assert.match(msg, /• 2 × Pizza muzza · \$36\.000/);
   assert.match(msg, /• 1 × Coca-Cola 500ml · \$4\.000/);
   assert.match(msg, /\*Total: \$40\.000\*/);

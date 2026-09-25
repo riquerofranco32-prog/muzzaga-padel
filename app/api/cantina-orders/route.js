@@ -6,31 +6,49 @@ import { MENU_ITEMS } from "../../../data/menu";
 import { validateOrder } from "../../../lib/cantinaOrder";
 
 // Freno para que nadie llene el panel de pedidos falsos: 6 cada 10 minutos
-// desde la misma conexión. Cuenta en la base (en Vercel cada request puede
-// caer en otra instancia) y con la IP hasheada, no en claro.
-const ORDER_LIMIT = 6;
+// por navegador y 40 por conexión. Con solo la IP, en el WiFi del club (o
+// detrás del mismo NAT de la operadora) el séptimo cliente distinto quedaba
+// afuera. Cuenta en la base (en Vercel cada request puede caer en otra
+// instancia) y con los datos hasheados, no en claro.
+const BROWSER_LIMIT = 6;
+const CONNECTION_LIMIT = 40;
 const ORDER_WINDOW_MS = 10 * 60 * 1000;
+const BROWSER_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const MAX_BODY_BYTES = 8 * 1024;
 const NOT_SAVED = "No pudimos anotar el pedido en el sistema del club.";
+
+const hashKey = (kind, raw) =>
+  createHash("sha256").update(`cantina:${kind}:${raw}`).digest("hex").slice(0, 32);
 
 function connectionKey(request) {
   const raw =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
     "desconocida";
-  return createHash("sha256").update(`cantina:${raw}`).digest("hex").slice(0, 32);
+  return hashKey("ip", raw);
 }
 
-async function allowOrder(db, key) {
+async function takeSlot(db, key, limit) {
   const now = Date.now();
   const result = await db.ref(`cantinaOrderLimits/${key}`).transaction((current) => {
     if (!current || now - (current.since || 0) > ORDER_WINDOW_MS) {
       return { since: now, count: 1 };
     }
-    if ((current.count || 0) >= ORDER_LIMIT) return; // sin lugar: aborta
+    if ((current.count || 0) >= limit) return; // sin lugar: aborta
     return { since: current.since, count: current.count + 1 };
   });
   return result.committed;
+}
+
+async function allowOrder(db, request, browserId) {
+  // Sin id de navegador válido, cuenta solo por conexión con el tope bajo.
+  if (!BROWSER_ID.test(browserId || "")) {
+    return takeSlot(db, connectionKey(request), BROWSER_LIMIT);
+  }
+  return (
+    (await takeSlot(db, hashKey("nav", browserId), BROWSER_LIMIT)) &&
+    (await takeSlot(db, connectionKey(request), CONNECTION_LIMIT))
+  );
 }
 
 /**
@@ -67,11 +85,11 @@ export async function POST(request) {
 
   try {
     const db = getDb();
-    if (!(await allowOrder(db, connectionKey(request)))) {
+    if (!(await allowOrder(db, request, input?.browserId))) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Hiciste varios pedidos seguidos: este no quedó anotado en el sistema del club.",
+          error: "Entraron muchos pedidos juntos y este no quedó anotado en el sistema del club.",
         },
         { status: 429 },
       );
