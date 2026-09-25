@@ -44,6 +44,10 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
   // default hasta que responde la API.
   const [courts, setCourts] = useState(COURTS);
   const [loadError, setLoadError] = useState(null);
+  // Sube para volver a pedir la disponibilidad (botón "Reintentar").
+  const [reloadKey, setReloadKey] = useState(0);
+  // Filas del último día cargado: el esqueleto de carga mide lo mismo.
+  const lastRowCount = useRef(7);
   const [selected, setSelected] = useState(null); // { courtId, start, end }
   // Hasta 768 el formulario es un drawer fijo sobre la página: va a <body> para
   // no quedar debajo del header y la barra inferior. En notebook va en línea.
@@ -134,6 +138,8 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
         if (cancelled) return;
         setSlots(data.slots);
         setSlotsDate(activeDate);
+        const rows = new Set((data.slots || []).map((sl) => sl.start)).size;
+        if (rows) lastRowCount.current = rows;
         if (data.courts?.length) setCourts(data.courts);
       })
       .catch(() => {
@@ -145,7 +151,7 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
     return () => {
       cancelled = true;
     };
-  }, [activeDate]);
+  }, [activeDate, reloadKey]);
 
   useEffect(() => {
     // slotsDate evita elegir sobre la grilla del día anterior mientras carga la nueva.
@@ -310,11 +316,49 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
       )}
 
       {!activeDay?.closed && loadError && (
-        <p className="booking-empty">{loadError}</p>
+        <div className="booking-empty booking-error" role="alert">
+          <p>{loadError}</p>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setReloadKey((k) => k + 1)}
+          >
+            Reintentar
+          </button>
+        </div>
       )}
 
+      {/* Mientras carga: la grilla vacía con el alto final (antes era un
+          renglón de texto y la grilla aparecía de golpe, empujando todo). */}
       {!activeDay?.closed && !loadError && !visibleSlots && (
-        <p className="booking-empty">Cargando disponibilidad…</p>
+        <div
+          className="booking-matrix-container is-loading"
+          style={{ "--court-columns": courtFilter === "all" ? courts.length : 1 }}
+          role="status"
+          aria-label="Cargando disponibilidad"
+        >
+          <div className="booking-matrix-header" aria-hidden="true">
+            <div>Horario</div>
+            {(courtFilter === "all" ? courts : courts.filter((c) => c.id === courtFilter)).map((c) => (
+              <div key={c.id}>
+                {c.name} ({c.type})
+              </div>
+            ))}
+          </div>
+          {Array.from({ length: lastRowCount.current }, (_, i) => (
+            <div key={i} className="booking-matrix-row" aria-hidden="true">
+              <div className="booking-matrix-time-col">
+                <span className="skeleton-bar" style={{ width: 44 }} />
+              </div>
+              {(courtFilter === "all" ? courts : courts.filter((c) => c.id === courtFilter)).map((c) => (
+                <div key={c.id} className="booking-slot is-skeleton">
+                  <span className="skeleton-bar" style={{ width: "46%" }} />
+                  <span className="skeleton-bar" style={{ width: 72 }} />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       )}
 
       {!activeDay?.closed && !loadError && visibleSlots && (

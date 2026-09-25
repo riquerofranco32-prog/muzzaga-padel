@@ -26,6 +26,7 @@ const CATEGORY_TABS = [
 export default function CommunityMatchesSection() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [selectedCat, setSelectedCat] = useState("all");
 
   // Join Modal State
@@ -55,10 +56,19 @@ export default function CommunityMatchesSection() {
 
   async function loadMatches() {
     setLoading(true);
-    const res = await getOpenMatches();
+    setLoadFailed(false);
+    let res;
+    try {
+      res = await getOpenMatches();
+    } catch {
+      res = { ok: false };
+    }
     setLoading(false);
     if (res.ok) {
       setMatches(res.matches);
+    } else {
+      // Antes un error se mostraba como "no hay partidos".
+      setLoadFailed(true);
     }
   }
 
@@ -175,6 +185,13 @@ export default function CommunityMatchesSection() {
             // decía "No hay partidos" aunque después aparecieran.
             <div className="booking-empty open-empty is-loading" role="status">
               Buscando partidos…
+            </div>
+          ) : loadFailed ? (
+            <div className="booking-empty open-empty" role="alert">
+              <p className="open-empty-desc">No pudimos cargar los partidos.</p>
+              <button type="button" className="btn btn-secondary" onClick={loadMatches}>
+                Reintentar
+              </button>
             </div>
           ) : filteredMatches.length === 0 ? (
             <div className="booking-empty open-empty">

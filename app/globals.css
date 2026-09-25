@@ -1181,6 +1181,49 @@ select:focus-visible,
   border: 1px solid var(--color-hairline);
 }
 
+/* Error de carga con salida. */
+.booking-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.booking-error p {
+  margin: 0;
+}
+
+/* Esqueleto de carga: estático (sin brillo que se mueve), con el alto de la
+   grilla real. */
+.booking-slot.is-skeleton {
+  background: var(--color-canvas-soft);
+  border-color: var(--color-hairline);
+  pointer-events: none;
+}
+
+.skeleton-bar {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--color-hairline-strong);
+  opacity: 0.6;
+}
+
+/* Las dos barras ocupan las mismas líneas que el nombre de la cancha (20 px)
+   y la etiqueta (23 px), así la celda mide lo mismo que la real. */
+.booking-slot.is-skeleton .skeleton-bar:first-child {
+  margin: 4px 0;
+}
+
+.booking-slot.is-skeleton .skeleton-bar:last-child {
+  height: 23px;
+  border-radius: 999px;
+}
+
+.booking-matrix-time-col .skeleton-bar {
+  height: 16px;
+}
+
 /* Booking Matrix Layout: hora x cancha */
 .booking-matrix-container {
   display: flex;
