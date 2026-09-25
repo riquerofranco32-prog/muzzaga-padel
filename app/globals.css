@@ -5436,7 +5436,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
    ========================================================================== */
 @media (max-width: 768px) {
   :root {
-    --spacing-section: 32px;
+    /* 6.6 · Mismo aire en todas las secciones: 96 en notebook, 56 en celu
+       (antes 32 en unas y 44 en las de fondo claro). */
+    --spacing-section: 56px;
     --bottom-bar-h: 62px;
   }
 
@@ -5614,10 +5616,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   .rating-display-val {
     font-size: 44px;
-  }
-
-  .section-bento {
-    padding: 44px 0;
   }
 
   .mobile-bottom-bar {
