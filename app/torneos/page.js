@@ -43,13 +43,13 @@ export default function TorneosPage() {
           >
             <div>
               <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-                Próxima Edición · Cupos Limitados
+                Próximo torneo
               </span>
               <h2 style={{ fontSize: 22, color: "var(--color-ink)", margin: "4px 0 8px" }}>
-                Torneo Primavera 2026 en Muzzaga
+                Fecha a confirmar
               </h2>
               <p style={{ color: "var(--text-secondary)", fontSize: 14, margin: 0, maxWidth: 500 }}>
-                Categorías 7ma, 6ta y Suma 12. Fase de grupos + cuadro eliminatorio, trofeos y premios en efectivo para campeones.
+                Escribinos por WhatsApp y te avisamos la fecha y las categorías apenas estén definidas.
               </p>
             </div>
             <a
@@ -59,7 +59,7 @@ export default function TorneosPage() {
               className="btn btn-linear-primary"
               style={{ padding: "10px 22px" }}
             >
-              Consultar Inscripción por WhatsApp →
+              Anotarme por WhatsApp →
             </a>
           </div>
 

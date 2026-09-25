@@ -1639,6 +1639,13 @@ body {
   font-weight: 800;
 }
 
+/* Sin fecha confirmada: el cuadrito muestra un calendario en vez del día. */
+.next-event-date svg {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 6px;
+}
+
 .next-event-tag {
   display: inline-flex;
   align-items: center;
@@ -1839,6 +1846,12 @@ body {
   .next-event {
     padding: 18px;
     gap: 16px;
+  }
+
+  .next-event-date svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
   }
 
   .next-event-date {

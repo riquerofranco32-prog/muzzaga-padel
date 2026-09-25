@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { CalendarClock } from "lucide-react";
 import { useLightbox } from "./LightboxProvider";
 import { CLUB_INFO } from "../data/club";
 
@@ -69,14 +70,14 @@ export default function HomeTorneosTeaser() {
         {/* CARD PROXIMO TORNEO */}
         <div className="next-event">
           <div className="next-event-date" aria-hidden="true">
-            <span>Próxima</span>
-            <strong>Fecha</strong>
+            <CalendarClock strokeWidth={2.2} />
+            <span>Fecha</span>
           </div>
           <div className="next-event-body">
-            <span className="next-event-tag">Inscripciones abiertas</span>
-            <h3 className="next-event-title">Categorías 7ma, 6ta y Suma 12</h3>
+            <span className="next-event-tag">Próximo torneo</span>
+            <h3 className="next-event-title">Fecha a confirmar</h3>
             <p className="next-event-desc">
-              Cupos limitados por categoría. Partidos a 3 sets, tercer tiempo incluido y transmisión de finales.
+              Escribinos por WhatsApp y te avisamos la fecha y las categorías apenas estén definidas.
             </p>
           </div>
           <a
