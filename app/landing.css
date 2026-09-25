@@ -629,12 +629,16 @@ body {
 
 /* --------------------------------------------------------------------------
    SECCIONES: encabezados numerados + tipografía display
+   Solo en la home: `:where(#top ~ *)` es "después del hero", y #top existe
+   solo acá. Sin eso, al llegar a una herramienta con el link interno (sin
+   recargar) esta hoja seguía cargada y su encabezado tomaba este estilo; al
+   entrar directo, no. :where() no suma especificidad.
    -------------------------------------------------------------------------- */
-.section-header-row {
+:where(#top ~ *) .section-header-row {
   margin-bottom: 36px;
 }
 
-.section-header-row div:has(> .section-title) > .badge-linear:first-child {
+:where(#top ~ *) .section-header-row div:has(> .section-title) > .badge-linear:first-child {
   counter-increment: landing-section;
   background: none;
   border: 0;
@@ -647,7 +651,7 @@ body {
   margin-bottom: 12px !important;
 }
 
-.section-header-row div:has(> .section-title) > .badge-linear:first-child::before {
+:where(#top ~ *) .section-header-row div:has(> .section-title) > .badge-linear:first-child::before {
   content: counter(landing-section, decimal-leading-zero);
   font-family: var(--font-display);
   font-size: 15px;
@@ -659,7 +663,7 @@ body {
   line-height: 1;
 }
 
-.section-title {
+:where(#top ~ *) .section-title {
   font-family: var(--font-display);
   font-weight: 800;
   text-transform: uppercase;
@@ -670,7 +674,7 @@ body {
   text-wrap: balance;
 }
 
-.section-desc {
+:where(#top ~ *) .section-desc {
   max-width: 56ch;
   margin-top: 12px;
   font-size: 15.5px;
@@ -678,7 +682,7 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  .section-header-row div:has(> .section-title) > .badge-linear:first-child {
+  :where(#top ~ *) .section-header-row div:has(> .section-title) > .badge-linear:first-child {
     color: #ff9a5a;
   }
 }
@@ -1447,11 +1451,11 @@ body {
     gap: 18px;
   }
 
-  .section-header-row {
+  :where(#top ~ *) .section-header-row {
     margin-bottom: 22px;
   }
 
-  .section-title {
+  :where(#top ~ *) .section-title {
     font-size: clamp(2rem, 9vw, 2.6rem);
     letter-spacing: 0;
   }
