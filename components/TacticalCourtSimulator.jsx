@@ -6,6 +6,7 @@ import {
   buildRopeWhatsAppUrl,
 } from "../lib/tacticalShare";
 import { Share2, Handshake } from "lucide-react";
+import ScrollRow from "./ScrollRow";
 
 const PRESET_TACTICS = [
   {
@@ -918,9 +919,10 @@ export default function TacticalCourtSimulator() {
                 </div>
 
                 {/* SELECTOR DE JUGADAS */}
-                <div
+                <ScrollRow
+                  axis="y"
                   className="tactic-buttons-list"
-                  style={{ maxHeight: 220, overflowY: "auto", paddingRight: 4 }}
+                  style={{ maxHeight: 220, paddingRight: 4 }}
                 >
                   {PRESET_TACTICS.map((item) => (
                     <button
@@ -949,7 +951,7 @@ export default function TacticalCourtSimulator() {
                       </div>
                     </button>
                   ))}
-                </div>
+                </ScrollRow>
 
                 {/* DETALLE Y SPECS */}
                 <div className="tactic-detail-box">
