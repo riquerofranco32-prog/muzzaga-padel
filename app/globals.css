@@ -6093,8 +6093,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   );
 }
 
-/* Con la rueda o arrastrando, el encaje se apaga; al soltar vuelve. */
-.scroll-row.is-wheeling,
+/* Arrastrando, el encaje se apaga; al soltar vuelve. */
 .scroll-row.is-dragging {
   scroll-snap-type: none;
 }
@@ -6113,6 +6112,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .scroll-col {
   --scroll-fade: 28px;
   overflow-y: auto;
+  scroll-padding-block: var(--scroll-fade);
 }
 
 .scroll-col[data-more-end] {
