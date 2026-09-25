@@ -62,6 +62,28 @@ body {
     linear-gradient(180deg, transparent 70%, var(--night) 100%);
 }
 
+/* Arriba, la foto no corta recto contra la página: pasa del color de fondo
+   a la foto con un desenfoque que se va apagando. */
+.hero-night::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 72px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--color-canvas), transparent 75%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(180deg, #000 35%, transparent);
+  mask-image: linear-gradient(180deg, #000 35%, transparent);
+}
+
+@media (max-width: 900px) {
+  .hero-night::before {
+    height: 48px;
+  }
+}
+
 /* Líneas de cancha en perspectiva: textura de marca, no información. */
 .hero-court-lines {
   position: absolute;
