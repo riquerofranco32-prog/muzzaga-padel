@@ -133,6 +133,20 @@ export default function CantinaCart({ lines, count, total, onQty, onClear, initi
   };
   const dialogRef = useDialogFocus(open, close);
 
+  // Con la hoja abierta la carta de atrás no se mueve. Va en <html>: el
+  // sitio le pone overflow al html, así que en el body no alcanzaba.
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    const scrollbar = window.innerWidth - root.clientWidth;
+    root.style.overflow = "hidden";
+    if (scrollbar) root.style.paddingRight = `${scrollbar}px`;
+    return () => {
+      root.style.overflow = "";
+      root.style.paddingRight = "";
+    };
+  }, [open]);
+
   useEffect(() => {
     try {
       setName(localStorage.getItem(NAME_KEY) || "");
@@ -216,6 +230,11 @@ export default function CantinaCart({ lines, count, total, onQty, onClear, initi
     setNotes("");
     setSendError("");
     onClear();
+    // La confirmación arranca arriba (código y mascota a la vista), aunque
+    // el panel estuviera scrolleado hasta el nombre.
+    requestAnimationFrame(() =>
+      headingRefs.current[variant]?.closest(".menu-cart-panel")?.scrollTo({ top: 0 }),
+    );
     focusHeading(variant);
   }
 

@@ -163,6 +163,10 @@ export default function MenuClient() {
               fontSize: 12,
               cursor: "pointer",
               textDecoration: "underline",
+              minHeight: 44,
+              padding: "0 12px",
+              display: "inline-flex",
+              alignItems: "center",
             }}
           >
             Quitar ubicación
