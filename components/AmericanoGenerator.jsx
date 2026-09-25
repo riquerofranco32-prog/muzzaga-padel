@@ -104,7 +104,8 @@ export default function AmericanoGenerator() {
                   className={`americano-count-btn${playerCount === count ? " active" : ""}`}
                   onClick={() => handleCountChange(count)}
                 >
-                  {count} jugadores
+                  {count}
+                  <span className="sr-only"> jugadores</span>
                 </button>
               ))}
             </div>

@@ -2974,7 +2974,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .americano-count-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
   gap: 8px;
 }
 
@@ -2983,9 +2984,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
   background: var(--color-canvas-soft);
   border: 1px solid var(--color-hairline-strong);
   color: var(--color-body);
-  padding: 8px 10px;
+  padding: 8px 6px;
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
   transition:
     transform var(--t-hover) var(--ease),
@@ -3077,9 +3079,21 @@ input[type="range"]::-webkit-slider-thumb:hover {
   gap: 10px;
 }
 
+/* Los nombres bajan de renglón en vez de salirse de la tarjeta. */
 .fixture-team {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 14px;
   color: var(--color-ink);
+}
+
+.fixture-team:last-child {
+  text-align: right;
+}
+
+.fixture-matchup > :not(.fixture-team) {
+  flex-shrink: 0;
 }
 
 .fixture-vs {
@@ -5792,9 +5806,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .americano-layout-grid {
     grid-template-columns: 1fr;
     gap: 20px;
-  }
-  .americano-count-tabs {
-    flex-wrap: wrap;
   }
   .admin-courts-timeline-grid {
     grid-template-columns: 1fr;
