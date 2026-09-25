@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Portal from "./Portal";
 import useDialogFocus from "../lib/useDialogFocus";
+import Mascota from "./Mascota";
 
 // Antes esta pantalla mostraba un CBU y un alias inventados (placeholder de
 // ejemplo) como si fueran los datos reales del club, con botón "Copiar" y
@@ -159,7 +160,8 @@ export default function BookingPassModal({
             gap: 10,
           }}
         >
-          <span style={{ fontSize: 20 }}>🎉</span>
+          {/* Reserva confirmada: la mascota festeja (entra una vez y queda quieta). */}
+          <Mascota pose="trofeo-paleta" size="s" className="pass-festejo" />
           <div style={{ fontSize: 12.5, color: "var(--color-ink)", lineHeight: 1.35 }}>
             <strong>¡Listo!</strong> Tu turno queda reservado. Para confirmarlo de forma definitiva, aboná la seña y envianos el comprobante.
           </div>

@@ -3233,7 +3233,19 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .digital-pass-modal {
   width: 100%;
   max-width: 440px;
+  /* El aviso de arriba queda fijo y el pase ocupa el resto con su propio
+     scroll: los dos juntos nunca pasan el alto de la pantalla. */
+  max-height: calc(100dvh - 24px);
+  display: flex;
+  flex-direction: column;
   animation: passPopIn var(--t-estado) var(--ease);
+}
+
+.digital-pass-modal > .digital-pass-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 @keyframes passPopIn {
@@ -5595,8 +5607,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   .digital-pass-card {
     padding: 20px 16px;
-    max-height: 88vh;
-    overflow-y: auto;
   }
 
   .lightbox-content {
@@ -6336,6 +6346,55 @@ textarea:focus-visible {
   font-size: 13.5px;
   line-height: 1.4;
   color: var(--text-secondary);
+}
+
+/* Canchas Abiertas sin partidos: la mascota invita a armar uno. El
+   recuadro de carga mide lo mismo para que no salte al terminar. */
+.open-empty {
+  grid-column: 1 / -1;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px 24px;
+}
+
+.open-empty.is-loading {
+  font-size: 14px;
+}
+
+.open-empty-title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.open-empty-desc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Pase digital: la mascota festeja la reserva. */
+.pass-festejo {
+  flex: 0 0 auto;
+  margin: -6px 0 -6px -4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pass-festejo {
+    animation: mascotaFesteja var(--t-entrada) var(--ease-mascota) 120ms both;
+  }
+}
+
+@keyframes mascotaFesteja {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(-10deg) scale(0.8);
+  }
 }
 
 /* Celu: los encabezados se apilan y no hay columna libre para la mascota

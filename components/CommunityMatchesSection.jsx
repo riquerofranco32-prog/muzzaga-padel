@@ -13,6 +13,15 @@ import Mascota from "./Mascota";
 
 const WHATSAPP = "5492995974176";
 
+const CATEGORY_TABS = [
+  { id: "all", label: "Todas las Categorías" },
+  { id: "7ma", label: "7ma (Iniciación)" },
+  { id: "6ta", label: "6ta (Intermedio)" },
+  { id: "5ta", label: "5ta (Avanzado)" },
+  { id: "Libre", label: "Libre / 4ta" },
+  { id: "Damas", label: "Damas" },
+];
+
 export default function CommunityMatchesSection() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -147,14 +156,7 @@ export default function CommunityMatchesSection() {
             marginBottom: 20,
           }}
         >
-          {[
-            { id: "all", label: "Todas las Categorías" },
-            { id: "7ma", label: "7ma (Iniciación)" },
-            { id: "6ta", label: "6ta (Intermedio)" },
-            { id: "5ta", label: "5ta (Avanzado)" },
-            { id: "Libre", label: "Libre / 4ta" },
-            { id: "Damas", label: "Damas" },
-          ].map((tab) => (
+          {CATEGORY_TABS.map((tab) => (
             <button
               key={tab.id}
               type="button"
@@ -167,45 +169,30 @@ export default function CommunityMatchesSection() {
         </div>
 
         <div className="open-cards-grid">
-          {filteredMatches.length === 0 ? (
-            <div
-              className="booking-empty"
-              style={{
-                gridColumn: "1 / -1",
-                padding: "36px 24px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
-              <div style={{ maxWidth: 460 }}>
-                <strong style={{ display: "block", fontSize: 16, marginBottom: 6, color: "var(--text-primary)" }}>
-                  No hay partidos abiertos programados hoy
+          {loading ? (
+            // Mismo recuadro que el estado vacío: antes, mientras cargaba,
+            // decía "No hay partidos" aunque después aparecieran.
+            <div className="booking-empty open-empty is-loading" role="status">
+              Buscando partidos…
+            </div>
+          ) : filteredMatches.length === 0 ? (
+            <div className="booking-empty open-empty">
+              <Mascota pose="pelota-padel-life" className="open-empty-mascot" />
+              <div>
+                <strong className="open-empty-title">
+                  {selectedCat === "all"
+                    ? "Todavía no hay partidos"
+                    : `Todavía no hay partidos de ${CATEGORY_TABS.find((t) => t.id === selectedCat)?.label || selectedCat}`}
                 </strong>
-                <p style={{ margin: 0, fontSize: 14, color: "var(--text-secondary)" }}>
-                  ¡Sé el primero en armar uno para tu nivel o sumate al grupo oficial de WhatsApp del club para enterarte al instante de nuevas convocatorias!
-                </p>
+                <p className="open-empty-desc">Armá el tuyo y sumá gente de tu nivel.</p>
               </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
-                <button
-                  type="button"
-                  className="btn btn-linear-primary"
-                  onClick={() => setCreateModal(true)}
-                  style={{ height: 40 }}
-                >
-                  + Publicar Partido Abierto
-                </button>
-                <a
-                  href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("¡Hola Muzzaga! Quiero sumarme al grupo de WhatsApp de Canchas Abiertas.")}`}
-                  target="_blank"
-                  rel="noopener"
-                  className="btn btn-secondary-whatsapp"
-                  style={{ height: 40, gap: 8 }}
-                >
-                  Sumarme al Grupo de WhatsApp →
-                </a>
-              </div>
+              <button
+                type="button"
+                className="btn btn-linear-primary"
+                onClick={() => setCreateModal(true)}
+              >
+                Publicar partido
+              </button>
             </div>
           ) : (
             filteredMatches.map((match) => {
