@@ -6231,6 +6231,16 @@ textarea:focus-visible {
   transform-origin: center bottom;
 }
 
+/* Fotos del club: el mismo tratamiento en todas (un poco menos de
+   saturación, sobre todo del azul de la cancha, y algo más de contraste).
+   Es por CSS hasta que lleguen los originales; después se puede pasar a
+   los archivos. */
+.hero-night-photo img,
+.fc-stage-img,
+.photo-bento-img {
+  filter: saturate(0.82) contrast(1.06);
+}
+
 /* Íconos de interfaz (lucide, 20 px). En naranja de marca sobre fondos
    claros; dentro de botones rellenos toman el color del texto. */
 .icono-marca {

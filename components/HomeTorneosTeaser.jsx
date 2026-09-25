@@ -35,8 +35,8 @@ const FEATURED_PHOTOS = [
   },
   {
     src: "/img/torneos/junio/jugadores_12.jpg",
-    alt: "Punto de torneo bajo luces LED en Muzzaga",
-    label: "Copa de Oro",
+    alt: "Cuatro jugadores posando en la red, Torneo Junio 2026",
+    label: "Torneo de junio",
   },
 ];
 

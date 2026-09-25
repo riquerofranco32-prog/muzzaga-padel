@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence, MotionConfig } from "motion/react";
+import Image from "next/image";
 
 const ICON_PROPS = {
   viewBox: "0 0 24 24",
@@ -93,12 +94,18 @@ function IconSofa() {
 // realidad la mesa del living viendo TV, match_action_led.jpg es un café con
 // la cancha de fondo, etc). No hay foto real de "alquiler de paletas": se
 // sacó esa feature en vez de ilustrarla con una imagen que no la muestra.
+// Los nombres de archivo engañan (no se renombran para no romper links):
+// lounge_tv_table.jpg es una cancha vacía con las luces prendidas,
+// court_blue_glass.jpg es el living con la pantalla y gente mirando, y
+// match_action_led.jpg es un café en la barra con la cancha atrás.
+// Ninguna foto de acá se repite en la cantina ni en torneos de la home.
 const FEATURES = [
   {
     id: "canchas",
     label: "Canchas de cristal",
     icon: IconCourt,
     image: "/img/court_bench_players.jpg",
+    alt: "Cancha de cristal con césped azul y un banco al costado",
     description: "2 canchas de cristal profesionales con rebote homogéneo.",
   },
   {
@@ -106,6 +113,7 @@ const FEATURES = [
     label: "Iluminación LED",
     icon: IconBulb,
     image: "/img/lounge_tv_table.jpg",
+    alt: "Cancha vacía con las luces LED prendidas",
     description:
       "Luz LED en todas las canchas para jugar de noche sin perder nitidez.",
   },
@@ -113,7 +121,8 @@ const FEATURES = [
     id: "cantina",
     label: "Cantina propia",
     icon: IconCantina,
-    image: "/img/cantina_beer_court.jpg",
+    image: "/img/match_action_led.jpg",
+    alt: "Café en la barra de la cantina con un partido de fondo",
     description: "Pizzas caseras, minutas y bebidas para el tercer tiempo.",
   },
   {
@@ -121,20 +130,23 @@ const FEATURES = [
     label: "Canchas Abiertas",
     icon: IconUsers,
     image: "/img/court_spectators.jpg",
+    alt: "Gente mirando un partido desde el costado de la cancha",
     description: "Partidos comunitarios para sumarte aunque vengas solo.",
   },
   {
     id: "torneos",
     label: "Torneos todo el año",
     icon: IconTrophy,
-    image: "/img/panoramic_courts.jpg",
+    image: "/img/torneos/junio/jugadores_12.jpg",
+    alt: "Cuatro jugadores posando en la red, Torneo Junio 2026",
     description: "Torneos y ligas internas durante toda la temporada.",
   },
   {
     id: "living",
     label: "Living y tercer tiempo",
     icon: IconSofa,
-    image: "/img/bar_coffee_snacks.jpg",
+    image: "/img/court_blue_glass.jpg",
+    alt: "El living de la cantina lleno, mirando un partido en la pantalla",
     description:
       "Pantalla grande, mesas y buena previa para quedarte después de jugar.",
   },
@@ -248,11 +260,13 @@ export default function FeatureCarousel() {
                   transition={MOVE}
                   className={`fc-stage-card${isActive ? " is-active" : ""}`}
                 >
-                  <img
+                  {/* La tarjeta mide 320 × 400 (420 × 525 desde 1024): next/image
+                      sirve ese ancho en vez del archivo entero. */}
+                  <Image
                     src={feature.image}
-                    alt={feature.label}
-                    loading="lazy"
-                    decoding="async"
+                    alt={feature.alt}
+                    fill
+                    sizes="(max-width: 1023px) 320px, 420px"
                     className={`fc-stage-img${isActive ? " active" : ""}`}
                   />
 

@@ -51,11 +51,11 @@ export default function HomeCantinaTeaser() {
 
           <BentoPhotoCard
             src="/img/bar_coffee_snacks.jpg"
-            alt="Buffet y minutas caseras en la cantina de Muzzaga"
-            caption="Cantina Muzzaga · comida casera y buffet"
+            alt="Empanadas caseras y el partido de la Selección en la pantalla de la cantina"
+            caption="Cantina Muzzaga · empanadas y fútbol en la pantalla"
             badge="Cocina propia"
             badgeClassName="badge-emerald"
-            title="Pizzas a la piedra y sándwiches de mila"
+            title="Empanadas y el partido en la pantalla"
           >
             Muzzas bien cargadas, tostados en pan de miga y opciones sin TACC
             listas para cuando termines de jugar.
