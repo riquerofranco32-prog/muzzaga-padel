@@ -310,17 +310,17 @@ export default function RatingCalculator() {
             marginBottom: 14,
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
             <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><Clock size={20} className="icono-marca" aria-hidden="true" /> Experiencia:</span>
-            <strong style={{ color: "var(--color-ink)" }}>{skills.experience}</strong>
+            <strong style={{ color: "var(--color-ink)", textAlign: "right" }}>{skills.experience}</strong>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
             <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><BrickWall size={20} className="icono-marca" aria-hidden="true" /> Rebote en el cristal:</span>
-            <strong style={{ color: "var(--color-ink)" }}>{skills.wallPlay}</strong>
+            <strong style={{ color: "var(--color-ink)", textAlign: "right" }}>{skills.wallPlay}</strong>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
             <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><Zap size={20} className="icono-marca" aria-hidden="true" /> Red y remate:</span>
-            <strong style={{ color: "var(--color-ink)" }}>{skills.netPlay}</strong>
+            <strong style={{ color: "var(--color-ink)", textAlign: "right" }}>{skills.netPlay}</strong>
           </div>
         </div>
 

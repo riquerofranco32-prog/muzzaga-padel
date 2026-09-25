@@ -354,7 +354,7 @@ export default function SplitCostCalculator() {
             </div>
 
             <div className="split-alias-notice">
-              <span>Coordinación de pago:</span>
+              <span>Coordinación de pago:</span>{" "}
               <span style={{ fontSize: 12.5, fontWeight: 500 }}>
                 Avisá por WhatsApp al <strong>299 597-4176</strong> para señar tu turno
               </span>
