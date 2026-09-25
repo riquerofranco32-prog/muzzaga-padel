@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CalendarClock } from "lucide-react";
 import { useLightbox } from "./LightboxProvider";
 import { CLUB_INFO } from "../data/club";
+import Mascota from "./Mascota";
 
 const FEATURED_PHOTOS = [
   {
@@ -56,13 +57,9 @@ export default function HomeTorneosTeaser() {
             </p>
           </div>
           <div className="mascot-section-badge">
-            <img
-              src="/img/mascotas/muzzaguito-trofeo-bolso.webp"
+            <Mascota
+              pose="trofeo-bolso"
               alt="Muzzaguito Campeón con Copa de Torneo"
-              width={668}
-              height={720}
-              loading="lazy"
-              decoding="async"
               className="mascot-section-img"
             />
           </div>

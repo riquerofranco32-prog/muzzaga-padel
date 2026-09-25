@@ -1,10 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
 import RatingCalculator from "../../../components/RatingCalculator";
 import { PADEL_LEVELS } from "../../../data/levels";
+import Mascota from "../../../components/Mascota";
 
 export const metadata = {
   title: "Test de nivel de pádel: ¿qué categoría sos? · Muzzaga Pádel",
@@ -44,11 +44,9 @@ export default function NivelPage() {
                 </p>
               </div>
               <div className="mascot-section-badge">
-                <Image
-                  src="/img/mascotas/muzzaguito-pelota-padel-life.webp"
+                <Mascota
+                  pose="pelota-padel-life"
                   alt="Muzzaguito sosteniendo pelota de pádel"
-                  width={160}
-                  height={160}
                   className="mascot-section-img"
                 />
               </div>

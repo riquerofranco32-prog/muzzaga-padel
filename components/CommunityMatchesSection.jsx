@@ -9,6 +9,7 @@ import {
 import { PRECIO_POR_JUGADOR } from "../data/pricing";
 import Portal from "./Portal";
 import useDialogFocus from "../lib/useDialogFocus";
+import Mascota from "./Mascota";
 
 const WHATSAPP = "5492995974176";
 
@@ -120,13 +121,9 @@ export default function CommunityMatchesSection() {
           </div>
           <div className="header-aside">
             <div className="mascot-section-badge">
-              <img
-                src="/img/mascotas/muzzaguito-pizza-good-vibes.webp"
+              <Mascota
+                pose="pizza-good-vibes"
                 alt="Muzzaguito compartiendo pizza con la comunidad"
-                width={720}
-                height={612}
-                loading="lazy"
-                decoding="async"
                 className="mascot-section-img"
               />
             </div>

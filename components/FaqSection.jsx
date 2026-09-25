@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { FAQS } from "../data/faq";
+import Mascota from "./Mascota";
 
 export default function FaqSection() {
   const [openIndex, setOpenIndex] = useState(0);
@@ -30,12 +30,9 @@ export default function FaqSection() {
           </div>
           <div className="header-aside">
             <div className="mascot-section-badge">
-              <Image
-                src="/img/mascotas/muzzaguito-guino-paleta-pulgar.webp"
-                alt="Muzzaguito respondiendo preguntas frecuentes"
-                width={649}
-                height={720}
-                sizes="(max-width: 768px) 128px, 230px"
+              <Mascota
+                pose="enredado-grip"
+                alt="Muzzaguito enredado con el grip, como con las dudas"
                 className="mascot-section-img"
               />
             </div>

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Mascota from "./Mascota";
 
 const GoogleMapsIcon = () => (
   <svg viewBox="0 0 24 24" width="15" height="15" fill="none">
@@ -50,13 +51,10 @@ export default function Footer() {
             </p>
 
             <div className="footer-mascot-box">
-              <img
-                src="/img/mascotas/muzzaguito-mochila-pulgar.webp"
+              <Mascota
+                pose="mochila-pulgar"
+                size="s"
                 alt="Muzzaguito con su mochila haciendo pulgar arriba"
-                width={720}
-                height={672}
-                loading="lazy"
-                decoding="async"
                 className="footer-mascot"
               />
               <span className="footer-mascot-text">

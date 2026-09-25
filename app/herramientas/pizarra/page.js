@@ -1,9 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
 import TacticalCourtSimulator from "../../../components/TacticalCourtSimulator";
+import Mascota from "../../../components/Mascota";
 
 export const metadata = {
   title: "Pizarra táctica de pádel interactiva · Muzzaga Pádel",
@@ -44,19 +44,10 @@ export default function PizarraPage() {
               alignItems: "center",
             }}
           >
-            <Image
-              src="/img/mascotas/muzzaguito-enredado-paleta.webp"
+            <Mascota
+              pose="enredado-paleta"
               alt="Muzzaguito enredado con la paleta"
-              width={180}
-              height={180}
-              className="mascot-hero-animated"
-              style={{
-                width: "clamp(135px, 22vw, 180px)",
-                height: "auto",
-                objectFit: "contain",
-                marginBottom: 16,
-                filter: "drop-shadow(0 14px 28px rgba(0,0,0,0.22))",
-              }}
+              className="mascot-cta"
             />
             <h3 style={{ fontSize: 20, color: "var(--color-ink)", marginBottom: 8 }}>
               Llevá la táctica a la pista

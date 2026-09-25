@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import { PRECIO_TURNO, PRECIO_POR_JUGADOR } from "../data/pricing";
 import { CALCULATOR_ITEMS as EXTRAS } from "../data/menu";
 import {
   buildSplitCostMessage,
   buildSplitCostWhatsAppUrl,
 } from "../lib/splitCost";
+import Mascota from "./Mascota";
 
 const CANCHA_PRICE = PRECIO_TURNO;
 
@@ -94,11 +94,9 @@ export default function SplitCostCalculator() {
             </p>
           </div>
           <div className="mascot-section-badge">
-            <Image
-              src="/img/mascotas/muzzaguito-pizza-padel-mood.webp"
+            <Mascota
+              pose="pizza-padel-mood"
               alt="Muzzaguito disfrutando una pizza en el tercer tiempo"
-              width={160}
-              height={160}
               className="mascot-section-img"
             />
           </div>

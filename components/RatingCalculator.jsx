@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Mascota from "./Mascota";
 import Link from "next/link";
 import { getCategoryForRating } from "../data/levels";
 import {
@@ -235,19 +236,11 @@ export default function RatingCalculator() {
             </strong>
           </div>
 
-          <img
-            src="/img/mascotas/muzzaguito-enredado-grip.webp"
+          <Mascota
+            pose="enredado-grip"
+            size="s"
             alt="Muzzaguito enredado con el grip"
-            width={682}
-            height={720}
-            loading="lazy"
-            decoding="async"
-            style={{
-              width: 74,
-              height: 74,
-              objectFit: "contain",
-              filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.22))",
-            }}
+            className="mascot-card"
           />
         </div>
 

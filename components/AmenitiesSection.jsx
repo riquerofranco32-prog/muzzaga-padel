@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import FeatureCarousel from "./FeatureCarousel";
+import Mascota from "./Mascota";
 
 // Solo lo que se puede afirmar sin la ficha técnica del club: el espesor
 // del cristal, la homologación, el césped y los proyectores quedan afuera
@@ -71,12 +71,9 @@ export default function AmenitiesSection() {
             </p>
           </div>
           <div className="mascot-section-badge">
-            <Image
-              src="/img/mascotas/muzzaguito-descanso-mate.webp"
+            <Mascota
+              pose="descanso-mate"
               alt="Muzzaguito descansando con mate y su paletero"
-              width={720}
-              height={710}
-              sizes="(max-width: 768px) 136px, 290px"
               className="mascot-section-img"
             />
           </div>

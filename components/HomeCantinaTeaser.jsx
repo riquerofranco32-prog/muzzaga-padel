@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BentoPhotoCard } from "./PhotoCard";
 import { CALCULATOR_ITEMS } from "../data/menu";
 import { CLUB_INFO } from "../data/club";
+import Mascota from "./Mascota";
 
 const FEATURED_ITEMS = CALCULATOR_ITEMS.slice(0, 6);
 
@@ -28,13 +29,9 @@ export default function HomeCantinaTeaser() {
             </p>
           </div>
           <div className="mascot-section-badge">
-            <img
-              src="/img/mascotas/muzzaguito-pizza-cerveza.webp"
+            <Mascota
+              pose="pizza-cerveza"
               alt="Muzzaguito con pizza y cerveza en la cantina"
-              width={720}
-              height={677}
-              loading="lazy"
-              decoding="async"
               className="mascot-section-img"
             />
           </div>

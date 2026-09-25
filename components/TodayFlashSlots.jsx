@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { COURTS, nowInClubTimezone, nextDays } from "../lib/booking";
 import { requestSlotPick } from "../lib/pickSlot";
 import { scrollBehavior } from "../lib/motion";
+import Mascota from "./Mascota";
 
 // Chips de relleno mientras llega la disponibilidad: misma estructura y mismo
 // alto que los reales, así la tarjeta ocupa su lugar desde el primer render y
@@ -107,13 +108,9 @@ export default function TodayFlashSlots() {
   return (
     <div className="container flash-wrap">
       <div className={`flash-card${loading ? " is-loading" : ""}`} aria-busy={loading || undefined}>
-        <img
-          src="/img/mascotas/muzzaguito-golpe-pelota.webp"
+        <Mascota
+          pose="golpe-pelota"
           alt=""
-          width={720}
-          height={600}
-          loading="lazy"
-          decoding="async"
           className="flash-mascot"
         />
 

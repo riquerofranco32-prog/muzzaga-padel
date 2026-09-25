@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import {
   generateFixtures,
   buildAmericanoShareMessage,
   buildAmericanoWhatsAppUrl,
 } from "../lib/americano";
+import Mascota from "./Mascota";
 
 const DEFAULT_NAMES = ["Jugador 1", "Jugador 2", "Jugador 3", "Jugador 4"];
 
@@ -80,11 +80,9 @@ export default function AmericanoGenerator() {
             </p>
           </div>
           <div className="mascot-section-badge">
-            <Image
-              src="/img/mascotas/muzzaguito-trofeo-paleta.webp"
+            <Mascota
+              pose="trofeo-paleta"
               alt="Muzzaguito festejando con la copa del americano"
-              width={160}
-              height={160}
               className="mascot-section-img"
             />
           </div>

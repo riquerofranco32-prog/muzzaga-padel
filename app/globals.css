@@ -6203,6 +6203,33 @@ textarea:focus-visible {
   }
 }
 
+/* Componente <Mascota>: tamaño M o S según el prop size. */
+.mascota {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.mascota-m {
+  width: var(--mascota-m);
+}
+
+.mascota-s {
+  width: var(--mascota-s);
+}
+
+/* Cierre de la pizarra táctica y ficha del test de nivel. */
+.mascot-cta {
+  margin-bottom: 16px;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.22));
+}
+
+.mascot-card {
+  flex: 0 0 auto;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.22));
+}
+
 /* Encabezado con mascota: texto a la izquierda, mascota en su columna.
    La mascota sola (sin botón) queda al costado del título también en
    tablet, donde el resto de los encabezados se apila. */
