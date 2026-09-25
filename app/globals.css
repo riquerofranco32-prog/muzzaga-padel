@@ -100,7 +100,12 @@
   --spacing-xl: 32px;
   --spacing-xxl: 48px;
   --spacing-section: 96px;
-  --bottom-bar-h: 64px;
+  /* La pastilla de abajo en el celu: su alto y el aire que la separa del
+     borde. --bottom-bar-h es todo lo que ocupa (lo usan el final de la
+     página, el botón del pedido y el menú del header). */
+  --bottom-pill-h: 60px;
+  --bottom-pill-gap: 10px;
+  --bottom-bar-h: calc(var(--bottom-pill-h) + var(--bottom-pill-gap));
 
   /* Movimiento: una sola curva para todo el sitio (ease-out suave) y otra
      con rebote que usa solo la mascota. `linear` queda únicamente donde la
@@ -3677,50 +3682,86 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: var(--color-muted);
 }
 
-/* Mobile Bottom App Bar (Expo Style) */
+/* Barra de abajo en el celu: una pastilla flotante, como la de Instagram.
+   Al bajar se achica y quedan los íconos; al subir (o arriba de todo)
+   vuelve con los nombres. Se achica solo con transform/opacity: el fondo
+   se escala desde el centro y cada ícono se corre hacia el medio lo mismo
+   que se achica el fondo (--k es su posición: 2, 1, 0, -1, -2). */
 .mobile-bottom-bar {
+  --pill-s: 0.78;
   display: none;
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(var(--bottom-bar-h) + env(safe-area-inset-bottom, 0px));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: color-mix(in srgb, var(--color-canvas) 95%, transparent);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--color-hairline);
+  /* 12 px a cada lado, centrada, y hasta 480 de ancho. Se mide contra el
+     ancho visible: con barra de scroll clásica (compu), 100vw incluye la
+     barra y la pastilla quedaba más ancha que la pantalla. */
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--bottom-pill-gap) + env(safe-area-inset-bottom, 0px));
+  max-width: 480px;
+  height: var(--bottom-pill-h);
+  margin-inline: auto;
   z-index: 99;
   justify-content: space-around;
-  align-items: center;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+  align-items: stretch;
+}
+
+.bottom-bar-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-surface-card) 90%, transparent);
+  /* Sin la línea -webkit- a mano: el compilador de CSS ya la agrega, y si
+     están las dos se queda solo con la de Safari (Chrome no desenfoca). */
+  backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--color-hairline-strong);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
+  pointer-events: none;
 }
 
 .bottom-bar-item {
   flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  height: 100%;
+  gap: 2px;
   color: var(--color-muted);
   font-size: 11px;
   font-weight: 500;
-  transition:
-    transform var(--t-hover) var(--ease),
-    opacity var(--t-hover) var(--ease);
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.bottom-bar-item svg {
-  width: 20px;
-  height: 20px;
-  transition: transform var(--t-hover) var(--ease);
+/* La burbuja del activo: va detrás del ícono y del nombre. */
+.bottom-bar-item::before {
+  content: "";
+  position: absolute;
+  inset: 6px 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  opacity: 0;
 }
 
-.bottom-bar-item:active svg {
-  transform: scale(0.9);
+.bottom-bar-item.active::before {
+  opacity: 1;
+}
+
+.bottom-bar-icon,
+.bottom-bar-label {
+  position: relative;
+  display: flex;
+}
+
+.bottom-bar-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+/* WhatsApp va sin nombre: el logo solo, más grande y centrado. */
+.bottom-bar-item--wa .bottom-bar-icon svg {
+  width: 28px;
+  height: 28px;
 }
 
 .bottom-bar-item.active,
@@ -3732,9 +3773,65 @@ input[type="range"]::-webkit-slider-thumb:hover {
   stroke: var(--color-accent-orange);
 }
 
-.bottom-bar-item.active span {
-  color: var(--color-ink);
+.bottom-bar-item.active .bottom-bar-label {
   font-weight: 600;
+}
+
+.bottom-bar-item:active .bottom-bar-icon svg {
+  transform: scale(0.9);
+}
+
+.bottom-bar-item:focus-visible {
+  outline: none;
+}
+
+.bottom-bar-item:focus-visible::before {
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--color-accent-orange);
+}
+
+/* Achicada (con teclado se abre para que se lea a dónde va cada una). */
+.mobile-bottom-bar.is-compact:not(:has(:focus-visible)) .bottom-bar-bg {
+  transform: scale(var(--pill-s));
+}
+
+.mobile-bottom-bar.is-compact:not(:has(:focus-visible)) .bottom-bar-item {
+  /* 100% es el ancho de su lugar: un quinto de la pastilla. */
+  transform: translateX(calc(100% * (1 - var(--pill-s)) * var(--k)));
+}
+
+.mobile-bottom-bar.is-compact:not(:has(:focus-visible)) .bottom-bar-item::before {
+  transform: scale(var(--pill-s), 0.72);
+}
+
+.mobile-bottom-bar.is-compact:not(:has(:focus-visible)) .bottom-bar-icon {
+  transform: translateY(9px);
+}
+
+.mobile-bottom-bar.is-compact:not(:has(:focus-visible)) .bottom-bar-item--wa .bottom-bar-icon {
+  transform: scale(0.82);
+}
+
+.mobile-bottom-bar.is-compact:not(:has(:focus-visible)) .bottom-bar-label {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bottom-bar-bg,
+  .bottom-bar-item,
+  .bottom-bar-item::before,
+  .bottom-bar-icon {
+    transition: transform var(--t-estado) var(--ease), opacity var(--t-estado) var(--ease);
+  }
+
+  .bottom-bar-label {
+    transition: transform var(--t-estado) var(--ease), opacity var(--t-hover) var(--ease);
+  }
+
+  .bottom-bar-icon svg {
+    transition: transform var(--t-hover) var(--ease);
+  }
 }
 
 /* ==========================================================================
@@ -5584,7 +5681,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
     /* 6.6 · Mismo aire en todas las secciones: 96 en notebook, 56 en celu
        (antes 32 en unas y 44 en las de fondo claro). */
     --spacing-section: 56px;
-    --bottom-bar-h: 62px;
   }
 
   .container {
