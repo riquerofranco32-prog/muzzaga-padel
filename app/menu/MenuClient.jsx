@@ -1,12 +1,24 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MENU_ITEMS, MENU_CATEGORIES } from "../../data/menu";
 import { CLUB_INFO } from "../../data/club";
 import ScrollRow from "../../components/ScrollRow";
+import CantinaCart, { QtyStepper } from "../../components/CantinaCart";
+import {
+  MAX_ORDER_QTY,
+  deliveryFromParam,
+  orderCount,
+  orderLines,
+  orderTotal,
+  parseStoredCart,
+} from "../../lib/cantinaOrder";
 import { MapPin, ShoppingCart, Pizza, CupSoda, Beer, Candy, ShoppingBag } from "lucide-react";
+
+// El pedido queda en el navegador: si se recarga la página no se pierde.
+const CART_KEY = "muzzaga-pedido";
 
 // Íconos de las pestañas (antes eran emojis dentro del texto de data/menu.js).
 const CATEGORY_ICONS = {
@@ -48,6 +60,36 @@ export default function MenuClient() {
   const [activeLocation, setActiveLocation] = useState(
     rawLocation ? LOCATION_NAMES[rawLocation.toLowerCase()] || rawLocation : null
   );
+  // Con el QR de una cancha o mesa, el pedido ya sale con esa entrega.
+  const initialDelivery = activeLocation ? deliveryFromParam(rawLocation) : null;
+
+  const [cart, setCart] = useState({}); // { id: cantidad }
+  const [cartLoaded, setCartLoaded] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCart(parseStoredCart(localStorage.getItem(CART_KEY), MENU_ITEMS));
+    } catch {}
+    setCartLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!cartLoaded) return;
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } catch {}
+  }, [cart, cartLoaded]);
+
+  const setQty = (id, qty) =>
+    setCart((prev) => {
+      const next = { ...prev };
+      if (qty <= 0) delete next[id];
+      else next[id] = Math.min(MAX_ORDER_QTY, qty);
+      return next;
+    });
+
+  const lines = useMemo(() => orderLines(cart, MENU_ITEMS), [cart]);
 
   const filteredItems = useMemo(() => {
     return MENU_ITEMS.filter((item) => {
@@ -60,22 +102,11 @@ export default function MenuClient() {
     });
   }, [selectedCat, search]);
 
-  const handleOrderWhatsapp = (itemName, itemPrice) => {
-    const locationPrefix = activeLocation
-      ? `*PEDIDO PARA ${activeLocation.toUpperCase()}*\n\n`
-      : "";
-    const msg = `${locationPrefix}¡Hola Muzzaga! Quiero pedir ${itemName} ($${itemPrice.toLocaleString("es-AR")}) de la cantina.`;
-    window.open(
-      `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(msg)}`,
-      "_blank",
-    );
-  };
-
   const handleGeneralOrder = () => {
     const locationPrefix = activeLocation
-      ? `*PEDIDO PARA ${activeLocation.toUpperCase()}*\n\n`
+      ? `*CONSULTA DESDE ${activeLocation.toUpperCase()}*\n\n`
       : "";
-    const msg = `${locationPrefix}¡Hola Muzzaga! Quiero hacer un pedido a la cantina.`;
+    const msg = `${locationPrefix}¡Hola Muzzaga! Tengo una consulta para la cantina.`;
     window.open(
       `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(msg)}`,
       "_blank",
@@ -137,7 +168,8 @@ export default function MenuClient() {
           <h1 className="section-title">Menú de la cantina</h1>
           <p className="section-desc">
             Pizzas a la piedra, tostados, sándwiches abundantes, cervezas heladas
-            y kiosco con vista directa a las canchas.
+            y kiosco con vista directa a las canchas. Armá tu pedido con el
+            carrito y mandalo por WhatsApp.
           </p>
         </div>
         <button
@@ -146,7 +178,7 @@ export default function MenuClient() {
           className="btn btn-secondary-whatsapp"
           style={{ gap: 8, height: 42, cursor: "pointer" }}
         >
-          Pedir por adelantado vía WhatsApp →
+          Consultas por WhatsApp →
         </button>
       </div>
 
@@ -213,7 +245,9 @@ export default function MenuClient() {
             gap: 12,
           }}
         >
-          {filteredItems.map((item) => (
+          {filteredItems.map((item) => {
+            const qty = cart[item.id] || 0;
+            return (
             <div
               key={item.id}
               style={{
@@ -261,31 +295,37 @@ export default function MenuClient() {
                 >
                   ${item.price.toLocaleString("es-AR")}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => handleOrderWhatsapp(item.name, item.price)}
-                  title="Pedir por WhatsApp"
-                  style={{
-                    background: "rgba(37, 211, 102, 0.12)",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: 44,
-                    height: 44,
-                    flexShrink: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    color: "#0f7b4f",
-                  }}
-                >
-                  <ShoppingCart size={20} aria-hidden="true" />
-                </button>
+                {qty > 0 ? (
+                  <QtyStepper name={item.name} qty={qty} onChange={(q) => setQty(item.id, q)} />
+                ) : (
+                  <button
+                    type="button"
+                    className="menu-add-btn"
+                    onClick={() => setQty(item.id, 1)}
+                    aria-label={`Agregar ${item.name} al pedido`}
+                    title="Agregar al pedido"
+                  >
+                    <ShoppingCart size={20} aria-hidden="true" />
+                  </button>
+                )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
+
+      <CantinaCart
+        lines={lines}
+        count={orderCount(lines)}
+        total={orderTotal(lines)}
+        onQty={setQty}
+        onClear={() => setCart({})}
+        initialDelivery={initialDelivery}
+        open={cartOpen}
+        onOpen={() => setCartOpen(true)}
+        onClose={() => setCartOpen(false)}
+      />
 
       {/* FOOTER CALL TO ACTION */}
       <div
