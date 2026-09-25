@@ -1,4 +1,6 @@
-const BASE_URL = "https://muzzaga-padel-seven.vercel.app";
+import { SITE_URL } from "../lib/site";
+
+const BASE_URL = SITE_URL;
 
 export default function sitemap() {
   const now = new Date().toISOString();

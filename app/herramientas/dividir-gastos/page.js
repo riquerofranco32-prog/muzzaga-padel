@@ -8,6 +8,7 @@ export const metadata = {
   title: "Calculadora para dividir cancha y cantina · Muzzaga Pádel",
   description:
     "Dividí en segundos el costo del turno de pádel y las consumiciones de cantina entre tus amigos. Copiá el desglose directo a WhatsApp.",
+  alternates: { canonical: "/herramientas/dividir-gastos" },
 };
 
 export default function DividirGastosPage() {

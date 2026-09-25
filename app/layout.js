@@ -3,6 +3,7 @@ import "./globals.css";
 import LightboxProvider from "../components/LightboxProvider";
 import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
 import { Analytics } from "@vercel/analytics/react";
+import { SITE_URL } from "../lib/site";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,9 +33,7 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://muzzagapadel.com.ar",
-  ),
+  metadataBase: new URL(SITE_URL),
   title:
     "Canchas de Pádel en Catriel · Muzzaga Pádel · Reservá tu Cancha Online",
   description:
@@ -69,14 +68,14 @@ const jsonLd = {
   name: "Muzzaga Pádel",
   description:
     "Club de pádel en Catriel, Río Negro. 2 canchas profesionales de cristal, iluminación LED, torneos todo el año y cantina propia.",
-  url: "https://muzzagapadel.com.ar",
+  url: SITE_URL,
   telephone: "+5492995974176",
   priceRange: "$$",
   hasMap: "https://maps.google.com/maps?q=-37.8832905,-67.8005469",
   image: [
-    "https://muzzagapadel.com.ar/img/court_glass_night_match.jpg",
-    "https://muzzagapadel.com.ar/img/panoramic_courts.jpg",
-    "https://muzzagapadel.com.ar/img/logo_full.png",
+    `${SITE_URL}/img/court_glass_night_match.jpg`,
+    `${SITE_URL}/img/panoramic_courts.jpg`,
+    `${SITE_URL}/img/logo_full.png`,
   ],
   geo: {
     "@type": "GeoCoordinates",
@@ -111,7 +110,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className={`${poppins.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable}`}>
+    <html lang="es-AR" className={`${poppins.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable}`}>
       <head>
         <script
           type="application/ld+json"

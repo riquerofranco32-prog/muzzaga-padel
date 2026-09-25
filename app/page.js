@@ -24,6 +24,10 @@ import { CLUB_INFO } from "../data/club";
 import { todayInClub } from "../lib/booking";
 import { FAQS } from "../data/faq";
 
+export const metadata = {
+  alternates: { canonical: "/" },
+};
+
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",

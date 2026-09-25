@@ -8,6 +8,7 @@ export const metadata = {
   title: "Generador de torneo americano de pádel · Muzzaga Pádel",
   description:
     "Armá el fixture de tu torneo americano de pádel en segundos para grupos de 4 a 8 jugadores. Rotaciones balanceadas y copia directa a WhatsApp.",
+  alternates: { canonical: "/herramientas/americano" },
 };
 
 export default function AmericanoPage() {
