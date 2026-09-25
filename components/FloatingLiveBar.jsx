@@ -24,11 +24,19 @@ export default function FloatingLiveBar({ schedule, blockedDates }) {
     return () => io.disconnect();
   }, []);
 
-  if (!visible) return null;
+  // La hora de quien mira, actualizada cada 30 s mientras se ve (como la
+  // barra del hero), para que "cierra en X min" no quede congelado.
+  const [now, setNow] = useState(null);
+  useEffect(() => {
+    if (!visible) return;
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(id);
+  }, [visible]);
 
-  // Solo se dibuja en el cliente (después de scrollear), así que la hora es
-  // la de quien mira.
-  const status = getClubStatus(new Date(), {
+  if (!visible || !now) return null;
+
+  const status = getClubStatus(now, {
     ...(schedule ? { schedule } : {}),
     blockedDates: blockedDates || [],
   });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createOpenMatch,
   getOpenMatches,
@@ -27,6 +27,7 @@ export default function CommunityMatchesSection() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
+  const cardsRef = useRef(null);
   const [selectedCat, setSelectedCat] = useState("all");
 
   // Join Modal State
@@ -179,17 +180,25 @@ export default function CommunityMatchesSection() {
           ))}
         </div>
 
-        <div className="open-cards-grid">
-          {loading ? (
-            // Mismo recuadro que el estado vacío: antes, mientras cargaba,
-            // decía "No hay partidos" aunque después aparecieran.
+        <div className="open-cards-grid" ref={cardsRef} tabIndex={-1}>
+          {loading && matches.length === 0 ? (
+            // Solo en la primera carga (al sumarse o publicar, las tarjetas
+            // quedan mientras se actualizan). Mismo recuadro que el estado
+            // vacío: antes, mientras cargaba, decía "No hay partidos".
             <div className="booking-empty open-empty is-loading" role="status">
               Buscando partidos…
             </div>
           ) : loadFailed ? (
             <div className="booking-empty open-empty" role="alert">
               <p className="open-empty-desc">No pudimos cargar los partidos.</p>
-              <button type="button" className="btn btn-secondary" onClick={loadMatches}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  cardsRef.current?.focus({ preventScroll: true });
+                  loadMatches();
+                }}
+              >
                 Reintentar
               </button>
             </div>
@@ -396,6 +405,7 @@ export default function CommunityMatchesSection() {
                 type="button"
                 className="admin-modal-close"
                 onClick={() => setJoinModal(null)}
+                aria-label="Cerrar"
               >
                 <X size={20} aria-hidden="true" />
               </button>
@@ -495,6 +505,7 @@ export default function CommunityMatchesSection() {
                 type="button"
                 className="admin-modal-close"
                 onClick={() => setCreateModal(false)}
+                aria-label="Cerrar"
               >
                 <X size={20} aria-hidden="true" />
               </button>
@@ -632,7 +643,7 @@ export default function CommunityMatchesSection() {
                 style={{ width: "100%", height: 44, justifyContent: "center" }}
                 disabled={createSubmitting}
               >
-                {createSubmitting ? "Publicando..." : "Publicar Convocatoria →"}
+                {createSubmitting ? "Publicando..." : "Publicar partido →"}
               </button>
             </form>
           </div>

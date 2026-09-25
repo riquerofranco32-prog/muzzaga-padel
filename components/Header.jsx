@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -16,7 +16,7 @@ const TOOLS_LINKS = [
   { href: "/herramientas/dividir-gastos", label: "Calculadora de gastos", desc: "Dividir cancha y cantina" },
   { href: "/herramientas/nivel", label: "Test de nivel", desc: "Calculá tu categoría de pádel" },
   { href: "/herramientas/pizarra", label: "Pizarra táctica", desc: "Simulador interactivo de jugadas" },
-  { href: "/herramientas/americano", label: "Torneo Americano", desc: "Generador de fixtures express" },
+  { href: "/herramientas/americano", label: "Torneo americano", desc: "Generador de fixtures express" },
 ];
 
 const MAPS_URL = "https://maps.app.goo.gl/kR1h9mhdLqGLKatV7";
@@ -41,11 +41,18 @@ const WhatsAppIcon = () => (
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const menuBtnRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
     function onKeyDown(e) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Escape") return;
+      // Cerrado, el panel es inert: si el foco estaba adentro, vuelve al
+      // botón que lo abrió en vez de caer en <body>.
+      if (document.activeElement?.closest("#mobile-nav-panel")) {
+        menuBtnRef.current?.focus();
+      }
+      setOpen(false);
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -58,12 +65,11 @@ export default function Header() {
           <Link
             href="/#top"
             className="brand-group"
-            aria-label="Muzzaga Pádel Catriel"
           >
             {/* next/image: el PNG original pesa 374 KB y acá se muestra a 34 px. */}
             <Image
               src="/img/logo_badge.png"
-              alt="Muzzaga Pádel"
+              alt=""
               width={34}
               height={34}
               priority
@@ -171,11 +177,12 @@ export default function Header() {
               className="btn btn-secondary-whatsapp header-whatsapp-btn"
               style={{ height: 36, padding: "6px 14px", gap: 6 }}
             >
-              <WhatsAppIcon /> WhatsApp Club
+              <WhatsAppIcon /> WhatsApp del club
             </a>
             <button
               type="button"
               className="mobile-menu-btn"
+              ref={menuBtnRef}
               onClick={() => setOpen((v) => !v)}
               aria-label="Abrir menú"
               aria-expanded={open}
@@ -262,7 +269,7 @@ export default function Header() {
             fontWeight: 600,
           }}
         >
-          <WhatsAppIcon /> WhatsApp Club →
+          <WhatsAppIcon /> WhatsApp del club →
         </a>
       </div>
       <div

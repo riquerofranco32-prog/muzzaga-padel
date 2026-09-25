@@ -10,8 +10,13 @@ import { CLUB_INFO } from "../data/club";
 export default function Error({ error, retry }) {
   useEffect(() => {
     console.error(error);
-    // Un error boundary es de cliente y no admite `metadata`.
+    // Un error boundary es de cliente y no admite `metadata`. Al salir
+    // (Reintentar o Ir al inicio) vuelve el título de la página.
+    const previous = document.title;
     document.title = "Algo falló · Muzzaga Pádel";
+    return () => {
+      document.title = previous;
+    };
   }, [error]);
 
   return (
@@ -22,7 +27,7 @@ export default function Error({ error, retry }) {
         title="Pelota afuera"
         text="Algo falló de nuestro lado. Probá de nuevo en un rato o escribinos por WhatsApp."
       >
-        <button type="button" className="btn btn-orange-primary" onClick={() => retry()}>
+        <button type="button" className="btn btn-linear-primary" onClick={() => retry()}>
           Reintentar
         </button>
         <Link href="/" className="btn btn-secondary">

@@ -48,6 +48,9 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
   const [reloadKey, setReloadKey] = useState(0);
   // Filas del último día cargado: el esqueleto de carga mide lo mismo.
   const lastRowCount = useRef(7);
+  // Contenedor estable de la grilla: al tocar "Reintentar" el botón se
+  // desmonta, y el foco pasa acá en vez de caer en <body>.
+  const gridAreaRef = useRef(null);
   const [selected, setSelected] = useState(null); // { courtId, start, end }
   // Hasta 768 el formulario es un drawer fijo sobre la página: va a <body> para
   // no quedar debajo del header y la barra inferior. En notebook va en línea.
@@ -262,7 +265,7 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
 
   return (
     <div className="booking-calendar">
-      <div className="booking-dates" role="tablist" aria-label="Elegí el día">
+      <div className="booking-dates" role="group" aria-label="Elegí el día">
         {days.map((day) => (
           <button
             key={day.iso}
@@ -294,7 +297,7 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
           onClick={() => setCourtFilter("all")}
           aria-pressed={courtFilter === "all"}
         >
-          Todas las Canchas
+          Todas las canchas
         </button>
         {courts.map((court) => (
           <button
@@ -309,148 +312,155 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
         ))}
       </div>
 
-      {activeDay?.closed && (
-        <p className="booking-empty">
-          Los domingos el club está cerrado. Elegí otro día.
-        </p>
-      )}
+      <div ref={gridAreaRef} tabIndex={-1} className="booking-grid-area">
+        {activeDay?.closed && (
+          <p className="booking-empty">
+            Los domingos el club está cerrado. Elegí otro día.
+          </p>
+        )}
 
-      {!activeDay?.closed && loadError && (
-        <div className="booking-empty booking-error" role="alert">
-          <p>{loadError}</p>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => setReloadKey((k) => k + 1)}
-          >
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      {/* Mientras carga: la grilla vacía con el alto final (antes era un
-          renglón de texto y la grilla aparecía de golpe, empujando todo). */}
-      {!activeDay?.closed && !loadError && !visibleSlots && (
-        <div
-          className="booking-matrix-container is-loading"
-          style={{ "--court-columns": courtFilter === "all" ? courts.length : 1 }}
-          role="status"
-          aria-label="Cargando disponibilidad"
-        >
-          <div className="booking-matrix-header" aria-hidden="true">
-            <div>Horario</div>
-            {(courtFilter === "all" ? courts : courts.filter((c) => c.id === courtFilter)).map((c) => (
-              <div key={c.id}>
-                {c.name} ({c.type})
-              </div>
-            ))}
+        {!activeDay?.closed && loadError && (
+          <div className="booking-empty booking-error" role="alert">
+            <p>{loadError}</p>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                gridAreaRef.current?.focus({ preventScroll: true });
+                setReloadKey((k) => k + 1);
+              }}
+            >
+              Reintentar
+            </button>
           </div>
-          {Array.from({ length: lastRowCount.current }, (_, i) => (
-            <div key={i} className="booking-matrix-row" aria-hidden="true">
-              <div className="booking-matrix-time-col">
-                <span className="skeleton-bar" style={{ width: 44 }} />
-              </div>
+        )}
+
+        {/* Mientras carga: la grilla vacía con el alto final (antes era un
+            renglón de texto y la grilla aparecía de golpe, empujando todo). */}
+        {!activeDay?.closed && !loadError && !visibleSlots && (
+          <div
+            className="booking-matrix-container is-loading"
+            style={{ "--court-columns": courtFilter === "all" ? courts.length : 1 }}
+            role="status"
+            aria-label="Cargando disponibilidad"
+          >
+            <div className="booking-matrix-header" aria-hidden="true">
+              <div>Horario</div>
               {(courtFilter === "all" ? courts : courts.filter((c) => c.id === courtFilter)).map((c) => (
-                <div key={c.id} className="booking-slot is-skeleton">
-                  <span className="skeleton-bar" style={{ width: "46%" }} />
-                  <span className="skeleton-bar" style={{ width: 72 }} />
+                <div key={c.id}>
+                  {c.name} ({c.type})
                 </div>
               ))}
             </div>
-          ))}
-        </div>
-      )}
-
-      {!activeDay?.closed && !loadError && visibleSlots && (
-        <div
-          className="booking-matrix-container"
-          style={{
-            "--court-columns": courtFilter === "all" ? courts.length : 1,
-          }}
-        >
-          {/* Encabezado de columnas de canchas */}
-          <div className="booking-matrix-header">
-            <div>Horario</div>
-            {(courtFilter === "all"
-              ? courts
-              : courts.filter((c) => c.id === courtFilter)
-            ).map((c) => (
-              <div key={c.id}>
-                {c.name} ({c.type})
+            {Array.from({ length: lastRowCount.current }, (_, i) => (
+              <div key={i} className="booking-matrix-row" aria-hidden="true">
+                <div className="booking-matrix-time-col">
+                  <span className="skeleton-bar" style={{ width: 44 }} />
+                </div>
+                {(courtFilter === "all" ? courts : courts.filter((c) => c.id === courtFilter)).map((c) => (
+                  <div key={c.id} className="booking-slot is-skeleton">
+                    <span className="skeleton-bar" style={{ width: "46%" }} />
+                    <span className="skeleton-bar" style={{ width: 72 }} />
+                  </div>
+                ))}
               </div>
             ))}
           </div>
+        )}
 
-          {/* Filas de la matriz por horario */}
-          {/* Sin .sort(): los horarios ya vienen en orden de la noche, y un
-              00:30 (club abierto pasada la medianoche) iría primero. */}
-          {[...new Set(visibleSlots.map((s) => s.start))].map((time) => {
-            const rowCourts =
-              courtFilter === "all"
+        {!activeDay?.closed && !loadError && visibleSlots && (
+          <div
+            className="booking-matrix-container"
+            style={{
+              "--court-columns": courtFilter === "all" ? courts.length : 1,
+            }}
+          >
+            {/* Encabezado de columnas de canchas */}
+            <div className="booking-matrix-header">
+              <div>Horario</div>
+              {(courtFilter === "all"
                 ? courts
-                : courts.filter((c) => c.id === courtFilter);
-
-            return (
-              <div key={time} className="booking-matrix-row">
-                <div className="booking-matrix-time-col">
-                  <strong>{time}</strong>
-                  <span>hs</span>
+                : courts.filter((c) => c.id === courtFilter)
+              ).map((c) => (
+                <div key={c.id}>
+                  {c.name} ({c.type})
                 </div>
+              ))}
+            </div>
 
-                {rowCourts.map((court) => {
-                  const slot = visibleSlots.find(
-                    (s) => s.courtId === court.id && s.start === time,
-                  );
-                  if (!slot) {
-                    return (
-                      <div
-                        key={court.id}
-                        className="booking-slot taken"
-                        style={{
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <span style={{ fontSize: 12, color: "var(--color-muted)" }}>
-                          No disponible
-                        </span>
-                      </div>
+            {/* Filas de la matriz por horario */}
+            {/* Sin .sort(): los horarios ya vienen en orden de la noche, y un
+                00:30 (club abierto pasada la medianoche) iría primero. */}
+            {[...new Set(visibleSlots.map((s) => s.start))].map((time) => {
+              const rowCourts =
+                courtFilter === "all"
+                  ? courts
+                  : courts.filter((c) => c.id === courtFilter);
+
+              return (
+                <div key={time} className="booking-matrix-row">
+                  <div className="booking-matrix-time-col">
+                    <strong>{time}</strong>
+                    <span>hs</span>
+                  </div>
+
+                  {rowCourts.map((court) => {
+                    const slot = visibleSlots.find(
+                      (s) => s.courtId === court.id && s.start === time,
                     );
-                  }
+                    if (!slot) {
+                      return (
+                        <div
+                          key={court.id}
+                          className="booking-slot taken"
+                          style={{
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <span style={{ fontSize: 12, color: "var(--color-muted)" }}>
+                            No disponible
+                          </span>
+                        </div>
+                      );
+                    }
 
-                  const isSelected =
-                    selected?.courtId === slot.courtId &&
-                    selected?.start === slot.start;
+                    const isSelected =
+                      selected?.courtId === slot.courtId &&
+                      selected?.start === slot.start;
 
-                  return (
-                    <button
-                      key={`${slot.courtId}-${slot.start}`}
-                      type="button"
-                      className={`booking-slot${slot.available ? "" : " taken"}${slot.past ? " past" : ""}${isSelected ? " selected" : ""}`}
-                      disabled={!slot.available}
-                      onClick={() => pickSlot(slot)}
-                      aria-label={`${court.name}, ${slot.start} hs, ${isSelected ? "Seleccionado" : slot.available ? "Disponible" : slot.past ? "Finalizado" : "Ocupado"}`}
-                    >
-                      <span className="slot-meta" style={{ fontWeight: 600 }}>
-                        {court.name}
-                      </span>
-                      <span className="slot-badge">
-                        {isSelected
-                          ? "Tu selección ✓"
-                          : slot.available
-                            ? "Disponible"
-                            : slot.past
-                              ? "Finalizado"
-                              : "Ocupado"}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-      )}
+                    // El nombre accesible empieza con el texto visible ("Cancha 1
+                    // Disponible") y suma la hora.
+                    return (
+                      <button
+                        key={`${slot.courtId}-${slot.start}`}
+                        type="button"
+                        className={`booking-slot${slot.available ? "" : " taken"}${slot.past ? " past" : ""}${isSelected ? " selected" : ""}`}
+                        disabled={!slot.available}
+                        onClick={() => pickSlot(slot)}
+                        aria-label={`${court.name} ${isSelected ? "Tu selección" : slot.available ? "Disponible" : slot.past ? "Finalizado" : "Ocupado"}, ${slot.start} hs`}
+                      >
+                        <span className="slot-meta" style={{ fontWeight: 600 }}>
+                          {court.name}
+                        </span>
+                        <span className="slot-badge">
+                          {isSelected
+                            ? "Tu selección ✓"
+                            : slot.available
+                              ? "Disponible"
+                              : slot.past
+                                ? "Finalizado"
+                                : "Ocupado"}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {selected && selectedPricing && (
         <MaybePortal enabled={isDrawer}>

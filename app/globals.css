@@ -1181,6 +1181,12 @@ select:focus-visible,
   border: 1px solid var(--color-hairline);
 }
 
+/* Recibe el foco al reintentar (por código, no con Tab). */
+.booking-grid-area:focus,
+.open-cards-grid:focus {
+  outline: none;
+}
+
 /* Error de carga con salida. */
 .booking-error {
   display: flex;
@@ -6099,9 +6105,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: #ff9a5a;
   }
 
-  /* El día elegido es una píldora clara en modo oscuro. */
+  /* El día elegido es una píldora clara en modo oscuro: sus textos pasan a
+     tonos oscuros (antes quedaban el gris y el naranja pensados para la
+     píldora negra, 2,2 y 2,7:1). */
   .booking-date-btn.active .booking-date-weekend-badge {
     color: #a8501a;
+  }
+
+  .booking-date-btn.active .booking-date-day,
+  .booking-date-btn.active .booking-date-month {
+    color: #55554f;
+  }
+
+  .booking-date-btn.active .booking-date-num {
+    color: #c2410c;
   }
 
   body::before {

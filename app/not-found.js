@@ -15,7 +15,7 @@ export default function NotFound() {
         title="Se nos enredó la paleta"
         text="La página que buscás no existe o cambió de lugar."
       >
-        <Link href="/" className="btn btn-orange-primary">
+        <Link href="/" className="btn btn-linear-primary">
           Ir al inicio
         </Link>
         <Link href="/#turnos" className="btn btn-secondary">
