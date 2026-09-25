@@ -3079,11 +3079,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
   gap: 10px;
 }
 
-/* Los nombres bajan de renglón en vez de salirse de la tarjeta. */
+/* Los nombres bajan de renglón en vez de salirse de la tarjeta; solo se
+   corta una palabra que no entra entera. */
 .fixture-team {
   flex: 1 1 0;
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   font-size: 14px;
   color: var(--color-ink);
 }
@@ -3094,6 +3095,27 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .fixture-matchup > :not(.fixture-team) {
   flex-shrink: 0;
+}
+
+/* Celu: los dos recuadros del resultado dejaban ~50 px por pareja y los
+   nombres se partían al medio ("Maxim/iliano"). Cada pareja va en su
+   renglón y el resultado entre las dos. */
+@media (max-width: 480px) {
+  .fixture-matchup {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .fixture-team,
+  .fixture-team:last-child {
+    flex: none;
+    text-align: center;
+  }
+
+  .fixture-matchup > :not(.fixture-team) {
+    align-self: center;
+  }
 }
 
 .fixture-vs {

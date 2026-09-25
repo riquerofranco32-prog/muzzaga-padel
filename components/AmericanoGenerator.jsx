@@ -216,8 +216,8 @@ export default function AmericanoGenerator() {
                             fontSize: 16,
                             fontWeight: 700,
                             borderRadius: 8,
-                            border: "1px solid var(--border)",
-                            background: "var(--surface)",
+                            border: "1px solid var(--color-hairline-strong)",
+                            background: "var(--color-surface-card)",
                             color: "var(--text-primary)",
                             padding: 0,
                           }}
@@ -242,8 +242,8 @@ export default function AmericanoGenerator() {
                             fontSize: 16,
                             fontWeight: 700,
                             borderRadius: 8,
-                            border: "1px solid var(--border)",
-                            background: "var(--surface)",
+                            border: "1px solid var(--color-hairline-strong)",
+                            background: "var(--color-surface-card)",
                             color: "var(--text-primary)",
                             padding: 0,
                           }}
