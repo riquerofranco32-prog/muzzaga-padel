@@ -21,12 +21,12 @@ export default function NivelPage() {
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
             <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange-text)", textDecoration: "none", fontWeight: 600 }}>
-              ← Volver al Inicio
+              ← Volver al inicio
             </Link>
             <span>/</span>
             <span>Herramientas</span>
             <span>/</span>
-            <span style={{ color: "var(--text-primary)" }}>Test de Nivel</span>
+            <span style={{ color: "var(--text-primary)" }}>Test de nivel</span>
           </div>
         </div>
 
@@ -35,9 +35,9 @@ export default function NivelPage() {
             <div className="section-header-row">
               <div>
                 <span className="badge-linear badge-indigo" style={{ marginBottom: 8 }}>
-                  Evaluación Deportiva
+                  Evaluación deportiva
                 </span>
-                <h1 className="section-title">Calculá tu Nivel de Juego</h1>
+                <h1 className="section-title">Calculá tu nivel de juego</h1>
                 <p className="section-desc">
                   Mapeamos la escala internacional de nivel (1.0 a 7.0) con las
                   categorías del pádel argentino (7ma a 1ra) para que siempre

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import FeatureCarousel from "./FeatureCarousel";
 import Mascota from "./Mascota";
+import { Grid2x2, Sprout, Lightbulb, Pizza } from "lucide-react";
 
 // Solo lo que se puede afirmar sin la ficha técnica del club: el espesor
 // del cristal, la homologación, el césped y los proyectores quedan afuera
@@ -13,7 +14,7 @@ const SPECS = [
     short: "Cristales",
     title: "Cristal templado",
     subtitle: "Rebote parejo",
-    icon: "💎",
+    icon: Grid2x2,
     tag: "Las dos canchas",
     desc: "Paredes de cristal templado en las dos canchas: el rebote es parejo en el fondo y en los laterales.",
   },
@@ -22,7 +23,7 @@ const SPECS = [
     short: "Césped",
     title: "Césped sintético",
     subtitle: "Buen agarre",
-    icon: "🌱",
+    icon: Sprout,
     tag: "Las dos canchas",
     desc: "Césped sintético para frenar, girar y arrancar sin resbalarte.",
   },
@@ -31,7 +32,7 @@ const SPECS = [
     short: "Iluminación",
     title: "Iluminación LED",
     subtitle: "Para jugar de noche",
-    icon: "💡",
+    icon: Lightbulb,
     tag: "Turnos de noche",
     desc: "Iluminación LED en las dos canchas para jugar de noche, hasta el último turno.",
   },
@@ -40,7 +41,7 @@ const SPECS = [
     short: "Cantina",
     title: "Cantina y tercer tiempo",
     subtitle: "Después de cada partido",
-    icon: "🍕",
+    icon: Pizza,
     tag: "Menú completo",
     desc: "Mesas, pantalla grande para seguir partidos y torneos, pizzas caseras, bebidas frías y opciones sin TACC para después del partido.",
   },
@@ -60,7 +61,7 @@ export default function AmenitiesSection() {
               className="badge-linear badge-emerald"
               style={{ marginBottom: 8 }}
             >
-              Instalaciones Profesionales
+              Instalaciones
             </span>
             <h2 className="section-title">
               Todo lo que necesitás para jugar al mejor nivel
@@ -85,7 +86,7 @@ export default function AmenitiesSection() {
         <div className="spec-panel">
           <div className="spec-panel-head">
             <div>
-              <span className="spec-eyebrow">Ficha Técnica Oficial</span>
+              <span className="spec-eyebrow">Ficha técnica</span>
               <h3 className="spec-heading">Especificaciones de las pistas</h3>
             </div>
 
@@ -99,7 +100,7 @@ export default function AmenitiesSection() {
                   className="spec-tab"
                   onClick={() => setSelectedSpec(s.id)}
                 >
-                  <span aria-hidden="true">{s.icon}</span>
+                  <s.icon size={20} className="icono-marca" aria-hidden="true" />
                   <span>{s.short}</span>
                 </button>
               ))}
@@ -108,7 +109,7 @@ export default function AmenitiesSection() {
 
           {/* key: re-monta el detalle para que la animación de entrada corra en cada cambio */}
           <div className="spec-detail" key={active.id} role="tabpanel">
-            <div className="spec-icon" aria-hidden="true">{active.icon}</div>
+            <div className="spec-icon" aria-hidden="true"><active.icon size={20} className="icono-marca" /></div>
             <div>
               <div className="spec-title-row">
                 <strong>{active.title}</strong>

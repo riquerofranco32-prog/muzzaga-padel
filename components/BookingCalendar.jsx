@@ -10,6 +10,7 @@ import { COURTS, nextDays, priceForSlot, todayInClub } from "../lib/booking";
 import { PICK_SLOT_EVENT } from "../lib/pickSlot";
 import { toWhatsappNumber } from "../lib/phone";
 import { trackEvent } from "../lib/analytics";
+import { X } from "lucide-react";
 
 const DAY_COUNT = 14;
 const CLUB_WHATSAPP = "5492995974176";
@@ -446,7 +447,7 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
                   }}
                   aria-label="Cerrar formulario"
                 >
-                  ✕
+                  <X size={20} aria-hidden="true" />
                 </button>
               </div>
             <div
@@ -660,7 +661,7 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
                 className="btn btn-secondary"
                 onClick={() => setConfirmed({ ...confirmed, showModal: true })}
               >
-                Ver Pase Digital &amp; Seña
+                Ver pase digital y seña
               </button>
             </div>
           </div>

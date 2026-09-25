@@ -58,7 +58,7 @@ export default function Footer() {
                 className="footer-mascot"
               />
               <span className="footer-mascot-text">
-                ¡Nos vemos en la pista! 🎾 Muzzaguito te acompaña en cada partido.
+                ¡Nos vemos en la cancha! Muzzaguito te acompaña en cada partido.
               </span>
             </div>
           </div>
@@ -87,7 +87,7 @@ export default function Footer() {
                 }}
               >
                 <a href="/#turnos" style={{ color: "var(--text-secondary)" }}>
-                  Elegí tu Turno
+                  Elegí tu turno
                 </a>
                 <a
                   href="/#canchas-abiertas"
@@ -96,16 +96,16 @@ export default function Footer() {
                   Canchas Abiertas
                 </a>
                 <a href="/torneos" style={{ color: "var(--text-secondary)" }}>
-                  Torneos Oficiales
+                  Torneos
                 </a>
                 <a href="/menu" style={{ color: "var(--text-secondary)" }}>
-                  Menú de Cantina
+                  Menú de la cantina
                 </a>
                 <a
                   href="/herramientas/dividir-gastos"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Herramientas para Jugadores
+                  Herramientas para jugadores
                 </a>
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function Footer() {
             reservados.
           </div>
           <div>
-            2 Canchas de Cristal · Cantina Propia · Iluminación LED
+            2 canchas de cristal · Cantina propia · Iluminación LED
           </div>
         </div>
       </div>

@@ -10,11 +10,12 @@ import { PRECIO_POR_JUGADOR } from "../data/pricing";
 import Portal from "./Portal";
 import useDialogFocus from "../lib/useDialogFocus";
 import Mascota from "./Mascota";
+import { X } from "lucide-react";
 
 const WHATSAPP = "5492995974176";
 
 const CATEGORY_TABS = [
-  { id: "all", label: "Todas las Categorías" },
+  { id: "all", label: "Todas las categorías" },
   { id: "7ma", label: "7ma (Iniciación)" },
   { id: "6ta", label: "6ta (Intermedio)" },
   { id: "5ta", label: "5ta (Avanzado)" },
@@ -120,7 +121,7 @@ export default function CommunityMatchesSection() {
               className="badge-linear badge-amber"
               style={{ marginBottom: 6 }}
             >
-              En Vivo · Matchmaking &amp; Comunidad
+              Comunidad · Partidos abiertos
             </span>
             <h2 className="section-title">Canchas Abiertas en Catriel</h2>
             <p className="section-desc">
@@ -141,7 +142,7 @@ export default function CommunityMatchesSection() {
               className="btn btn-secondary"
               onClick={() => setCreateModal(true)}
             >
-              + Publicar Partido Abierto
+              + Publicar partido
             </button>
           </div>
         </div>
@@ -269,7 +270,7 @@ export default function CommunityMatchesSection() {
                             }
                             title="Hacé clic para sumarte a este lugar"
                           >
-                            +1 ¡Sumarme!
+                            +1 Sumarme
                           </button>
                         ),
                       )}
@@ -308,7 +309,7 @@ export default function CommunityMatchesSection() {
                         className="badge-linear badge-emerald"
                         style={{ fontSize: 12 }}
                       >
-                        ✓ Partido Completo
+                        ✓ Partido completo
                       </span>
                     ) : (
                       <button
@@ -372,14 +373,14 @@ export default function CommunityMatchesSection() {
                   margin: 0,
                 }}
               >
-                Sumarme a Cancha Abierta
+                Sumarme al partido
               </h3>
               <button
                 type="button"
                 className="admin-modal-close"
                 onClick={() => setJoinModal(null)}
               >
-                ✕
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
 
@@ -397,7 +398,7 @@ export default function CommunityMatchesSection() {
             <form onSubmit={handleJoinSubmit}>
               <div style={{ marginBottom: 12 }}>
                 <label className="admin-field-label">
-                  Tu Nombre y Apellido:
+                  Tu nombre y apellido:
                 </label>
                 <input
                   type="text"
@@ -412,7 +413,7 @@ export default function CommunityMatchesSection() {
 
               <div style={{ marginBottom: 18 }}>
                 <label className="admin-field-label">
-                  Tu Teléfono (WhatsApp):
+                  Tu teléfono (WhatsApp):
                 </label>
                 <input
                   type="tel"
@@ -471,20 +472,20 @@ export default function CommunityMatchesSection() {
                   margin: 0,
                 }}
               >
-                Publicar Convocatoria Abierta
+                Publicar partido abierto
               </h3>
               <button
                 type="button"
                 className="admin-modal-close"
                 onClick={() => setCreateModal(false)}
               >
-                ✕
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
 
             <form onSubmit={handleCreateSubmit}>
               <div style={{ marginBottom: 12 }}>
-                <label className="admin-field-label">Categoría / Nivel:</label>
+                <label className="admin-field-label">Categoría o nivel:</label>
                 <select
                   className="admin-modal-select"
                   value={createForm.category}
@@ -559,7 +560,7 @@ export default function CommunityMatchesSection() {
               >
                 <div>
                   <label className="admin-field-label">
-                    Tu Nombre (Organizador):
+                    Tu nombre (organizador):
                   </label>
                   <input
                     type="text"

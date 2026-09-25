@@ -8,6 +8,7 @@ import {
   buildSplitCostWhatsAppUrl,
 } from "../lib/splitCost";
 import Mascota from "./Mascota";
+import { CreditCard, Share2, Check, Copy } from "lucide-react";
 
 const CANCHA_PRICE = PRECIO_TURNO;
 
@@ -83,10 +84,10 @@ export default function SplitCostCalculator() {
               className="badge-linear badge-emerald"
               style={{ marginBottom: 8 }}
             >
-              Herramienta para Grupos
+              Herramienta para grupos
             </span>
             <h2 className="section-title">
-              Calculadora de Partido &amp; 3er Tiempo
+              Calculadora de partido y tercer tiempo
             </h2>
             <p className="section-desc">
               Dividí en segundos la cancha y lo que van a comer o tomar en la
@@ -135,7 +136,7 @@ export default function SplitCostCalculator() {
                     fontSize: 14,
                   }}
                 >
-                  Cancha Oficial de Cristal
+                  Cancha de cristal
                 </div>
                 <div style={{ fontSize: 12, color: "var(--color-muted)" }}>
                   Turno de 90 minutos
@@ -189,7 +190,7 @@ export default function SplitCostCalculator() {
             <div className="split-section-header" style={{ marginTop: 24 }}>
               <span className="split-step-badge">3</span>
               <div>
-                <h3 className="split-step-title">Sumar Cantina &amp; Extras</h3>
+                <h3 className="split-step-title">Sumar cantina y extras</h3>
                 <p className="split-step-desc">
                   Pizzas, birras, bebidas y minutas para el partido.
                 </p>
@@ -240,7 +241,7 @@ export default function SplitCostCalculator() {
           {/* COLUMNA DERECHA: TICKET FINTECH & COPIAR */}
           <div className="split-summary-card">
             <div className="split-ticket-top">
-              <span className="split-ticket-badge">Resumen del Partido</span>
+              <span className="split-ticket-badge">Resumen del partido</span>
               <div className="split-amount-big">
                 ${perPerson.toLocaleString("es-AR")}
                 <span className="split-amount-sub">
@@ -252,7 +253,7 @@ export default function SplitCostCalculator() {
             <div className="split-ticket-breakdown">
               <div className="ticket-row">
                 <div>
-                  <span>Cancha Oficial (90 min)</span>
+                  <span>Cancha (90 min)</span>
                   <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
                     ${(canchaPrice / 4).toLocaleString("es-AR")} por jugador si
                     son cuatro
@@ -279,7 +280,7 @@ export default function SplitCostCalculator() {
               <div className="ticket-divider" />
 
               <div className="ticket-row total">
-                <span>Total General</span>
+                <span>Total</span>
                 <strong>${grandTotal.toLocaleString("es-AR")}</strong>
               </div>
             </div>
@@ -294,7 +295,7 @@ export default function SplitCostCalculator() {
                   marginBottom: 4,
                 }}
               >
-                💳 Tu Alias o CBU para cobrar (opcional):
+                <CreditCard size={20} className="icono-marca" aria-hidden="true" /> Tu alias o CBU para cobrar (opcional):
               </label>
               <input
                 type="text"
@@ -329,7 +330,7 @@ export default function SplitCostCalculator() {
                   textDecoration: "none",
                 }}
               >
-                <span>📲</span> Enviar al Grupo de WhatsApp
+                <Share2 size={20} aria-hidden="true" /> Enviar al grupo de WhatsApp
               </a>
 
               <button
@@ -343,9 +344,11 @@ export default function SplitCostCalculator() {
                 }}
                 onClick={handleCopySummary}
               >
-                {copied
-                  ? "✓ ¡Desglose copiado al portapapeles!"
-                  : "📋 Copiar texto del desglose"}
+                {copied ? (
+                  <><Check size={20} className="icono-marca" aria-hidden="true" /> Desglose copiado</>
+                ) : (
+                  <><Copy size={20} className="icono-marca" aria-hidden="true" /> Copiar texto del desglose</>
+                )}
               </button>
             </div>
 

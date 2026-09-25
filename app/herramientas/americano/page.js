@@ -19,7 +19,7 @@ export default function AmericanoPage() {
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
             <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange-text)", textDecoration: "none", fontWeight: 600 }}>
-              ← Volver al Inicio
+              ← Volver al inicio
             </Link>
             <span>/</span>
             <span>Herramientas</span>
@@ -48,7 +48,7 @@ export default function AmericanoPage() {
               Reservá turnos consecutivos para jugar el torneo con tus amigos y disfrutar del mejor tercer tiempo en la cantina.
             </p>
             <Link href="/#turnos" className="btn btn-linear-primary" style={{ padding: "10px 24px" }}>
-              Reservar Horarios →
+              Reservar turno →
             </Link>
           </div>
         </div>

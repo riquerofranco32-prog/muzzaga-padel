@@ -5,6 +5,7 @@ import {
   buildTacticWhatsAppUrl,
   buildRopeWhatsAppUrl,
 } from "../lib/tacticalShare";
+import { Share2, Handshake } from "lucide-react";
 
 const PRESET_TACTICS = [
   {
@@ -47,7 +48,7 @@ const PRESET_TACTICS = [
   },
   {
     id: "smash_x3",
-    title: "Smash por 3 (Definición)",
+    title: "Smash por 3 (definición)",
     category: "Definición",
     difficulty: "★★★★★",
     effectiveness: "94%",
@@ -161,7 +162,7 @@ const PRESET_TACTICS = [
   },
   {
     id: "bandeja_doble",
-    title: "Bandeja a la doble pared (Esquina)",
+    title: "Bandeja a la doble pared (esquina)",
     category: "Construcción",
     difficulty: "★★★★☆",
     effectiveness: "90%",
@@ -242,7 +243,7 @@ const PRESET_TACTICS = [
 const ROPE_THEORY_PHASES = [
   {
     id: "saque",
-    name: "1. Saque & Subida",
+    name: "1. Saque y subida",
     desc: "El sacador avanza a la red en línea recta mientras el compañero ya está afirmado esperando la devolución.",
     p1: { x: 175, y: 260, label: "Sacador" },
     p2: { x: 85, y: 210, label: "Compañero" },
@@ -250,7 +251,7 @@ const ROPE_THEORY_PHASES = [
   },
   {
     id: "bloqueo",
-    name: "2. Bloqueo en Red (Ataque)",
+    name: "2. Bloqueo en la red (ataque)",
     desc: "Ambos pegados a 2 metros de la red. La 'cuerda' imaginaria los mantiene a 3 metros de distancia mutua cubriendo el centro y esquinas.",
     p1: { x: 180, y: 200, label: "Drive Red" },
     p2: { x: 90, y: 200, label: "Revés Red" },
@@ -264,7 +265,7 @@ const ROPE_THEORY_PHASES = [
   },
   {
     id: "defensa",
-    name: "3. Defensa en Fondo",
+    name: "3. Defensa en el fondo",
     desc: "Ambos detrás de la línea de saque para defender con cristales. Si uno sale a la esquina, el otro cubre el centro.",
     p1: { x: 210, y: 440, label: "Drive Fondo" },
     p2: { x: 120, y: 425, label: "Revés Cobertura" },
@@ -272,7 +273,7 @@ const ROPE_THEORY_PHASES = [
   },
   {
     id: "cobertura_globo",
-    name: "4. Basculación por Globo",
+    name: "4. Basculación por globo",
     desc: "El rival tira globo cruzado: el jugador de revés retrocede en diagonal y su compañero bascula al centro para defender juntos.",
     p1: { x: 140, y: 380, label: "Apoyo Central" },
     p2: { x: 80, y: 450, label: "Recupera Globo" },
@@ -368,9 +369,9 @@ export default function TacticalCourtSimulator() {
               className="badge-linear badge-indigo"
               style={{ marginBottom: 8 }}
             >
-              Simulador 3D / 2D Oficial · Muzzaga Pádel
+              Simulador táctico · Muzzaga Pádel
             </span>
-            <h2 className="section-title">Pizarra Táctica Interactiva</h2>
+            <h2 className="section-title">Pizarra táctica interactiva</h2>
             <p className="section-desc">
               Analizá jugadas maestras, entendé la sincronización de pareja y
               posicioná a tus jugadores sobre el césped y cristal de Muzzaga.
@@ -387,7 +388,7 @@ export default function TacticalCourtSimulator() {
                 replayAnimation();
               }}
             >
-              Jugadas Pro
+              Jugadas pro
             </button>
             <button
               type="button"
@@ -431,9 +432,9 @@ export default function TacticalCourtSimulator() {
                   }}
                 >
                   {boardMode === "presets"
-                    ? "Animación en Vivo"
+                    ? "Animación en vivo"
                     : boardMode === "rope"
-                      ? "Sincronía de Pareja"
+                      ? "Sincronía de pareja"
                       : "Modo Libre"}
                 </span>
               </div>
@@ -452,7 +453,7 @@ export default function TacticalCourtSimulator() {
                     borderColor: "rgba(255,255,255,0.2)",
                   }}
                 >
-                  Repetir Tiro
+                  Repetir tiro
                 </button>
               )}
             </div>
@@ -691,7 +692,7 @@ export default function TacticalCourtSimulator() {
                     textAnchor="middle"
                     fontWeight="bold"
                   >
-                    ⚠️ {rope.dangerZone.label}
+                    {rope.dangerZone.label}
                   </text>
                 </>
               )}
@@ -1010,7 +1011,7 @@ export default function TacticalCourtSimulator() {
                         marginBottom: 6,
                       }}
                     >
-                      Secuencia de Golpe Paso a Paso:
+                      Secuencia del golpe, paso a paso:
                     </span>
                     <div
                       style={{
@@ -1054,7 +1055,7 @@ export default function TacticalCourtSimulator() {
                         marginBottom: 2,
                       }}
                     >
-                      <span>Consejo de los Profesores:</span>
+                      <span>Consejo de los profes:</span>
                     </div>
                     <p
                       style={{
@@ -1090,8 +1091,8 @@ export default function TacticalCourtSimulator() {
                     }}
                     title="Enviar esta jugada táctica a tu compañero por WhatsApp"
                   >
-                    <span style={{ fontSize: 16 }}>📲</span>
-                    <span>Compartir Jugada con mi Pareja</span>
+                    <Share2 size={20} aria-hidden="true" />
+                    <span>Compartir jugada con mi pareja</span>
                   </a>
                 </div>
               </>
@@ -1105,7 +1106,7 @@ export default function TacticalCourtSimulator() {
                     className="badge-linear badge-emerald"
                     style={{ marginBottom: 6 }}
                   >
-                    Sincronización Táctica de Pareja
+                    Sincronización táctica de pareja
                   </span>
                   <h4
                     style={{
@@ -1114,7 +1115,7 @@ export default function TacticalCourtSimulator() {
                       margin: "4px 0 6px",
                     }}
                   >
-                    La Teoría de la Cuerda en Pádel
+                    La teoría de la cuerda en pádel
                   </h4>
                   <p
                     style={{
@@ -1175,7 +1176,7 @@ export default function TacticalCourtSimulator() {
                       marginBottom: 4,
                     }}
                   >
-                    Regla de Oro del Doble:
+                    Regla de oro del doble:
                   </strong>
                   <span style={{ fontSize: 12.5, color: "var(--color-ink)" }}>
                     "Nunca te quedes mirando el golpe de tu compañero: ajustá tu
@@ -1206,8 +1207,8 @@ export default function TacticalCourtSimulator() {
                   }}
                   title="Enviar este movimiento táctico de pareja a tu compañero por WhatsApp"
                 >
-                  <span style={{ fontSize: 16 }}>🤝</span>
-                  <span>Compartir Sincronización con mi Pareja</span>
+                  <Handshake size={20} aria-hidden="true" />
+                  <span>Compartir sincronización con mi pareja</span>
                 </a>
               </>
             )}
@@ -1220,7 +1221,7 @@ export default function TacticalCourtSimulator() {
                     className="badge-linear badge-amber"
                     style={{ marginBottom: 6 }}
                   >
-                    Entrenador Táctico Interactivo
+                    Entrenador táctico interactivo
                   </span>
                   <h4
                     style={{
@@ -1229,7 +1230,7 @@ export default function TacticalCourtSimulator() {
                       margin: "4px 0 6px",
                     }}
                   >
-                    Diseñá tu Propia Estrategia
+                    Diseñá tu propia estrategia
                   </h4>
                   <p
                     style={{
@@ -1304,7 +1305,7 @@ export default function TacticalCourtSimulator() {
                     onClick={resetFreeCourt}
                     style={{ flex: 1, justifyContent: "center" }}
                   >
-                    Reiniciar Posiciones
+                    Reiniciar posiciones
                   </button>
                 </div>
               </>
@@ -1320,7 +1321,7 @@ export default function TacticalCourtSimulator() {
                 rel="noopener"
                 className="tactical-clases-link whatsapp-text"
               >
-                Consultar por Clases Tácticas por WhatsApp →
+                Consultar por clases por WhatsApp →
               </a>
             </div>
           </div>

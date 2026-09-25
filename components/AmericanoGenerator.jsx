@@ -7,6 +7,7 @@ import {
   buildAmericanoWhatsAppUrl,
 } from "../lib/americano";
 import Mascota from "./Mascota";
+import { Share2, Check, Copy } from "lucide-react";
 
 const DEFAULT_NAMES = ["Jugador 1", "Jugador 2", "Jugador 3", "Jugador 4"];
 
@@ -72,9 +73,9 @@ export default function AmericanoGenerator() {
         <div className="section-header-row">
           <div>
             <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-              Herramienta Comunitaria
+              Herramienta para grupos
             </span>
-            <h2 className="section-title">Generador de Torneo Americano</h2>
+            <h2 className="section-title">Generador de torneo americano</h2>
             <p className="section-desc">
               Armá las rotaciones de parejas al instante para que todos jueguen con y contra todos en partidos de 4 o 6 games. Anotá los resultados en vivo y compartilo por WhatsApp.
             </p>
@@ -141,7 +142,7 @@ export default function AmericanoGenerator() {
               }}
             >
               <div>
-                <span className="badge-linear badge-emerald">Fixture Automático</span>
+                <span className="badge-linear badge-emerald">Fixture automático</span>
                 <h3 style={{ fontSize: 17, color: "var(--text-primary)", margin: "4px 0 0" }}>
                   Rondas &amp; Cruces de Parejas
                 </h3>
@@ -162,7 +163,7 @@ export default function AmericanoGenerator() {
                   }}
                   title="Abrir en WhatsApp y enviar fixture al grupo"
                 >
-                  <span>📲</span>
+                  <Share2 size={20} aria-hidden="true" />
                   <span>WhatsApp</span>
                 </a>
 
@@ -173,7 +174,7 @@ export default function AmericanoGenerator() {
                   onClick={copyFixture}
                   title="Copiar fixture completo al portapapeles"
                 >
-                  {copied ? "✓ Copiado" : "📋 Copiar"}
+                  {copied ? <><Check size={20} className="icono-marca" aria-hidden="true" /> Copiado</> : <><Copy size={20} className="icono-marca" aria-hidden="true" /> Copiar</>}
                 </button>
               </div>
             </div>

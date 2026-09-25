@@ -6,14 +6,14 @@ export const MENU_ITEMS = [
   { id: "pizza_muzza", category: "buffet", name: "Pizza muzza", price: 18000, featured: true },
   { id: "pizza_napo", category: "buffet", name: "Pizza napo", price: 20000, featured: true },
   { id: "pizza_especial", category: "buffet", name: "Pizza especial", price: 22000, featured: true },
-  { id: "pizza_stacc", category: "buffet", name: "Pizza S/TACC", price: 18000, tag: "Sin TACC" },
+  { id: "pizza_stacc", category: "buffet", name: "Pizza sin TACC", price: 18000, tag: "Sin TACC" },
   { id: "pizza_vegana", category: "buffet", name: "Pizza vegana", price: 25000, tag: "Vegana" },
   { id: "tostados", category: "buffet", name: "Tostados", price: 14000, featured: true },
   { id: "empanada_unidad", category: "buffet", name: "Empanada (unidad)", price: 2000, featured: true },
   { id: "empanadas_docena", category: "buffet", name: "Docena de empanadas", price: 24000 },
   { id: "sandwich_mila", category: "buffet", name: "Sándwich de mila", price: 20000, featured: true },
   { id: "porcion_dulce", category: "buffet", name: "Porción dulce", price: 10000, featured: true },
-  { id: "brownie_stacc", category: "buffet", name: "Brownie S/TACC", price: 8000, tag: "Sin TACC" },
+  { id: "brownie_stacc", category: "buffet", name: "Brownie sin TACC", price: 8000, tag: "Sin TACC" },
 
   // Bebidas sin alcohol
   { id: "agua_500", category: "bebidas-sin", name: "Agua 500ml", price: 2000 },
@@ -73,11 +73,11 @@ export const MENU_ITEMS = [
 
 export const MENU_CATEGORIES = [
   { id: "all", label: "Todo" },
-  { id: "buffet", label: "🍕 Cocina" },
-  { id: "bebidas-sin", label: "🥤 Bebidas sin alcohol" },
-  { id: "bebidas-con", label: "🍺 Bebidas con alcohol" },
-  { id: "kiosco", label: "🍫 Kiosco" },
-  { id: "accesorios", label: "🎾 Accesorios" },
+  { id: "buffet", label: "Cocina" },
+  { id: "bebidas-sin", label: "Bebidas sin alcohol" },
+  { id: "bebidas-con", label: "Bebidas con alcohol" },
+  { id: "kiosco", label: "Kiosco" },
+  { id: "accesorios", label: "Accesorios" },
 ];
 
 // Subconjunto curado de ítems para la calculadora de 3er tiempo / split cost

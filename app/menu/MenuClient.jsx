@@ -5,6 +5,21 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MENU_ITEMS, MENU_CATEGORIES } from "../../data/menu";
 import { CLUB_INFO } from "../../data/club";
+import { MapPin, ShoppingCart, Pizza, CupSoda, Beer, Candy, ShoppingBag } from "lucide-react";
+
+// Íconos de las pestañas (antes eran emojis dentro del texto de data/menu.js).
+const CATEGORY_ICONS = {
+  buffet: Pizza,
+  "bebidas-sin": CupSoda,
+  "bebidas-con": Beer,
+  kiosco: Candy,
+  accesorios: ShoppingBag,
+};
+
+function CategoryIcon({ id }) {
+  const Icon = CATEGORY_ICONS[id];
+  return Icon ? <Icon size={20} className="icono-marca" aria-hidden="true" /> : null;
+}
 
 const LOCATION_NAMES = {
   "cancha-1": "Cancha 1 (Pista de Cristal)",
@@ -85,10 +100,10 @@ export default function MenuClient() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 22 }}>📍</span>
+            <MapPin size={20} className="icono-marca" aria-hidden="true" />
             <div>
               <div style={{ fontSize: 11, textTransform: "uppercase", fontWeight: 700, color: "var(--color-accent-orange-text)" }}>
-                Entrega Directa Activada
+                Entrega directa activada
               </div>
               <strong style={{ fontSize: 15, color: "var(--color-ink)" }}>
                 {activeLocation}
@@ -116,9 +131,9 @@ export default function MenuClient() {
       <div className="section-header-row" style={{ marginBottom: 24 }}>
         <div>
           <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-            Carta Oficial · Cantina &amp; 3er Tiempo
+            Carta de la cantina · Tercer tiempo
           </span>
-          <h1 className="section-title">Menú de la Cantina</h1>
+          <h1 className="section-title">Menú de la cantina</h1>
           <p className="section-desc">
             Pizzas a la piedra, tostados, sándwiches abundantes, cervezas heladas
             y kiosco con vista directa a las canchas.
@@ -180,6 +195,7 @@ export default function MenuClient() {
               onClick={() => setSelectedCat(cat.id)}
               style={{ whiteSpace: "nowrap" }}
             >
+              <CategoryIcon id={cat.id} />
               {cat.label}
             </button>
           ))}
@@ -266,10 +282,10 @@ export default function MenuClient() {
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
-                    color: "#25D366",
+                    color: "#0f7b4f",
                   }}
                 >
-                  🛒
+                  <ShoppingCart size={20} aria-hidden="true" />
                 </button>
               </div>
             </div>

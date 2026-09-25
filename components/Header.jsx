@@ -13,9 +13,9 @@ const NAV_LINKS = [
 ];
 
 const TOOLS_LINKS = [
-  { href: "/herramientas/dividir-gastos", label: "Calculadora de Gastos", desc: "Dividir cancha y cantina" },
-  { href: "/herramientas/nivel", label: "Test de Nivel", desc: "Calculá tu categoría de pádel" },
-  { href: "/herramientas/pizarra", label: "Pizarra Táctica", desc: "Simulador interactivo de jugadas" },
+  { href: "/herramientas/dividir-gastos", label: "Calculadora de gastos", desc: "Dividir cancha y cantina" },
+  { href: "/herramientas/nivel", label: "Test de nivel", desc: "Calculá tu categoría de pádel" },
+  { href: "/herramientas/pizarra", label: "Pizarra táctica", desc: "Simulador interactivo de jugadas" },
   { href: "/herramientas/americano", label: "Torneo Americano", desc: "Generador de fixtures express" },
 ];
 

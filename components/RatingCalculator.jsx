@@ -9,6 +9,7 @@ import {
   buildLevelWhatsAppUrl,
   evaluatePlayerSkills,
 } from "../lib/levelShare";
+import { Clock, BrickWall, Zap, Share2, Trophy, MessageCircle } from "lucide-react";
 
 export default function RatingCalculator() {
   const [mode, setMode] = useState("quiz"); // 'quiz' | 'slider'
@@ -65,14 +66,14 @@ export default function RatingCalculator() {
           className={`rating-tab-btn${mode === "quiz" ? " active" : ""}`}
           onClick={() => setMode("quiz")}
         >
-          Test Guiado (3 Preguntas)
+          Test guiado (3 preguntas)
         </button>
         <button
           type="button"
           className={`rating-tab-btn${mode === "slider" ? " active" : ""}`}
           onClick={() => setMode("slider")}
         >
-          Ajuste Manual
+          Ajuste manual
         </button>
       </div>
 
@@ -225,11 +226,11 @@ export default function RatingCalculator() {
                 fontWeight: 800,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
-                color: "var(--color-accent-orange, #ff5722)",
+                color: "var(--color-accent-orange-text)",
                 display: "block",
               }}
             >
-              Ficha Oficial de Jugador
+              Ficha de jugador
             </span>
             <strong style={{ fontSize: 15, color: "var(--color-ink)" }}>
               Muzzaga Pádel Club
@@ -310,15 +311,15 @@ export default function RatingCalculator() {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
-            <span style={{ color: "var(--color-muted)" }}>🕒 Experiencia:</span>
+            <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><Clock size={20} className="icono-marca" aria-hidden="true" /> Experiencia:</span>
             <strong style={{ color: "var(--color-ink)" }}>{skills.experience}</strong>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
-            <span style={{ color: "var(--color-muted)" }}>🧱 Rebote en Cristal:</span>
+            <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><BrickWall size={20} className="icono-marca" aria-hidden="true" /> Rebote en el cristal:</span>
             <strong style={{ color: "var(--color-ink)" }}>{skills.wallPlay}</strong>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span style={{ color: "var(--color-muted)" }}>🎾 Red &amp; Remate:</span>
+            <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><Zap size={20} className="icono-marca" aria-hidden="true" /> Red y remate:</span>
             <strong style={{ color: "var(--color-ink)" }}>{skills.netPlay}</strong>
           </div>
         </div>
@@ -343,8 +344,8 @@ export default function RatingCalculator() {
             }}
             title="Compartir mi nivel de pádel con mi compañero o grupo"
           >
-            <span>📲</span>
-            <span>Compartir Ficha por WhatsApp</span>
+            <Share2 size={20} aria-hidden="true" />
+            <span>Compartir ficha por WhatsApp</span>
           </a>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -359,7 +360,7 @@ export default function RatingCalculator() {
                 textAlign: "center",
               }}
             >
-              🏆 Ver Torneos
+              <Trophy size={20} className="icono-marca" aria-hidden="true" /> Ver torneos
             </a>
 
             <a
@@ -375,7 +376,7 @@ export default function RatingCalculator() {
                 textAlign: "center",
               }}
             >
-              💬 Partidos Parejos
+              <MessageCircle size={20} className="icono-marca" aria-hidden="true" /> Partidos parejos
             </a>
           </div>
         </div>

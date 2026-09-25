@@ -35,7 +35,7 @@ const barlowCondensed = Barlow_Condensed({
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title:
-    "Canchas de Pádel en Catriel · Muzzaga Pádel · Reservá tu Cancha Online",
+    "Canchas de pádel en Catriel · Muzzaga Pádel · Reservá tu cancha online",
   description:
     "Club de pádel en Catriel, Río Negro. 2 canchas profesionales de cristal, iluminación LED, turnos de 90 min, Canchas Abiertas comunitarias y cantina.",
   // Íconos: app/favicon.ico, app/icon.png y app/apple-icon.png (convención de archivos).

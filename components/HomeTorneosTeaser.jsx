@@ -11,27 +11,27 @@ const FEATURED_PHOTOS = [
   {
     src: "/img/torneos/agosto/ganadores_1er_caballeros.jpg",
     alt: "1er puesto 7ma Caballeros, Torneo Agosto 2026",
-    label: "1er Puesto Caballeros",
+    label: "1er puesto Caballeros",
   },
   {
     src: "/img/torneos/agosto/ganadores_1er_damas.jpg",
     alt: "1er puesto 7ma Damas, Torneo Agosto 2026",
-    label: "1er Puesto Damas",
+    label: "1er puesto Damas",
   },
   {
     src: "/img/torneos/junio/ganadores_1er_puesto.jpg",
     alt: "1er puesto 6ta Libre (G. Salinas y F. Alcalá)",
-    label: "1er Puesto 6ta Libre",
+    label: "1er puesto 6ta Libre",
   },
   {
     src: "/img/torneos/agosto/jugadores_01.jpg",
     alt: "Partido en cancha de cristal, Torneo Agosto 2026",
-    label: "Fase de Grupos",
+    label: "Fase de grupos",
   },
   {
     src: "/img/torneos/agosto/jugadores_06.jpg",
     alt: "Jugadores en acción, Torneo Agosto 2026",
-    label: "Definición en Red",
+    label: "Definición en la red",
   },
   {
     src: "/img/torneos/junio/jugadores_12.jpg",
@@ -49,7 +49,7 @@ export default function HomeTorneosTeaser() {
         <div className="section-header-row" style={{ alignItems: "center" }}>
           <div>
             <span className="badge-linear badge-amber" style={{ marginBottom: 6 }}>
-              Competencia &amp; Comunidad
+              Competencia y comunidad
             </span>
             <h2 className="section-title">Torneos en Muzzaga</h2>
             <p className="section-desc">

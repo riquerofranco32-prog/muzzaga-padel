@@ -22,7 +22,7 @@ export default function FaqSection() {
             >
               Dudas habituales
             </span>
-            <h2 className="section-title">Preguntas Frecuentes</h2>
+            <h2 className="section-title">Preguntas frecuentes</h2>
             <p className="section-desc">
               Todo lo que necesitás saber antes de venir a jugar a Muzzaga
               Pádel.

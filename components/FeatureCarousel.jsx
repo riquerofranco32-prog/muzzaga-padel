@@ -96,7 +96,7 @@ function IconSofa() {
 const FEATURES = [
   {
     id: "canchas",
-    label: "Canchas de Cristal",
+    label: "Canchas de cristal",
     icon: IconCourt,
     image: "/img/court_bench_players.jpg",
     description: "2 canchas de cristal profesionales con rebote homogéneo.",
@@ -111,7 +111,7 @@ const FEATURES = [
   },
   {
     id: "cantina",
-    label: "Cantina Propia",
+    label: "Cantina propia",
     icon: IconCantina,
     image: "/img/cantina_beer_court.jpg",
     description: "Pizzas caseras, minutas y bebidas para el tercer tiempo.",
@@ -125,14 +125,14 @@ const FEATURES = [
   },
   {
     id: "torneos",
-    label: "Torneos Todo el Año",
+    label: "Torneos todo el año",
     icon: IconTrophy,
     image: "/img/panoramic_courts.jpg",
     description: "Torneos y ligas internas durante toda la temporada.",
   },
   {
     id: "living",
-    label: "Living y Tercer Tiempo",
+    label: "Living y tercer tiempo",
     icon: IconSofa,
     image: "/img/bar_coffee_snacks.jpg",
     description:

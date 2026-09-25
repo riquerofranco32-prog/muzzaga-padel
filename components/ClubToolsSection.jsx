@@ -1,41 +1,42 @@
 import Link from "next/link";
+import { Wallet, Target, Presentation, Zap } from "lucide-react";
 
 const TOOLS = [
   {
     href: "/herramientas/dividir-gastos",
-    badge: "Para Grupos",
+    badge: "Para grupos",
     badgeColor: "badge-emerald",
-    icon: "💰",
-    title: "Dividir Cancha & 3er Tiempo",
+    icon: Wallet,
+    title: "Dividir cancha y tercer tiempo",
     desc: "Calculá en segundos cuánto paga cada uno por el turno y los consumos de cantina. Copiá el desglose directo al grupo de WhatsApp.",
-    cta: "Abrir Calculadora",
+    cta: "Abrir calculadora",
   },
   {
     href: "/herramientas/nivel",
     badge: "Competencia",
     badgeColor: "badge-indigo",
-    icon: "🎯",
-    title: "Test de Nivel & Categorías",
+    icon: Target,
+    title: "Test de nivel y categorías",
     desc: "Descubrí si sos 7ma, 6ta o 5ta según tu juego y la escala internacional (1.0 a 7.0). Ideal para anotarte en partidos parejos.",
-    cta: "Calcular mi Nivel",
+    cta: "Calcular mi nivel",
   },
   {
     href: "/herramientas/pizarra",
     badge: "Estrategia",
     badgeColor: "badge-amber",
-    icon: "📋",
-    title: "Pizarra Táctica Interactiva",
+    icon: Presentation,
+    title: "Pizarra táctica interactiva",
     desc: "Simulador interactivo de jugadas en cancha de cristal: repasá paso a paso la víbora a la reja, el smash por 3, bandejas y chiquitas.",
-    cta: "Ver Simulador Táctico",
+    cta: "Ver simulador táctico",
   },
   {
     href: "/herramientas/americano",
-    badge: "Torneos Express",
+    badge: "Torneos express",
     badgeColor: "badge-emerald",
-    icon: "⚡",
-    title: "Generador de Torneo Americano",
+    icon: Zap,
+    title: "Generador de torneo americano",
     desc: "Armá el fixture de rotación para 4 a 8 jugadores donde todos juegan con todos en partidos cortos y equilibrados.",
-    cta: "Generar Fixture",
+    cta: "Generar fixture",
   },
 ];
 
@@ -53,10 +54,10 @@ export default function ClubToolsSection() {
               className="badge-linear badge-amber"
               style={{ marginBottom: 8 }}
             >
-              Herramientas Gratuitas
+              Herramientas gratis
             </span>
             <h2 className="section-title">
-              Utilidades para Jugadores del Club
+              Herramientas para jugar mejor
             </h2>
             <p className="section-desc">
               Herramientas interactivas creadas para ayudarte a organizar tus
@@ -71,7 +72,7 @@ export default function ClubToolsSection() {
               <div>
                 <div className="club-tool-top">
                   <span className="club-tool-icon" aria-hidden="true">
-                    {tool.icon}
+                    <tool.icon size={20} className="icono-marca" />
                   </span>
                   <span className={`badge-linear ${tool.badgeColor}`}>
                     {tool.badge}

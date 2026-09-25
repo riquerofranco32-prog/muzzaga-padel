@@ -27,22 +27,22 @@ const TOURNAMENTS = [
       {
         src: "/img/torneos/agosto/ganadores_1er_caballeros.jpg",
         alt: "1er puesto categoría 7ma Caballeros, Torneo Agosto 2026",
-        label: "1er Puesto Caballeros",
+        label: "1er puesto Caballeros",
       },
       {
         src: "/img/torneos/agosto/ganadores_2do_caballeros.jpg",
         alt: "2do puesto categoría 7ma Caballeros, Torneo Agosto 2026",
-        label: "2do Puesto Caballeros",
+        label: "2do puesto Caballeros",
       },
       {
         src: "/img/torneos/agosto/ganadores_1er_damas.jpg",
         alt: "1er puesto categoría 7ma Damas, Torneo Agosto 2026",
-        label: "1er Puesto Damas",
+        label: "1er puesto Damas",
       },
       {
         src: "/img/torneos/agosto/ganadores_2do_damas.jpg",
         alt: "2do puesto categoría 7ma Damas, Torneo Agosto 2026",
-        label: "2do Puesto Damas",
+        label: "2do puesto Damas",
       },
     ],
   },
@@ -54,12 +54,12 @@ const TOURNAMENTS = [
       {
         src: "/img/torneos/junio/ganadores_1er_puesto.jpg",
         alt: "1er puesto categoría Sexta Libre, Gabriel Salinas y Franco Alcalá, Primer Torneo Junio 2026",
-        label: "1er Puesto 6ta (G. Salinas - F. Alcalá)",
+        label: "1er puesto 6ta (G. Salinas - F. Alcalá)",
       },
       {
         src: "/img/torneos/junio/ganadores_2do_puesto.jpg",
         alt: "2do puesto categoría Sexta Libre, Sebastián Riquero y Lucas Ponce, Primer Torneo Junio 2026",
-        label: "2do Puesto 6ta (S. Riquero - L. Ponce)",
+        label: "2do puesto 6ta (S. Riquero - L. Ponce)",
       },
     ],
   },

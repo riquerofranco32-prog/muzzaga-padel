@@ -6192,6 +6192,22 @@ textarea:focus-visible {
   transform-origin: center bottom;
 }
 
+/* Íconos de interfaz (lucide, 20 px). En naranja de marca sobre fondos
+   claros; dentro de botones rellenos toman el color del texto. */
+.icono-marca {
+  flex: 0 0 auto;
+  color: var(--color-accent-orange);
+}
+
+.btn svg,
+.booking-court-tab svg {
+  flex: 0 0 auto;
+}
+
+.booking-court-tab:has(svg) {
+  gap: 6px;
+}
+
 /* ==========================================================================
    MASCOTA · sistema
    Tres tamaños: XL en el hero (lo maneja landing.css), M en encabezados de

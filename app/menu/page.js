@@ -20,10 +20,10 @@ export default function MenuPage() {
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
             <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange-text)", textDecoration: "none", fontWeight: 600 }}>
-              ← Volver al Inicio
+              ← Volver al inicio
             </Link>
             <span>/</span>
-            <span style={{ color: "var(--text-primary)" }}>Menú de Cantina</span>
+            <span style={{ color: "var(--text-primary)" }}>Menú de la cantina</span>
           </div>
         </div>
 

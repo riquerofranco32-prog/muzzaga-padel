@@ -17,6 +17,7 @@ const TITULAR = process.env.NEXT_PUBLIC_PAYMENT_TITULAR || "Muzzaga Pádel";
 
 import { trackEvent } from "../lib/analytics";
 import { buildGoogleCalendarUrl, downloadIcsCalendar } from "../lib/calendar";
+import { CalendarPlus, Download, Users, Check } from "lucide-react";
 
 export default function BookingPassModal({
   bookingCode,
@@ -202,7 +203,7 @@ export default function BookingPassModal({
                     letterSpacing: "0.06em",
                   }}
                 >
-                  Pase Digital de Cancha
+                  Pase digital de cancha
                 </span>
               </div>
             </div>
@@ -257,7 +258,7 @@ export default function BookingPassModal({
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <span className="pass-label">Seña para Confirmar</span>
+              <span className="pass-label">Seña para confirmar</span>
               <div className="pass-sena-val">
                 ${Math.round(booking.total / 2).toLocaleString("es-AR")}
               </div>
@@ -377,7 +378,7 @@ export default function BookingPassModal({
                       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                         <path d="M19 4H5c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H5V8h14v10z" />
                       </svg>
-                      Pagar Seña con Mercado Pago (${Math.round((booking.total || 60000) / 2).toLocaleString("es-AR")})
+                      Pagar seña con Mercado Pago (${Math.round((booking.total || 60000) / 2).toLocaleString("es-AR")})
                     </>
                   )}
                 </button>
@@ -416,7 +417,7 @@ export default function BookingPassModal({
                 className="btn btn-secondary"
                 style={{ justifyContent: "center", height: 38, fontSize: 12 }}
               >
-                📅 Google Calendar
+                <CalendarPlus size={20} className="icono-marca" aria-hidden="true" /> Google Calendar
               </a>
               <button
                 type="button"
@@ -424,7 +425,7 @@ export default function BookingPassModal({
                 style={{ justifyContent: "center", height: 38, fontSize: 12 }}
                 onClick={handleDownloadCalendar}
               >
-                📥 Apple / Outlook (.ics)
+                <Download size={20} className="icono-marca" aria-hidden="true" /> Apple / Outlook (.ics)
               </button>
             </div>
 
@@ -439,7 +440,7 @@ export default function BookingPassModal({
               }}
               onClick={handleShareGroup}
             >
-              {shareSuccess ? "✓ ¡Mensaje para el grupo copiado!" : "👥 Compartir al grupo de WhatsApp"}
+              {shareSuccess ? <><Check size={20} className="icono-marca" aria-hidden="true" /> Mensaje para el grupo copiado</> : <><Users size={20} className="icono-marca" aria-hidden="true" /> Compartir al grupo de WhatsApp</>}
             </button>
 
             <button
