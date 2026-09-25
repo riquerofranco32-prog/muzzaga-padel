@@ -1098,12 +1098,14 @@ select:focus-visible,
 }
 
 /* Booking Dates Bar */
+/* Padding arriba y abajo: la fila recorta, y sin lugar el hover (1 px
+   arriba) perdía el borde y la sombra del día elegido cortaba recto. */
 .booking-dates {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 6px;
-  margin-bottom: 16px;
+  padding: 2px 0 16px;
+  margin-bottom: 6px;
   scrollbar-width: none;
 }
 
@@ -1186,7 +1188,8 @@ select:focus-visible,
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  padding-block: 2px 6px;
+  margin-bottom: 12px;
 }
 
 .booking-court-tab {
@@ -2101,9 +2104,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 @media (min-width: 1024px) {
+  /* max-width: con min-height 600 y 16:9, entre 1024 y ~1115 px el marco
+     medía 1067 px y se salía 67 px por la derecha. */
   .fc-frame {
     flex-direction: row;
     aspect-ratio: 16 / 9;
+    max-width: 100%;
   }
 }
 
