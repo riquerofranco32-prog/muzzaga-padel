@@ -152,12 +152,12 @@ export default async function Home() {
               <dd><StatCounter value={config.courts?.length || 2} /></dd>
             </div>
             <div className="hero-stat">
-              <dt>Torneos disputados</dt>
-              <dd><StatCounter value={12} suffix="+" /></dd>
+              <dt>Torneos</dt>
+              <dd className="hero-stat-word">Todo el año</dd>
             </div>
             <div className="hero-stat">
-              <dt>Jugadores en la comunidad</dt>
-              <dd><StatCounter value={800} prefix="+" /></dd>
+              <dt>Jugadores pasan por el club</dt>
+              <dd><StatCounter value={300} prefix="+" /></dd>
             </div>
             <div className="hero-stat">
               <dt>Minutos por turno</dt>
