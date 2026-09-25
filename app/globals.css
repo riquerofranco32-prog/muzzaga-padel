@@ -3758,7 +3758,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
   height: 21px;
 }
 
-/* WhatsApp va sin nombre: el logo solo, más grande y centrado. */
+/* WhatsApp va sin nombre: el logo solo, más grande. Abierta, va un poco a
+   la izquierda y arriba del centro de su lugar: en el medio del espacio
+   libre entre "Menú" y el borde. En el centro exacto, sin nombre, se veía
+   despegado del resto. Achicada, vuelve a la fila de los otros íconos. */
+.bottom-bar-item--wa .bottom-bar-icon {
+  transform: translate(-10px, -4px);
+}
+
 .bottom-bar-item--wa .bottom-bar-icon svg {
   width: 28px;
   height: 28px;
