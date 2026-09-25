@@ -2,7 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Bell, ExternalLink, LayoutDashboard, LogOut, PanelLeft, PanelLeftClose, Search, Tv } from "lucide-react";
+import {
+  Bell,
+  ExternalLink,
+  LayoutDashboard,
+  LogOut,
+  PanelLeft,
+  PanelLeftClose,
+  Search,
+  Tv,
+} from "lucide-react";
 import {
   adminAddPayment,
   adminCancelBooking,
@@ -34,6 +43,7 @@ import CajaView from "./views/CajaView";
 import ConfiguracionView from "./views/ConfiguracionView";
 import CreateBookingModal from "./CreateBookingModal";
 import BookingDetailModal from "./BookingDetailModal";
+import StaffPinModal from "./ui/StaffPinModal";
 import { ICON_PROPS, NAV_GROUPS, NAV_ITEMS, findNavItem } from "./nav";
 import { Toaster, useToasts } from "./ui/Toaster";
 import CommandPalette from "./ui/CommandPalette";
@@ -69,6 +79,7 @@ export default function AdminPage() {
   const [pinInput, setPinInput] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
+  const [cancelTarget, setCancelTarget] = useState(null);
 
   // Vista activa del sidebar
   const [view, setView] = useState("agenda");
@@ -150,10 +161,13 @@ export default function AdminPage() {
       // Pedido nuevo de la carta: aviso aunque se esté en otra vista.
       const count = res.alerts.find((a) => a.id === "web-orders")?.count || 0;
       if (webOrdersSeen.current !== null && count > webOrdersSeen.current) {
-        showToast("Entró un pedido de la carta: se cobra antes de pasar a la cocina.", {
-          duration: 10000,
-          action: { label: "Ver", onClick: () => navigate("cantina") },
-        });
+        showToast(
+          "Entró un pedido de la carta: se cobra antes de pasar a la cocina.",
+          {
+            duration: 10000,
+            action: { label: "Ver", onClick: () => navigate("cantina") },
+          },
+        );
       }
       webOrdersSeen.current = count;
     }
@@ -325,22 +339,8 @@ export default function AdminPage() {
     });
   }
 
-  async function handleCancel(bookingId, courtId, startTime) {
-    if (
-      !confirm(
-        `¿Estás seguro de cancelar este turno de las ${startTime} hs y liberar la cancha?`,
-      )
-    )
-      return;
-    const res = await adminCancelBooking(
-      bookingId,
-      activeDate,
-      courtId,
-      startTime,
-    );
-    if (!res.ok) return showError(res, "No se pudo cancelar el turno.");
-    refreshMoney();
-    showToast(`Turno de las ${startTime} cancelado · horario liberado`);
+  function handleCancel(bookingId, courtId, startTime) {
+    setCancelTarget({ bookingId, courtId, startTime });
   }
 
   async function loadClients() {
@@ -428,7 +428,10 @@ export default function AdminPage() {
     e.preventDefault();
     setModalSubmitting(true);
     // El fin del turno lo calcula el server según la duración configurada.
-    const res = await adminCreateManualBooking({ date: activeDate, ...modalForm });
+    const res = await adminCreateManualBooking({
+      date: activeDate,
+      ...modalForm,
+    });
     setModalSubmitting(false);
     if (!res.ok) return showError(res, "No se pudo crear la reserva.");
     setIsModalOpen(false);
@@ -629,7 +632,9 @@ export default function AdminPage() {
     <div className="admin-dashboard-layout">
       <div className="admin-shell">
         {/* SIDEBAR ESTILO KRAVIO */}
-        <aside className={`admin-sidebar${sidebarCollapsed ? " collapsed" : ""}`}>
+        <aside
+          className={`admin-sidebar${sidebarCollapsed ? " collapsed" : ""}`}
+        >
           <div className="admin-sidebar-brand">
             <Link href="/admin" className="admin-sidebar-brand-inner">
               <img
@@ -656,10 +661,22 @@ export default function AdminPage() {
               type="button"
               className="admin-sidebar-collapse-btn"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              title={sidebarCollapsed ? "Expandir barra lateral" : "Colapsar barra lateral"}
-              aria-label={sidebarCollapsed ? "Expandir barra lateral" : "Colapsar barra lateral"}
+              title={
+                sidebarCollapsed
+                  ? "Expandir barra lateral"
+                  : "Colapsar barra lateral"
+              }
+              aria-label={
+                sidebarCollapsed
+                  ? "Expandir barra lateral"
+                  : "Colapsar barra lateral"
+              }
             >
-              {sidebarCollapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+              {sidebarCollapsed ? (
+                <PanelLeft size={16} />
+              ) : (
+                <PanelLeftClose size={16} />
+              )}
             </button>
           </div>
 
@@ -670,11 +687,15 @@ export default function AdminPage() {
               onClick={() => setIsPaletteOpen(true)}
               aria-label="Buscar en el panel (Ctrl + K)"
             >
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+              >
                 <Search size={14} />
                 <span>Buscar…</span>
               </span>
-              <kbd className="admin-kbd" style={{ fontSize: 10 }}>Ctrl K</kbd>
+              <kbd className="admin-kbd" style={{ fontSize: 10 }}>
+                Ctrl K
+              </kbd>
             </button>
           )}
 
@@ -739,7 +760,10 @@ export default function AdminPage() {
                     <strong>Staff Muzzaga</strong>
                     <span>admin@muzzaga.com</span>
                   </div>
-                  <LogOut size={15} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
+                  <LogOut
+                    size={15}
+                    style={{ color: "var(--text-muted)", flexShrink: 0 }}
+                  />
                 </>
               )}
             </div>
@@ -754,9 +778,16 @@ export default function AdminPage() {
               <div className="admin-breadcrumbs">
                 <LayoutDashboard size={14} />
                 <span>Panel General</span>
-                <span className="admin-breadcrumb-sep" style={{ color: "#d1d5db" }}>/</span>
+                <span
+                  className="admin-breadcrumb-sep"
+                  style={{ color: "#d1d5db" }}
+                >
+                  /
+                </span>
                 <span className="admin-breadcrumb-active">
-                  {view === "agenda" ? "Agenda & Control" : findNavItem(view).label}
+                  {view === "agenda"
+                    ? "Agenda & Control"
+                    : findNavItem(view).label}
                 </span>
               </div>
               <div className="admin-kravio-top-tools">
@@ -773,7 +804,9 @@ export default function AdminPage() {
                       showToast(`${a.title} · ${a.detail}`, {
                         tone: a.tone === "danger" ? "error" : "success",
                         duration: 8000,
-                        action: a.view ? { label: "Ver", onClick: () => navigate(a.view) } : undefined,
+                        action: a.view
+                          ? { label: "Ver", onClick: () => navigate(a.view) }
+                          : undefined,
                       }),
                     );
                   }}
@@ -1013,6 +1046,35 @@ export default function AdminPage() {
           onMoved={() => {
             loadDayData(activeDate);
             setDetailBooking(null);
+          }}
+        />
+      )}
+
+      {/* PIN de staff para cancelar un turno (libera el horario) */}
+      {cancelTarget && (
+        <StaffPinModal
+          isOpen={Boolean(cancelTarget)}
+          title="Cancelar Turno"
+          description={`¿Confirmás que querés cancelar este turno de las ${cancelTarget.startTime} hs y liberar la cancha?`}
+          confirmButtonText="Cancelar Turno"
+          confirmButtonTone="danger"
+          onClose={() => setCancelTarget(null)}
+          onConfirm={async ({ pin, reason }) => {
+            const res = await adminCancelBooking({
+              bookingId: cancelTarget.bookingId,
+              pin,
+              reason,
+            });
+            if (res.ok) {
+              const { startTime } = cancelTarget;
+              setCancelTarget(null);
+              refreshMoney();
+              showToast(
+                `Turno de las ${startTime} cancelado · horario liberado`,
+              );
+            } else {
+              throw new Error(res.error || "No se pudo cancelar el turno.");
+            }
           }}
         />
       )}

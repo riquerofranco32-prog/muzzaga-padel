@@ -8,13 +8,21 @@ import {
   CreditCard,
   Eye,
   EyeOff,
+  Pencil,
   Plus,
   Store,
   Tag,
   Trash2,
+  Users,
   X,
 } from "lucide-react";
-import { adminGetClubConfig, adminSaveClubConfig } from "../actions";
+import {
+  adminGetClubConfig,
+  adminGetStaff,
+  adminSaveClubConfig,
+  adminSaveStaffMember,
+  adminSetStaffActive,
+} from "../actions";
 import {
   MAX_COURTS,
   depositFor,
@@ -25,6 +33,18 @@ import {
 import { isoAddDays, todayInClub } from "../../../lib/booking";
 import { formatARS, formatDate, plural } from "../../../lib/format";
 import { Skeleton } from "../ui/states";
+import StaffPinModal from "../ui/StaffPinModal";
+
+// Espejo del server (lib/staff.js no se puede importar en un componente
+// "use client": usa node:crypto para hashear PINs).
+const STAFF_ROLE_OPTIONS = [
+  "Administrador",
+  "Encargado",
+  "Recepción",
+  "Cantina",
+  "Profesor",
+];
+const EMPTY_STAFF_FORM = { id: null, name: "", role: "Recepción", pin: "" };
 
 const ICON = { size: 18, strokeWidth: 1.75, "aria-hidden": true };
 const WEEKDAYS = [
@@ -45,6 +65,7 @@ const SECTIONS = [
   { id: "cobros", label: "Cobros", icon: CreditCard },
   { id: "cierres", label: "Cierres", icon: CalendarX },
   { id: "club", label: "Club", icon: Store },
+  { id: "equipo", label: "Equipo", icon: Users },
 ];
 
 /** Próximo día de la semana `weekday` desde hoy, para previsualizar turnos. */
@@ -70,6 +91,15 @@ export default function ConfiguracionView({
   const [showCbu, setShowCbu] = useState(false);
   const [activeSection, setActiveSection] = useState("canchas");
 
+  // Equipo (PINs de staff)
+  const [staff, setStaff] = useState(null);
+  const [staffNeedsSetup, setStaffNeedsSetup] = useState(false);
+  const [staffForm, setStaffForm] = useState(EMPTY_STAFF_FORM);
+  const [staffError, setStaffError] = useState("");
+  const [staffAuthOpen, setStaffAuthOpen] = useState(false);
+  const [staffSaving, setStaffSaving] = useState(false);
+  const [toggleTarget, setToggleTarget] = useState(null);
+
   useEffect(() => {
     adminGetClubConfig().then((res) => {
       if (res.ok) {
@@ -79,7 +109,62 @@ export default function ConfiguracionView({
         onExpiredSession?.(res);
       }
     });
+    refreshStaff();
   }, []);
+
+  async function refreshStaff() {
+    const res = await adminGetStaff();
+    if (res.ok) {
+      setStaff(res.staff);
+      setStaffNeedsSetup(res.needsSetup);
+    } else {
+      onExpiredSession?.(res);
+    }
+  }
+
+  async function callSaveStaff(authPin) {
+    return adminSaveStaffMember({
+      id: staffForm.id || undefined,
+      name: staffForm.name,
+      role: staffNeedsSetup ? "Administrador" : staffForm.role,
+      pin: staffForm.pin || undefined,
+      authPin,
+    });
+  }
+
+  function onSubmitStaffForm(e) {
+    e.preventDefault();
+    setStaffError("");
+    if (!staffForm.name.trim()) return setStaffError("Ingresá el nombre.");
+    if ((!staffForm.id || staffForm.pin) && !/^\d{4,6}$/.test(staffForm.pin)) {
+      return setStaffError("El PIN tiene que tener de 4 a 6 números.");
+    }
+    if (staffNeedsSetup) {
+      setStaffSaving(true);
+      callSaveStaff("").then((res) => {
+        setStaffSaving(false);
+        if (res.ok) {
+          setStaffForm(EMPTY_STAFF_FORM);
+          refreshStaff();
+          onToast?.("Administrador creado");
+        } else {
+          setStaffError(res.error || "No se pudo guardar.");
+        }
+      });
+    } else {
+      setStaffAuthOpen(true);
+    }
+  }
+
+  function editStaffMember(member) {
+    setStaffError("");
+    setStaffForm({
+      id: member.id,
+      name: member.name,
+      role: member.role,
+      pin: "",
+    });
+  }
 
   const isDirty = useMemo(
     () =>
@@ -674,7 +759,218 @@ export default function ConfiguracionView({
             </p>
           </div>
         </section>
+
+        {/* EQUIPO */}
+        <section id="cfg-equipo" className="admin-settings-card">
+          <h3 className="admin-section-title">
+            <Users {...ICON} /> Equipo
+          </h3>
+          <p className="admin-field-hint" style={{ marginTop: 0 }}>
+            Cada integrante tiene su propio PIN (4 a 6 números): lo pide el
+            panel al cancelar o eliminar un turno, anular una venta, etc., así
+            queda registrado quién hizo el cambio.
+          </p>
+
+          {staff === null ? (
+            <Skeleton height={120} radius={12} />
+          ) : (
+            <>
+              {staff.length > 0 && (
+                <ul
+                  className="admin-chip-list"
+                  style={{
+                    flexDirection: "column",
+                    alignItems: "stretch",
+                    gap: 8,
+                  }}
+                >
+                  {staff.map((m) => (
+                    <li
+                      key={m.id}
+                      className="admin-field-row"
+                      style={{
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        opacity: m.active ? 1 : 0.55,
+                      }}
+                    >
+                      <div>
+                        <strong>{m.name}</strong>{" "}
+                        <span className="admin-field-hint">
+                          {m.role}
+                          {!m.active && " · dado de baja"}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={() => editStaffMember(m)}
+                          aria-label={`Editar a ${m.name}`}
+                        >
+                          <Pencil size={14} strokeWidth={1.75} aria-hidden />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={() => setToggleTarget(m)}
+                          aria-label={
+                            m.active
+                              ? `Dar de baja a ${m.name}`
+                              : `Reactivar a ${m.name}`
+                          }
+                        >
+                          {m.active ? "Dar de baja" : "Reactivar"}
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <form
+                onSubmit={onSubmitStaffForm}
+                className="admin-field-row"
+                style={{
+                  marginTop: staff.length > 0 ? 16 : 0,
+                  alignItems: "flex-end",
+                }}
+              >
+                <div className="admin-field">
+                  <label className="admin-field-label" htmlFor="cfg-staff-name">
+                    Nombre
+                  </label>
+                  <input
+                    id="cfg-staff-name"
+                    type="text"
+                    maxLength={40}
+                    value={staffForm.name}
+                    onChange={(e) =>
+                      setStaffForm((f) => ({ ...f, name: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="admin-field">
+                  <label className="admin-field-label" htmlFor="cfg-staff-role">
+                    Rol
+                  </label>
+                  {staffNeedsSetup ? (
+                    <output id="cfg-staff-role">Administrador</output>
+                  ) : (
+                    <select
+                      id="cfg-staff-role"
+                      value={staffForm.role}
+                      onChange={(e) =>
+                        setStaffForm((f) => ({ ...f, role: e.target.value }))
+                      }
+                    >
+                      {STAFF_ROLE_OPTIONS.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <div className="admin-field">
+                  <label className="admin-field-label" htmlFor="cfg-staff-pin">
+                    PIN {staffForm.id && "(dejalo vacío para no cambiarlo)"}
+                  </label>
+                  <input
+                    id="cfg-staff-pin"
+                    type="password"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={6}
+                    placeholder="••••"
+                    value={staffForm.pin}
+                    onChange={(e) =>
+                      setStaffForm((f) => ({
+                        ...f,
+                        pin: e.target.value.replace(/\D/g, "").slice(0, 6),
+                      }))
+                    }
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="btn btn-linear-primary"
+                  disabled={staffSaving}
+                >
+                  {staffForm.id ? "Guardar cambios" : "Agregar"}
+                </button>
+                {staffForm.id && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setStaffForm(EMPTY_STAFF_FORM)}
+                  >
+                    Cancelar
+                  </button>
+                )}
+              </form>
+              {staffNeedsSetup && (
+                <p className="admin-field-hint">
+                  El primer integrante tiene que ser Administrador. Después vas
+                  a poder sumar al resto del equipo con su PIN.
+                </p>
+              )}
+              {staffError && (
+                <p className="admin-field-error" role="alert">
+                  {staffError}
+                </p>
+              )}
+            </>
+          )}
+        </section>
       </div>
+
+      {toggleTarget && (
+        <StaffPinModal
+          isOpen={Boolean(toggleTarget)}
+          title={toggleTarget.active ? "Dar de Baja" : "Reactivar Integrante"}
+          description={`¿Confirmás ${toggleTarget.active ? "dar de baja a" : "reactivar a"} ${toggleTarget.name} (${toggleTarget.role})?`}
+          confirmButtonText={toggleTarget.active ? "Dar de Baja" : "Reactivar"}
+          confirmButtonTone={toggleTarget.active ? "danger" : "primary"}
+          onClose={() => setToggleTarget(null)}
+          onConfirm={async ({ pin }) => {
+            const res = await adminSetStaffActive({
+              id: toggleTarget.id,
+              active: !toggleTarget.active,
+              authPin: pin,
+            });
+            if (!res.ok) throw new Error(res.error || "No se pudo actualizar.");
+            const wasActive = toggleTarget.active;
+            setToggleTarget(null);
+            refreshStaff();
+            onToast?.(
+              wasActive ? "Integrante dado de baja" : "Integrante reactivado",
+            );
+          }}
+        />
+      )}
+
+      {staffAuthOpen && (
+        <StaffPinModal
+          isOpen={staffAuthOpen}
+          title={staffForm.id ? "Editar Integrante" : "Agregar Integrante"}
+          description="El PIN de un Administrador o Encargado autoriza este cambio en el equipo."
+          confirmButtonText="Confirmar"
+          confirmButtonTone="primary"
+          onClose={() => setStaffAuthOpen(false)}
+          onConfirm={async ({ pin }) => {
+            const res = await callSaveStaff(pin);
+            if (!res.ok) throw new Error(res.error || "No se pudo guardar.");
+            const wasEditing = Boolean(staffForm.id);
+            setStaffForm(EMPTY_STAFF_FORM);
+            setStaffAuthOpen(false);
+            refreshStaff();
+            onToast?.(
+              wasEditing ? "Integrante actualizado" : "Integrante agregado",
+            );
+          }}
+        />
+      )}
 
       {isDirty && (
         <div
