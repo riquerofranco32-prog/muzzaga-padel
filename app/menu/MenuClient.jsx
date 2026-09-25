@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MENU_ITEMS, MENU_CATEGORIES } from "../../data/menu";
 import { CLUB_INFO } from "../../data/club";
+import ScrollRow from "../../components/ScrollRow";
 import { MapPin, ShoppingCart, Pizza, CupSoda, Beer, Candy, ShoppingBag } from "lucide-react";
 
 // Íconos de las pestañas (antes eran emojis dentro del texto de data/menu.js).
@@ -179,14 +180,7 @@ export default function MenuClient() {
         </div>
 
         {/* CHIPS DE CATEGORÍA */}
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            overflowX: "auto",
-            paddingBottom: 6,
-          }}
-        >
+        <ScrollRow className="menu-category-tabs" role="group" aria-label="Categorías de la carta">
           {MENU_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
@@ -199,7 +193,7 @@ export default function MenuClient() {
               {cat.label}
             </button>
           ))}
-        </div>
+        </ScrollRow>
       </div>
 
       {/* LISTA DE PRODUCTOS */}

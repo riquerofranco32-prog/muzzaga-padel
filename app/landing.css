@@ -1507,6 +1507,19 @@ body {
   }
 }
 
+/* Celu: las cuatro pestañas en 2 × 2, enteras, en vez de una fila cortada. */
+@media (max-width: 640px) {
+  .spec-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .spec-tab {
+    justify-content: center;
+  }
+}
+
 /* --------------------------------------------------------------------------
    FLOTANTES: la barra "reservar" al centro y el ayudante en el margen
    derecho (antes los dos iban en bottom/right 24px y se pisaban).

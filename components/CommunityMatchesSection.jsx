@@ -10,6 +10,7 @@ import { PRECIO_POR_JUGADOR } from "../data/pricing";
 import Portal from "./Portal";
 import useDialogFocus from "../lib/useDialogFocus";
 import Mascota from "./Mascota";
+import ScrollRow from "./ScrollRow";
 import { X } from "lucide-react";
 
 const WHATSAPP = "5492995974176";
@@ -159,15 +160,7 @@ export default function CommunityMatchesSection() {
         </div>
 
         {/* CATEGORY FILTER PILLS */}
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            overflowX: "auto",
-            paddingBottom: 8,
-            marginBottom: 20,
-          }}
-        >
+        <ScrollRow className="open-category-tabs">
           {CATEGORY_TABS.map((tab) => (
             <button
               key={tab.id}
@@ -178,7 +171,7 @@ export default function CommunityMatchesSection() {
               {tab.label}
             </button>
           ))}
-        </div>
+        </ScrollRow>
 
         <div className="open-cards-grid" ref={cardsRef} tabIndex={-1}>
           {loading && matches.length === 0 ? (

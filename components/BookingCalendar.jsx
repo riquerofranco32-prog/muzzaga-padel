@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createBooking } from "../app/actions";
 import BookingPassModal from "./BookingPassModal";
 import { MaybePortal } from "./Portal";
+import ScrollRow from "./ScrollRow";
 import { scrollBehavior } from "../lib/motion";
 import useMediaQuery from "../lib/useMediaQuery";
 import { COURTS, nextDays, priceForSlot, todayInClub } from "../lib/booking";
@@ -265,7 +266,7 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
 
   return (
     <div className="booking-calendar">
-      <div className="booking-dates" role="group" aria-label="Elegí el día">
+      <ScrollRow className="booking-dates" role="group" aria-label="Elegí el día">
         {days.map((day) => (
           <button
             key={day.iso}
@@ -288,9 +289,9 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
             <span className="booking-date-month">{day.monthName}</span>
           </button>
         ))}
-      </div>
+      </ScrollRow>
 
-      <div className="booking-court-tabs">
+      <ScrollRow className="booking-court-tabs">
         <button
           type="button"
           className={`booking-court-tab${courtFilter === "all" ? " active" : ""}`}
@@ -310,7 +311,7 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
             {court.name} ({court.type})
           </button>
         ))}
-      </div>
+      </ScrollRow>
 
       <div ref={gridAreaRef} tabIndex={-1} className="booking-grid-area">
         {activeDay?.closed && (

@@ -5963,6 +5963,140 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 /* ==========================================================================
+   FILAS DESLIZABLES (components/ScrollRow.jsx · lib/useScrollRow.js)
+   Se deslizan con el dedo, con la rueda del mouse o arrastrando. El borde
+   se difumina solo del lado donde queda contenido escondido: antes la fila
+   se veía cortada y no había ninguna pista de que seguía.
+   ========================================================================== */
+.scroll-row {
+  --scroll-fade: 28px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* Que el elemento enfocado o encajado no quede debajo del difuminado. */
+  scroll-padding-inline: var(--scroll-fade);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-row > * {
+  flex-shrink: 0;
+}
+
+.scroll-row img {
+  -webkit-user-drag: none;
+}
+
+.scroll-row[data-more-start],
+.scroll-row[data-more-end] {
+  cursor: grab;
+}
+
+.scroll-row[data-more-end] {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - var(--scroll-fade)), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - var(--scroll-fade)), transparent);
+}
+
+.scroll-row[data-more-start] {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--scroll-fade));
+  mask-image: linear-gradient(90deg, transparent, #000 var(--scroll-fade));
+}
+
+.scroll-row[data-more-start][data-more-end] {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent
+  );
+}
+
+/* Con la rueda o arrastrando, el encaje se apaga; al soltar vuelve. */
+.scroll-row.is-wheeling,
+.scroll-row.is-dragging {
+  scroll-snap-type: none;
+}
+
+.scroll-row.is-dragging,
+.scroll-row.is-dragging * {
+  cursor: grabbing;
+}
+
+/* El anillo de foco va por dentro: por fuera lo recortaba la fila. */
+.scroll-row :focus-visible {
+  outline-offset: -3px;
+}
+
+/* Lo mismo en vertical, para listas con scroll propio. */
+.scroll-col {
+  --scroll-fade: 28px;
+  overflow-y: auto;
+}
+
+.scroll-col[data-more-end] {
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - var(--scroll-fade)), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - var(--scroll-fade)), transparent);
+}
+
+.scroll-col[data-more-start] {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 var(--scroll-fade));
+  mask-image: linear-gradient(180deg, transparent, #000 var(--scroll-fade));
+}
+
+.scroll-col[data-more-start][data-more-end] {
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent
+  );
+}
+
+.open-category-tabs,
+.menu-category-tabs {
+  display: flex;
+  gap: 8px;
+  padding-block: 2px 6px;
+}
+
+.open-category-tabs {
+  margin-bottom: 20px;
+}
+
+/* Texto solo para lectores de pantalla. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
    MOBILE: listas largas (turnos, extras de cantina, menú) pasan de apilarse
    verticalmente a un carrusel horizontal con scroll-snap. Mismo contenido,
    ocupan una sola fila en vez de arrastrar la página hacia abajo.

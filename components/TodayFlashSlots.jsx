@@ -5,6 +5,7 @@ import { COURTS, nowInClubTimezone, nextDays } from "../lib/booking";
 import { requestSlotPick } from "../lib/pickSlot";
 import { scrollBehavior } from "../lib/motion";
 import Mascota from "./Mascota";
+import ScrollRow from "./ScrollRow";
 
 // Chips de relleno mientras llega la disponibilidad: misma estructura y mismo
 // alto que los reales, así la tarjeta ocupa su lugar desde el primer render y
@@ -135,7 +136,7 @@ export default function TodayFlashSlots() {
             )}
           </div>
 
-          <div className="flash-chips">
+          <ScrollRow className="flash-chips">
             {loading
               ? SKELETON_CHIPS.map((i) => (
                   <div key={i} className="flash-chip is-skeleton" aria-hidden="true">
@@ -165,7 +166,7 @@ export default function TodayFlashSlots() {
                     </button>
                   );
                 })}
-          </div>
+          </ScrollRow>
         </div>
       </div>
     </div>

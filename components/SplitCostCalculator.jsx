@@ -8,6 +8,7 @@ import {
   buildSplitCostWhatsAppUrl,
 } from "../lib/splitCost";
 import Mascota from "./Mascota";
+import ScrollRow from "./ScrollRow";
 import { CreditCard, Share2, Check, Copy } from "lucide-react";
 
 const CANCHA_PRICE = PRECIO_TURNO;
@@ -198,7 +199,7 @@ export default function SplitCostCalculator() {
             </div>
 
             <p className="mobile-swipe-hint">← Deslizá para ver más extras →</p>
-            <div className="extras-selector-list">
+            <ScrollRow className="extras-selector-list">
               {EXTRAS.map((extra) => {
                 const qty = selectedExtras[extra.id] || 0;
                 return (
@@ -235,7 +236,7 @@ export default function SplitCostCalculator() {
                   </div>
                 );
               })}
-            </div>
+            </ScrollRow>
           </div>
 
           {/* COLUMNA DERECHA: TICKET FINTECH & COPIAR */}
