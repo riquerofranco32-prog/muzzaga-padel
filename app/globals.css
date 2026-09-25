@@ -342,7 +342,7 @@ select:focus-visible,
 
 .btn:active,
 .btn:hover:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 /* Primary Button (Expo Pure Black or High-Voltage Orange) */
@@ -360,11 +360,10 @@ select:focus-visible,
   background: #1a1a1a;
   border-color: #1a1a1a;
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .btn-linear-primary:active {
-  transform: translateY(0);
+  transform: scale(0.98);
   background: #000000;
 }
 
@@ -381,7 +380,6 @@ select:focus-visible,
   background: var(--color-accent-orange-hover);
   border-color: var(--color-accent-orange-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(255, 94, 0, 0.35);
 }
 
 /* Secondary Button (Expo Clean Light Card) */
@@ -397,11 +395,10 @@ select:focus-visible,
   border-color: #b0b4ba;
   color: #000000;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .btn-secondary:active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 /* WhatsApp Styles */
@@ -422,7 +419,6 @@ select:focus-visible,
   background: #0c6340;
   border-color: #0c6340;
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.45);
   transform: translateY(-1px);
 }
 
@@ -1087,6 +1083,7 @@ select:focus-visible,
 .booking-date-btn:hover {
   background: var(--color-canvas-soft);
   border-color: var(--color-accent-orange-border);
+  transform: translateY(-1px);
 }
 
 .booking-date-btn.active {
@@ -1165,6 +1162,7 @@ select:focus-visible,
 .booking-court-tab:hover {
   color: var(--color-ink);
   border-color: #b0b4ba;
+  transform: translateY(-1px);
 }
 
 .booking-court-tab.active {
@@ -1295,7 +1293,7 @@ select:focus-visible,
 .booking-slot:hover:not(:disabled) {
   background: var(--color-accent-orange-subtle);
   border-color: var(--color-accent-orange-border);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(255, 94, 0, 0.08);
 }
 
@@ -1589,8 +1587,7 @@ select:focus-visible,
 
 .open-card:hover {
   border-color: var(--color-accent-orange-border);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(255, 94, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .player-slots-layout {
@@ -1808,9 +1805,8 @@ select:focus-visible,
 }
 
 .info-link-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--color-hairline-strong);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
 }
 
 .rating-box {
@@ -2107,6 +2103,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .fc-pill:hover {
   border-color: rgba(255, 255, 255, 0.4);
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .fc-pill.active {
@@ -2371,9 +2368,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .photo-bento-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--color-accent-orange);
-  box-shadow: 0 20px 40px rgba(255, 94, 0, 0.15);
 }
 
 .photo-bento-img {
@@ -2446,9 +2442,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .torneo-thumb:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--color-accent-orange);
-  box-shadow: 0 14px 28px rgba(255, 94, 0, 0.15);
 }
 
 .torneo-thumb img {
@@ -2532,6 +2527,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .player-count-btn:hover {
   border-color: #b0b4ba;
   color: var(--color-ink);
+  transform: translateY(-1px);
 }
 
 .player-count-btn.active {
@@ -2896,6 +2892,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .americano-count-btn:hover {
   border-color: #b0b4ba;
   color: var(--color-ink);
+  transform: translateY(-1px);
 }
 
 .americano-count-btn.active {
@@ -3396,6 +3393,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .pass-copy-btn:hover {
   background: var(--color-accent-orange);
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .pass-copy-btn.copied {
@@ -6527,4 +6525,17 @@ textarea:focus-visible {
     transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* 6.3 · Al apretar, todos los botones y chips se hunden igual. Va al final
+   para ganarle al hover (misma especificidad). */
+.booking-date-btn:active,
+.booking-court-tab:active,
+.booking-slot:active:not(:disabled),
+.fc-pill:active,
+.player-count-btn:active,
+.americano-count-btn:active,
+.pass-copy-btn:active,
+.floating-live-action:active {
+  transform: scale(0.98);
 }

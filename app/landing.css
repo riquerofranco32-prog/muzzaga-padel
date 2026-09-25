@@ -254,10 +254,7 @@ body {
 
 .hero-btn-primary:hover {
   background: #f07e36;
-  transform: translateY(-2px);
-  box-shadow:
-    0 16px 36px -8px var(--orange-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
 .hero-btn-primary:active {
@@ -287,6 +284,7 @@ body {
 .hero-btn-ghost:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 .hero-btn-ghost:hover span {
@@ -845,8 +843,7 @@ body {
 
 .flash-chip:hover {
   border-color: var(--color-accent-orange);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px -10px var(--orange-glow);
+  transform: translateY(-1px);
 }
 
 .flash-chip-time {
@@ -1009,6 +1006,7 @@ body {
 
 .spec-tab:hover {
   color: var(--color-ink);
+  transform: translateY(-1px);
 }
 
 .spec-tab[aria-selected="true"] {
@@ -1136,9 +1134,8 @@ body {
 }
 
 .club-tool-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
   border-color: var(--color-accent-orange-border);
-  box-shadow: 0 26px 44px -26px rgba(0, 0, 0, 0.4);
 }
 
 .club-tool-card:hover::after {
@@ -1163,9 +1160,6 @@ body {
   transition: transform var(--t-hover) var(--ease);
 }
 
-.club-tool-card:hover .club-tool-icon {
-  transform: rotate(-8deg) scale(1.08);
-}
 
 .club-tool-title {
   font-family: var(--font-display);
@@ -1254,8 +1248,8 @@ body {
 }
 
 .info-link-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 20px 36px -24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+  border-color: var(--color-accent-orange-border);
 }
 
 .contact-eyebrow {
@@ -1310,7 +1304,7 @@ body {
 }
 
 .torneo-thumb:hover {
-  transform: translateY(-4px) rotate(-0.6deg);
+  transform: translateY(-2px);
 }
 
 /* --------------------------------------------------------------------------
@@ -1591,6 +1585,7 @@ body {
 .section-more-link:hover {
   border-color: var(--color-accent-orange);
   color: var(--color-accent-orange-text);
+  transform: translateY(-1px);
 }
 
 .section-more-link:hover span {
@@ -1722,7 +1717,7 @@ body {
 .next-event-cta:hover {
   background: var(--color-accent-orange);
   color: #fff;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .torneo-bento {
@@ -2155,4 +2150,14 @@ body {
   .flash-wrap {
     margin-top: 64px;
   }
+}
+
+/* 6.3 · Al apretar, botones y chips de la home se hunden igual que el
+   resto. Va al final para ganarle al hover. */
+.hero-btn-ghost:active,
+.flash-chip:active,
+.spec-tab:active,
+.next-event-cta:active,
+.section-more-link:active {
+  transform: scale(0.98);
 }
