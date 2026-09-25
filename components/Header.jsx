@@ -197,9 +197,12 @@ export default function Header() {
         </div>
       </header>
 
+      {/* Cerrado es invisible (opacidad 0) pero seguía en el orden de Tab:
+          con teclado se recorrían links que no se ven. inert lo saca. */}
       <div
         id="mobile-nav-panel"
         className={`mobile-nav-panel${open ? " open" : ""}`}
+        inert={!open}
       >
         <a
           href="/#turnos"
