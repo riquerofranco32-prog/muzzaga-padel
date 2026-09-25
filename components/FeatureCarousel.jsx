@@ -156,6 +156,9 @@ const FEATURES = [
 const EASE = [0.16, 1, 0.3, 1];
 const MOVE = { duration: 0.4, ease: EASE };
 const ITEM_HEIGHT = 52;
+// Deslizar la foto: pasa si se arrastró más que esto o se soltó rápido.
+const SWIPE_PX = 50;
+const SWIPE_VELOCITY = 400;
 
 const wrap = (min, max, v) => {
   const rangeSize = max - min;
@@ -256,6 +259,19 @@ export default function FeatureCarousel() {
                   style={{
                     zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0,
                     pointerEvents: isActive ? "auto" : "none",
+                    // De costado la arrastra; para arriba y abajo sigue la página.
+                    touchAction: "pan-y",
+                  }}
+                  drag={isActive ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.35}
+                  dragSnapToOrigin
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x < -SWIPE_PX || info.velocity.x < -SWIPE_VELOCITY) {
+                      setStep((s) => s + 1);
+                    } else if (info.offset.x > SWIPE_PX || info.velocity.x > SWIPE_VELOCITY) {
+                      setStep((s) => s - 1);
+                    }
                   }}
                   transition={MOVE}
                   className={`fc-stage-card${isActive ? " is-active" : ""}`}
@@ -267,6 +283,7 @@ export default function FeatureCarousel() {
                     alt={feature.alt}
                     fill
                     sizes="(max-width: 1023px) 320px, 420px"
+                    draggable={false}
                     className={`fc-stage-img${isActive ? " active" : ""}`}
                   />
 
