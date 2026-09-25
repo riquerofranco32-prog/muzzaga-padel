@@ -38,10 +38,7 @@ export const metadata = {
     "Canchas de Pádel en Catriel · Muzzaga Pádel · Reservá tu Cancha Online",
   description:
     "Club de pádel en Catriel, Río Negro. 2 canchas profesionales de cristal, iluminación LED, turnos de 90 min, Canchas Abiertas comunitarias y cantina.",
-  icons: {
-    icon: "/img/logo_badge.png",
-    apple: "/img/logo_badge.png",
-  },
+  // Íconos: app/favicon.ico, app/icon.png y app/apple-icon.png (convención de archivos).
   openGraph: {
     type: "website",
     siteName: "Muzzaga Pádel",
@@ -59,7 +56,8 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#e8722a",
+  // Negro de marca: el naranja pintaba toda la barra del navegador.
+  themeColor: "#1b1b19",
 };
 
 const jsonLd = {
