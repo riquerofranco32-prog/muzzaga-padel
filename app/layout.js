@@ -45,14 +45,14 @@ export const metadata = {
   openGraph: {
     type: "website",
     siteName: "Muzzaga Pádel",
-    title: "Canchas de Pádel en Catriel · Muzzaga Pádel",
+    title: "Canchas de pádel en Catriel · Muzzaga Pádel",
     description:
       "2 canchas de cristal templado, iluminación LED, torneos y cantina propia para el mejor tercer tiempo en Catriel.",
     locale: "es_AR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Canchas de Pádel en Catriel · Muzzaga Pádel",
+    title: "Canchas de pádel en Catriel · Muzzaga Pádel",
     description:
       "2 canchas de cristal templado, iluminación LED, torneos y cantina propia para el mejor tercer tiempo en Catriel.",
   },
