@@ -26,8 +26,8 @@ const PRESET_TACTICS = [
       r2: { x: 210, y: 430, label: "R2" }, // Rival en esquina
     },
     bouncePos: { x: 245, y: 430 },
-    wallPos: { x: 275, y: 410 },
-    trajectory: "M 130 195 Q 185 300, 245 430 Q 265 425, 278 405",
+    wallPos: { x: 282, y: 395 },
+    trajectory: "M 130 195 Q 185 300, 245 430 Q 268 420, 282 397",
     phases: [
       {
         phase: "1. Armado",
@@ -96,14 +96,14 @@ const PRESET_TACTICS = [
     desc: "Acompañá la bola cuando sale del cristal de fondo. Ganá tiempo con un globo alto y profundo para que tu pareja y vos puedan tomar la red.",
     tip: "Flexioná las rodillas, pala por debajo de la pelota y terminá el gesto apuntando al techo.",
     players: {
-      p1: { x: 75, y: 455, label: "J1 (Vos)" },
-      p2: { x: 175, y: 440, label: "J2 (Pareja)" },
+      p1: { x: 95, y: 440, label: "J1 (Vos)" },
+      p2: { x: 185, y: 440, label: "J2 (Pareja)" },
       r1: { x: 100, y: 190, label: "R1 (Red)" },
       r2: { x: 200, y: 190, label: "R2 (Red)" },
     },
-    bouncePos: { x: 60, y: 475 },
+    bouncePos: { x: 48, y: 462 },
     wallPos: null,
-    trajectory: "M 60 475 Q 90 280, 225 90",
+    trajectory: "M 48 462 Q 90 280, 225 90",
     phases: [
       {
         phase: "1. Espera",
@@ -211,15 +211,15 @@ const PRESET_TACTICS = [
     desc: "Cuando el smash del rival rebota en tu cristal de fondo y cruza la red despacio, amortiguás la bola con toque ultra cortado para dejarla pegada a la red de su lado.",
     tip: "Aflojá la muñeca en el último instante y retrocedé la pala ligeramente al impactar para quitar toda la inercia.",
     players: {
-      p1: { x: 140, y: 240, label: "J1 (Vos)" },
+      p1: { x: 140, y: 285, label: "J1 (Vos)" },
       p2: { x: 80, y: 350, label: "J2" },
       r1: { x: 130, y: 150, label: "R1 (Pegador)" },
       r2: { x: 220, y: 180, label: "R2" },
     },
-    bouncePos: { x: 140, y: 245 },
+    bouncePos: { x: 165, y: 238 },
     wallPos: null,
     trajectory:
-      "M 130 150 Q 140 400, 140 460 Q 140 350, 140 240 Q 145 235, 145 230",
+      "M 130 150 Q 140 400, 140 460 Q 140 350, 140 285 Q 152 250, 165 238",
     phases: [
       {
         phase: "1. Anticipación",
@@ -649,12 +649,14 @@ export default function TacticalCourtSimulator() {
               />
               <circle cx="15" cy="250" r="4" fill="#E8722A" />
               <circle cx="285" cy="250" r="4" fill="#E8722A" />
+              {/* En el extremo derecho: en el medio chocaba con jugadores y
+                  piques de casi todas las jugadas. */}
               <text
-                x="150"
-                y="246"
+                x="280"
+                y="242"
                 fill="#ffffff"
                 fontSize="9"
-                textAnchor="middle"
+                textAnchor="end"
                 opacity="0.8"
                 fontWeight="600"
               >
