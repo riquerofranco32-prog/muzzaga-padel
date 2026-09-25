@@ -442,7 +442,7 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
                       >
                         <span className="slot-meta" style={{ fontWeight: 600 }}>
                           {court.name}
-                        </span>
+                        </span>{" "}
                         <span className="slot-badge">
                           {isSelected
                             ? "Tu selección ✓"
