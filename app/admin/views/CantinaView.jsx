@@ -175,10 +175,10 @@ export default function CantinaView({ onExpiredSession, onToast }) {
         action: {
           label: "Deshacer",
           onClick: async () => {
-            const undo = await adminVoidCantinaSale(
-              res.saleId,
-              "Deshecha al registrar",
-            );
+            const undo = await adminVoidCantinaSale({
+              saleId: res.saleId,
+              reason: "Deshecha al registrar",
+            });
             if (!undo.ok) {
               onToast?.(undo.error || "No se pudo deshacer la venta.", {
                 tone: "error",
@@ -195,7 +195,10 @@ export default function CantinaView({ onExpiredSession, onToast }) {
   }
 
   async function confirmVoid() {
-    const res = await adminVoidCantinaSale(voiding.id, voidReason);
+    const res = await adminVoidCantinaSale({
+      saleId: voiding.id,
+      reason: voidReason,
+    });
     if (res.ok) {
       setVoiding(null);
       setVoidReason("");
