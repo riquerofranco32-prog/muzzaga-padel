@@ -4,13 +4,14 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import BottomNav from "../../components/BottomNav";
 import MenuClient from "./MenuClient";
+import { pageMetadata } from "../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Menú de la cantina · Muzzaga Pádel",
   description:
     "Carta completa de la cantina de Muzzaga Pádel: pizzas caseras, tostados, sándwiches de mila, cervezas heladas, bebidas frías y kiosco en Catriel.",
-  alternates: { canonical: "/menu" },
-};
+  path: "/menu",
+});
 
 export default function MenuPage() {
   return (

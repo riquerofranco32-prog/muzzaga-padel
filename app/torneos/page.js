@@ -4,13 +4,14 @@ import Footer from "../../components/Footer";
 import BottomNav from "../../components/BottomNav";
 import TorneosGallery from "../../components/TorneosGallery";
 import { CLUB_INFO } from "../../data/club";
+import { pageMetadata } from "../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Torneos de pádel en Catriel · Muzzaga Pádel",
   description:
     "Torneos de pádel en Catriel, Río Negro, todo el año: fotos de las ediciones anteriores, ganadores e inscripción para la próxima fecha.",
-  alternates: { canonical: "/torneos" },
-};
+  path: "/torneos",
+});
 
 export default function TorneosPage() {
   return (

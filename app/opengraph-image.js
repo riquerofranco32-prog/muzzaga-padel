@@ -120,6 +120,7 @@ export default async function Image() {
         />
       </div>
     ),
-    { ...size, fonts }
+    // Con fonts: [] next/og no carga su fuente por defecto y falla.
+    { ...size, ...(fonts.length ? { fonts } : {}) }
   );
 }

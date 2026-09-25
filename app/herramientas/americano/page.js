@@ -3,13 +3,14 @@ import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
 import AmericanoGenerator from "../../../components/AmericanoGenerator";
+import { pageMetadata } from "../../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Generador de torneo americano de pádel · Muzzaga Pádel",
   description:
     "Armá el fixture de tu torneo americano de pádel en segundos para grupos de 4 a 8 jugadores. Rotaciones balanceadas y copia directa a WhatsApp.",
-  alternates: { canonical: "/herramientas/americano" },
-};
+  path: "/herramientas/americano",
+});
 
 export default function AmericanoPage() {
   return (
@@ -24,7 +25,7 @@ export default function AmericanoPage() {
             <span>/</span>
             <span>Herramientas</span>
             <span>/</span>
-            <span style={{ color: "var(--text-primary)" }}>Torneo Americano</span>
+            <span style={{ color: "var(--text-primary)" }}>Torneo americano</span>
           </div>
         </div>
 

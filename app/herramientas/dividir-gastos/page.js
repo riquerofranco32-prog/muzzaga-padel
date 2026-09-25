@@ -3,13 +3,14 @@ import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
 import SplitCostCalculator from "../../../components/SplitCostCalculator";
+import { pageMetadata } from "../../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Calculadora para dividir cancha y cantina · Muzzaga Pádel",
   description:
     "Dividí en segundos el costo del turno de pádel y las consumiciones de cantina entre tus amigos. Copiá el desglose directo a WhatsApp.",
-  alternates: { canonical: "/herramientas/dividir-gastos" },
-};
+  path: "/herramientas/dividir-gastos",
+});
 
 export default function DividirGastosPage() {
   return (
@@ -45,10 +46,10 @@ export default function DividirGastosPage() {
               ¿Ya tienen el equipo listo?
             </h3>
             <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 20 }}>
-              Elegí día y horario para tu partido en nuestras canchas de cristal profesionales.
+              Elegí día y horario para tu partido en nuestras canchas de cristal templado.
             </p>
             <Link href="/#turnos" className="btn btn-linear-primary" style={{ padding: "10px 24px" }}>
-              Reservar Cancha en Muzzaga →
+              Reservar turno →
             </Link>
           </div>
         </div>

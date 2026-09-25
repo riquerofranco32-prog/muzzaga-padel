@@ -4,13 +4,14 @@ import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
 import TacticalCourtSimulator from "../../../components/TacticalCourtSimulator";
 import Mascota from "../../../components/Mascota";
+import { pageMetadata } from "../../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Pizarra táctica de pádel interactiva · Muzzaga Pádel",
   description:
     "Simulador interactivo de jugadas y táctica de pádel en cancha de cristal: víbora a la reja, smash por 3, bandeja y chiquita animadas paso a paso.",
-  alternates: { canonical: "/herramientas/pizarra" },
-};
+  path: "/herramientas/pizarra",
+});
 
 export default function PizarraPage() {
   return (

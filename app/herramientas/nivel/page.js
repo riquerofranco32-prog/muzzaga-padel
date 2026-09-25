@@ -5,13 +5,14 @@ import BottomNav from "../../../components/BottomNav";
 import RatingCalculator from "../../../components/RatingCalculator";
 import { PADEL_LEVELS } from "../../../data/levels";
 import Mascota from "../../../components/Mascota";
+import { pageMetadata } from "../../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Test de nivel de pádel: ¿qué categoría sos? · Muzzaga Pádel",
   description:
     "Descubrí tu nivel de pádel en la escala internacional (1.0 a 7.0) y su equivalencia con las categorías argentinas (7ma a 1ra). Sumate a partidos parejos.",
-  alternates: { canonical: "/herramientas/nivel" },
-};
+  path: "/herramientas/nivel",
+});
 
 export default function NivelPage() {
   return (
