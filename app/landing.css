@@ -41,7 +41,6 @@ body {
 .hero-night-photo img {
   object-fit: cover;
   object-position: center 40%;
-  opacity: 0.7;
 }
 
 .hero-night-photo::after {
@@ -51,16 +50,16 @@ body {
   background:
     radial-gradient(
       ellipse 60% 70% at 78% 45%,
-      rgba(232, 114, 42, 0.28),
+      rgba(232, 114, 42, 0.14),
       transparent 70%
     ),
     linear-gradient(
       90deg,
-      rgba(15, 15, 13, 0.96) 0%,
-      rgba(15, 15, 13, 0.78) 45%,
-      rgba(15, 15, 13, 0.45) 100%
+      rgba(15, 15, 13, 0.7) 0%,
+      rgba(15, 15, 13, 0.4) 45%,
+      rgba(15, 15, 13, 0.1) 100%
     ),
-    linear-gradient(180deg, transparent 55%, var(--night) 100%);
+    linear-gradient(180deg, transparent 70%, var(--night) 100%);
 }
 
 /* Líneas de cancha en perspectiva: textura de marca, no información. */
@@ -105,10 +104,43 @@ body {
 }
 
 .hero-night-copy {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+}
+
+/* La foto va al 100 % con un degradado liviano; lo oscuro queda solo acá,
+   detrás del texto, y se desvanece antes de llegar a los bordes. */
+.hero-night-copy::before {
+  content: "";
+  position: absolute;
+  inset: -14% -22% -14% -40%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    rgba(15, 15, 13, 0.55),
+    rgba(15, 15, 13, 0.35) 50%,
+    transparent 75%
+  );
+}
+
+/* Celu: el texto ocupa todo el ancho, así que el velo cubre el bloque
+   entero y se apaga recién debajo de la lista de confianza. */
+@media (max-width: 768px) {
+  .hero-night-copy::before {
+    inset: -4% -16px -10%;
+    background: linear-gradient(
+      180deg,
+      rgba(15, 15, 13, 0.25) 0%,
+      rgba(15, 15, 13, 0.5) 35%,
+      rgba(15, 15, 13, 0.55) 88%,
+      transparent 100%
+    );
+  }
 }
 
 /* Barra "en vivo" (LiveWeatherRadar) dentro del hero */
@@ -267,7 +299,8 @@ body {
   flex-wrap: wrap;
   gap: 8px 20px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.68);
+  /* Con la foto al 100 % (5.1) el 0,68 bajaba de 4,5:1 en celu. */
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .hero-trust li {
@@ -430,7 +463,7 @@ body {
 .hero-stat dt {
   grid-row: 2;
   font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .hero-stat dd {
