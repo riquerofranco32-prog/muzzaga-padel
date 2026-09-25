@@ -3437,9 +3437,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
   opacity: 1;
 }
 
-.radar-status-item.highlight {
-  color: var(--color-accent-orange);
-  font-weight: 600;
+.radar-dot {
+  color: #9c9c96;
+}
+
+.radar-dot.is-open {
+  color: #0f7b4f;
 }
 
 .radar-divider {

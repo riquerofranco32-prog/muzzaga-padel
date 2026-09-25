@@ -1,13 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getClubStatus, getClubTimeString } from "../data/horarios";
+import { clubStatusLine, getClubStatus } from "../data/horarios";
 
-export default function LiveWeatherRadar() {
+/**
+ * Estado del club en el hero, calculado del horario de Configuración (y los
+ * días bloqueados): "Abierto ahora · cierra a las 00:30" o "Cerrado · abre
+ * mañana a las 14:00". Antes sumaba "Iluminación LED activa" o "Cristales
+ * panorámicos" según la hora y "Pistas cubiertas · cero viento": nada de eso
+ * se mide, así que salió.
+ */
+export default function LiveWeatherRadar({ schedule, blockedDates }) {
   // null hasta el montaje: la home es estática (ISR), así que el servidor no
-  // sabe la hora de quien la mira. Antes mostraba "Club Abierto · 17:00 hs"
-  // inventado y lo cambiaba al hidratar. Ahora reserva el lugar sin texto y
-  // aparece con la hora real.
+  // sabe la hora de quien la mira. Reserva el lugar sin texto y aparece con
+  // el estado real.
   const [now, setNow] = useState(null);
 
   useEffect(() => {
@@ -18,8 +24,9 @@ export default function LiveWeatherRadar() {
   }, []);
 
   const ready = now !== null;
-  const status = ready ? getClubStatus(now) : null;
-  const time = ready ? getClubTimeString(now) : "00:00 hs";
+  const status = ready
+    ? getClubStatus(now, { ...(schedule ? { schedule } : {}), blockedDates: blockedDates || [] })
+    : null;
 
   return (
     <div
@@ -27,33 +34,8 @@ export default function LiveWeatherRadar() {
       aria-hidden={ready ? undefined : true}
     >
       <div className="radar-status-item">
-        <span
-          className="pulse-dot"
-          style={{ color: status?.isOpen ? "#0F7B4F" : "#9c9c96" }}
-        />
-        <span>
-          {status?.isOpen ? "Club Abierto" : "Club Cerrado"} · {time} en Catriel
-        </span>
-      </div>
-
-      <div className="radar-divider" />
-
-      <div className="radar-status-item highlight">
-        <span
-          className="pulse-dot"
-          style={{ color: "var(--brand-orange, #E8722A)", marginRight: 4 }}
-        />
-        <span>
-          {status?.isNight
-            ? "Canchas 1 y 2: Iluminación LED Activa"
-            : "Canchas 1 y 2: Cristales Panorámicos"}
-        </span>
-      </div>
-
-      <div className="radar-divider" />
-
-      <div className="radar-status-item" style={{ color: "#0F7B4F", fontWeight: 600 }}>
-        <span>🛡️ Pistas Cubiertas · Cero Viento</span>
+        <span className={`pulse-dot radar-dot${status?.isOpen ? " is-open" : ""}`} />
+        <span>{status ? clubStatusLine(status) : "Abierto ahora · cierra a las 00:30"}</span>
       </div>
     </div>
   );

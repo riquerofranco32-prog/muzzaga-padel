@@ -94,7 +94,7 @@ export default async function Home() {
 
         <div className="container hero-night-grid">
           <div className="hero-night-copy">
-            <LiveWeatherRadar />
+            <LiveWeatherRadar schedule={config.schedule} blockedDates={config.blockedDates} />
 
             <p className="hero-kicker">
               <span className="hero-kicker-line" /> Club de pádel · Catriel, Río Negro

@@ -122,17 +122,12 @@ body {
   box-shadow: none;
 }
 
-/* "Pistas cubiertas" pasa a la lista de confianza del hero. */
-.hero-night .live-weather-radar-bar > :nth-child(n + 4) {
-  display: none;
-}
-
 .hero-night .radar-divider {
   background: rgba(255, 255, 255, 0.16);
 }
 
-.hero-night .radar-status-item.highlight {
-  color: #ffb07a;
+.hero-night .radar-dot.is-open {
+  color: #34d399;
 }
 
 .hero-kicker {
