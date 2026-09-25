@@ -3,13 +3,12 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import BottomNav from "../../components/BottomNav";
 import TorneosGallery from "../../components/TorneosGallery";
-import TournamentBracket from "../../components/TournamentBracket";
 import { CLUB_INFO } from "../../data/club";
 
 export const metadata = {
   title: "Torneos de pádel en Catriel · Muzzaga Pádel",
   description:
-    "Torneos de pádel oficiales en Catriel, Río Negro: cuadros, categorías Damas y Caballeros, fotos de ganadores e inscripciones para la próxima fecha.",
+    "Torneos de pádel en Catriel, Río Negro, todo el año: fotos de las ediciones anteriores, ganadores e inscripción para la próxima fecha.",
 };
 
 export default function TorneosPage() {
@@ -64,8 +63,8 @@ export default function TorneosPage() {
             </a>
           </div>
 
-          {/* CUADROS Y LLAVES EN VIVO */}
-          <TournamentBracket />
+          {/* Cuadros "en vivo": ocultos hasta tener datos reales del torneo
+              (el componente, con jugadores de ejemplo, queda en components/). */}
         </div>
 
         <TorneosGallery />
