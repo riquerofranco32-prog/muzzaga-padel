@@ -393,7 +393,9 @@ select:focus-visible,
 .btn-secondary:hover {
   background: var(--color-canvas-soft);
   border-color: #b0b4ba;
-  color: #000000;
+  /* Tinta y no negro fijo: en modo oscuro el fondo del hover es oscuro y el
+     texto negro desaparecía (1,1:1). */
+  color: var(--color-ink);
   transform: translateY(-1px);
 }
 
@@ -2144,8 +2146,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
   cursor: pointer;
   white-space: nowrap;
   transition:
-    transform var(--t-estado) var(--ease),
-    opacity var(--t-estado) var(--ease);
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   font-family: var(--font-sans);
 }
 

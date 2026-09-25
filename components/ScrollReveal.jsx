@@ -22,20 +22,34 @@ export default function ScrollReveal() {
       el.style.setProperty("--i", Math.min(siblings.indexOf(el), 6));
     });
 
+    const timers = [];
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            io.unobserve(entry.target);
-          }
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          el.classList.add("in-view");
+          io.unobserve(el);
+          // Terminada la entrada (500 ms más su escalonado), la tarjeta
+          // vuelve a sus transiciones propias. Si no, el hover heredaba los
+          // 500 ms y la demora de la entrada.
+          const i = Number(el.style.getPropertyValue("--i")) || 0;
+          timers.push(
+            setTimeout(() => {
+              el.classList.remove("reveal-up", "in-view");
+              el.style.removeProperty("--i");
+            }, 500 + i * 60 + 250),
+          );
         });
       },
       { threshold: 0.15 },
     );
     targets.forEach((el) => io.observe(el));
 
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      timers.forEach(clearTimeout);
+    };
   }, []);
 
   return null;

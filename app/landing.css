@@ -2161,3 +2161,37 @@ body {
 .section-more-link:active {
   transform: scale(0.98);
 }
+
+/* 6.3 · Estos tres subían 1 px de golpe: su regla base no transicionaba
+   transform (la tenía solo el ícono de adentro). */
+.hero-btn-ghost,
+.spec-tab,
+.section-more-link {
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
+}
+
+/* 5.1 · Las cifras del hero quedan fuera del velo del texto y, con la foto
+   al 100 %, sus etiquetas bajaban de 4,5:1 sobre las líneas claras de la
+   cancha. Un velo propio, suave, que se apaga a los costados. */
+.hero-stats {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-stats::before {
+  content: "";
+  position: absolute;
+  inset: -20px -24px -16px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 15, 13, 0) 0%,
+    rgba(15, 15, 13, 0.5) 30%,
+    rgba(15, 15, 13, 0.55) 100%
+  );
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
