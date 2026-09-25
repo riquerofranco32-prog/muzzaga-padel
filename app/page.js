@@ -358,7 +358,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <FloatingLiveBar />
+      <FloatingLiveBar schedule={config.schedule} blockedDates={config.blockedDates} />
       <MascotFloatHelper />
       <Footer />
       <BottomNav />
