@@ -551,6 +551,11 @@ body {
   .ticker-track {
     animation: tickerMove 38s linear infinite;
   }
+
+  /* Tarjeta del ayudante flotante (antes pedía fadeInUp, que no existe). */
+  .mascot-float-card {
+    animation: floatIn var(--t-estado) var(--ease);
+  }
 }
 
 @keyframes tickerMove {

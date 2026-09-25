@@ -15,6 +15,7 @@ export default function MascotFloatHelper() {
       {/* POPUP / GREETING CARD */}
       {isOpen && (
         <div
+          className="mascot-float-card"
           style={{
             marginBottom: 12,
             background: "#ffffff",
@@ -25,7 +26,6 @@ export default function MascotFloatHelper() {
             maxWidth: 270,
             width: "calc(100vw - 48px)",
             position: "relative",
-            animation: "fadeInUp var(--t-estado) var(--ease-mascota)",
           }}
         >
           <button

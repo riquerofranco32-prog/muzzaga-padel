@@ -913,8 +913,13 @@ select:focus-visible,
   align-items: flex-end;
   gap: 18px;
   width: max-content;
-  animation: marqueeContinuous 42s linear infinite;
-  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marqueeContinuous 42s linear infinite;
+    will-change: transform;
+  }
 }
 
 /* Alturas alternadas: todas las cards a 230px quedaba muy plano para una
@@ -4974,7 +4979,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-size: 13.5px;
   letter-spacing: 0.04em;
   margin-bottom: 16px;
-  animation: pulseGlow 1.8s infinite var(--ease);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .golden-point-banner {
+    animation: pulseGlow 1.8s infinite var(--ease);
+  }
 }
 
 @keyframes pulseGlow {
@@ -6190,13 +6200,18 @@ textarea:focus-visible {
 }
 
 
+/* Red de seguridad para lo que no tenga su propia guardia. Las demoras
+   también van a cero: si no, lo que entra con "both" quedaba invisible hasta
+   360 ms y aparecía de golpe. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
 }

@@ -6,7 +6,7 @@
 // son las reales del club (public/img), no placeholders de stock.
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, MotionConfig } from "motion/react";
 
 const ICON_PROPS = {
   viewBox: "0 0 24 24",
@@ -176,7 +176,10 @@ export default function FeatureCarousel() {
     return "hidden";
   };
 
+  // Con "reducir movimiento" motion deja las fotos quietas y solo cambia la
+  // opacidad.
   return (
+    <MotionConfig reducedMotion="user">
     <div className="fc-wrap">
       <div className="fc-frame">
         <div className="fc-nav">
@@ -276,5 +279,6 @@ export default function FeatureCarousel() {
         </div>
       </div>
     </div>
+    </MotionConfig>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createBooking } from "../app/actions";
 import BookingPassModal from "./BookingPassModal";
 import { MaybePortal } from "./Portal";
+import { scrollBehavior } from "../lib/motion";
 import useMediaQuery from "../lib/useMediaQuery";
 import { COURTS, nextDays, priceForSlot, todayInClub } from "../lib/booking";
 import { PICK_SLOT_EVENT } from "../lib/pickSlot";
@@ -114,7 +115,7 @@ export default function BookingCalendar({ serverToday }) {
   // scrollear a mano para verlo.
   useEffect(() => {
     if (!selected || !formRef.current) return;
-    formRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    formRef.current.scrollIntoView({ behavior: scrollBehavior(), block: "center" });
     const firstInput = formRef.current.querySelector("input");
     firstInput?.focus({ preventScroll: true });
   }, [selected, isDrawer]);

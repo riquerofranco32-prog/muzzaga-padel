@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { COURTS, nowInClubTimezone, nextDays } from "../lib/booking";
 import { requestSlotPick } from "../lib/pickSlot";
+import { scrollBehavior } from "../lib/motion";
 
 // Chips de relleno mientras llega la disponibilidad: misma estructura y mismo
 // alto que los reales, así la tarjeta ocupa su lugar desde el primer render y
@@ -53,7 +54,7 @@ export default function TodayFlashSlots() {
   }
 
   function handleSelectSlot(slot) {
-    document.getElementById("turnos")?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById("turnos")?.scrollIntoView({ behavior: scrollBehavior() });
     requestSlotPick({ date: activeDate, courtId: slot.courtId, start: slot.start });
   }
 
