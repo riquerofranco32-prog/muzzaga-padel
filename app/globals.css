@@ -629,13 +629,9 @@ select:focus-visible,
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-lg);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: 8px;
   z-index: 200;
-  /* Con los links de herramientas en columna el panel es más alto: en un
-     celular horizontal scrollea adentro en vez de salirse de la pantalla. */
   max-height: calc(100dvh - 92px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   transform: translateY(-12px);
   opacity: 0;
   pointer-events: none;
@@ -648,6 +644,59 @@ select:focus-visible,
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
+}
+
+/* Si no entra (celu chico o acostado) scrollea esto, con el borde de abajo
+   difuminado mientras quede algo; el recuadro del panel no se corta. */
+.mobile-nav-scroll {
+  min-height: 0;
+  padding: 8px;
+  overscroll-behavior: contain;
+}
+
+/* Herramientas en dos columnas y Maps + WhatsApp en un renglón: así el
+   panel entra entero en un celular de 667 px de alto. */
+.mobile-nav-group {
+  border-top: 1px solid var(--color-hairline);
+  margin: 8px 0 4px;
+  padding-top: 8px;
+}
+
+.mobile-nav-group-title {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding: 6px 14px 2px;
+}
+
+.mobile-nav-tools,
+.mobile-nav-contact {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 4px;
+}
+
+.mobile-nav-tools .mobile-nav-link,
+.mobile-nav-contact .mobile-nav-link {
+  padding-inline: 12px;
+}
+
+.mobile-nav-contact {
+  border-top: 1px solid var(--color-hairline);
+  padding-top: 4px;
+}
+
+/* Con la barra de abajo visible el panel termina antes: antes seguía por
+   detrás de la barra y los últimos links quedaban tapados. */
+@media (max-width: 768px), (max-width: 1180px) and (max-height: 500px) {
+  .mobile-nav-panel {
+    max-height: calc(
+      100dvh - 76px - var(--bottom-bar-h) - env(safe-area-inset-bottom, 0px) - 12px
+    );
+  }
 }
 
 .mobile-nav-link {

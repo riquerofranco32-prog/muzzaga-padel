@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import ScrollRow from "./ScrollRow";
 
 const NAV_LINKS = [
   { href: "/#turnos", label: "Turnos" },
@@ -13,7 +14,8 @@ const NAV_LINKS = [
 ];
 
 const TOOLS_LINKS = [
-  { href: "/herramientas/dividir-gastos", label: "Calculadora de gastos", desc: "Dividir cancha y cantina" },
+  // `short`: el menú de celu los muestra en dos columnas.
+  { href: "/herramientas/dividir-gastos", label: "Calculadora de gastos", short: "Dividir gastos", desc: "Dividir cancha y cantina" },
   { href: "/herramientas/nivel", label: "Test de nivel", desc: "Calculá tu categoría de pádel" },
   { href: "/herramientas/pizarra", label: "Pizarra táctica", desc: "Simulador interactivo de jugadas" },
   { href: "/herramientas/americano", label: "Torneo americano", desc: "Generador de fixtures express" },
@@ -208,6 +210,7 @@ export default function Header() {
         className={`mobile-nav-panel${open ? " open" : ""}`}
         inert={!open}
       >
+        <ScrollRow axis="y" className="mobile-nav-scroll">
         <a
           href="/#turnos"
           className="btn btn-orange-primary"
@@ -228,23 +231,23 @@ export default function Header() {
           </a>
         ))}
 
-        <div style={{ borderTop: "1px solid var(--color-hairline)", margin: "10px 0", paddingTop: 10 }}>
-          <span style={{ display: "block", fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em", padding: "8px 14px 4px" }}>
-            Herramientas del Club
-          </span>
-          {TOOLS_LINKS.map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="mobile-nav-link"
-              onClick={() => setOpen(false)}
-              style={{ fontSize: 14 }}
-            >
-              {tool.label}
-            </Link>
-          ))}
+        <div className="mobile-nav-group">
+          <span className="mobile-nav-group-title">Herramientas del club</span>
+          <div className="mobile-nav-tools">
+            {TOOLS_LINKS.map((tool) => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className="mobile-nav-link"
+                onClick={() => setOpen(false)}
+              >
+                {tool.short || tool.label}
+              </Link>
+            ))}
+          </div>
         </div>
 
+        <div className="mobile-nav-contact">
         <a
           className="mobile-nav-link maps-text"
           href={MAPS_URL}
@@ -266,8 +269,10 @@ export default function Header() {
             fontWeight: 600,
           }}
         >
-          <WhatsAppIcon /> WhatsApp del club →
+          <WhatsAppIcon /> WhatsApp
         </a>
+        </div>
+        </ScrollRow>
       </div>
       <div
         id="mobile-nav-backdrop"
