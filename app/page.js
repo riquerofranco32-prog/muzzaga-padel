@@ -47,7 +47,7 @@ const TICKER_ITEMS = [
   "Turnos de 90 min",
   "Canchas Abiertas",
   "Torneos todo el año",
-  "Cantina & tercer tiempo",
+  "Cantina y tercer tiempo",
   "Catriel · Río Negro",
 ];
 

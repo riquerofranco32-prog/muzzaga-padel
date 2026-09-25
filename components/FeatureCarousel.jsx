@@ -106,7 +106,7 @@ const FEATURES = [
     icon: IconCourt,
     image: "/img/court_bench_players.jpg",
     alt: "Cancha de cristal con césped azul y un banco al costado",
-    description: "2 canchas de cristal profesionales con rebote homogéneo.",
+    description: "2 canchas de cristal templado con rebote parejo.",
   },
   {
     id: "led",

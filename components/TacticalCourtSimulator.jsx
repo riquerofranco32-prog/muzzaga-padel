@@ -75,7 +75,7 @@ const PRESET_TACTICS = [
         desc: "Impacto a las 12 en punto con 'muñecazo' hacia afuera.",
       },
       {
-        phase: "3. Rebote Cristal",
+        phase: "3. Rebote en el cristal",
         desc: "Impacto en el cristal de fondo a más de 2,5 m de altura.",
       },
       {
@@ -155,7 +155,7 @@ const PRESET_TACTICS = [
         desc: "La pelota cae a los pies del rival obligándolo a levantar.",
       },
       {
-        phase: "4. Volea Firme",
+        phase: "4. Volea firme",
         desc: "Paso adelante de tu pareja para liquidar en la red.",
       },
     ],
@@ -402,7 +402,7 @@ export default function TacticalCourtSimulator() {
               className={`rating-tab-btn${boardMode === "free" ? " active" : ""}`}
               onClick={() => setBoardMode("free")}
             >
-              Pizarra Libre
+              Pizarra libre
             </button>
           </div>
         </div>
@@ -435,7 +435,7 @@ export default function TacticalCourtSimulator() {
                     ? "Animación en vivo"
                     : boardMode === "rope"
                       ? "Sincronía de pareja"
-                      : "Modo Libre"}
+                      : "Modo libre"}
                 </span>
               </div>
 
@@ -1266,10 +1266,10 @@ export default function TacticalCourtSimulator() {
                     }}
                   >
                     {[
-                      { id: "p1", name: "J1 (Tu Jugador)", color: "#E8722A" },
-                      { id: "p2", name: "J2 (Tu Pareja)", color: "#E8722A" },
-                      { id: "r1", name: "R1 (Rival Drive)", color: "#38bdf8" },
-                      { id: "r2", name: "R2 (Rival Revés)", color: "#38bdf8" },
+                      { id: "p1", name: "J1 (tu jugador)", color: "#E8722A" },
+                      { id: "p2", name: "J2 (tu pareja)", color: "#E8722A" },
+                      { id: "r1", name: "R1 (rival de drive)", color: "#38bdf8" },
+                      { id: "r2", name: "R2 (rival de revés)", color: "#38bdf8" },
                     ].map((btn) => (
                       <button
                         key={btn.id}

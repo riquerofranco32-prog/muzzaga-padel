@@ -22,10 +22,10 @@ function CategoryIcon({ id }) {
 }
 
 const LOCATION_NAMES = {
-  "cancha-1": "Cancha 1 (Pista de Cristal)",
-  "cancha-2": "Cancha 2 (Pista de Cristal)",
-  "cancha1": "Cancha 1 (Pista de Cristal)",
-  "cancha2": "Cancha 2 (Pista de Cristal)",
+  "cancha-1": "Cancha 1 (cristal)",
+  "cancha-2": "Cancha 2 (cristal)",
+  "cancha1": "Cancha 1 (cristal)",
+  "cancha2": "Cancha 2 (cristal)",
   "mesa-1": "Mesa 1 (Cantina)",
   "mesa-2": "Mesa 2 (Cantina)",
   "mesa-3": "Mesa 3 (Cantina)",
@@ -313,7 +313,7 @@ export default function MenuClient() {
           Reservá tu turno de 90 minutos y asegurate el mejor tercer tiempo en Catriel.
         </p>
         <Link href="/#turnos" className="btn btn-linear-primary" style={{ padding: "10px 24px" }}>
-          Reservar Cancha →
+          Reservar cancha →
         </Link>
       </div>
     </div>

@@ -7,7 +7,7 @@ export const MENU_ITEMS = [
   { id: "pizza_napo", category: "buffet", name: "Pizza napo", price: 20000, featured: true },
   { id: "pizza_especial", category: "buffet", name: "Pizza especial", price: 22000, featured: true },
   { id: "pizza_stacc", category: "buffet", name: "Pizza sin TACC", price: 18000, tag: "Sin TACC" },
-  { id: "pizza_vegana", category: "buffet", name: "Pizza vegana", price: 25000, tag: "Vegana" },
+  // "Pizza vegana" fuera hasta que el club confirme que la tiene (ver 2.8).
   { id: "tostados", category: "buffet", name: "Tostados", price: 14000, featured: true },
   { id: "empanada_unidad", category: "buffet", name: "Empanada (unidad)", price: 2000, featured: true },
   { id: "empanadas_docena", category: "buffet", name: "Docena de empanadas", price: 24000 },

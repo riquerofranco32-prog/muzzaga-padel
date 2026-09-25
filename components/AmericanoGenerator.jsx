@@ -144,7 +144,7 @@ export default function AmericanoGenerator() {
               <div>
                 <span className="badge-linear badge-emerald">Fixture automático</span>
                 <h3 style={{ fontSize: 17, color: "var(--text-primary)", margin: "4px 0 0" }}>
-                  Rondas &amp; Cruces de Parejas
+                  Rondas y cruces de parejas
                 </h3>
               </div>
 

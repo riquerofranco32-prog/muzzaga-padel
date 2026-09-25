@@ -242,7 +242,7 @@ export default function BookingPassModal({
           {/* FINANCIALS */}
           <div className="pass-financial-row">
             <div>
-              <span className="pass-label">Total Cancha (90 min)</span>
+              <span className="pass-label">Total cancha (90 min)</span>
               <div className="pass-price-val">
                 ${booking.total.toLocaleString("es-AR")}
               </div>
@@ -286,7 +286,7 @@ export default function BookingPassModal({
                       className={`pass-copy-btn${copiedField === "alias" ? " copied" : ""}`}
                       onClick={() => copyValue("alias", REAL_ALIAS)}
                     >
-                      {copiedField === "alias" ? "Copiado" : "Copiar Alias"}
+                      {copiedField === "alias" ? "Copiado" : "Copiar alias"}
                     </button>
                   </div>
                 )}
@@ -325,9 +325,7 @@ export default function BookingPassModal({
                   margin: 0,
                 }}
               >
-                Te confirmamos el alias o CBU para la seña por WhatsApp al
-                coordinar el turno — así evitamos pasarte un dato de pago
-                desactualizado.
+                Consultá el alias por WhatsApp o en el mostrador.
               </p>
             )}
           </div>

@@ -27,7 +27,7 @@ test("buildSplitCostMessage formats court and extras correctly", () => {
   assert.ok(msg.includes("2x Heineken 1L: $8.400"));
   assert.ok(msg.includes("1x Pizza Muzzarella: $9.500"));
   // Total: 32000 + 8400 + 9500 = 49900. 49900 / 4 = 12475
-  assert.ok(msg.includes("Total General: $49.900"));
+  assert.ok(msg.includes("Total: $49.900"));
   assert.ok(msg.includes("$12.475"));
   assert.ok(msg.includes("lucas.padel.mp"));
 });

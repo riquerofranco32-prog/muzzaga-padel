@@ -47,7 +47,7 @@ export default function Footer() {
               }}
             >
               Club de pádel en Catriel, Río Negro. Canchas de cristal
-              profesionales, torneos y cantina propia.
+              templado, torneos y cantina propia.
             </p>
 
             <div className="footer-mascot-box">
@@ -154,7 +154,7 @@ export default function Footer() {
                   rel="noopener"
                   className="maps-text"
                 >
-                  <GoogleMapsIcon /> Google Maps Oficial
+                  <GoogleMapsIcon /> Google Maps
                 </a>
               </div>
             </div>

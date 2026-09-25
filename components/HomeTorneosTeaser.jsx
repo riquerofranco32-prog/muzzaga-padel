@@ -25,13 +25,13 @@ const FEATURED_PHOTOS = [
   },
   {
     src: "/img/torneos/agosto/jugadores_01.jpg",
-    alt: "Partido en cancha de cristal, Torneo Agosto 2026",
-    label: "Fase de grupos",
+    alt: "Cuatro jugadores posando en la red, Torneo Agosto 2026",
+    label: "Caballeros de agosto",
   },
   {
     src: "/img/torneos/agosto/jugadores_06.jpg",
-    alt: "Jugadores en acción, Torneo Agosto 2026",
-    label: "Definición en la red",
+    alt: "Cuatro jugadoras posando en la red, Torneo Agosto 2026",
+    label: "Damas de agosto",
   },
   {
     src: "/img/torneos/junio/jugadores_12.jpg",
@@ -114,7 +114,7 @@ export default function HomeTorneosTeaser() {
 
         <div className="section-more">
           <Link href="/torneos" className="section-more-link">
-            Ver galería completa y fixture <span aria-hidden="true">→</span>
+            Ver galería completa <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>

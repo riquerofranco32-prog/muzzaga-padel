@@ -109,7 +109,7 @@ export default function SplitCostCalculator() {
             <div className="split-section-header">
               <span className="split-step-badge">1</span>
               <div>
-                <h3 className="split-step-title">Turno de Cancha (90 min)</h3>
+                <h3 className="split-step-title">Turno de cancha (90 min)</h3>
                 <p className="split-step-desc">
                   Tarifa fija para todos los días y horarios
                 </p>
