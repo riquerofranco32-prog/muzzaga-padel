@@ -658,8 +658,8 @@ select:focus-visible,
    panel entra entero en un celular de 667 px de alto. */
 .mobile-nav-group {
   border-top: 1px solid var(--color-hairline);
-  margin: 8px 0 4px;
-  padding-top: 8px;
+  margin: 4px 0 2px;
+  padding-top: 6px;
 }
 
 .mobile-nav-group-title {

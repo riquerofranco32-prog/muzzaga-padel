@@ -18,7 +18,7 @@ const TOOLS_LINKS = [
   { href: "/herramientas/dividir-gastos", label: "Calculadora de gastos", short: "Dividir gastos", desc: "Dividir cancha y cantina" },
   { href: "/herramientas/nivel", label: "Test de nivel", desc: "Calculá tu categoría de pádel" },
   { href: "/herramientas/pizarra", label: "Pizarra táctica", desc: "Simulador interactivo de jugadas" },
-  { href: "/herramientas/americano", label: "Torneo americano", desc: "Generador de fixtures express" },
+  { href: "/herramientas/americano", label: "Torneo americano", short: "Americano", desc: "Generador de fixtures express" },
 ];
 
 const MAPS_URL = "https://maps.app.goo.gl/kR1h9mhdLqGLKatV7";
