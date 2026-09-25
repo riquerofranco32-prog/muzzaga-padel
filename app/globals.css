@@ -6182,24 +6182,162 @@ textarea:focus-visible {
   transform-origin: center bottom;
 }
 
-.mascot-section-badge {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ==========================================================================
+   MASCOTA · sistema
+   Tres tamaños: XL en el hero (lo maneja landing.css), M en encabezados de
+   sección y tarjetas, S en footer y ayudante. Solo la del hero reacciona
+   (inclinación y flotación); las demás entran una vez y quedan quietas.
+   Ninguna pisa un control: cada una tiene su lugar en el flujo, sin
+   position absolute ni márgenes negativos sobre lo que sigue.
+   Está acá y no en landing.css porque el footer (y sus mascotas) también
+   se ve en las subpáginas, que no cargan landing.css.
+   ========================================================================== */
+:root {
+  --mascota-m: 160px;
+  --mascota-s: 96px;
 }
 
-.mascot-section-img {
-  width: clamp(105px, 14vw, 152px);
+@media (max-width: 900px) {
+  :root {
+    --mascota-m: 120px;
+  }
+}
+
+/* Encabezado con mascota: texto a la izquierda, mascota en su columna.
+   La mascota sola (sin botón) queda al costado del título también en
+   tablet, donde el resto de los encabezados se apila. */
+.section-header-row:has(.mascot-section-badge) {
+  flex-wrap: nowrap;
+  gap: 24px;
+}
+
+.section-header-row:has(> .mascot-section-badge) {
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.section-header-row:has(.mascot-section-badge) > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mascot-section-badge {
+  position: static;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mascot-section-img,
+.flash-mascot,
+.footer-mascot {
+  display: block;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.16));
-  transition: transform var(--t-estado) var(--ease-mascota);
-  display: block;
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.3));
+  transform-origin: center bottom;
+  transition: transform var(--t-estado) var(--ease);
 }
 
-.mascot-section-img:hover {
-  transform: translateY(-6px) scale(1.05);
+.mascot-section-img,
+.flash-mascot {
+  width: var(--mascota-m);
+}
+
+/* Mascota + botón: la mascota arriba, el botón abajo, sin tocarse. */
+.header-aside {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* Al pasar el mouse, un giro chico. Sin resorte y sin moverse con el
+   scroll: eso queda para la del hero. */
+@media (hover: hover) {
+  .mascot-section-img:hover,
+  .flash-mascot:hover,
+  .footer-mascot-box:hover .footer-mascot {
+    transform: rotate(-3deg);
+  }
+}
+
+/* Entrada: una sola vez, cuando el encabezado entra en pantalla. */
+@media (prefers-reduced-motion: no-preference) {
+  .section-header-row.reveal-up .mascot-section-badge {
+    opacity: 0;
+    transform: translateY(16px) scale(0.94);
+    transition:
+      opacity var(--t-entrada) var(--ease-mascota),
+      transform var(--t-entrada) var(--ease-mascota);
+    transition-delay: 120ms;
+  }
+
+  .section-header-row.reveal-up.in-view .mascot-section-badge {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Turnos flash: la mascota en su celda, a la izquierda, apoyada abajo. */
+.flash-card > .flash-mascot {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin: 0;
+}
+
+/* Footer: tamaño S, al lado del texto. */
+.footer-mascot-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 380px;
+  margin-top: 40px;
+  padding: 12px 16px 12px 12px;
+  border-radius: 18px;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+}
+
+.footer-mascot {
+  flex: 0 0 auto;
+  width: var(--mascota-s);
+}
+
+.footer-mascot-text {
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* Celu: los encabezados se apilan y no hay columna libre para la mascota
+   sin achicar el título; queda la del hero, la del footer y la del estado
+   vacío de Canchas Abiertas. */
+@media (max-width: 768px) {
+  /* Encabezado apilado: botón a la izquierda, mascota a la derecha. */
+  .header-aside {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .header-aside .mascot-section-badge {
+    order: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-header-row .mascot-section-badge,
+  .flash-card > .flash-mascot {
+    display: none;
+  }
+
+  .header-aside > :not(.mascot-section-badge) {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 }
 
 

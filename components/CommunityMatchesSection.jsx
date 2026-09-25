@@ -104,7 +104,7 @@ export default function CommunityMatchesSection() {
   return (
     <section id="canchas-abiertas" className="section-community">
       <div className="container">
-        <div className="section-header-row" style={{ alignItems: "center" }}>
+        <div className="section-header-row">
           <div>
             <span
               className="badge-linear badge-amber"
