@@ -578,12 +578,6 @@ select:focus-visible,
   letter-spacing: -0.02em;
 }
 
-.brand-sub {
-  font-size: 12px;
-  color: var(--color-muted);
-  margin-left: 4px;
-}
-
 .nav-links-row {
   display: flex;
   align-items: center;

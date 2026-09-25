@@ -80,10 +80,7 @@ export default function Header() {
                 display: "block",
               }}
             />
-            <div>
-              <span className="brand-text">Muzzaga</span>
-              <span className="brand-sub">Catriel</span>
-            </div>
+            <span className="brand-text">Muzzaga</span>
           </Link>
 
           <nav className="nav-links-row" aria-label="Navegación principal">
