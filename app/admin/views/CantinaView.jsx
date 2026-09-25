@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Ban,
+  ClipboardList,
   Coins,
   Minus,
   Plus,
@@ -28,8 +29,15 @@ import {
   adminSettleCantinaSale,
   adminVoidCantinaSale,
   adminDeleteCantinaSale,
+  adminGetCantinaOrders,
+  adminSetCantinaOrderStatus,
   getAdminDayData,
 } from "../actions";
+import {
+  OPEN_ORDER_STATUSES,
+  ORDER_STATUS_LABELS,
+  payLabel,
+} from "../../../lib/cantinaOrder";
 import { MENU_CATEGORIES, MENU_ITEMS } from "../../../data/menu";
 import StaffPinModal from "../ui/StaffPinModal";
 import { todayInClub } from "../../../lib/booking";
@@ -44,6 +52,8 @@ const ICON = { size: 16, strokeWidth: 1.75, "aria-hidden": true };
 const METHODS = [...PAYMENT_METHODS, { value: "cuenta", label: "A cuenta" }];
 const methodLabel = (m) => METHODS.find((x) => x.value === m)?.label || m;
 const QUICK_FAVORITE_IDS = ["agua_500", "gatorade_500", "corona_330", "tubo_pelotas"];
+// Cada cuánto se buscan pedidos nuevos de la carta mientras la vista está abierta.
+const ORDERS_POLL_MS = 20000;
 // Las categorías del menú público traen emoji adelante; en el admin, texto solo.
 const plainLabel = (label) => String(label || "").replace(/^[^\p{L}\p{N}]+/u, "");
 const categoryLabel = (id) =>
@@ -72,7 +82,89 @@ export default function CantinaView({ onExpiredSession, onToast }) {
   const [voiding, setVoiding] = useState(null); // venta a anular
   const [voidReason, setVoidReason] = useState("");
   const [deletingSale, setDeletingSale] = useState(null);
+  const [orders, setOrders] = useState(null); // pedidos de la carta del día
+  const [pendingOrder, setPendingOrder] = useState(null); // el que se está cobrando
+  const [confirmCancel, setConfirmCancel] = useState(null);
+  const seenOrderIds = useRef(null);
   const searchRef = useRef(null);
+
+  async function loadOrders() {
+    const res = await adminGetCantinaOrders(date);
+    if (!res.ok) {
+      onExpiredSession?.(res);
+      return;
+    }
+    // Aviso de los que entraron desde la última vez (no en la primera carga).
+    const fresh = seenOrderIds.current
+      ? res.orders.filter((o) => o.status === "nuevo" && !seenOrderIds.current.has(o.id))
+      : [];
+    seenOrderIds.current = new Set(res.orders.map((o) => o.id));
+    fresh.forEach((o) =>
+      onToast?.(`Nuevo pedido de la carta · #${o.code} · ${o.name} · ${formatARS(o.total)}`),
+    );
+    setOrders(res.orders);
+  }
+
+  useEffect(() => {
+    seenOrderIds.current = null;
+    setOrders(null);
+    loadOrders();
+    if (date !== todayInClub()) return;
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") loadOrders();
+    }, ORDERS_POLL_MS);
+    return () => clearInterval(id);
+  }, [date]);
+
+  async function setOrderStatus(order, status, { saleId, undo } = {}) {
+    const res = await adminSetCantinaOrderStatus(order.id, status, saleId);
+    setConfirmCancel(null);
+    if (!res.ok) {
+      if (res.orderChanged) loadOrders();
+      if (!onExpiredSession?.(res)) {
+        onToast?.(res.error || "No se pudo actualizar el pedido.", { tone: "error" });
+      }
+      return false;
+    }
+    if (pendingOrder?.id === order.id && status === "cancelado") {
+      setPendingOrder(null);
+      setCart([]);
+    }
+    loadOrders();
+    const from = order.status;
+    onToast?.(
+      `Pedido #${order.code} · ${ORDER_STATUS_LABELS[status].toLowerCase()}`,
+      undo
+        ? {
+            action: {
+              label: "Deshacer",
+              onClick: () => setOrderStatus({ ...order, status }, from),
+            },
+          }
+        : undefined,
+    );
+    return true;
+  }
+
+  /** Pasa el pedido a la venta actual para cobrarlo con el método que sea. */
+  function chargeOrder(order) {
+    // Si había otra venta a medio armar, se reemplaza: que quede dicho.
+    const replaced = cart.length > 0 && pendingOrder?.id !== order.id;
+    setCart(
+      (order.items || []).map((it) => ({ name: it.name, price: it.price, qty: it.qty })),
+    );
+    setPendingOrder({ id: order.id, code: order.code, name: order.name });
+    setIsCartOpen(true);
+    onToast?.(
+      `Pedido #${order.code} en la venta: elegí cómo lo pagan.${replaced ? " La venta que estaba armada se descartó." : ""}`,
+    );
+  }
+
+  // Si la venta queda vacía (tacho o "−"), el pedido de la carta se suelta:
+  // si no, la próxima venta cualquiera lo daba por cobrado.
+  useEffect(() => {
+    if (cart.length === 0) setPendingOrder(null);
+  }, [cart.length]);
 
   useEffect(() => {
     loadSales();
@@ -148,14 +240,23 @@ export default function CantinaView({ onExpiredSession, onToast }) {
       return;
     }
     setSubmitting(true);
+    // Con un pedido de la carta, la misma venta lo cobra y lo pasa a cocina
+    // (se prepara recién pago); si ya lo cobró otra pantalla, no se registra.
+    const chargedOrder = pendingOrder;
     const res = await adminAddCantinaSale({
       date,
       items: cart,
       method,
       chargeTo: method === "cuenta" ? chargeTo : undefined,
+      orderId: chargedOrder?.id,
     });
     setSubmitting(false);
     if (!res.ok) {
+      if (res.orderChanged) {
+        setPendingOrder(null);
+        setCart([]);
+        loadOrders();
+      }
       if (!onExpiredSession?.(res)) {
         onToast?.(res.error || "No se pudo registrar la venta.", {
           tone: "error",
@@ -166,19 +267,25 @@ export default function CantinaView({ onExpiredSession, onToast }) {
     setCart([]);
     setIsCartOpen(false);
     loadSales();
+    if (chargedOrder) {
+      setPendingOrder(null);
+      loadOrders();
+    }
     const account = dayBookings.find((b) => b.id === chargeTo);
     onToast?.(
-      method === "cuenta"
-        ? `Cargado a la cuenta de ${account?.playerName || "el turno"} · ${formatARS(res.total)}`
-        : `Venta registrada · ${formatARS(res.total)}`,
+      chargedOrder
+        ? `Pedido #${chargedOrder.code} cobrado · ${formatARS(res.total)}: ya puede ir a la cocina`
+        : method === "cuenta"
+          ? `Cargado a la cuenta de ${account?.playerName || "el turno"} · ${formatARS(res.total)}`
+          : `Venta registrada · ${formatARS(res.total)}`,
       {
         action: {
           label: "Deshacer",
           onClick: async () => {
-            const undo = await adminVoidCantinaSale(
-              res.saleId,
-              "Deshecha al registrar",
-            );
+            const undo = await adminVoidCantinaSale({
+              saleId: res.saleId,
+              reason: "Deshecha al registrar",
+            });
             if (!undo.ok) {
               onToast?.(undo.error || "No se pudo deshacer la venta.", {
                 tone: "error",
@@ -186,6 +293,12 @@ export default function CantinaView({ onExpiredSession, onToast }) {
               return;
             }
             loadSales();
+            // El pedido que se cobró con esa venta vuelve a esperar el pago.
+            if (chargedOrder) {
+              await setOrderStatus({ ...chargedOrder, status: "preparando" }, "nuevo", {
+                saleId: res.saleId,
+              });
+            }
             onToast?.("Venta deshecha");
           },
         },
@@ -195,7 +308,10 @@ export default function CantinaView({ onExpiredSession, onToast }) {
   }
 
   async function confirmVoid() {
-    const res = await adminVoidCantinaSale(voiding.id, voidReason);
+    const res = await adminVoidCantinaSale({
+      saleId: voiding.id,
+      reason: voidReason,
+    });
     if (res.ok) {
       setVoiding(null);
       setVoidReason("");
@@ -252,6 +368,10 @@ export default function CantinaView({ onExpiredSession, onToast }) {
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
   }
 
+  const orderList = orders || [];
+  const openOrders = orderList.filter((o) => OPEN_ORDER_STATUSES.includes(o.status));
+  const closedOrders = orderList.filter((o) => !OPEN_ORDER_STATUSES.includes(o.status));
+
   const salesList = sales || [];
   const dayTotal = computeDailyCash({ sales: salesList }).cobradoCantina;
   const onAccount = onAccountTotal(salesList);
@@ -293,7 +413,10 @@ export default function CantinaView({ onExpiredSession, onToast }) {
           <button
             type="button"
             className="admin-link-btn"
-            onClick={() => setCart([])}
+            onClick={() => {
+              setCart([]);
+              setPendingOrder(null);
+            }}
           >
             Vaciar
           </button>
@@ -307,6 +430,13 @@ export default function CantinaView({ onExpiredSession, onToast }) {
           <X {...ICON} />
         </button>
       </div>
+
+      {pendingOrder && (
+        <p className="admin-order-charging">
+          Cobrando el pedido de la carta <strong>#{pendingOrder.code}</strong> ·{" "}
+          {pendingOrder.name}
+        </p>
+      )}
 
       {cart.length === 0 ? (
         <p className="admin-field-hint">
@@ -464,6 +594,133 @@ export default function CantinaView({ onExpiredSession, onToast }) {
           </div>
         </div>
       </div>
+
+      {/* PEDIDOS DE LA CARTA (web) */}
+      <section className="admin-web-orders" aria-labelledby="web-orders-title">
+        <h2 className="admin-section-title" id="web-orders-title">
+          <ClipboardList {...ICON} /> Pedidos de la carta
+          {openOrders.length > 0 && (
+            <span className="admin-tag admin-order-count">
+              {plural(openOrders.length, "abierto", "abiertos")}
+            </span>
+          )}
+        </h2>
+        {!orders ? (
+          <SkeletonRows count={2} />
+        ) : openOrders.length === 0 ? (
+          <p className="admin-field-hint">
+            {closedOrders.length
+              ? "No hay pedidos abiertos. Los que entren por la carta aparecen acá solos."
+              : "Todavía no entró ningún pedido por la carta este día. Aparecen acá solos, sin recargar."}
+          </p>
+        ) : (
+          <ul className="admin-order-list">
+            {openOrders.map((o) => (
+              <li
+                key={o.id}
+                className={`admin-order is-${o.status}${pendingOrder?.id === o.id ? " is-charging" : ""}`}
+              >
+                <div className="admin-order-head">
+                  <strong className="admin-order-code">#{o.code}</strong>
+                  <span className="admin-order-time">
+                    {o.createdAt ? formatTime(o.createdAt) : "—"}
+                  </span>
+                  <span className="admin-tag" data-order-status={o.status}>
+                    {ORDER_STATUS_LABELS[o.status] || o.status}
+                  </span>
+                  <strong className="admin-order-total">{formatARS(o.total)}</strong>
+                </div>
+                <p className="admin-order-who">
+                  {o.name} · {o.deliverTo}
+                </p>
+                <p className={`admin-order-pay${o.status === "nuevo" ? " is-pending" : ""}`}>
+                  {o.status === "nuevo"
+                    ? `Sin pagar · paga ${payLabel(o.payWith)}. Cobralo para que la cocina lo empiece.`
+                    : `Pagado${o.paidAt ? ` a las ${formatTime(o.paidAt)}` : ""} · en cocina`}
+                </p>
+                <ul className="admin-order-items">
+                  {(o.items || []).map((it) => (
+                    <li key={it.id || it.name}>
+                      {it.qty}× {it.name}
+                    </li>
+                  ))}
+                </ul>
+                {o.notes && <p className="admin-order-notes">“{o.notes}”</p>}
+                <div className="admin-order-actions">
+                  {confirmCancel === o.id ? (
+                    <>
+                      <span className="admin-field-hint">¿Cancelar el pedido?</span>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setConfirmCancel(null)}
+                      >
+                        No
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary admin-order-danger"
+                        onClick={() => setOrderStatus(o, "cancelado")}
+                      >
+                        Sí, cancelar
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Se cobra antes de preparar: sin pagar solo se
+                          puede cobrar (o cancelar); pagado, entregar. */}
+                      {o.status === "nuevo" ? (
+                        <button
+                          type="button"
+                          className="btn btn-linear-primary"
+                          onClick={() => chargeOrder(o)}
+                        >
+                          Cobrar
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-linear-primary"
+                          onClick={() => setOrderStatus(o, "entregado", { undo: true })}
+                        >
+                          Entregado
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="admin-link-btn"
+                        onClick={() => setConfirmCancel(o.id)}
+                      >
+                        Cancelar
+                      </button>
+                    </>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {closedOrders.length > 0 && (
+          <details className="admin-order-history">
+            <summary>
+              Entregados y cancelados ({closedOrders.length})
+            </summary>
+            <ul>
+              {closedOrders.map((o) => (
+                <li key={o.id} className={`is-${o.status}`}>
+                  <span>
+                    #{o.code} · {o.createdAt ? formatTime(o.createdAt) : "—"} · {o.name}
+                  </span>
+                  <span className="admin-tag" data-order-status={o.status}>
+                    {ORDER_STATUS_LABELS[o.status] || o.status}
+                  </span>
+                  <strong>{formatARS(o.total)}</strong>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </section>
 
       <div className="admin-pos">
         <div className="admin-pos-catalog">

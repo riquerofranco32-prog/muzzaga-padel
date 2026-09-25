@@ -190,13 +190,14 @@ export default function TournamentBracket() {
           marginBottom: 18,
           overflowX: "auto",
           paddingBottom: 4,
+          scrollbarWidth: "none",
         }}
       >
         <button
           type="button"
           className={`booking-court-tab${activeRoundTab === "all" ? " active" : ""}`}
           onClick={() => setActiveRoundTab("all")}
-          style={{ fontSize: 12.5 }}
+          style={{ fontSize: 12.5, whiteSpace: "nowrap", flexShrink: 0 }}
         >
           Ver todo el cuadro
         </button>
@@ -206,7 +207,7 @@ export default function TournamentBracket() {
             type="button"
             className={`booking-court-tab${activeRoundTab === round.id ? " active" : ""}`}
             onClick={() => setActiveRoundTab(round.id)}
-            style={{ fontSize: 12.5, whiteSpace: "nowrap" }}
+            style={{ fontSize: 12.5, whiteSpace: "nowrap", flexShrink: 0 }}
           >
             {round.name}
           </button>

@@ -8,8 +8,6 @@
 
 :root {
   --font-display: var(--font-barlow-condensed), "Arial Narrow", sans-serif;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --orange-glow: rgba(232, 114, 42, 0.45);
   --night: #0f0f0d;
 }
@@ -43,13 +41,6 @@ body {
 .hero-night-photo img {
   object-fit: cover;
   object-position: center 40%;
-  opacity: 0.7;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero-night-photo img {
-    animation: heroKenBurns 26s ease-in-out infinite alternate;
-  }
 }
 
 .hero-night-photo::after {
@@ -59,16 +50,16 @@ body {
   background:
     radial-gradient(
       ellipse 60% 70% at 78% 45%,
-      rgba(232, 114, 42, 0.28),
+      rgba(232, 114, 42, 0.14),
       transparent 70%
     ),
     linear-gradient(
       90deg,
-      rgba(15, 15, 13, 0.96) 0%,
-      rgba(15, 15, 13, 0.78) 45%,
-      rgba(15, 15, 13, 0.45) 100%
+      rgba(15, 15, 13, 0.7) 0%,
+      rgba(15, 15, 13, 0.4) 45%,
+      rgba(15, 15, 13, 0.1) 100%
     ),
-    linear-gradient(180deg, transparent 55%, var(--night) 100%);
+    linear-gradient(180deg, transparent 70%, var(--night) 100%);
 }
 
 /* Líneas de cancha en perspectiva: textura de marca, no información. */
@@ -91,25 +82,16 @@ body {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero-court-lines path {
-    stroke-dasharray: 1400;
-    stroke-dashoffset: 1400;
-    animation: courtDraw 2.4s var(--ease-out) 0.3s forwards;
-  }
-  .hero-court-lines path:nth-child(2) {
-    animation-delay: 0.6s;
-  }
-  .hero-court-lines path:nth-child(3) {
-    animation-delay: 0.8s;
-  }
-  .hero-court-lines path:nth-child(4) {
-    animation-delay: 1s;
+  /* Antes se trazaba cada línea animando stroke-dashoffset: ahora entra el
+     SVG entero con opacidad. */
+  .hero-court-lines {
+    animation: courtDraw var(--t-entrada) var(--ease) 0.3s both;
   }
 }
 
 @keyframes courtDraw {
-  to {
-    stroke-dashoffset: 0;
+  from {
+    opacity: 0;
   }
 }
 
@@ -122,10 +104,46 @@ body {
 }
 
 .hero-night-copy {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
+}
+
+/* La foto va al 100 % con un degradado liviano; lo oscuro queda solo acá,
+   detrás del texto, y se desvanece antes de llegar a los bordes. */
+.hero-night-copy::before {
+  content: "";
+  position: absolute;
+  inset: -14% -22% -14% -40%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    rgba(15, 15, 13, 0.55),
+    rgba(15, 15, 13, 0.35) 50%,
+    transparent 75%
+  );
+}
+
+/* Celu: el texto ocupa todo el ancho, así que el velo cubre el bloque
+   entero y se apaga recién debajo de la lista de confianza. Arriba entra
+   de a poco: si arrancaba en 0,25 de golpe dibujaba una línea recta justo
+   debajo del difuminado del hero. */
+@media (max-width: 768px) {
+  .hero-night-copy::before {
+    inset: -4% -16px -10%;
+    background: linear-gradient(
+      180deg,
+      rgba(15, 15, 13, 0) 0,
+      rgba(15, 15, 13, 0.28) 32px,
+      rgba(15, 15, 13, 0.5) 35%,
+      rgba(15, 15, 13, 0.55) 88%,
+      transparent 100%
+    );
+  }
 }
 
 /* Barra "en vivo" (LiveWeatherRadar) dentro del hero */
@@ -139,17 +157,12 @@ body {
   box-shadow: none;
 }
 
-/* "Pistas cubiertas" pasa a la lista de confianza del hero. */
-.hero-night .live-weather-radar-bar > :nth-child(n + 4) {
-  display: none;
-}
-
 .hero-night .radar-divider {
   background: rgba(255, 255, 255, 0.16);
 }
 
-.hero-night .radar-status-item.highlight {
-  color: #ffb07a;
+.hero-night .radar-dot.is-open {
+  color: #34d399;
 }
 
 .hero-kicker {
@@ -227,41 +240,12 @@ body {
   box-shadow:
     0 10px 30px -6px var(--orange-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition:
-    transform 0.25s var(--ease-out),
-    box-shadow 0.25s var(--ease-out),
-    background 0.2s;
-}
-
-.hero-btn-primary::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    110deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.35) 50%,
-    transparent 70%
-  );
-  transform: translateX(-120%);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero-btn-primary::after {
-    animation: btnShine 4.5s ease-in-out 2s infinite;
-  }
   .hero-btn-primary:hover svg {
-    animation: nudgeDown 0.6s var(--ease-out);
-  }
-}
-
-@keyframes btnShine {
-  0%,
-  70% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(120%);
+    animation: nudgeDown var(--t-estado) var(--ease);
   }
 }
 
@@ -273,10 +257,7 @@ body {
 
 .hero-btn-primary:hover {
   background: #f07e36;
-  transform: translateY(-2px);
-  box-shadow:
-    0 16px 36px -8px var(--orange-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
 .hero-btn-primary:active {
@@ -297,18 +278,16 @@ body {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition:
-    background 0.2s,
-    border-color 0.2s;
 }
 
 .hero-btn-ghost span {
-  transition: transform 0.25s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .hero-btn-ghost:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 .hero-btn-ghost:hover span {
@@ -321,7 +300,8 @@ body {
   flex-wrap: wrap;
   gap: 8px 20px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.68);
+  /* Con la foto al 100 % (5.1) el 0,68 bajaba de 4,5:1 en celu. */
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .hero-trust li {
@@ -378,34 +358,12 @@ body {
   border-color: rgba(232, 114, 42, 0.18);
 }
 
+/* Loops del sitio: dos y nada más, la mascota del hero y la cinta. El resto
+   (anillo que giraba, tarjetas que flotaban al lado del precio, destello del
+   botón, Ken Burns de la foto) queda quieto para que la mascota se vea. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero-mascot-ring::before {
-    animation: spinSlow 40s linear infinite;
-  }
   .hero-mascot {
-    animation: mascotFloat 4.2s ease-in-out infinite;
-  }
-  .hero-float-price {
-    animation: floatY 5s ease-in-out infinite;
-  }
-  .hero-float-glass {
-    animation: floatY 5.5s ease-in-out 0.8s infinite reverse;
-  }
-}
-
-@keyframes spinSlow {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes floatY {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 0 -8px;
+    animation: mascotFloat 4.2s var(--ease-mascota) infinite;
   }
 }
 
@@ -486,10 +444,14 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+/* Cada celda ocupa dos filas de la grilla (cifra y etiqueta) con subgrid:
+   las cifras quedan en la misma línea aunque una etiqueta ocupe dos. */
 .hero-stat {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 2px;
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: 2px;
+  align-content: start;
   padding: 20px 20px 0;
   border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -500,11 +462,14 @@ body {
 }
 
 .hero-stat dt {
+  grid-row: 2;
   font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .hero-stat dd {
+  grid-row: 1;
+  align-self: end;
   font-family: var(--font-display);
   font-weight: 800;
   font-size: clamp(34px, 4vw, 52px);
@@ -517,51 +482,58 @@ body {
   color: var(--color-accent-orange);
 }
 
+/* Celda sin cifra ("Todo el año"): misma tipografía, más chica para que
+   entre en una línea y quede apoyada sobre su etiqueta como las demás. */
+.hero-stat dd.hero-stat-word {
+  font-size: clamp(22px, 2.3vw, 30px);
+  line-height: 1.1;
+}
+
 /* Entrada escalonada del hero */
 @media (prefers-reduced-motion: no-preference) {
   .hero-night-copy > *,
   .hero-night-visual,
   .hero-stats {
-    animation: heroRise 0.9s var(--ease-out) both;
+    animation: heroRise var(--t-entrada) var(--ease) both;
   }
   .hero-night-copy > :nth-child(1) {
-    animation-delay: 0.05s;
+    animation-delay: 0s;
   }
   .hero-night-copy > :nth-child(2) {
-    animation-delay: 0.12s;
+    animation-delay: 0.06s;
   }
   .hero-night-copy > :nth-child(3) {
-    animation-delay: 0.2s;
+    animation-delay: 0.12s;
   }
   .hero-night-copy > :nth-child(4) {
-    animation-delay: 0.32s;
+    animation-delay: 0.18s;
   }
   .hero-night-copy > :nth-child(5) {
-    animation-delay: 0.42s;
+    animation-delay: 0.24s;
   }
   .hero-night-copy > :nth-child(6) {
-    animation-delay: 0.52s;
+    animation-delay: 0.3s;
   }
   .hero-night-visual {
     animation-name: heroPop;
-    animation-duration: 1.1s;
-    animation-delay: 0.25s;
+    animation-duration: var(--t-entrada);
+    animation-delay: 0.12s;
   }
   .hero-stats {
-    animation-delay: 0.65s;
+    animation-delay: 0.36s;
   }
 
   .hero-line {
-    animation: lineUp 0.9s var(--ease-out) both;
+    animation: lineUp var(--t-entrada) var(--ease) both;
   }
   .hero-line:nth-child(1) {
-    animation-delay: 0.15s;
+    animation-delay: 0.12s;
   }
   .hero-line:nth-child(2) {
-    animation-delay: 0.24s;
+    animation-delay: 0.18s;
   }
   .hero-line:nth-child(3) {
-    animation-delay: 0.36s;
+    animation-delay: 0.24s;
   }
 }
 
@@ -591,12 +563,10 @@ body {
   from {
     opacity: 0;
     transform: translateY(0.4em);
-    clip-path: inset(0 0 100% 0);
   }
   to {
     opacity: 1;
     transform: none;
-    clip-path: inset(0 0 -20% 0);
   }
 }
 
@@ -659,12 +629,16 @@ body {
 
 /* --------------------------------------------------------------------------
    SECCIONES: encabezados numerados + tipografía display
+   Solo en la home: `:where(#top ~ *)` es "después del hero", y #top existe
+   solo acá. Sin eso, al llegar a una herramienta con el link interno (sin
+   recargar) esta hoja seguía cargada y su encabezado tomaba este estilo; al
+   entrar directo, no. :where() no suma especificidad.
    -------------------------------------------------------------------------- */
-.section-header-row {
+:where(#top ~ *) .section-header-row {
   margin-bottom: 36px;
 }
 
-.section-header-row div:has(> .section-title) > .badge-linear:first-child {
+:where(#top ~ *) .section-header-row div:has(> .section-title) > .badge-linear:first-child {
   counter-increment: landing-section;
   background: none;
   border: 0;
@@ -677,7 +651,7 @@ body {
   margin-bottom: 12px !important;
 }
 
-.section-header-row div:has(> .section-title) > .badge-linear:first-child::before {
+:where(#top ~ *) .section-header-row div:has(> .section-title) > .badge-linear:first-child::before {
   content: counter(landing-section, decimal-leading-zero);
   font-family: var(--font-display);
   font-size: 15px;
@@ -689,7 +663,7 @@ body {
   line-height: 1;
 }
 
-.section-title {
+:where(#top ~ *) .section-title {
   font-family: var(--font-display);
   font-weight: 800;
   text-transform: uppercase;
@@ -700,7 +674,7 @@ body {
   text-wrap: balance;
 }
 
-.section-desc {
+:where(#top ~ *) .section-desc {
   max-width: 56ch;
   margin-top: 12px;
   font-size: 15.5px;
@@ -708,30 +682,8 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  .section-header-row div:has(> .section-title) > .badge-linear:first-child {
+  :where(#top ~ *) .section-header-row div:has(> .section-title) > .badge-linear:first-child {
     color: #ff9a5a;
-  }
-}
-
-/* Mascotas de sección: menos protagonismo, más como sello */
-.mascot-section-img {
-  width: clamp(92px, 11vw, 128px);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .section-header-row.in-view .mascot-section-img {
-    animation: mascotWave 0.9s var(--ease-spring) 0.2s both;
-  }
-}
-
-@keyframes mascotWave {
-  from {
-    opacity: 0;
-    transform: translateY(20px) rotate(-8deg) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
@@ -809,13 +761,6 @@ body {
   flex-wrap: wrap;
 }
 
-.flash-mascot {
-  flex-shrink: 0;
-  width: clamp(84px, 11vw, 116px);
-  height: auto;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.25));
-}
-
 .flash-body {
   flex: 1;
   min-width: 0;
@@ -841,7 +786,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--color-accent-orange);
+  background: #c2410c;
   color: #fff;
   font-size: 10.5px;
   font-weight: 700;
@@ -900,16 +845,12 @@ body {
   cursor: pointer;
   text-align: left;
   color: inherit;
-  transition:
-    transform 0.2s var(--ease-out),
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .flash-chip:hover {
   border-color: var(--color-accent-orange);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px -10px var(--orange-glow);
+  transform: translateY(-1px);
 }
 
 .flash-chip-time {
@@ -933,14 +874,33 @@ body {
   background: var(--color-accent-orange-subtle);
   padding: 4px 8px;
   border-radius: 6px;
-  transition:
-    background 0.2s,
-    color 0.2s;
 }
 
 .flash-chip:hover .flash-chip-cta {
   background: var(--color-accent-orange);
   color: #fff;
+}
+
+/* Mientras carga: mismos chips, sin texto. Estático a propósito (sin brillo
+   que se mueva): solo reserva el alto para que la página no salte. */
+.flash-chip.is-skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Todavía no sabemos si hay turnos: el badge guarda su lugar sin afirmarlo. */
+.flash-card.is-loading .flash-live {
+  visibility: hidden;
+}
+
+.flash-chip.is-skeleton .flash-chip-time,
+.flash-chip.is-skeleton .flash-chip-court,
+.flash-chip.is-skeleton .flash-chip-cta,
+.flash-skeleton-text {
+  color: transparent;
+  background: var(--color-hairline-soft);
+  border-radius: 6px;
+  user-select: none;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -957,10 +917,7 @@ body {
   border-radius: 20px;
   padding: 28px 26px 22px;
   overflow: hidden;
-  transition:
-    transform 0.3s var(--ease-out),
-    border-color 0.3s,
-    box-shadow 0.3s;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .testimonial-card::before {
@@ -1052,14 +1009,11 @@ body {
   font-size: 12.5px;
   font-weight: 500;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    box-shadow 0.2s;
 }
 
 .spec-tab:hover {
   color: var(--color-ink);
+  transform: translateY(-1px);
 }
 
 .spec-tab[aria-selected="true"] {
@@ -1084,7 +1038,7 @@ body {
 
 @media (prefers-reduced-motion: no-preference) {
   .spec-detail {
-    animation: specIn 0.45s var(--ease-out);
+    animation: specIn var(--t-estado) var(--ease);
   }
 }
 
@@ -1100,12 +1054,11 @@ body {
 }
 
 .spec-icon {
-  width: 60px;
-  height: 60px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  font-size: 30px;
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--color-accent-orange-subtle);
   border: 1px solid var(--color-accent-orange-border);
 }
@@ -1126,7 +1079,7 @@ body {
 .spec-tag {
   font-size: 11px;
   font-weight: 600;
-  color: var(--accent-emerald);
+  color: #0a6640;
   background: rgba(16, 185, 129, 0.12);
   padding: 2px 9px;
   border-radius: 999px;
@@ -1167,10 +1120,7 @@ body {
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline-strong);
   overflow: hidden;
-  transition:
-    transform 0.3s var(--ease-out),
-    border-color 0.3s,
-    box-shadow 0.3s;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .club-tool-card::after {
@@ -1186,14 +1136,13 @@ body {
     transparent 70%
   );
   opacity: 0;
-  transition: opacity 0.4s;
+  transition: opacity var(--t-hover) var(--ease);
   pointer-events: none;
 }
 
 .club-tool-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
   border-color: var(--color-accent-orange-border);
-  box-shadow: 0 26px 44px -26px rgba(0, 0, 0, 0.4);
 }
 
 .club-tool-card:hover::after {
@@ -1208,20 +1157,16 @@ body {
 }
 
 .club-tool-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  font-size: 24px;
   border-radius: 14px;
   background: var(--color-canvas-soft);
   border: 1px solid var(--color-hairline);
-  transition: transform 0.35s var(--ease-spring);
+  transition: transform var(--t-hover) var(--ease);
 }
 
-.club-tool-card:hover .club-tool-icon {
-  transform: rotate(-8deg) scale(1.08);
-}
 
 .club-tool-title {
   font-family: var(--font-display);
@@ -1251,15 +1196,11 @@ body {
   color: var(--color-ink);
   background: var(--color-canvas-soft);
   border: 1px solid var(--color-hairline);
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
 }
 
 .club-tool-link::after {
   content: "→";
-  transition: transform 0.25s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .club-tool-card:hover .club-tool-link {
@@ -1280,20 +1221,26 @@ body {
   overflow: hidden;
 }
 
-.map-overlay-actions {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  right: 16px;
+/* Maps y Waze juntos en el encabezado de la sección. Antes iban también
+   superpuestos al mapa: duplicaban el botón de arriba y en celular tapaban la
+   atribución de Google. */
+.map-header-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  pointer-events: none;
 }
 
-.map-overlay-actions > * {
-  pointer-events: auto;
-  height: 38px;
+@media (max-width: 768px) {
+  .map-header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .map-header-actions > .btn {
+    width: 100%;
+    height: 46px;
+    justify-content: center;
+  }
 }
 
 .contact-grid {
@@ -1304,15 +1251,12 @@ body {
 
 .info-link-card {
   border-radius: 18px;
-  transition:
-    transform 0.25s var(--ease-out),
-    border-color 0.25s,
-    box-shadow 0.25s;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .info-link-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 20px 36px -24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+  border-color: var(--color-accent-orange-border);
 }
 
 .contact-eyebrow {
@@ -1343,7 +1287,7 @@ body {
 
 .contact-arrow {
   font-size: 20px;
-  transition: transform 0.25s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .info-link-card:hover .contact-arrow {
@@ -1355,10 +1299,6 @@ body {
    -------------------------------------------------------------------------- */
 .faq-card {
   border-radius: 16px;
-  transition:
-    border-color 0.25s,
-    box-shadow 0.25s,
-    background 0.25s;
 }
 
 .faq-card:hover {
@@ -1371,23 +1311,21 @@ body {
 }
 
 .torneo-thumb:hover {
-  transform: translateY(-4px) rotate(-0.6deg);
+  transform: translateY(-2px);
 }
 
 /* --------------------------------------------------------------------------
    SCROLL REVEAL con escalonado (ScrollReveal setea --i por hermano)
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: no-preference) {
+  /* Una sola vez (ScrollReveal deja de observar) y 60 ms entre hermanos,
+     hasta 6: la séptima tarjeta no espera más de 360 ms. */
   .reveal-up {
-    transform: translateY(28px);
+    transform: translateY(16px);
     transition:
-      opacity 0.8s var(--ease-out),
-      transform 0.8s var(--ease-out);
-    transition-delay: calc(var(--i, 0) * 80ms);
-  }
-
-  .reveal-up.in-view {
-    transition-delay: calc(var(--i, 0) * 80ms);
+      opacity var(--t-entrada) var(--ease),
+      transform var(--t-entrada) var(--ease);
+    transition-delay: calc(var(--i, 0) * 60ms);
   }
 }
 
@@ -1513,11 +1451,11 @@ body {
     gap: 18px;
   }
 
-  .section-header-row {
+  :where(#top ~ *) .section-header-row {
     margin-bottom: 22px;
   }
 
-  .section-title {
+  :where(#top ~ *) .section-title {
     font-size: clamp(2rem, 9vw, 2.6rem);
     letter-spacing: 0;
   }
@@ -1531,10 +1469,6 @@ body {
     padding: 14px;
     gap: 12px;
     align-items: flex-start;
-  }
-
-  .flash-mascot {
-    display: none;
   }
 
   .spec-panel {
@@ -1558,31 +1492,87 @@ body {
   }
 }
 
-/* --------------------------------------------------------------------------
-   FLOTANTES: la mascota ayuda a la derecha, la barra "reservar" al centro
-   (antes las dos iban en bottom/right 24px y se pisaban).
-   -------------------------------------------------------------------------- */
-.mascot-float {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+/* Celu: las cuatro pestañas en 2 × 2, enteras, en vez de una fila cortada. */
+@media (max-width: 640px) {
+  .spec-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .spec-tab {
+    justify-content: center;
+  }
 }
 
+/* --------------------------------------------------------------------------
+   FLOTANTES: la barra "reservar" al centro y el ayudante en el margen
+   derecho (antes los dos iban en bottom/right 24px y se pisaban).
+   -------------------------------------------------------------------------- */
 .floating-live-pill {
   right: auto;
   left: 50%;
   translate: -50% 0;
 }
 
-/* En celu la mascota tapaba la columna de la Cancha 2 en la grilla de
-   turnos, y lo que ofrece (WhatsApp, menú) ya está en la barra inferior. */
-@media (max-width: 768px) {
+/* El ayudante vive en el margen lateral: el contenido mide 1152 px, así que
+   desde 1400 px de ancho sobran 124 px a cada lado y no pisa nada.
+   Más angosto, o con la barra inferior (celu y tablet), no se muestra. */
+.mascot-float {
+  display: none;
+}
+
+@media (min-width: 1400px) and (min-height: 600px) {
   .mascot-float {
-    display: none;
+    position: fixed;
+    right: 12px;
+    bottom: 20px;
+    z-index: 90;
+    width: 104px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition:
+      opacity var(--t-estado) var(--ease),
+      transform var(--t-estado) var(--ease);
+  }
+
+  .mascot-float.is-visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}
+
+.mascot-float-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: #1b1b19;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.4);
+}
+
+.mascot-float .mascota {
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.3));
+  transform-origin: center bottom;
+  transition: transform var(--t-estado) var(--ease);
+}
+
+@media (hover: hover) {
+  .mascot-float:hover .mascota {
+    transform: rotate(-3deg);
   }
 }
 
@@ -1606,16 +1596,16 @@ body {
   color: var(--color-ink);
   border: 1px solid var(--color-hairline-strong);
   background: var(--color-surface-card);
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
 
 .section-more-link span {
-  transition: transform 0.25s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .section-more-link:hover {
   border-color: var(--color-accent-orange);
   color: var(--color-accent-orange-text);
+  transform: translateY(-1px);
 }
 
 .section-more-link:hover span {
@@ -1687,6 +1677,13 @@ body {
   font-weight: 800;
 }
 
+/* Sin fecha confirmada: el cuadrito muestra un calendario en vez del día. */
+.next-event-date svg {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 6px;
+}
+
 .next-event-tag {
   display: inline-flex;
   align-items: center;
@@ -1734,13 +1731,13 @@ body {
   font-weight: 700;
   font-size: 14px;
   white-space: nowrap;
-  transition: transform 0.25s var(--ease-out), background 0.2s;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .next-event-cta:hover {
   background: var(--color-accent-orange);
   color: #fff;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .torneo-bento {
@@ -1762,7 +1759,7 @@ body {
 }
 
 .torneo-bento .torneo-thumb img {
-  transition: transform 0.6s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .torneo-bento .torneo-thumb:hover img {
@@ -1889,6 +1886,12 @@ body {
     gap: 16px;
   }
 
+  .next-event-date svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+  }
+
   .next-event-date {
     width: 68px;
     height: 68px;
@@ -1932,13 +1935,6 @@ body {
     font-size: 13px;
   }
 
-  /* globals.css fija .booking-slot a 168px para el carrusel horizontal
-     (.booking-slots-grid); dentro de la grilla hora x cancha tiene que
-     ocupar su columna. */
-  .booking-matrix-row .booking-slot {
-    width: auto;
-  }
-
   .booking-court-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -1964,6 +1960,34 @@ body {
 .hero-night {
   isolation: auto;
   overflow: visible;
+}
+
+/* La foto sube por detrás del header y llega al borde de arriba de la
+   pantalla: el header flota sobre ella. Antes quedaba una franja de página
+   entre los dos y la foto cortaba recto (y un degradado de blanco a la foto
+   dejaba un gris sucio). El margen negativo y el padding se compensan:
+   el contenido del hero y todo lo de abajo quedan donde estaban. */
+:root {
+  --hero-bajo-header: 78px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --hero-bajo-header: 64px;
+  }
+}
+
+.hero-night {
+  margin-top: calc(-1 * var(--hero-bajo-header));
+  padding-top: calc(72px + var(--hero-bajo-header));
+  min-height: calc(min(100svh, 920px) + var(--hero-bajo-header));
+}
+
+@media (max-width: 900px) {
+  .hero-night {
+    padding-top: calc(36px + var(--hero-bajo-header));
+    min-height: auto;
+  }
 }
 
 .hero-night-photo {
@@ -2022,7 +2046,7 @@ body {
     rotateY(calc(var(--tilt-x, 0) * 20deg))
     rotateX(calc(var(--tilt-y, 0) * -12deg))
     translateX(calc(var(--tilt-x, 0) * 18px));
-  transition: transform 0.5s var(--ease-out);
+  transition: transform var(--t-estado) var(--ease-mascota);
   transform-style: preserve-3d;
 }
 
@@ -2077,145 +2101,9 @@ body {
   }
 }
 
-/* ---- Mascotas de sección ---------------------------------------------- */
-.section-header-row {
-  position: relative;
-  /* Gana a las tarjetas siguientes (que con el reveal tienen transform y
-     arman su propio contexto de apilado) para que la mascota las pise. */
-  z-index: 5;
-}
-
-.mascot-section-img {
-  width: clamp(190px, 21vw, 290px);
-  height: auto;
-  filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.45));
-  cursor: pointer;
-}
-
-/* Sin botón al lado: cuelga sobre la esquina de la tarjeta de abajo */
-.section-header-row > .mascot-section-badge {
-  position: absolute;
-  right: 12px;
-  bottom: -104px;
-}
-
-/* Con botón al lado: parado arriba del botón */
-.header-aside {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.header-aside .mascot-section-badge {
-  position: absolute;
-  right: 8px;
-  bottom: calc(100% - 16px);
-}
-
-.header-aside .mascot-section-img {
-  width: clamp(170px, 17vw, 230px);
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .mascot-section-img:hover {
-    transform: none;
-    animation: mascotWiggle 0.7s var(--ease-spring);
-  }
-}
-
-@keyframes mascotWiggle {
-  0% { transform: none; }
-  25% { transform: rotate(-9deg) scale(1.06); }
-  50% { transform: rotate(7deg) scale(1.08) translateY(-10px); }
-  75% { transform: rotate(-3deg) scale(1.03); }
-  100% { transform: none; }
-}
-
-/* Parallax con scroll: entra desde abajo girado, se endereza en el centro de
-   la pantalla y sigue subiendo al salir. Sin soporte queda quieto. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .mascot-section-badge {
-      animation: mascotDrift linear both;
-      animation-timeline: view();
-      animation-range: entry 0% exit 100%;
-    }
-  }
-}
-
-@keyframes mascotDrift {
-  0% { translate: 0 90px; rotate: -10deg; }
-  45% { translate: 0 0; rotate: 0deg; }
-  100% { translate: 0 -60px; rotate: 6deg; }
-}
-
-/* ---- Turnos flash: asoma por arriba del recuadro ------------------------ */
-.flash-wrap {
-  margin-top: 56px;
-}
-
+/* ---- Turnos flash ------------------------------------------------------- */
 .flash-card {
   position: relative;
-  overflow: visible;
-}
-
-.flash-mascot {
-  width: clamp(150px, 15vw, 190px);
-  margin: -78px -6px -26px -14px;
-  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.4));
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .flash-mascot {
-    animation: flashSwing 2.6s ease-in-out infinite;
-    transform-origin: 60% 90%;
-  }
-}
-
-@keyframes flashSwing {
-  0%, 100% { rotate: -4deg; }
-  50% { rotate: 5deg; translate: 0 -6px; }
-}
-
-/* ---- Footer: sale por arriba de su caja --------------------------------- */
-.footer-mascot-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 84px;
-  max-width: 380px;
-  margin-top: 64px;
-  padding: 14px 16px 14px 150px;
-  border-radius: 18px;
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-hairline-strong);
-}
-
-.footer-mascot {
-  position: absolute;
-  left: 4px;
-  bottom: 2px;
-  width: 146px;
-  height: auto;
-  filter: drop-shadow(0 16px 20px rgba(0, 0, 0, 0.35));
-  transition: transform 0.4s var(--ease-spring);
-  transform-origin: center bottom;
-}
-
-.footer-mascot-box:hover .footer-mascot {
-  transform: translateY(-8px) rotate(-5deg);
-}
-
-.footer-mascot-text {
-  font-size: 13.5px;
-  line-height: 1.4;
-  color: var(--text-secondary);
-}
-
-/* ---- Ayudante flotante (escritorio) -------------------------------------- */
-.mascot-float img {
-  width: 118px !important;
 }
 
 /* ---- Responsive ---------------------------------------------------------- */
@@ -2270,77 +2158,8 @@ body {
     width: min(80vw, 310px);
   }
 
-  .section-header-row > .mascot-section-badge {
-    right: -10px;
-    bottom: auto;
-    top: -96px;
-  }
-
-  .mascot-section-img {
-    width: 136px;
-  }
-
-  .header-aside {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-
-  .header-aside .mascot-section-badge {
-    position: static;
-    order: 2;
-    margin: -40px -8px -34px 0;
-  }
-
-  .header-aside .mascot-section-img {
-    width: 128px;
-  }
-
-  .flash-wrap {
-    margin-top: 72px;
-  }
-
-  .flash-mascot {
-    display: block;
-    position: absolute;
-    top: -74px;
-    right: -6px;
-    width: 118px;
-    margin: 0;
-  }
-
-  .flash-head {
-    padding-right: 84px;
-  }
-
-  .footer-mascot-box {
-    margin-top: 72px;
-  }
 }
 
-/* Parado sobre un botón: el botón siempre queda legible por encima de los
-   pies, y el parallax es casi solo de giro para no taparlo al entrar. */
-.header-aside > .btn,
-.header-aside > a,
-.header-aside > button {
-  position: relative;
-  z-index: 1;
-}
-
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .header-aside .mascot-section-badge {
-      animation-name: mascotPerch;
-    }
-  }
-}
-
-@keyframes mascotPerch {
-  0% { translate: 0 -14px; rotate: -8deg; }
-  45% { translate: 0 0; rotate: 0deg; }
-  100% { translate: 0 -24px; rotate: 5deg; }
-}
 
 /* Celu: la mascota del hero XL tapaba stats y la tarjeta de turnos. Acá va
    en una fila compacta (precio a la izquierda, mascota a la derecha), sin
@@ -2379,4 +2198,48 @@ body {
   .flash-wrap {
     margin-top: 64px;
   }
+}
+
+/* 6.3 · Al apretar, botones y chips de la home se hunden igual que el
+   resto. Va al final para ganarle al hover. */
+.hero-btn-ghost:active,
+.flash-chip:active,
+.spec-tab:active,
+.next-event-cta:active,
+.section-more-link:active {
+  transform: scale(0.98);
+}
+
+/* 6.3 · Estos tres subían 1 px de golpe: su regla base no transicionaba
+   transform (la tenía solo el ícono de adentro). */
+.hero-btn-ghost,
+.spec-tab,
+.section-more-link {
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
+}
+
+/* 5.1 · Las cifras del hero quedan fuera del velo del texto y, con la foto
+   al 100 %, sus etiquetas bajaban de 4,5:1 sobre las líneas claras de la
+   cancha. Un velo propio, suave, que se apaga a los costados. */
+.hero-stats {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-stats::before {
+  content: "";
+  position: absolute;
+  inset: -20px -24px -16px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 15, 13, 0) 0%,
+    rgba(15, 15, 13, 0.5) 30%,
+    rgba(15, 15, 13, 0.55) 100%
+  );
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }

@@ -37,10 +37,11 @@ export default function LightboxProvider({ children }) {
 
   useEffect(() => {
     if (!photo) return;
-    document.body.style.overflow = "hidden";
+    // En <html>: el sitio le pone overflow al html y en el body no frenaba el scroll.
+    document.documentElement.style.overflow = "hidden";
     closeBtnRef.current?.focus();
     return () => {
-      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [photo]);
 

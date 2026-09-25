@@ -4,12 +4,14 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import BottomNav from "../../components/BottomNav";
 import MenuClient from "./MenuClient";
+import { pageMetadata } from "../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Menú de la cantina · Muzzaga Pádel",
   description:
     "Carta completa de la cantina de Muzzaga Pádel: pizzas caseras, tostados, sándwiches de mila, cervezas heladas, bebidas frías y kiosco en Catriel.",
-};
+  path: "/menu",
+});
 
 export default function MenuPage() {
   return (
@@ -18,11 +20,11 @@ export default function MenuPage() {
       <main style={{ paddingTop: 90, minHeight: "80vh" }}>
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
-            <Link href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
-              ← Volver al Inicio
+            <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange-text)", textDecoration: "none", fontWeight: 600 }}>
+              ← Volver al inicio
             </Link>
             <span>/</span>
-            <span style={{ color: "var(--text-primary)" }}>Menú de Cantina</span>
+            <span style={{ color: "var(--text-primary)" }}>Menú de la cantina</span>
           </div>
         </div>
 

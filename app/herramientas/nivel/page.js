@@ -1,16 +1,18 @@
 import Link from "next/link";
-import Image from "next/image";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
 import RatingCalculator from "../../../components/RatingCalculator";
 import { PADEL_LEVELS } from "../../../data/levels";
+import Mascota from "../../../components/Mascota";
+import { pageMetadata } from "../../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Test de nivel de pádel: ¿qué categoría sos? · Muzzaga Pádel",
   description:
     "Descubrí tu nivel de pádel en la escala internacional (1.0 a 7.0) y su equivalencia con las categorías argentinas (7ma a 1ra). Sumate a partidos parejos.",
-};
+  path: "/herramientas/nivel",
+});
 
 export default function NivelPage() {
   return (
@@ -19,13 +21,13 @@ export default function NivelPage() {
       <main style={{ paddingTop: 90, minHeight: "80vh" }}>
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
-            <Link href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
-              ← Volver al Inicio
+            <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange-text)", textDecoration: "none", fontWeight: 600 }}>
+              ← Volver al inicio
             </Link>
             <span>/</span>
             <span>Herramientas</span>
             <span>/</span>
-            <span style={{ color: "var(--text-primary)" }}>Test de Nivel</span>
+            <span style={{ color: "var(--text-primary)" }}>Test de nivel</span>
           </div>
         </div>
 
@@ -34,9 +36,9 @@ export default function NivelPage() {
             <div className="section-header-row">
               <div>
                 <span className="badge-linear badge-indigo" style={{ marginBottom: 8 }}>
-                  Evaluación Deportiva
+                  Evaluación deportiva
                 </span>
-                <h1 className="section-title">Calculá tu Nivel de Juego</h1>
+                <h1 className="section-title">Calculá tu nivel de juego</h1>
                 <p className="section-desc">
                   Mapeamos la escala internacional de nivel (1.0 a 7.0) con las
                   categorías del pádel argentino (7ma a 1ra) para que siempre
@@ -44,11 +46,9 @@ export default function NivelPage() {
                 </p>
               </div>
               <div className="mascot-section-badge">
-                <Image
-                  src="/img/mascotas/muzzaguito-pelota-padel-life.webp"
+                <Mascota
+                  pose="pelota-padel-life"
                   alt="Muzzaguito sosteniendo pelota de pádel"
-                  width={160}
-                  height={160}
                   className="mascot-section-img"
                 />
               </div>

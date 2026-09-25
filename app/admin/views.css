@@ -304,6 +304,205 @@
   color: var(--tone-fg);
 }
 
+/* ---------- Cantina: pedidos de la carta (web) ---------- */
+.admin-root .admin-web-orders {
+  margin-bottom: 20px;
+}
+
+.admin-root .admin-web-orders > .admin-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-root .admin-order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.admin-root .admin-order {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-orange);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.admin-root .admin-order.is-preparando {
+  border-left-color: var(--info);
+}
+
+.admin-root .admin-order.is-charging {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 1px;
+}
+
+.admin-root .admin-order-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-root .admin-order-head .admin-tag {
+  margin-left: 0;
+}
+
+.admin-root .admin-order-code {
+  font-family: var(--font-code);
+  font-size: 15px;
+  color: var(--text);
+}
+
+.admin-root .admin-order-time {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-order-total {
+  margin-left: auto;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.admin-root .admin-order-who {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.admin-root .admin-order-pay {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #047857;
+}
+
+.admin-root .admin-order-pay.is-pending {
+  color: #b4501a;
+}
+
+.admin-root .admin-order-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-order-notes {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius-control);
+  background: #fdf3e2;
+  font-size: 13px;
+  color: #92400e;
+}
+
+.admin-root .admin-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 4px;
+}
+
+.admin-root .admin-order-actions .btn {
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+/* "Cancelar" es un link, pero se toca en celu: 44 px como el resto. */
+.admin-root .admin-order-actions .admin-link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
+}
+
+.admin-root .admin-order-danger {
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.admin-root .admin-tag[data-order-status="nuevo"] {
+  background: var(--accent-orange-soft);
+  color: #b4501a;
+  border-color: rgba(232, 101, 26, 0.3);
+}
+
+.admin-root .admin-tag[data-order-status="preparando"] {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0369a1;
+  border-color: rgba(2, 132, 199, 0.3);
+}
+
+.admin-root .admin-tag[data-order-status="entregado"] {
+  background: var(--success-soft);
+  color: #047857;
+  border-color: rgba(5, 150, 105, 0.3);
+}
+
+.admin-root .admin-order-history {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.admin-root .admin-order-history summary {
+  cursor: pointer;
+  padding: 6px 0;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-order-history ul {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.admin-root .admin-order-history li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-root .admin-order-history li:last-child {
+  border-bottom: none;
+}
+
+/* Sin opacity: el texto tiene que seguir llegando a AA. */
+.admin-root .admin-order-history li.is-cancelado {
+  color: var(--text-muted);
+}
+
+.admin-root .admin-order-history li.is-cancelado strong {
+  text-decoration: line-through;
+}
+
+.admin-root .admin-order-charging {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  background: var(--accent-orange-soft);
+  font-size: 13px;
+  color: var(--text);
+}
+
 /* ---------- Cantina (POS) ---------- */
 .admin-root .admin-pos {
   display: grid;

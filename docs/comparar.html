@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparador · original vs pulido</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; background: #e9e9e9; color: #222; display: flex; flex-direction: column; overflow: hidden; }
+  header { flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 8px 12px; background: #fff; border-bottom: 1px solid #ccc; }
+  header h1 { margin: 0 8px 0 0; font-size: 13px; font-weight: 600; }
+  .grupo { display: flex; align-items: center; gap: 4px; }
+  .grupo label { color: #666; margin-right: 4px; }
+  button, input { font: inherit; height: 28px; border: 1px solid #bbb; border-radius: 4px; background: #fff; color: #222; padding: 0 10px; }
+  button { cursor: pointer; }
+  button:hover { background: #f3f3f3; }
+  button[aria-pressed="true"] { background: #222; color: #fff; border-color: #222; }
+  input { width: 260px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chips button { height: 24px; padding: 0 8px; font-size: 12px; border-color: #ddd; }
+  .estado { margin-left: auto; color: #666; font-variant-numeric: tabular-nums; }
+  main { flex: 1; min-height: 0; display: flex; gap: 16px; padding: 12px; overflow: auto; align-items: flex-start; justify-content: center; }
+  .pane { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+  .pane .titulo { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: #444; }
+  .pane .titulo strong { color: #222; }
+  .pane .titulo a { color: #444; }
+  .marco { background: #fff; border: 1px solid #bbb; border-radius: 6px; overflow: hidden; transform-origin: top left; }
+  iframe { display: block; border: 0; background: #fff; }
+  .aviso { color: #a33; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Comparador</h1>
+  <div class="grupo" role="group" aria-label="Ancho">
+    <label>Ancho</label>
+    <button type="button" data-ancho="390">390</button>
+    <button type="button" data-ancho="768">768</button>
+    <button type="button" data-ancho="1440">1440</button>
+  </div>
+  <form class="grupo" id="form-ruta">
+    <label for="ruta">Ir a</label>
+    <input id="ruta" name="ruta" list="secciones" placeholder="#turnos, /menu, /torneos…" autocomplete="off">
+    <datalist id="secciones">
+      <option value="/"></option><option value="#turnos"></option><option value="#comunidad"></option><option value="#instalaciones"></option>
+      <option value="#canchas-abiertas"></option><option value="#torneos"></option><option value="#cantina"></option><option value="#herramientas"></option>
+      <option value="#faq"></option><option value="#ubicacion"></option><option value="/torneos"></option><option value="/menu"></option>
+      <option value="/herramientas/dividir-gastos"></option><option value="/herramientas/nivel"></option><option value="/herramientas/pizarra"></option><option value="/herramientas/americano"></option>
+    </datalist>
+    <button type="submit">Ir</button>
+    <button type="button" id="recargar" title="Recarga los dos iframes">Recargar</button>
+  </form>
+  <div class="chips" id="chips">
+    <button type="button" data-ruta="/">Inicio</button>
+    <button type="button" data-ruta="#turnos">Turnos</button>
+    <button type="button" data-ruta="#instalaciones">Instalaciones</button>
+    <button type="button" data-ruta="#canchas-abiertas">Canchas abiertas</button>
+    <button type="button" data-ruta="#torneos">Torneos</button>
+    <button type="button" data-ruta="#cantina">Cantina</button>
+    <button type="button" data-ruta="#herramientas">Herramientas</button>
+    <button type="button" data-ruta="#faq">FAQ</button>
+    <button type="button" data-ruta="#ubicacion">Ubicación</button>
+    <button type="button" data-ruta="/torneos">/torneos</button>
+    <button type="button" data-ruta="/menu">/menu</button>
+  </div>
+  <span class="estado" id="estado"></span>
+</header>
+<main>
+  <section class="pane" id="pane-original">
+    <div class="titulo"><strong>Original · origin/master</strong><a href="http://localhost:3000" target="_blank" rel="noopener">localhost:3000</a></div>
+    <div class="marco"><iframe id="f-original" title="Sitio original" src="http://localhost:3000/"></iframe></div>
+  </section>
+  <section class="pane" id="pane-pulido">
+    <div class="titulo"><strong>Pulido · polish/pulido</strong><a href="http://localhost:3001" target="_blank" rel="noopener">localhost:3001</a></div>
+    <div class="marco"><iframe id="f-pulido" title="Sitio pulido" src="http://localhost:3001/"></iframe></div>
+  </section>
+</main>
+<script>
+(function () {
+  var BASES = { original: 'http://localhost:3000', pulido: 'http://localhost:3001' };
+  var ALTOS = { 390: 844, 768: 1024, 1440: 900 };
+  var frames = { original: document.getElementById('f-original'), pulido: document.getElementById('f-pulido') };
+  var estado = document.getElementById('estado');
+  var input = document.getElementById('ruta');
+  var ancho = 390, ruta = '/';
+
+  try { ancho = Number(localStorage.getItem('comparar.ancho')) || 390; ruta = localStorage.getItem('comparar.ruta') || '/'; } catch (e) {}
+
+  function guardar() { try { localStorage.setItem('comparar.ancho', String(ancho)); localStorage.setItem('comparar.ruta', ruta); } catch (e) {} }
+
+  function normalizar(valor) {
+    var v = (valor || '').trim();
+    if (!v) return '/';
+    if (v[0] === '#' || v[0] === '/') return v[0] === '#' ? '/' + v : v;
+    if (/^[a-z0-9-]+$/i.test(v)) return '/#' + v;
+    return '/' + v.replace(/^\/+/, '');
+  }
+
+  function navegar(valor) {
+    ruta = normalizar(valor);
+    input.value = ruta === '/' ? '/' : ruta.replace(/^\/#/, '#');
+    Object.keys(frames).forEach(function (k) {
+      var destino = BASES[k] + ruta;
+      // Si sólo cambia el hash, el iframe navega al fragmento sin recargar.
+      if (frames[k].getAttribute('src') === destino) frames[k].setAttribute('src', destino.split('#')[0]);
+      frames[k].setAttribute('src', destino);
+    });
+    guardar();
+  }
+
+  function aplicarAncho() {
+    var alto = ALTOS[ancho] || 900;
+    var main = document.querySelector('main');
+    var disponibleAncho = (main.clientWidth - 24 - 16) / 2;
+    var disponibleAlto = main.clientHeight - 24 - 22;
+    var escala = Math.min(1, disponibleAncho / ancho, disponibleAlto / alto);
+    Object.keys(frames).forEach(function (k) {
+      var f = frames[k];
+      f.style.width = ancho + 'px';
+      f.style.height = alto + 'px';
+      var marco = f.parentNode;
+      marco.style.transform = 'scale(' + escala + ')';
+      marco.style.width = ancho + 'px';
+      marco.style.height = alto + 'px';
+      var pane = marco.parentNode;
+      pane.style.width = Math.round(ancho * escala) + 'px';
+      pane.style.height = Math.round(alto * escala) + 28 + 'px';
+    });
+    document.querySelectorAll('[data-ancho]').forEach(function (b) { b.setAttribute('aria-pressed', String(Number(b.dataset.ancho) === ancho)); });
+    estado.textContent = ancho + ' × ' + alto + ' · escala ' + Math.round(escala * 100) + '%';
+    guardar();
+  }
+
+  document.querySelectorAll('[data-ancho]').forEach(function (b) { b.addEventListener('click', function () { ancho = Number(b.dataset.ancho); aplicarAncho(); }); });
+  document.getElementById('chips').addEventListener('click', function (e) { var b = e.target.closest('[data-ruta]'); if (b) navegar(b.dataset.ruta); });
+  document.getElementById('form-ruta').addEventListener('submit', function (e) { e.preventDefault(); navegar(input.value); });
+  document.getElementById('recargar').addEventListener('click', function () { Object.keys(frames).forEach(function (k) { var f = frames[k]; var s = f.getAttribute('src'); f.setAttribute('src', 'about:blank'); setTimeout(function () { f.setAttribute('src', s); }, 50); }); });
+  window.addEventListener('resize', aplicarAncho);
+
+  navegar(ruta);
+  aplicarAncho();
+})();
+</script>
+</body>
+</html>

@@ -5,8 +5,9 @@
 // íconos son los mismos SVG inline que ya usa AmenitiesSection, y las fotos
 // son las reales del club (public/img), no placeholders de stock.
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState } from "react";
+import { motion, AnimatePresence, MotionConfig } from "motion/react";
+import Image from "next/image";
 
 const ICON_PROPS = {
   viewBox: "0 0 24 24",
@@ -93,27 +94,35 @@ function IconSofa() {
 // realidad la mesa del living viendo TV, match_action_led.jpg es un café con
 // la cancha de fondo, etc). No hay foto real de "alquiler de paletas": se
 // sacó esa feature en vez de ilustrarla con una imagen que no la muestra.
+// Los nombres de archivo engañan (no se renombran para no romper links):
+// lounge_tv_table.jpg es una cancha vacía con las luces prendidas,
+// court_blue_glass.jpg es el living con la pantalla y gente mirando, y
+// match_action_led.jpg es un café en la barra con la cancha atrás.
+// Ninguna foto de acá se repite en la cantina ni en torneos de la home.
 const FEATURES = [
   {
     id: "canchas",
-    label: "Canchas de Cristal",
+    label: "Canchas de cristal",
     icon: IconCourt,
     image: "/img/court_bench_players.jpg",
-    description: "2 canchas de cristal profesionales con rebote homogéneo.",
+    alt: "Cancha de cristal con césped azul y un banco al costado",
+    description: "2 canchas de cristal templado con rebote parejo.",
   },
   {
     id: "led",
     label: "Iluminación LED",
     icon: IconBulb,
     image: "/img/lounge_tv_table.jpg",
+    alt: "Cancha vacía con las luces LED prendidas",
     description:
       "Luz LED en todas las canchas para jugar de noche sin perder nitidez.",
   },
   {
     id: "cantina",
-    label: "Cantina Propia",
+    label: "Cantina propia",
     icon: IconCantina,
-    image: "/img/cantina_beer_court.jpg",
+    image: "/img/match_action_led.jpg",
+    alt: "Café en la barra de la cantina con un partido de fondo",
     description: "Pizzas caseras, minutas y bebidas para el tercer tiempo.",
   },
   {
@@ -121,27 +130,35 @@ const FEATURES = [
     label: "Canchas Abiertas",
     icon: IconUsers,
     image: "/img/court_spectators.jpg",
+    alt: "Gente mirando un partido desde el costado de la cancha",
     description: "Partidos comunitarios para sumarte aunque vengas solo.",
   },
   {
     id: "torneos",
-    label: "Torneos Todo el Año",
+    label: "Torneos todo el año",
     icon: IconTrophy,
-    image: "/img/panoramic_courts.jpg",
+    image: "/img/torneos/junio/jugadores_12.jpg",
+    alt: "Cuatro jugadores posando en la red, Torneo Junio 2026",
     description: "Torneos y ligas internas durante toda la temporada.",
   },
   {
     id: "living",
-    label: "Living y Tercer Tiempo",
+    label: "Living y tercer tiempo",
     icon: IconSofa,
-    image: "/img/bar_coffee_snacks.jpg",
+    image: "/img/court_blue_glass.jpg",
+    alt: "El living de la cantina lleno, mirando un partido en la pantalla",
     description:
       "Pantalla grande, mesas y buena previa para quedarte después de jugar.",
   },
 ];
 
-const AUTO_PLAY_INTERVAL = 3500;
+// Misma curva que --ease en globals.css: motion no lee variables CSS.
+const EASE = [0.16, 1, 0.3, 1];
+const MOVE = { duration: 0.4, ease: EASE };
 const ITEM_HEIGHT = 52;
+// Deslizar la foto: pasa si se arrastró más que esto o se soltó rápido.
+const SWIPE_PX = 50;
+const SWIPE_VELOCITY = 400;
 
 const wrap = (min, max, v) => {
   const rangeSize = max - min;
@@ -150,23 +167,17 @@ const wrap = (min, max, v) => {
 
 export default function FeatureCarousel() {
   const [step, setStep] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
 
   const currentIndex =
     ((step % FEATURES.length) + FEATURES.length) % FEATURES.length;
-
-  const nextStep = useCallback(() => setStep((prev) => prev + 1), []);
 
   const handleChipClick = (index) => {
     const diff = (index - currentIndex + FEATURES.length) % FEATURES.length;
     if (diff > 0) setStep((s) => s + diff);
   };
 
-  useEffect(() => {
-    if (isPaused) return;
-    const interval = setInterval(nextStep, AUTO_PLAY_INTERVAL);
-    return () => clearInterval(interval);
-  }, [nextStep, isPaused]);
+  // Sin autoplay: pasaba solo cada 3,5 s mientras el texto de al lado se
+  // leía. Ahora avanza cuando lo tocás.
 
   const getCardStatus = (index) => {
     const diff = index - currentIndex;
@@ -180,7 +191,10 @@ export default function FeatureCarousel() {
     return "hidden";
   };
 
+  // Con "reducir movimiento" motion deja las fotos quietas y solo cambia la
+  // opacidad.
   return (
+    <MotionConfig reducedMotion="user">
     <div className="fc-wrap">
       <div className="fc-frame">
         <div className="fc-nav">
@@ -205,19 +219,12 @@ export default function FeatureCarousel() {
                     y: wrappedDistance * ITEM_HEIGHT,
                     opacity: 1 - Math.abs(wrappedDistance) * 0.25,
                   }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 90,
-                    damping: 22,
-                    mass: 1,
-                  }}
+                  transition={MOVE}
                   className="fc-nav-item"
                 >
                   <button
                     type="button"
                     onClick={() => handleChipClick(index)}
-                    onMouseEnter={() => setIsPaused(true)}
-                    onMouseLeave={() => setIsPaused(false)}
                     className={`fc-pill${isActive ? " active" : ""}`}
                   >
                     <span className="fc-pill-icon">
@@ -248,20 +255,35 @@ export default function FeatureCarousel() {
                     scale: isActive ? 1 : isPrev || isNext ? 0.85 : 0.7,
                     opacity: isActive ? 1 : isPrev || isNext ? 0.4 : 0,
                     rotate: isPrev ? -3 : isNext ? 3 : 0,
+                  }}
+                  style={{
                     zIndex: isActive ? 20 : isPrev || isNext ? 10 : 0,
                     pointerEvents: isActive ? "auto" : "none",
+                    // De costado la arrastra; para arriba y abajo sigue la página.
+                    touchAction: "pan-y",
                   }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 25,
-                    mass: 0.8,
+                  drag={isActive ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.35}
+                  dragSnapToOrigin
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x < -SWIPE_PX || info.velocity.x < -SWIPE_VELOCITY) {
+                      setStep((s) => s + 1);
+                    } else if (info.offset.x > SWIPE_PX || info.velocity.x > SWIPE_VELOCITY) {
+                      setStep((s) => s - 1);
+                    }
                   }}
-                  className="fc-stage-card"
+                  transition={MOVE}
+                  className={`fc-stage-card${isActive ? " is-active" : ""}`}
                 >
-                  <img
+                  {/* La tarjeta mide 320 × 400 (420 × 525 desde 1024): next/image
+                      sirve ese ancho en vez del archivo entero. */}
+                  <Image
                     src={feature.image}
-                    alt={feature.label}
+                    alt={feature.alt}
+                    fill
+                    sizes="(max-width: 1023px) 320px, 420px"
+                    draggable={false}
                     className={`fc-stage-img${isActive ? " active" : ""}`}
                   />
 
@@ -271,6 +293,7 @@ export default function FeatureCarousel() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
+                        transition={MOVE}
                         className="fc-stage-caption"
                       >
                         <span className="fc-stage-tag">
@@ -287,5 +310,6 @@ export default function FeatureCarousel() {
         </div>
       </div>
     </div>
+    </MotionConfig>
   );
 }

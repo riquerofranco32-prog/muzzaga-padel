@@ -8,7 +8,6 @@ import CommunityMatchesSection from "../components/CommunityMatchesSection";
 import HomeTorneosTeaser from "../components/HomeTorneosTeaser";
 import HomeCantinaTeaser from "../components/HomeCantinaTeaser";
 import ClubToolsSection from "../components/ClubToolsSection";
-import TestimonialsSection from "../components/TestimonialsSection";
 import FaqSection from "../components/FaqSection";
 import FloatingLiveBar from "../components/FloatingLiveBar";
 import MascotFloatHelper from "../components/MascotFloatHelper";
@@ -25,6 +24,10 @@ import { CLUB_INFO } from "../data/club";
 import { todayInClub } from "../lib/booking";
 import { FAQS } from "../data/faq";
 
+export const metadata = {
+  alternates: { canonical: "/" },
+};
+
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -39,12 +42,12 @@ const faqJsonLd = {
 };
 
 const TICKER_ITEMS = [
-  "Cristal templado 10 mm",
+  "Cristal templado",
   "Iluminación LED",
   "Turnos de 90 min",
   "Canchas Abiertas",
   "Torneos todo el año",
-  "Cantina & tercer tiempo",
+  "Cantina y tercer tiempo",
   "Catriel · Río Negro",
 ];
 
@@ -80,7 +83,10 @@ export default async function Home() {
             alt=""
             fill
             priority
-            sizes="100vw"
+            // La foto es 4:3 y en vertical se recorta con object-fit: cover: a 390
+            // de ancho se dibuja a unos 1285 px (330vw), no a 100vw. Con "100vw"
+            // el celular recibía 828 px para cubrir 2570 px de pantalla.
+            sizes="(max-width: 480px) 330vw, (max-width: 900px) 170vw, 100vw"
           />
         </div>
         <svg className="hero-court-lines" viewBox="0 0 1200 600" preserveAspectRatio="none" aria-hidden="true">
@@ -92,7 +98,7 @@ export default async function Home() {
 
         <div className="container hero-night-grid">
           <div className="hero-night-copy">
-            <LiveWeatherRadar />
+            <LiveWeatherRadar schedule={config.schedule} blockedDates={config.blockedDates} />
 
             <p className="hero-kicker">
               <span className="hero-kicker-line" /> Club de pádel · Catriel, Río Negro
@@ -105,7 +111,7 @@ export default async function Home() {
             </h1>
 
             <p className="hero-night-lede">
-              {config.courts?.length || 2} canchas oficiales de cristal con iluminación LED, turnos de{" "}
+              {config.courts?.length || 2} canchas de cristal templado con iluminación LED, turnos de{" "}
               {config.slotDurationMin} minutos, Canchas Abiertas comunitarias y cantina para el mejor tercer tiempo.
             </p>
 
@@ -122,9 +128,7 @@ export default async function Home() {
             </div>
 
             <ul className="hero-trust">
-              <li>Confirmás por WhatsApp</li>
-              <li>Seña por Mercado Pago</li>
-              <li>Cancelás hasta 4 h antes</li>
+              <li>Confirmás con una seña por WhatsApp</li>
               <li>Pistas cubiertas, cero viento</li>
             </ul>
           </div>
@@ -139,7 +143,7 @@ export default async function Home() {
             </div>
             <div className="hero-float-card hero-float-glass">
               <span className="hero-float-dot" />
-              Cristal 10 mm · LED
+              Cristal templado · LED
             </div>
           </div>
 
@@ -149,12 +153,12 @@ export default async function Home() {
               <dd><StatCounter value={config.courts?.length || 2} /></dd>
             </div>
             <div className="hero-stat">
-              <dt>Torneos disputados</dt>
-              <dd><StatCounter value={12} suffix="+" /></dd>
+              <dt>Torneos</dt>
+              <dd className="hero-stat-word">Todo el año</dd>
             </div>
             <div className="hero-stat">
-              <dt>Jugadores en la comunidad</dt>
-              <dd><StatCounter value={800} prefix="+" /></dd>
+              <dt>Jugadores pasan por el club</dt>
+              <dd><StatCounter value={300} prefix="+" /></dd>
             </div>
             <div className="hero-stat">
               <dt>Minutos por turno</dt>
@@ -189,9 +193,9 @@ export default async function Home() {
           <div className="section-header-row">
             <div>
               <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-                Disponibilidad Real
+                Disponibilidad real
               </span>
-              <h2 className="section-title">Reservá tu Cancha</h2>
+              <h2 className="section-title">Reservá tu cancha</h2>
               <p className="section-desc">
                 Elegí día y horario en tiempo real y confirmá tu turno al instante.
               </p>
@@ -207,11 +211,12 @@ export default async function Home() {
             </div>
           </div>
 
-          <BookingCalendar serverToday={todayInClub()} />
+          <BookingCalendar serverToday={todayInClub()} mpEnabled={Boolean(process.env.MP_ACCESS_TOKEN)} />
         </div>
       </section>
 
-      <TestimonialsSection />
+      {/* Testimonios: fuera hasta tener reseñas reales con nombre y foto (o
+          las de Google). El componente queda en components/. */}
 
       {/* 4. INSTALACIONES */}
       <AmenitiesSection />
@@ -237,49 +242,20 @@ export default async function Home() {
           <div className="section-header-row">
             <div>
               <span className="badge-linear badge-emerald" style={{ marginBottom: 8 }}>
-                Cómo Llegar
+                Cómo llegar
               </span>
-              <h2 className="section-title">Ubicación y Horarios</h2>
+              <h2 className="section-title">Ubicación y horarios</h2>
               <p className="section-desc">
-                Av. Cacique Catriel y Córdoba, Catriel, Río Negro. Lunes a Sábado de 14:00 a 00:30 hs.
+                Av. Cacique Catriel y Córdoba, Catriel, Río Negro. De lunes a sábado, de 14:00 a 00:30 hs.
               </p>
             </div>
-            <a
-              href={CLUB_INFO.mapsUrl}
-              target="_blank"
-              rel="noopener"
-              className="btn btn-secondary-maps"
-              style={{ gap: 8 }}
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
-                <path
-                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                  fill="#EA4335"
-                />
-                <circle cx="12" cy="9" r="2.8" fill="#ffffff" />
-              </svg>
-              <span className="maps-text">Abrir en Google Maps →</span>
-            </a>
-          </div>
-
-          <div className="map-frame-wrap">
-            <iframe
-              title="Mapa de Muzzaga Pádel en Catriel"
-              src="https://maps.google.com/maps?q=-37.8832905,-67.8005469&hl=es&z=16&output=embed"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-            <div className="map-overlay-actions">
+            <div className="map-header-actions">
               <a
                 href={CLUB_INFO.mapsUrl}
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary-maps"
-                
+                style={{ gap: 8 }}
               >
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
                   <path
@@ -295,7 +271,6 @@ export default async function Home() {
                 target="_blank"
                 rel="noopener"
                 className="btn btn-secondary"
-                
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -314,6 +289,19 @@ export default async function Home() {
             </div>
           </div>
 
+          <div className="map-frame-wrap">
+            <iframe
+              title="Mapa de Muzzaga Pádel en Catriel"
+              src="https://maps.google.com/maps?q=-37.8832905,-67.8005469&hl=es&z=16&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+
           <div className="contact-grid">
             <a
               href={CLUB_INFO.mapsUrl}
@@ -330,8 +318,8 @@ export default async function Home() {
                     />
                     <circle cx="12" cy="9" r="2.8" fill="#ffffff" />
                   </svg>
-                  <span style={{ color: "#EA4335" }}>Google Maps</span> ·
-                  Ubicación Oficial
+                  <span className="maps-text">Google Maps</span> ·
+                  Cómo llegar
                 </span>
                 <div className="contact-title">
                   Muzzaga Pádel
@@ -359,14 +347,12 @@ export default async function Home() {
                   >
                     <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z" />
                   </svg>
-                  <span style={{ color: "#25D366" }}>WhatsApp</span> · Atención Directa
+                  <span className="whatsapp-text">WhatsApp</span> · Atención directa
                 </span>
                 <div className="contact-title">
-                  WhatsApp del Club
+                  WhatsApp del club
                 </div>
-                <span
-                  style={{ fontSize: 13, color: "#25D366", fontWeight: 600 }}
-                >
+                <span className="whatsapp-text" style={{ fontSize: 13 }}>
                   {CLUB_INFO.phoneFormatted}
                 </span>
               </div>
@@ -376,7 +362,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <FloatingLiveBar />
+      <FloatingLiveBar schedule={config.schedule} blockedDates={config.blockedDates} />
       <MascotFloatHelper />
       <Footer />
       <BottomNav />

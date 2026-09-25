@@ -23,7 +23,7 @@ export default function ScrollProgress() {
 
   return (
     <div className="scroll-progress-track" aria-hidden="true">
-      <div className="scroll-progress-fill" style={{ width: `${pct}%` }} />
+      <div className="scroll-progress-fill" style={{ transform: `scaleX(${pct / 100})` }} />
     </div>
   );
 }

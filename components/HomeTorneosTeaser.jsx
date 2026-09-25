@@ -2,39 +2,41 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { CalendarClock } from "lucide-react";
 import { useLightbox } from "./LightboxProvider";
 import { CLUB_INFO } from "../data/club";
+import Mascota from "./Mascota";
 
 const FEATURED_PHOTOS = [
   {
     src: "/img/torneos/agosto/ganadores_1er_caballeros.jpg",
     alt: "1er puesto 7ma Caballeros, Torneo Agosto 2026",
-    label: "1er Puesto Caballeros",
+    label: "1er puesto Caballeros",
   },
   {
     src: "/img/torneos/agosto/ganadores_1er_damas.jpg",
     alt: "1er puesto 7ma Damas, Torneo Agosto 2026",
-    label: "1er Puesto Damas",
+    label: "1er puesto Damas",
   },
   {
     src: "/img/torneos/junio/ganadores_1er_puesto.jpg",
     alt: "1er puesto 6ta Libre (G. Salinas y F. Alcalá)",
-    label: "1er Puesto 6ta Libre",
+    label: "1er puesto 6ta Libre",
   },
   {
     src: "/img/torneos/agosto/jugadores_01.jpg",
-    alt: "Partido en cancha de cristal, Torneo Agosto 2026",
-    label: "Fase de Grupos",
+    alt: "Cuatro jugadores posando en la red, Torneo Agosto 2026",
+    label: "Caballeros de agosto",
   },
   {
     src: "/img/torneos/agosto/jugadores_06.jpg",
-    alt: "Jugadores en acción, Torneo Agosto 2026",
-    label: "Definición en Red",
+    alt: "Cuatro jugadoras posando en la red, Torneo Agosto 2026",
+    label: "Damas de agosto",
   },
   {
     src: "/img/torneos/junio/jugadores_12.jpg",
-    alt: "Punto de torneo bajo luces LED en Muzzaga",
-    label: "Copa de Oro",
+    alt: "Cuatro jugadores posando en la red, Torneo Junio 2026",
+    label: "Torneo de junio",
   },
 ];
 
@@ -47,19 +49,17 @@ export default function HomeTorneosTeaser() {
         <div className="section-header-row" style={{ alignItems: "center" }}>
           <div>
             <span className="badge-linear badge-amber" style={{ marginBottom: 6 }}>
-              Competencia &amp; Comunidad
+              Competencia y comunidad
             </span>
             <h2 className="section-title">Torneos en Muzzaga</h2>
             <p className="section-desc">
-              Fechas oficiales por categoría con fase de grupos, copas de oro y plata, trofeos y premios en efectivo.
+              Torneos por categoría todo el año. Mirá las fotos de junio y agosto y anotate para el próximo.
             </p>
           </div>
           <div className="mascot-section-badge">
-            <img
-              src="/img/mascotas/muzzaguito-trofeo-bolso.webp"
+            <Mascota
+              pose="trofeo-bolso"
               alt="Muzzaguito Campeón con Copa de Torneo"
-              width={160}
-              height={160}
               className="mascot-section-img"
             />
           </div>
@@ -67,14 +67,14 @@ export default function HomeTorneosTeaser() {
         {/* CARD PROXIMO TORNEO */}
         <div className="next-event">
           <div className="next-event-date" aria-hidden="true">
-            <span>Próxima</span>
-            <strong>Fecha</strong>
+            <CalendarClock strokeWidth={2.2} />
+            <span>Fecha</span>
           </div>
           <div className="next-event-body">
-            <span className="next-event-tag">Inscripciones abiertas</span>
-            <h3 className="next-event-title">Categorías 7ma, 6ta y Suma 12</h3>
+            <span className="next-event-tag">Próximo torneo</span>
+            <h3 className="next-event-title">Fecha a confirmar</h3>
             <p className="next-event-desc">
-              Cupos limitados por categoría. Partidos a 3 sets, tercer tiempo incluido y transmisión de finales.
+              Escribinos por WhatsApp y te avisamos la fecha y las categorías apenas estén definidas.
             </p>
           </div>
           <a
@@ -89,7 +89,7 @@ export default function HomeTorneosTeaser() {
 
         {/* GRILLA RESUMIDA DE 6 FOTOS */}
         <div className="torneo-thumb-grid torneo-bento">
-          {FEATURED_PHOTOS.slice(0, 5).map((photo) => (
+          {FEATURED_PHOTOS.slice(0, 5).map((photo, i) => (
             <button
               type="button"
               key={photo.src}
@@ -102,7 +102,8 @@ export default function HomeTorneosTeaser() {
                 alt={photo.alt}
                 fill
                 loading="lazy"
-                sizes="(max-width: 640px) 45vw, 360px"
+                // La primera ocupa dos columnas y dos filas del bento.
+                sizes={i === 0 ? "(max-width: 900px) 92vw, 570px" : "(max-width: 900px) 46vw, 280px"}
               />
               <div className="torneo-thumb-badge">
                 <span>{photo.label}</span>
@@ -113,7 +114,7 @@ export default function HomeTorneosTeaser() {
 
         <div className="section-more">
           <Link href="/torneos" className="section-more-link">
-            Ver galería completa y fixture <span aria-hidden="true">→</span>
+            Ver galería completa <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>

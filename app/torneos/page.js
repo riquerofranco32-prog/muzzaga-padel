@@ -3,14 +3,15 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import BottomNav from "../../components/BottomNav";
 import TorneosGallery from "../../components/TorneosGallery";
-import TournamentBracket from "../../components/TournamentBracket";
 import { CLUB_INFO } from "../../data/club";
+import { pageMetadata } from "../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Torneos de pádel en Catriel · Muzzaga Pádel",
   description:
-    "Torneos de pádel oficiales en Catriel, Río Negro: cuadros, categorías Damas y Caballeros, fotos de ganadores e inscripciones para la próxima fecha.",
-};
+    "Torneos de pádel en Catriel, Río Negro, todo el año: fotos de las ediciones anteriores, ganadores e inscripción para la próxima fecha.",
+  path: "/torneos",
+});
 
 export default function TorneosPage() {
   return (
@@ -19,11 +20,11 @@ export default function TorneosPage() {
       <main style={{ paddingTop: 90, minHeight: "80vh" }}>
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
-            <Link href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
-              ← Volver al Inicio
+            <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange-text)", textDecoration: "none", fontWeight: 600 }}>
+              ← Volver al inicio
             </Link>
             <span>/</span>
-            <span style={{ color: "var(--text-primary)" }}>Torneos Oficiales</span>
+            <span style={{ color: "var(--text-primary)" }}>Torneos</span>
           </div>
         </div>
 
@@ -44,13 +45,13 @@ export default function TorneosPage() {
           >
             <div>
               <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-                Próxima Edición · Cupos Limitados
+                Próximo torneo
               </span>
               <h2 style={{ fontSize: 22, color: "var(--color-ink)", margin: "4px 0 8px" }}>
-                Torneo Primavera 2026 en Muzzaga
+                Fecha a confirmar
               </h2>
               <p style={{ color: "var(--text-secondary)", fontSize: 14, margin: 0, maxWidth: 500 }}>
-                Categorías 7ma, 6ta y Suma 12. Fase de grupos + cuadro eliminatorio, trofeos y premios en efectivo para campeones.
+                Escribinos por WhatsApp y te avisamos la fecha y las categorías apenas estén definidas.
               </p>
             </div>
             <a
@@ -60,12 +61,12 @@ export default function TorneosPage() {
               className="btn btn-linear-primary"
               style={{ padding: "10px 22px" }}
             >
-              Consultar Inscripción por WhatsApp →
+              Anotarme por WhatsApp →
             </a>
           </div>
 
-          {/* CUADROS Y LLAVES EN VIVO */}
-          <TournamentBracket />
+          {/* Cuadros "en vivo": ocultos hasta tener datos reales del torneo
+              (el componente, con jugadores de ejemplo, queda en components/). */}
         </div>
 
         <TorneosGallery />

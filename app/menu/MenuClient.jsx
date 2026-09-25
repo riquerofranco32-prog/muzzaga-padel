@@ -1,16 +1,44 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MENU_ITEMS, MENU_CATEGORIES } from "../../data/menu";
 import { CLUB_INFO } from "../../data/club";
+import ScrollRow from "../../components/ScrollRow";
+import CantinaCart, { QtyStepper } from "../../components/CantinaCart";
+import {
+  MAX_ORDER_QTY,
+  deliveryFromParam,
+  orderCount,
+  orderLines,
+  orderTotal,
+  parseStoredCart,
+} from "../../lib/cantinaOrder";
+import { MapPin, ShoppingCart, Pizza, CupSoda, Beer, Candy, ShoppingBag } from "lucide-react";
+
+// El pedido queda en el navegador: si se recarga la página no se pierde.
+const CART_KEY = "muzzaga-pedido";
+
+// Íconos de las pestañas (antes eran emojis dentro del texto de data/menu.js).
+const CATEGORY_ICONS = {
+  buffet: Pizza,
+  "bebidas-sin": CupSoda,
+  "bebidas-con": Beer,
+  kiosco: Candy,
+  accesorios: ShoppingBag,
+};
+
+function CategoryIcon({ id }) {
+  const Icon = CATEGORY_ICONS[id];
+  return Icon ? <Icon size={20} className="icono-marca" aria-hidden="true" /> : null;
+}
 
 const LOCATION_NAMES = {
-  "cancha-1": "Cancha 1 (Pista de Cristal)",
-  "cancha-2": "Cancha 2 (Pista de Cristal)",
-  "cancha1": "Cancha 1 (Pista de Cristal)",
-  "cancha2": "Cancha 2 (Pista de Cristal)",
+  "cancha-1": "Cancha 1 (cristal)",
+  "cancha-2": "Cancha 2 (cristal)",
+  "cancha1": "Cancha 1 (cristal)",
+  "cancha2": "Cancha 2 (cristal)",
   "mesa-1": "Mesa 1 (Cantina)",
   "mesa-2": "Mesa 2 (Cantina)",
   "mesa-3": "Mesa 3 (Cantina)",
@@ -32,6 +60,47 @@ export default function MenuClient() {
   const [activeLocation, setActiveLocation] = useState(
     rawLocation ? LOCATION_NAMES[rawLocation.toLowerCase()] || rawLocation : null
   );
+  // Con el QR de una cancha o mesa, el pedido ya sale con esa entrega.
+  const initialDelivery = activeLocation ? deliveryFromParam(rawLocation) : null;
+
+  const [cart, setCart] = useState({}); // { id: cantidad }
+  const [cartLoaded, setCartLoaded] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      setCart(parseStoredCart(localStorage.getItem(CART_KEY), MENU_ITEMS));
+    } catch {}
+    setCartLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!cartLoaded) return;
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } catch {}
+  }, [cart, cartLoaded]);
+
+  const setQty = (id, qty) =>
+    setCart((prev) => {
+      const next = { ...prev };
+      if (qty <= 0) delete next[id];
+      else next[id] = Math.min(MAX_ORDER_QTY, qty);
+      return next;
+    });
+
+  const lines = useMemo(() => orderLines(cart, MENU_ITEMS), [cart]);
+  const cartCount = orderCount(lines);
+
+  // Al sacar un producto con el tacho de su tarjeta, el control vuelve a ser
+  // "Agregar": el foco pasa a ese botón en vez de perderse.
+  const addRefs = useRef({});
+  const [refocusAdd, setRefocusAdd] = useState(null);
+  useEffect(() => {
+    if (!refocusAdd) return;
+    addRefs.current[refocusAdd]?.focus();
+    setRefocusAdd(null);
+  }, [refocusAdd]);
 
   const filteredItems = useMemo(() => {
     return MENU_ITEMS.filter((item) => {
@@ -44,22 +113,11 @@ export default function MenuClient() {
     });
   }, [selectedCat, search]);
 
-  const handleOrderWhatsapp = (itemName, itemPrice) => {
-    const locationPrefix = activeLocation
-      ? `*PEDIDO PARA ${activeLocation.toUpperCase()}*\n\n`
-      : "";
-    const msg = `${locationPrefix}¡Hola Muzzaga! Quiero pedir ${itemName} ($${itemPrice.toLocaleString("es-AR")}) de la cantina.`;
-    window.open(
-      `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(msg)}`,
-      "_blank",
-    );
-  };
-
   const handleGeneralOrder = () => {
     const locationPrefix = activeLocation
-      ? `*PEDIDO PARA ${activeLocation.toUpperCase()}*\n\n`
+      ? `*CONSULTA DESDE ${activeLocation.toUpperCase()}*\n\n`
       : "";
-    const msg = `${locationPrefix}¡Hola Muzzaga! Quiero hacer un pedido a la cantina.`;
+    const msg = `${locationPrefix}¡Hola Muzzaga! Tengo una consulta para la cantina.`;
     window.open(
       `https://wa.me/${CLUB_INFO.phoneRaw}?text=${encodeURIComponent(msg)}`,
       "_blank",
@@ -85,10 +143,10 @@ export default function MenuClient() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 22 }}>📍</span>
+            <MapPin size={20} className="icono-marca" aria-hidden="true" />
             <div>
-              <div style={{ fontSize: 11, textTransform: "uppercase", fontWeight: 700, color: "var(--color-accent-orange)" }}>
-                Entrega Directa Activada
+              <div style={{ fontSize: 11, textTransform: "uppercase", fontWeight: 700, color: "var(--color-accent-orange-text)" }}>
+                Entrega directa activada
               </div>
               <strong style={{ fontSize: 15, color: "var(--color-ink)" }}>
                 {activeLocation}
@@ -105,6 +163,10 @@ export default function MenuClient() {
               fontSize: 12,
               cursor: "pointer",
               textDecoration: "underline",
+              minHeight: 44,
+              padding: "0 12px",
+              display: "inline-flex",
+              alignItems: "center",
             }}
           >
             Quitar ubicación
@@ -116,23 +178,40 @@ export default function MenuClient() {
       <div className="section-header-row" style={{ marginBottom: 24 }}>
         <div>
           <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-            Carta Oficial · Cantina &amp; 3er Tiempo
+            Carta de la cantina · Tercer tiempo
           </span>
-          <h1 className="section-title">Menú de la Cantina</h1>
+          <h1 className="section-title">Menú de la cantina</h1>
           <p className="section-desc">
             Pizzas a la piedra, tostados, sándwiches abundantes, cervezas heladas
-            y kiosco con vista directa a las canchas.
+            y kiosco con vista directa a las canchas. Sumá lo que quieras con el
+            carrito y encargalo: la cocina lo empieza cuando está pagado.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleGeneralOrder}
-          className="btn btn-secondary-whatsapp"
-          style={{ gap: 8, height: 42, cursor: "pointer" }}
-        >
-          Pedir por adelantado vía WhatsApp →
-        </button>
+        <div className="menu-header-actions">
+          {/* En celu el pedido vive en una hoja: este botón la abre siempre,
+              también vacía. En compu el pedido ya está a la vista al costado. */}
+          <button
+            type="button"
+            className="btn btn-linear-primary menu-cart-open"
+            onClick={() => setCartOpen(true)}
+          >
+            <ShoppingCart size={18} aria-hidden="true" />
+            Ver mi pedido
+            {cartCount > 0 && <span className="menu-cart-open-count">{cartCount}</span>}
+          </button>
+          <button
+            type="button"
+            onClick={handleGeneralOrder}
+            className="btn btn-secondary-whatsapp"
+            style={{ gap: 8, height: 42, cursor: "pointer" }}
+          >
+            Consultas por WhatsApp →
+          </button>
+        </div>
       </div>
+
+      <div className="menu-layout">
+      <div className="menu-main">
 
       {/* BUSCADOR Y FILTROS */}
       <div
@@ -146,7 +225,8 @@ export default function MenuClient() {
         <div style={{ maxWidth: 440 }}>
           <input
             type="search"
-            placeholder="Buscar por producto (ej. Pizza, Corona, Sin TACC)..."
+            placeholder="Buscar: pizza, Corona, sin TACC…"
+            aria-label="Buscar en la carta"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -163,14 +243,7 @@ export default function MenuClient() {
         </div>
 
         {/* CHIPS DE CATEGORÍA */}
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            overflowX: "auto",
-            paddingBottom: 6,
-          }}
-        >
+        <ScrollRow className="menu-category-tabs" role="group" aria-label="Categorías de la carta">
           {MENU_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
@@ -179,10 +252,11 @@ export default function MenuClient() {
               onClick={() => setSelectedCat(cat.id)}
               style={{ whiteSpace: "nowrap" }}
             >
+              <CategoryIcon id={cat.id} />
               {cat.label}
             </button>
           ))}
-        </div>
+        </ScrollRow>
       </div>
 
       {/* LISTA DE PRODUCTOS */}
@@ -202,7 +276,9 @@ export default function MenuClient() {
             gap: 12,
           }}
         >
-          {filteredItems.map((item) => (
+          {filteredItems.map((item) => {
+            const qty = cart[item.id] || 0;
+            return (
             <div
               key={item.id}
               style={{
@@ -214,7 +290,7 @@ export default function MenuClient() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 gap: 12,
-                transition: "all 0.15s ease",
+                transition: "transform var(--t-hover) var(--ease), opacity var(--t-hover) var(--ease)",
               }}
             >
               <div>
@@ -250,30 +326,53 @@ export default function MenuClient() {
                 >
                   ${item.price.toLocaleString("es-AR")}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => handleOrderWhatsapp(item.name, item.price)}
-                  title="Pedir por WhatsApp"
-                  style={{
-                    background: "rgba(37, 211, 102, 0.12)",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: 32,
-                    height: 32,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    color: "#25D366",
-                  }}
-                >
-                  🛒
-                </button>
+                {/* Ancho fijo: al agregar, el "+" pasa a "− 1 +" sin correr el
+                    precio ni hacer crecer la tarjeta. */}
+                <span className="menu-item-control">
+                  {qty > 0 ? (
+                    <QtyStepper
+                      name={item.name}
+                      qty={qty}
+                      onChange={(q) => {
+                        setQty(item.id, q);
+                        if (q <= 0) setRefocusAdd(item.id);
+                      }}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      className="menu-add-btn"
+                      ref={(el) => {
+                        addRefs.current[item.id] = el;
+                      }}
+                      onClick={() => setQty(item.id, 1)}
+                      aria-label={`Agregar ${item.name} al pedido`}
+                      title="Agregar al pedido"
+                    >
+                      <ShoppingCart size={20} aria-hidden="true" />
+                    </button>
+                  )}
+                </span>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
+      </div>
+
+      <CantinaCart
+        lines={lines}
+        count={cartCount}
+        total={orderTotal(lines)}
+        onQty={setQty}
+        onClear={() => setCart({})}
+        initialDelivery={initialDelivery}
+        open={cartOpen}
+        onOpen={() => setCartOpen(true)}
+        onClose={() => setCartOpen(false)}
+      />
+      </div>
 
       {/* FOOTER CALL TO ACTION */}
       <div
@@ -295,7 +394,7 @@ export default function MenuClient() {
           Reservá tu turno de 90 minutos y asegurate el mejor tercer tiempo en Catriel.
         </p>
         <Link href="/#turnos" className="btn btn-linear-primary" style={{ padding: "10px 24px" }}>
-          Reservar Cancha →
+          Reservar cancha →
         </Link>
       </div>
     </div>

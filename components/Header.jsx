@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import ScrollRow from "./ScrollRow";
 
 const NAV_LINKS = [
   { href: "/#turnos", label: "Turnos" },
@@ -12,10 +14,11 @@ const NAV_LINKS = [
 ];
 
 const TOOLS_LINKS = [
-  { href: "/herramientas/dividir-gastos", label: "Calculadora de Gastos", desc: "Dividir cancha y cantina" },
-  { href: "/herramientas/nivel", label: "Test de Nivel", desc: "Calculá tu categoría de pádel" },
-  { href: "/herramientas/pizarra", label: "Pizarra Táctica", desc: "Simulador interactivo de jugadas" },
-  { href: "/herramientas/americano", label: "Torneo Americano", desc: "Generador de fixtures express" },
+  // `short`: el menú de celu los muestra en dos columnas.
+  { href: "/herramientas/dividir-gastos", label: "Calculadora de gastos", short: "Dividir gastos", desc: "Dividir cancha y cantina" },
+  { href: "/herramientas/nivel", label: "Test de nivel", desc: "Calculá tu categoría de pádel" },
+  { href: "/herramientas/pizarra", label: "Pizarra táctica", desc: "Simulador interactivo de jugadas" },
+  { href: "/herramientas/americano", label: "Torneo americano", short: "Americano", desc: "Generador de fixtures express" },
 ];
 
 const MAPS_URL = "https://maps.app.goo.gl/kR1h9mhdLqGLKatV7";
@@ -40,11 +43,18 @@ const WhatsAppIcon = () => (
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const menuBtnRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
     function onKeyDown(e) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Escape") return;
+      // Cerrado, el panel es inert: si el foco estaba adentro, vuelve al
+      // botón que lo abrió en vez de caer en <body>.
+      if (document.activeElement?.closest("#mobile-nav-panel")) {
+        menuBtnRef.current?.focus();
+      }
+      setOpen(false);
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -57,13 +67,14 @@ export default function Header() {
           <Link
             href="/#top"
             className="brand-group"
-            aria-label="Muzzaga Pádel Catriel"
           >
-            <img
+            {/* next/image: el PNG original pesa 374 KB y acá se muestra a 34 px. */}
+            <Image
               src="/img/logo_badge.png"
-              alt="Muzzaga Pádel"
+              alt=""
               width={34}
               height={34}
+              priority
               style={{
                 width: 34,
                 height: 34,
@@ -71,10 +82,7 @@ export default function Header() {
                 display: "block",
               }}
             />
-            <div>
-              <span className="brand-text">Muzzaga</span>
-              <span className="brand-sub">Catriel</span>
-            </div>
+            <span className="brand-text">Muzzaga</span>
           </Link>
 
           <nav className="nav-links-row" aria-label="Navegación principal">
@@ -107,7 +115,7 @@ export default function Header() {
                 }}
               >
                 <span>Herramientas</span>
-                <span style={{ fontSize: 10, transition: "transform 0.2s", transform: toolsOpen ? "rotate(180deg)" : "none" }}>
+                <span style={{ fontSize: 10, transition: "transform var(--t-estado) var(--ease)", transform: toolsOpen ? "rotate(180deg)" : "none" }}>
                   ▼
                 </span>
               </button>
@@ -142,7 +150,6 @@ export default function Header() {
                         borderRadius: "var(--radius-sm)",
                         textDecoration: "none",
                         color: "var(--text-primary)",
-                        transition: "background 0.15s ease",
                       }}
                     >
                       <strong style={{ display: "block", fontSize: 13 }}>{tool.label}</strong>
@@ -157,7 +164,7 @@ export default function Header() {
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <a
               href="/#turnos"
-              className="btn btn-linear-primary header-reserve-btn"
+              className="btn btn-orange-primary header-reserve-btn"
               style={{ height: 36, padding: "6px 16px", fontWeight: 700 }}
             >
               Reservar
@@ -169,11 +176,12 @@ export default function Header() {
               className="btn btn-secondary-whatsapp header-whatsapp-btn"
               style={{ height: 36, padding: "6px 14px", gap: 6 }}
             >
-              <WhatsAppIcon /> WhatsApp Club
+              <WhatsAppIcon /> WhatsApp del club
             </a>
             <button
               type="button"
               className="mobile-menu-btn"
+              ref={menuBtnRef}
               onClick={() => setOpen((v) => !v)}
               aria-label="Abrir menú"
               aria-expanded={open}
@@ -195,17 +203,21 @@ export default function Header() {
         </div>
       </header>
 
+      {/* Cerrado es invisible (opacidad 0) pero seguía en el orden de Tab:
+          con teclado se recorrían links que no se ven. inert lo saca. */}
       <div
         id="mobile-nav-panel"
         className={`mobile-nav-panel${open ? " open" : ""}`}
+        inert={!open}
       >
+        <ScrollRow axis="y" className="mobile-nav-scroll">
         <a
           href="/#turnos"
-          className="btn btn-linear-primary"
+          className="btn btn-orange-primary"
           onClick={() => setOpen(false)}
           style={{ width: "100%", height: 42, justifyContent: "center", marginBottom: 12 }}
         >
-          Reservar Cancha →
+          Reservar cancha →
         </a>
 
         {NAV_LINKS.map((link) => (
@@ -219,23 +231,23 @@ export default function Header() {
           </a>
         ))}
 
-        <div style={{ borderTop: "1px solid var(--color-hairline)", margin: "10px 0", paddingTop: 10 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em", padding: "0 12px" }}>
-            Herramientas del Club
-          </span>
-          {TOOLS_LINKS.map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="mobile-nav-link"
-              onClick={() => setOpen(false)}
-              style={{ fontSize: 14 }}
-            >
-              {tool.label}
-            </Link>
-          ))}
+        <div className="mobile-nav-group">
+          <span className="mobile-nav-group-title">Herramientas del club</span>
+          <div className="mobile-nav-tools">
+            {TOOLS_LINKS.map((tool) => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className="mobile-nav-link"
+                onClick={() => setOpen(false)}
+              >
+                {tool.short || tool.label}
+              </Link>
+            ))}
+          </div>
         </div>
 
+        <div className="mobile-nav-contact">
         <a
           className="mobile-nav-link maps-text"
           href={MAPS_URL}
@@ -257,8 +269,10 @@ export default function Header() {
             fontWeight: 600,
           }}
         >
-          <WhatsAppIcon /> WhatsApp Club →
+          <WhatsAppIcon /> WhatsApp
         </a>
+        </div>
+        </ScrollRow>
       </div>
       <div
         id="mobile-nav-backdrop"

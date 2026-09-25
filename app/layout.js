@@ -3,6 +3,7 @@ import "./globals.css";
 import LightboxProvider from "../components/LightboxProvider";
 import ServiceWorkerRegister from "../components/ServiceWorkerRegister";
 import { Analytics } from "@vercel/analytics/react";
+import { SITE_URL } from "../lib/site";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,35 +33,31 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://muzzagapadel.com.ar",
-  ),
+  metadataBase: new URL(SITE_URL),
   title:
-    "Canchas de Pádel en Catriel · Muzzaga Pádel · Reservá tu Cancha Online",
+    "Canchas de pádel en Catriel · Muzzaga Pádel · Reservá tu cancha online",
   description:
-    "Club de pádel en Catriel, Río Negro. 2 canchas profesionales de cristal, iluminación LED, turnos de 90 min, Canchas Abiertas comunitarias y cantina.",
-  icons: {
-    icon: "/img/logo_badge.png",
-    apple: "/img/logo_badge.png",
-  },
+    "Club de pádel en Catriel, Río Negro. 2 canchas de cristal templado, iluminación LED, turnos de 90 min, Canchas Abiertas comunitarias y cantina.",
+  // Íconos: app/favicon.ico, app/icon.png y app/apple-icon.png (convención de archivos).
   openGraph: {
     type: "website",
     siteName: "Muzzaga Pádel",
-    title: "Canchas de Pádel en Catriel · Muzzaga Pádel",
+    title: "Canchas de pádel en Catriel · Muzzaga Pádel",
     description:
-      "2 canchas oficiales de cristal, iluminación LED, torneos y cantina propia para el mejor tercer tiempo en Catriel.",
+      "2 canchas de cristal templado, iluminación LED, torneos y cantina propia para el mejor tercer tiempo en Catriel.",
     locale: "es_AR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Canchas de Pádel en Catriel · Muzzaga Pádel",
+    title: "Canchas de pádel en Catriel · Muzzaga Pádel",
     description:
-      "2 canchas oficiales de cristal, iluminación LED, torneos y cantina propia para el mejor tercer tiempo en Catriel.",
+      "2 canchas de cristal templado, iluminación LED, torneos y cantina propia para el mejor tercer tiempo en Catriel.",
   },
 };
 
 export const viewport = {
-  themeColor: "#e8722a",
+  // Negro de marca: el naranja pintaba toda la barra del navegador.
+  themeColor: "#1b1b19",
 };
 
 const jsonLd = {
@@ -68,15 +65,15 @@ const jsonLd = {
   "@type": "SportsActivityLocation",
   name: "Muzzaga Pádel",
   description:
-    "Club de pádel en Catriel, Río Negro. 2 canchas profesionales de cristal, iluminación LED, torneos todo el año y cantina propia.",
-  url: "https://muzzagapadel.com.ar",
+    "Club de pádel en Catriel, Río Negro. 2 canchas de cristal templado, iluminación LED, torneos todo el año y cantina propia.",
+  url: SITE_URL,
   telephone: "+5492995974176",
   priceRange: "$$",
   hasMap: "https://maps.google.com/maps?q=-37.8832905,-67.8005469",
   image: [
-    "https://muzzagapadel.com.ar/img/court_glass_night_match.jpg",
-    "https://muzzagapadel.com.ar/img/panoramic_courts.jpg",
-    "https://muzzagapadel.com.ar/img/logo_full.png",
+    `${SITE_URL}/img/court_glass_night_match.jpg`,
+    `${SITE_URL}/img/panoramic_courts.jpg`,
+    `${SITE_URL}/img/logo_full.png`,
   ],
   geo: {
     "@type": "GeoCoordinates",
@@ -111,7 +108,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className={`${poppins.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable}`}>
+    <html lang="es-AR" className={`${poppins.variable} ${jetbrainsMono.variable} ${barlowCondensed.variable}`}>
       <head>
         <script
           type="application/ld+json"

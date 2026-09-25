@@ -72,7 +72,7 @@ const ALL_CATEGORIES = [
       { name: "Definición / Smash", level: "Traída a campo propio y smash x3 constante", pct: 90 },
     ],
     palaRecom: "Formato Diamante / Lágrima Hard, balance alto, balance pro para máxima aceleración.",
-    tournaments: "Torneo Abierto 3ra/4ta · Suma 8 · Premios en efectivo y palas pro",
+    tournaments: "Torneo Abierto 3ra/4ta · Suma 8",
     whatsappMsg: "¡Hola Muzzaga! Soy jugador de 4ta/3ra. Quiero consultar por torneos de primera categoría y partidos de nivel.",
   },
   {
@@ -223,7 +223,7 @@ export default function CategoriesExplorer() {
               </div>
 
               <div className="cat-info-block" style={{ background: "var(--color-accent-orange-subtle)", borderColor: "var(--color-accent-orange-border)" }}>
-                <span className="cat-info-tag" style={{ color: "var(--color-accent-orange)" }}>Matchmaking en Catriel</span>
+                <span className="cat-info-tag" style={{ color: "var(--color-accent-orange-text)" }}>Matchmaking en Catriel</span>
                 <p style={{ fontSize: 13, color: "var(--color-text-link)", margin: "4px 0 0", lineHeight: 1.5 }}>
                   ¿Buscás pareja o rivales de {current.name}? Tenemos grupos activos organizados por nivel.
                 </p>

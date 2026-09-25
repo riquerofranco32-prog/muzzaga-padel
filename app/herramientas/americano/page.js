@@ -3,12 +3,14 @@ import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
 import AmericanoGenerator from "../../../components/AmericanoGenerator";
+import { pageMetadata } from "../../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Generador de torneo americano de pádel · Muzzaga Pádel",
   description:
     "Armá el fixture de tu torneo americano de pádel en segundos para grupos de 4 a 8 jugadores. Rotaciones balanceadas y copia directa a WhatsApp.",
-};
+  path: "/herramientas/americano",
+});
 
 export default function AmericanoPage() {
   return (
@@ -17,13 +19,13 @@ export default function AmericanoPage() {
       <main style={{ paddingTop: 90, minHeight: "80vh" }}>
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
-            <Link href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
-              ← Volver al Inicio
+            <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange-text)", textDecoration: "none", fontWeight: 600 }}>
+              ← Volver al inicio
             </Link>
             <span>/</span>
             <span>Herramientas</span>
             <span>/</span>
-            <span style={{ color: "var(--text-primary)" }}>Torneo Americano</span>
+            <span style={{ color: "var(--text-primary)" }}>Torneo americano</span>
           </div>
         </div>
 
@@ -47,7 +49,7 @@ export default function AmericanoPage() {
               Reservá turnos consecutivos para jugar el torneo con tus amigos y disfrutar del mejor tercer tiempo en la cantina.
             </p>
             <Link href="/#turnos" className="btn btn-linear-primary" style={{ padding: "10px 24px" }}>
-              Reservar Horarios →
+              Reservar turno →
             </Link>
           </div>
         </div>

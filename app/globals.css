@@ -101,6 +101,18 @@
   --spacing-xxl: 48px;
   --spacing-section: 96px;
   --bottom-bar-h: 64px;
+
+  /* Movimiento: una sola curva para todo el sitio (ease-out suave) y otra
+     con rebote que usa solo la mascota. `linear` queda únicamente donde la
+     velocidad tiene que ser constante: la cinta y lo que va atado al scroll. */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-mascota: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Tres duraciones y nada más: hover, cambio de estado (abrir, activar,
+     seguir al puntero) y entrada (lo que aparece al cargar o al scrollear).
+     Ninguna entrada pasa de 700 ms. */
+  --t-hover: 150ms;
+  --t-estado: 240ms;
+  --t-entrada: 500ms;
 }
 
 *,
@@ -117,7 +129,12 @@ html {
   font-size: 16px;
   background: var(--color-canvas);
   color-scheme: light;
+  /* clip, no hidden: hidden convierte a html/body en contenedores de scroll y
+     el header deja de quedar pegado (position: sticky necesita que el que
+     scrollea sea el viewport). clip recorta igual el desborde horizontal de la
+     cinta y la mascota XL. hidden queda como respaldo para Safari < 16. */
   overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
 }
 
@@ -130,6 +147,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  overflow-x: clip;
   padding-bottom: calc(var(--bottom-bar-h) + 24px);
   position: relative;
 }
@@ -160,9 +178,7 @@ code {
 a {
   color: inherit;
   text-decoration: none;
-  transition:
-    color 0.15s ease,
-    opacity 0.15s ease;
+  transition: opacity var(--t-hover) var(--ease);
 }
 
 button,
@@ -268,10 +284,10 @@ select:focus-visible,
 @media (prefers-reduced-motion: no-preference) {
   .reveal-up {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(16px);
     transition:
-      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity var(--t-entrada) var(--ease),
+      transform var(--t-entrada) var(--ease);
   }
 
   .reveal-up.in-view {
@@ -279,29 +295,8 @@ select:focus-visible,
     transform: none;
   }
 
-  /* Stagger: sin esto, todas las cards de una misma grilla cruzan el umbral
-     de scroll casi al mismo tiempo y aparecen juntas en vez de en cascada. */
-  .open-cards-grid .reveal-up:nth-child(2) {
-    transition-delay: 0.08s;
-  }
-  .faq-list .faq-card:nth-child(2) {
-    transition-delay: 0.05s;
-  }
-  .faq-list .faq-card:nth-child(3) {
-    transition-delay: 0.1s;
-  }
-  .faq-list .faq-card:nth-child(4) {
-    transition-delay: 0.15s;
-  }
-  .faq-list .faq-card:nth-child(5) {
-    transition-delay: 0.2s;
-  }
-  .faq-list .faq-card:nth-child(6) {
-    transition-delay: 0.25s;
-  }
-  .faq-list .faq-card:nth-child(7) {
-    transition-delay: 0.3s;
-  }
+  /* El escalonado (60 ms entre hermanos) lo pone landing.css con --i, que
+     setea ScrollReveal. */
 }
 
 .scroll-progress-track {
@@ -315,9 +310,11 @@ select:focus-visible,
 }
 
 .scroll-progress-fill {
+  width: 100%;
   height: 100%;
   background: var(--color-accent-orange);
-  transition: width 0.1s linear;
+  transform-origin: left center;
+  transform: scaleX(0);
 }
 
 /* ==========================================================================
@@ -337,13 +334,15 @@ select:focus-visible,
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   position: relative;
 }
 
 .btn:active,
 .btn:hover:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 /* Primary Button (Expo Pure Black or High-Voltage Orange) */
@@ -361,11 +360,10 @@ select:focus-visible,
   background: #1a1a1a;
   border-color: #1a1a1a;
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .btn-linear-primary:active {
-  transform: translateY(0);
+  transform: scale(0.98);
   background: #000000;
 }
 
@@ -382,7 +380,6 @@ select:focus-visible,
   background: var(--color-accent-orange-hover);
   border-color: var(--color-accent-orange-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(255, 94, 0, 0.35);
 }
 
 /* Secondary Button (Expo Clean Light Card) */
@@ -396,20 +393,23 @@ select:focus-visible,
 .btn-secondary:hover {
   background: var(--color-canvas-soft);
   border-color: #b0b4ba;
-  color: #000000;
+  /* Tinta y no negro fijo: en modo oscuro el fondo del hover es oscuro y el
+     texto negro desaparecía (1,1:1). */
+  color: var(--color-ink);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .btn-secondary:active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 /* WhatsApp Styles */
 .btn-whatsapp {
-  background: #25d366;
+  /* #25d366 con texto blanco da 1,98:1: ilegible. El verde oscuro que ya usa
+     el sitio para los textos de WhatsApp da 5,3:1. */
+  background: #0f7b4f;
   color: #ffffff;
-  border: 1px solid #25d366;
+  border: 1px solid #0f7b4f;
   box-shadow: 0 2px 10px rgba(37, 211, 102, 0.3);
   font-weight: 600;
   display: inline-flex;
@@ -418,17 +418,16 @@ select:focus-visible,
 }
 
 .btn-whatsapp:hover {
-  background: #20ba5a;
-  border-color: #20ba5a;
+  background: #0c6340;
+  border-color: #0c6340;
   color: #ffffff;
-  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.45);
   transform: translateY(-1px);
 }
 
 .btn-secondary-whatsapp {
   background: rgba(37, 211, 102, 0.08);
   border: 1px solid rgba(37, 211, 102, 0.35);
-  color: #0f7b4f;
+  color: #0b6b43;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -473,7 +472,7 @@ select:focus-visible,
 }
 
 .maps-text {
-  color: #ea4335;
+  color: #c5221f;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -481,7 +480,7 @@ select:focus-visible,
 }
 
 .maps-text:hover {
-  color: #c5221f;
+  color: #a51d1a;
 }
 
 /* Expo Pill Badges */
@@ -579,12 +578,6 @@ select:focus-visible,
   letter-spacing: -0.02em;
 }
 
-.brand-sub {
-  font-size: 12px;
-  color: var(--color-muted);
-  margin-left: 4px;
-}
-
 .nav-links-row {
   display: flex;
   align-items: center;
@@ -596,7 +589,6 @@ select:focus-visible,
   color: var(--color-body);
   font-weight: 500;
   cursor: pointer;
-  transition: color 0.15s ease;
 }
 
 .nav-link:hover {
@@ -637,14 +629,15 @@ select:focus-visible,
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-lg);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: 8px;
   z-index: 200;
+  max-height: calc(100dvh - 92px);
+  overflow: hidden;
   transform: translateY(-12px);
   opacity: 0;
   pointer-events: none;
   transition:
-    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.2s ease;
+    transform var(--t-estado) var(--ease),
+    opacity var(--t-estado) var(--ease);
 }
 
 .mobile-nav-panel.open {
@@ -653,7 +646,63 @@ select:focus-visible,
   pointer-events: auto;
 }
 
+/* Si no entra (celu chico o acostado) scrollea esto, con el borde de abajo
+   difuminado mientras quede algo; el recuadro del panel no se corta. */
+.mobile-nav-scroll {
+  min-height: 0;
+  padding: 8px;
+  overscroll-behavior: contain;
+}
+
+/* Herramientas en dos columnas y Maps + WhatsApp en un renglón: así el
+   panel entra entero en un celular de 667 px de alto. */
+.mobile-nav-group {
+  border-top: 1px solid var(--color-hairline);
+  margin: 4px 0 2px;
+  padding-top: 6px;
+}
+
+.mobile-nav-group-title {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding: 6px 14px 2px;
+}
+
+.mobile-nav-tools,
+.mobile-nav-contact {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 4px;
+}
+
+.mobile-nav-tools .mobile-nav-link,
+.mobile-nav-contact .mobile-nav-link {
+  padding-inline: 12px;
+}
+
+.mobile-nav-contact {
+  border-top: 1px solid var(--color-hairline);
+  padding-top: 4px;
+}
+
+/* Con la barra de abajo visible el panel termina antes: antes seguía por
+   detrás de la barra y los últimos links quedaban tapados. */
+@media (max-width: 768px), (max-width: 1180px) and (max-height: 500px) {
+  .mobile-nav-panel {
+    max-height: calc(
+      100dvh - 76px - var(--bottom-bar-h) - env(safe-area-inset-bottom, 0px) - 12px
+    );
+  }
+}
+
 .mobile-nav-link {
+  /* Sin display los links de herramientas (que no son hijos directos del
+     panel flex) quedaban en línea, uno pegado al otro. */
+  display: block;
   padding: 12px 14px;
   font-size: 14px;
   font-weight: 500;
@@ -712,23 +761,6 @@ select:focus-visible,
   object-position: center 40%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .hero-bg-photo img {
-    animation: heroKenBurns 24s ease-in-out infinite alternate;
-  }
-}
-
-@keyframes heroKenBurns {
-  from {
-    transform: scale(1);
-    object-position: center 40%;
-  }
-  to {
-    transform: scale(1.08);
-    object-position: center 34%;
-  }
-}
-
 .hero-bg-photo::after {
   content: "";
   position: absolute;
@@ -764,7 +796,9 @@ select:focus-visible,
   font-weight: 500;
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .tagline-pill:hover {
@@ -799,7 +833,7 @@ select:focus-visible,
   .hero-display-title,
   .hero-description-text,
   .hero-cta-buttons {
-    animation: heroRise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: heroRise var(--t-entrada) var(--ease) both;
   }
 
   .hero-logo-wrap {
@@ -851,7 +885,9 @@ select:focus-visible,
   box-shadow: 0 4px 18px rgba(232, 114, 42, 0.45);
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .hero-cta-main:hover {
@@ -878,7 +914,9 @@ select:focus-visible,
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(8px);
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .hero-link-canchas:hover {
@@ -916,8 +954,13 @@ select:focus-visible,
   align-items: flex-end;
   gap: 18px;
   width: max-content;
-  animation: marqueeContinuous 42s linear infinite;
-  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marqueeContinuous 42s linear infinite;
+    will-change: transform;
+  }
 }
 
 /* Alturas alternadas: todas las cards a 230px quedaba muy plano para una
@@ -932,6 +975,25 @@ select:focus-visible,
 
 .marquee-container:hover .marquee-track {
   animation-play-state: paused;
+}
+
+/* Con "reducir movimiento" la tira no corre sola: quedaba cortada y sin
+   forma de ver el resto de las fotos. Se desliza a mano y sin las copias
+   que solo sirven para el loop. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-container {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .marquee-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .marquee-track > [data-dup] {
+    display: none;
+  }
 }
 
 @keyframes marqueeContinuous {
@@ -954,10 +1016,7 @@ select:focus-visible,
   border: 1px solid var(--color-hairline-strong);
   background: var(--color-surface-card);
   cursor: pointer;
-  transition:
-    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .marquee-card:nth-child(odd) {
@@ -985,7 +1044,7 @@ select:focus-visible,
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .marquee-card:hover .marquee-img {
@@ -1058,12 +1117,14 @@ select:focus-visible,
 }
 
 /* Booking Dates Bar */
+/* Padding arriba y abajo: la fila recorta, y sin lugar el hover (1 px
+   arriba) perdía el borde y la sombra del día elegido cortaba recto. */
 .booking-dates {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 6px;
-  margin-bottom: 16px;
+  padding: 2px 0 16px;
+  margin-bottom: 6px;
   scrollbar-width: none;
 }
 
@@ -1076,16 +1137,19 @@ select:focus-visible,
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-md);
-  padding: 12px 8px;
+  padding: 12px 6px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .booking-date-btn:hover {
   background: var(--color-canvas-soft);
   border-color: var(--color-accent-orange-border);
+  transform: translateY(-1px);
 }
 
 .booking-date-btn.active {
@@ -1095,8 +1159,11 @@ select:focus-visible,
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* "DOM" + "FINDE" en un renglón: si bajaba, el domingo quedaba más alto
+   que el resto de la fila. */
 .booking-date-day {
   display: block;
+  white-space: nowrap;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -1115,6 +1182,10 @@ select:focus-visible,
   line-height: 1.2;
   margin: 2px 0;
   color: var(--color-ink);
+}
+
+.booking-date-btn.active .booking-date-weekend-badge {
+  color: #ff9a5a;
 }
 
 .booking-date-btn.active .booking-date-num {
@@ -1136,7 +1207,8 @@ select:focus-visible,
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  padding-block: 2px 6px;
+  margin-bottom: 12px;
 }
 
 .booking-court-tab {
@@ -1152,12 +1224,15 @@ select:focus-visible,
   font-weight: 500;
   color: var(--color-body);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .booking-court-tab:hover {
   color: var(--color-ink);
   border-color: #b0b4ba;
+  transform: translateY(-1px);
 }
 
 .booking-court-tab.active {
@@ -1174,6 +1249,55 @@ select:focus-visible,
   background: var(--color-canvas-soft);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-hairline);
+}
+
+/* Recibe el foco al reintentar (por código, no con Tab). */
+.booking-grid-area:focus,
+.open-cards-grid:focus {
+  outline: none;
+}
+
+/* Error de carga con salida. */
+.booking-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.booking-error p {
+  margin: 0;
+}
+
+/* Esqueleto de carga: estático (sin brillo que se mueve), con el alto de la
+   grilla real. */
+.booking-slot.is-skeleton {
+  background: var(--color-canvas-soft);
+  border-color: var(--color-hairline);
+  pointer-events: none;
+}
+
+.skeleton-bar {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--color-hairline-strong);
+  opacity: 0.6;
+}
+
+/* Las dos barras ocupan las mismas líneas que el nombre de la cancha (20 px)
+   y la etiqueta (23 px), así la celda mide lo mismo que la real. */
+.booking-slot.is-skeleton .skeleton-bar:first-child {
+  margin: 4px 0;
+}
+
+.booking-slot.is-skeleton .skeleton-bar:last-child {
+  height: 23px;
+  border-radius: 999px;
+}
+
+.booking-matrix-time-col .skeleton-bar {
+  height: 16px;
 }
 
 /* Booking Matrix Layout: hora x cancha */
@@ -1228,12 +1352,13 @@ select:focus-visible,
 }
 
 .booking-date-weekend-badge {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   background: rgba(232, 114, 42, 0.15);
-  color: var(--color-accent-orange);
-  padding: 1px 5px;
+  color: #a8501a;
+  padding: 1px 4px;
+  margin-left: 2px;
   border-radius: 4px;
   display: inline-block;
 }
@@ -1279,14 +1404,16 @@ select:focus-visible,
   gap: 6px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .booking-slot:hover:not(:disabled) {
   background: var(--color-accent-orange-subtle);
   border-color: var(--color-accent-orange-border);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(255, 94, 0, 0.08);
 }
 
@@ -1329,12 +1456,12 @@ select:focus-visible,
 .slot-badge {
   font-size: 11px;
   font-weight: 600;
-  color: var(--color-accent-orange);
+  color: var(--color-accent-orange-text);
   background: var(--bg-card);
   border: 1px solid var(--color-accent-orange-border);
   padding: 2px 8px;
   border-radius: var(--radius-pill);
-  transition: transform 0.2s ease;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .booking-slot:hover:not(:disabled) .slot-badge {
@@ -1362,7 +1489,7 @@ select:focus-visible,
     z-index: 1000;
     display: flex;
     align-items: flex-end;
-    animation: fadeIn 0.2s ease;
+    animation: fadeIn var(--t-estado) var(--ease);
   }
   .booking-drawer-backdrop .booking-form {
     width: 100%;
@@ -1373,7 +1500,13 @@ select:focus-visible,
     border-bottom: none;
     padding-bottom: max(28px, calc(env(safe-area-inset-bottom) + 16px));
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.25);
-    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideUp var(--t-estado) var(--ease);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
 }
 
@@ -1415,7 +1548,6 @@ select:focus-visible,
   padding: 10px 12px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.15s ease;
 }
 
 .booking-form input:focus,
@@ -1449,8 +1581,6 @@ select:focus-visible,
 .confirm-check-circle {
   stroke: var(--accent-emerald);
   stroke-width: 2.5;
-  stroke-dasharray: 151;
-  stroke-dashoffset: 151;
 }
 
 .confirm-check-mark {
@@ -1458,30 +1588,18 @@ select:focus-visible,
   stroke-width: 3.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 30;
-  stroke-dashoffset: 30;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .confirm-check-circle {
-    animation: confirmCheckDraw 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-  }
-  .confirm-check-mark {
-    animation: confirmCheckDraw 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.45s
-      forwards;
+  .confirm-check-icon {
+    animation: confirmCheckPop var(--t-entrada) var(--ease) both;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .confirm-check-circle,
-  .confirm-check-mark {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes confirmCheckDraw {
-  to {
-    stroke-dashoffset: 0;
+@keyframes confirmCheckPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
   }
 }
 
@@ -1498,7 +1616,9 @@ select:focus-visible,
   padding: 12px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1580,13 +1700,14 @@ select:focus-visible,
   justify-content: space-between;
   gap: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .open-card:hover {
   border-color: var(--color-accent-orange-border);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(255, 94, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .player-slots-layout {
@@ -1627,7 +1748,9 @@ select:focus-visible,
   color: var(--color-text-link);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   font-size: 12px;
   border-radius: var(--radius-sm);
   padding: 6px 8px;
@@ -1646,11 +1769,13 @@ select:focus-visible,
   padding: var(--spacing-section) 0;
 }
 
+/* start: con center, la columna de categorías (más corta) quedaba
+   centrada contra el test y dejaba un hueco de 236 px arriba. */
 .rating-grid-layout {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 40px;
-  align-items: center;
+  align-items: start;
 }
 
 .rating-category-card {
@@ -1661,15 +1786,38 @@ select:focus-visible,
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   margin-bottom: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
-.rating-category-card:hover {
-  border-color: var(--color-accent-orange-border);
-  transform: translateX(4px);
-  background: var(--color-canvas-soft);
+/* Ver torneos + Partidos parejos: en celu angosto uno debajo del otro
+   (lado a lado, "Partidos parejos" bajaba a dos renglones). */
+.rating-share-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .rating-share-actions {
+    grid-template-columns: 1fr;
+  }
+
+  /* "Test guiado (3 preguntas)" bajaba a dos renglones al lado de "Ajuste
+     manual": las tres preguntas están justo abajo. */
+  .rating-tab-extra {
+    display: none;
+  }
+}
+
+/* "1.5 - 2.9" en un renglón: se achicaba y quedaba en dos o tres. */
+.rating-category-card > .badge-linear {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -1692,7 +1840,9 @@ select:focus-visible,
   border-radius: var(--radius-lg);
   padding: 22px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   display: flex;
   flex-direction: column;
 }
@@ -1791,14 +1941,15 @@ select:focus-visible,
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   text-decoration: none;
 }
 
 .info-link-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--color-hairline-strong);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
 }
 
 .rating-box {
@@ -1854,7 +2005,9 @@ select:focus-visible,
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .rating-tab-btn.active {
@@ -1915,7 +2068,9 @@ select:focus-visible,
   border-radius: var(--radius-sm);
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   line-height: 1.3;
   text-align: center;
 }
@@ -1962,7 +2117,7 @@ input[type="range"]::-webkit-slider-thumb {
   border: 2px solid var(--color-accent-orange);
   box-shadow: 0 2px 6px rgba(255, 94, 0, 0.4);
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
@@ -1991,9 +2146,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 @media (min-width: 1024px) {
+  /* max-width: con min-height 600 y 16:9, entre 1024 y ~1115 px el marco
+     medía 1067 px y se salía 67 px por la derecha. */
   .fc-frame {
     flex-direction: row;
     aspect-ratio: 16 / 9;
+    max-width: 100%;
   }
 }
 
@@ -2082,19 +2240,23 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.35s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   font-family: var(--font-sans);
 }
 
 .fc-pill:hover {
   border-color: rgba(255, 255, 255, 0.4);
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .fc-pill.active {
   background: #ffffff;
   border-color: #ffffff;
-  color: var(--color-accent-orange-hover);
+  /* Fijo, no la variable: la píldora activa es blanca también en modo oscuro. */
+  color: #c2410c;
 }
 
 .fc-pill-icon {
@@ -2102,7 +2264,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   align-items: center;
   justify-content: center;
   color: rgba(255, 255, 255, 0.45);
-  transition: color 0.35s ease;
 }
 
 .fc-pill.active .fc-pill-icon {
@@ -2147,6 +2308,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .fc-stage-card {
   position: absolute;
   inset: 0;
+  isolation: isolate;
   border-radius: var(--radius-xxl);
   overflow: hidden;
   border: 6px solid var(--color-surface-card);
@@ -2158,16 +2320,38 @@ input[type="range"]::-webkit-slider-thumb:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: grayscale(1) blur(2px) brightness(0.75);
-  transition: filter 0.7s ease;
 }
 
-.fc-stage-img.active {
-  filter: grayscale(0) blur(0) brightness(1);
+/* ::after le saca la saturación (blend "saturation" con gris) y ::before la
+   oscurece; en la tarjeta activa las dos se desvanecen. */
+.fc-stage-card::before,
+.fc-stage-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity var(--t-estado) var(--ease);
+}
+
+.fc-stage-card::after {
+  background: #808080;
+  mix-blend-mode: saturation;
+}
+
+.fc-stage-card::before {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.fc-stage-card.is-active::before,
+.fc-stage-card.is-active::after {
+  opacity: 0;
 }
 
 .fc-stage-caption {
   position: absolute;
+  z-index: 2;
   inset-inline: 0;
   bottom: 0;
   padding: 60px 28px 28px;
@@ -2249,7 +2433,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .menu-filter-pill:hover {
@@ -2278,7 +2464,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
@@ -2320,13 +2508,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--color-hairline-strong);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .photo-bento-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--color-accent-orange);
-  box-shadow: 0 20px 40px rgba(255, 94, 0, 0.15);
 }
 
 .photo-bento-img {
@@ -2334,7 +2523,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.4s ease;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .photo-bento-card:hover .photo-bento-img {
@@ -2374,7 +2563,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid var(--color-hairline-strong);
   background: var(--color-canvas-soft, #f3f4f6);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .torneo-thumb-badge {
@@ -2397,9 +2588,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .torneo-thumb:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--color-accent-orange);
-  box-shadow: 0 14px 28px rgba(255, 94, 0, 0.15);
 }
 
 .torneo-thumb img {
@@ -2475,12 +2665,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: var(--radius-sm);
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .player-count-btn:hover {
   border-color: #b0b4ba;
   color: var(--color-ink);
+  transform: translateY(-1px);
 }
 
 .player-count-btn.active {
@@ -2504,7 +2697,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: border-color 0.15s ease;
 }
 
 .extra-item-row:hover {
@@ -2553,7 +2745,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .counter-btn:hover {
@@ -2645,7 +2839,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .ticket-row.total strong {
   font-size: 17px;
-  color: var(--color-accent-orange);
+  color: var(--color-accent-orange-text);
 }
 
 .ticket-divider {
@@ -2663,7 +2857,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   display: flex;
   align-items: center;
   gap: 10px;
-  animation: fadeIn 0.25s ease;
+  animation: fadeIn var(--t-estado) var(--ease);
 }
 
 .split-alias-notice {
@@ -2712,13 +2906,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .animated-ball-trajectory {
   stroke-dasharray: 8 4;
-  animation: trajectoryPulse 2s linear infinite;
-}
-
-@keyframes trajectoryPulse {
-  to {
-    stroke-dashoffset: -24;
-  }
 }
 
 .court-glass-indicator {
@@ -2746,6 +2933,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
   margin-bottom: 20px;
 }
 
+/* En una columna con alto fijo, flex achicaba cada botón a 44 px y los
+   títulos de dos o tres renglones se pisaban con el de abajo. */
+.tactic-buttons-list > * {
+  flex-shrink: 0;
+}
+
 .tactic-select-btn {
   background: var(--color-canvas-soft);
   border: 1px solid var(--color-hairline-strong);
@@ -2758,7 +2951,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: var(--color-body);
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .tactic-select-btn:hover {
@@ -2797,7 +2992,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   min-height: 44px;
   padding: 0 16px;
   border-radius: var(--radius-pill);
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .tactical-clases-link:hover {
@@ -2825,7 +3022,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .americano-count-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
   gap: 8px;
 }
 
@@ -2834,17 +3032,21 @@ input[type="range"]::-webkit-slider-thumb:hover {
   background: var(--color-canvas-soft);
   border: 1px solid var(--color-hairline-strong);
   color: var(--color-body);
-  padding: 8px 10px;
+  padding: 8px 6px;
   border-radius: var(--radius-sm);
-  font-size: 12.5px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   text-align: center;
 }
 
 .americano-count-btn:hover {
   border-color: #b0b4ba;
   color: var(--color-ink);
+  transform: translateY(-1px);
 }
 
 .americano-count-btn.active {
@@ -2889,7 +3091,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: var(--color-ink);
   font-size: 13.5px;
   outline: none;
-  transition: border-color 0.2s ease;
 }
 
 .americano-input:focus {
@@ -2914,7 +3115,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-size: 11px;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--color-accent-orange);
+  color: #a8501a;
   letter-spacing: 0.06em;
   margin-bottom: 6px;
 }
@@ -2926,9 +3127,43 @@ input[type="range"]::-webkit-slider-thumb:hover {
   gap: 10px;
 }
 
+/* Los nombres bajan de renglón en vez de salirse de la tarjeta; solo se
+   corta una palabra que no entra entera. */
 .fixture-team {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-wrap: break-word;
   font-size: 14px;
   color: var(--color-ink);
+}
+
+.fixture-team:last-child {
+  text-align: right;
+}
+
+.fixture-matchup > :not(.fixture-team) {
+  flex-shrink: 0;
+}
+
+/* Celu: los dos recuadros del resultado dejaban ~50 px por pareja y los
+   nombres se partían al medio ("Maxim/iliano"). Cada pareja va en su
+   renglón y el resultado entre las dos. */
+@media (max-width: 480px) {
+  .fixture-matchup {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .fixture-team,
+  .fixture-team:last-child {
+    flex: none;
+    text-align: center;
+  }
+
+  .fixture-matchup > :not(.fixture-team) {
+    align-self: center;
+  }
 }
 
 .fixture-vs {
@@ -3029,7 +3264,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-md);
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .faq-card.active {
@@ -3066,7 +3303,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .faq-answer-wrap {
   display: grid;
   grid-template-rows: minmax(0, 0fr);
-  transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .faq-answer-wrap.open {
@@ -3077,6 +3313,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
   min-height: 0;
   overflow: hidden;
   padding: 0 22px 18px 22px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity var(--t-estado) var(--ease),
+    transform var(--t-estado) var(--ease);
+}
+
+.faq-answer-wrap.open .faq-answer-content {
+  opacity: 1;
+  transform: none;
 }
 
 .faq-answer-content p {
@@ -3172,7 +3418,19 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .digital-pass-modal {
   width: 100%;
   max-width: 440px;
-  animation: passPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  /* El aviso de arriba queda fijo y el pase ocupa el resto con su propio
+     scroll: los dos juntos nunca pasan el alto de la pantalla. */
+  max-height: calc(100dvh - 24px);
+  display: flex;
+  flex-direction: column;
+  animation: passPopIn var(--t-estado) var(--ease);
+}
+
+.digital-pass-modal > .digital-pass-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 @keyframes passPopIn {
@@ -3313,7 +3571,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   padding: 4px 10px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   white-space: nowrap;
   font-weight: 600;
 }
@@ -3321,6 +3581,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .pass-copy-btn:hover {
   background: var(--color-accent-orange);
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .pass-copy-btn.copied {
@@ -3364,9 +3625,22 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-weight: 500;
 }
 
-.radar-status-item.highlight {
-  color: var(--color-accent-orange);
-  font-weight: 600;
+/* Hasta saber la hora real la barra ocupa su lugar pero no muestra texto. */
+.live-weather-radar-bar > * {
+  opacity: 0;
+  transition: opacity var(--t-estado) var(--ease);
+}
+
+.live-weather-radar-bar.is-ready > * {
+  opacity: 1;
+}
+
+.radar-dot {
+  color: #9c9c96;
+}
+
+.radar-dot.is-open {
+  color: #0f7b4f;
 }
 
 .radar-divider {
@@ -3433,14 +3707,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: var(--color-muted);
   font-size: 11px;
   font-weight: 500;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   user-select: none;
 }
 
 .bottom-bar-item svg {
   width: 20px;
   height: 20px;
-  transition: transform 0.15s ease;
+  transition: transform var(--t-hover) var(--ease);
 }
 
 .bottom-bar-item:active svg {
@@ -4229,7 +4505,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  animation: modalFadeIn 0.2s ease-out;
+  animation: modalFadeIn var(--t-estado) var(--ease);
 }
 
 .admin-modal-card {
@@ -4242,7 +4518,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   box-shadow:
     0 25px 60px -10px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.05);
-  animation: modalScaleIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalScaleIn var(--t-estado) var(--ease);
 }
 
 @keyframes modalFadeIn {
@@ -4771,7 +5047,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   gap: 3px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   position: relative;
 }
 
@@ -4818,7 +5096,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   justify-content: center;
   gap: 2px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   text-align: center;
 }
 
@@ -4900,7 +5180,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-size: 13.5px;
   letter-spacing: 0.04em;
   margin-bottom: 16px;
-  animation: pulseGlow 1.8s infinite;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .golden-point-banner {
+    animation: pulseGlow 1.8s infinite var(--ease);
+  }
 }
 
 @keyframes pulseGlow {
@@ -4951,7 +5236,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-md);
   padding: 10px 14px;
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
 }
 
 .scoreboard-row.serving {
@@ -5004,7 +5291,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   width: 100%;
 }
 
@@ -5065,7 +5354,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   padding: 12px 18px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -5157,7 +5448,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .cat-progress-fill {
   height: 100%;
   border-radius: 3px;
-  transition: width 0.4s ease;
 }
 
 .cat-info-sidebox {
@@ -5190,7 +5480,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   bottom: 24px;
   right: 24px;
   z-index: 95;
-  animation: floatIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: floatIn var(--t-entrada) var(--ease);
 }
 
 @keyframes floatIn {
@@ -5243,7 +5533,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: var(--radius-pill);
   font-size: 13px;
   font-weight: 600;
-  transition: all 0.2s ease;
+  position: relative;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   white-space: nowrap;
 }
 
@@ -5252,21 +5545,34 @@ input[type="range"]::-webkit-slider-thumb:hover {
   transform: translateY(-1px);
 }
 
+/* Un solo pulso cuando aparece la píldora: marca dónde reservar y se queda
+   quieta. Antes pulsaba tres veces al lado del texto. */
 @media (prefers-reduced-motion: no-preference) {
-  .floating-live-action {
-    animation: ctaPulseRing 1.6s ease-out 0.6s 3;
+  .floating-live-action::after {
+    animation: ctaPulseRing 1.2s var(--ease) 0.4s 1;
   }
+}
+
+/* El anillo es un pseudo-elemento con sombra fija: se anima su escala y su
+   opacidad, no la sombra. */
+.floating-live-action::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 6px rgba(232, 114, 42, 0.45);
+  opacity: 0;
+  pointer-events: none;
 }
 
 @keyframes ctaPulseRing {
   0% {
-    box-shadow: 0 0 0 0 rgba(232, 114, 42, 0.45);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(232, 114, 42, 0);
+    opacity: 1;
+    transform: scale(0.92);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(232, 114, 42, 0);
+    opacity: 0;
+    transform: scale(1.18);
   }
 }
 
@@ -5275,7 +5581,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
    ========================================================================== */
 @media (max-width: 768px) {
   :root {
-    --spacing-section: 32px;
+    /* 6.6 · Mismo aire en todas las secciones: 96 en notebook, 56 en celu
+       (antes 32 en unas y 44 en las de fondo claro). */
+    --spacing-section: 56px;
     --bottom-bar-h: 62px;
   }
 
@@ -5446,6 +5754,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
     gap: 20px;
   }
 
+  /* Apilado, el test va primero: antes quedaba debajo de las tres
+     categorías y del aviso de Canchas Abiertas. */
+  .rating-grid-layout > :last-child {
+    order: -1;
+  }
+
   .rating-box {
     padding: 20px 16px;
     border-radius: 16px;
@@ -5453,10 +5767,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   .rating-display-val {
     font-size: 44px;
-  }
-
-  .section-bento {
-    padding: 44px 0;
   }
 
   .mobile-bottom-bar {
@@ -5487,8 +5797,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
   .digital-pass-card {
     padding: 20px 16px;
-    max-height: 88vh;
-    overflow-y: auto;
   }
 
   .lightbox-content {
@@ -5575,9 +5883,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  .americano-count-tabs {
-    flex-wrap: wrap;
-  }
   .admin-courts-timeline-grid {
     grid-template-columns: 1fr;
   }
@@ -5621,7 +5926,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
   gap: 2px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition:
+    transform var(--t-hover) var(--ease),
+    opacity var(--t-hover) var(--ease);
   min-width: 140px;
 }
 
@@ -5708,7 +6015,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .cat-progress-fill {
   height: 100%;
   border-radius: 4px;
-  transition: width 0.4s ease;
 }
 
 .cat-info-sidebox {
@@ -5751,6 +6057,43 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 }
 
+/* ==========================================================================
+   CONTROLES TÁCTILES: 44 PX MÍNIMO
+   min-height le gana a los `height` inline de 28 a 42 px que tenían varios
+   botones, así que alcanza con fijarlo acá. El panel /admin queda afuera:
+   es una herramienta de escritorio con tablas densas.
+   ========================================================================== */
+:where(
+  .btn,
+  .brand-group,
+  .nav-link,
+  .fc-pill,
+  .spec-tab,
+  .booking-court-tab,
+  .player-count-btn,
+  .americano-count-btn,
+  .americano-input,
+  .back-link,
+  select,
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="hidden"])
+):not(.admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *) {
+  min-height: 44px;
+}
+
+.nav-link,
+.back-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Links del pie: cada uno ocupa su renglón de 44 px (antes 22 px + 8 de
+   separación). */
+.app-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 .mobile-swipe-hint {
   display: none;
 }
@@ -5762,6 +6105,840 @@ input[type="range"]::-webkit-slider-thumb:hover {
     font-size: 12px;
     color: var(--color-muted);
     margin-bottom: 10px;
+  }
+}
+
+/* ==========================================================================
+   FILAS DESLIZABLES (components/ScrollRow.jsx · lib/useScrollRow.js)
+   Se deslizan con el dedo, con la rueda del mouse o arrastrando. El borde
+   se difumina solo del lado donde queda contenido escondido: antes la fila
+   se veía cortada y no había ninguna pista de que seguía.
+   ========================================================================== */
+.scroll-row {
+  --scroll-fade: 28px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  /* Que el elemento enfocado o encajado no quede debajo del difuminado. */
+  scroll-padding-inline: var(--scroll-fade);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-row > * {
+  flex-shrink: 0;
+}
+
+.scroll-row img {
+  -webkit-user-drag: none;
+}
+
+.scroll-row[data-more-start],
+.scroll-row[data-more-end] {
+  cursor: grab;
+}
+
+.scroll-row[data-more-end] {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - var(--scroll-fade)), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - var(--scroll-fade)), transparent);
+}
+
+.scroll-row[data-more-start] {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--scroll-fade));
+  mask-image: linear-gradient(90deg, transparent, #000 var(--scroll-fade));
+}
+
+.scroll-row[data-more-start][data-more-end] {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent
+  );
+}
+
+/* Arrastrando, el encaje se apaga; al soltar vuelve. */
+.scroll-row.is-dragging {
+  scroll-snap-type: none;
+}
+
+.scroll-row.is-dragging,
+.scroll-row.is-dragging * {
+  cursor: grabbing;
+}
+
+/* El anillo de foco va por dentro: por fuera lo recortaba la fila. */
+.scroll-row :focus-visible {
+  outline-offset: -3px;
+}
+
+/* Lo mismo en vertical, para listas con scroll propio. */
+.scroll-col {
+  --scroll-fade: 28px;
+  overflow-y: auto;
+  scroll-padding-block: var(--scroll-fade);
+}
+
+.scroll-col[data-more-end] {
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - var(--scroll-fade)), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - var(--scroll-fade)), transparent);
+}
+
+.scroll-col[data-more-start] {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 var(--scroll-fade));
+  mask-image: linear-gradient(180deg, transparent, #000 var(--scroll-fade));
+}
+
+.scroll-col[data-more-start][data-more-end] {
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent,
+    #000 var(--scroll-fade),
+    #000 calc(100% - var(--scroll-fade)),
+    transparent
+  );
+}
+
+.open-category-tabs,
+.menu-category-tabs {
+  display: flex;
+  gap: 8px;
+  padding-block: 2px 6px;
+}
+
+.open-category-tabs {
+  margin-bottom: 20px;
+}
+
+/* Texto solo para lectores de pantalla. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   CARTA: PEDIDO A LA CANTINA (components/CantinaCart.jsx)
+   Cada producto suma al pedido. En compu el pedido está siempre a la vista
+   en una columna al costado; en celu, "Ver mi pedido" (arriba) y la barra de
+   abajo abren el mismo panel. Se paga antes de que la cocina lo empiece.
+   ========================================================================== */
+.menu-item-control {
+  flex: 0 0 114px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.menu-add-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--color-accent-orange-border, #f2cbb4);
+  background: var(--color-accent-orange-subtle);
+  color: var(--color-accent-orange-text);
+  cursor: pointer;
+  transition: transform var(--t-hover) var(--ease);
+}
+
+.qty-stepper {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-card);
+}
+
+.qty-stepper button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: transform var(--t-hover) var(--ease);
+}
+
+.qty-stepper button:disabled {
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.qty-stepper-value {
+  min-width: 22px;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.menu-add-btn:active,
+.qty-stepper button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Encabezado de la carta: "Ver mi pedido" (solo celu y tablet) + consultas. */
+.menu-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn.menu-cart-open {
+  gap: 8px;
+  height: 42px;
+}
+
+.menu-cart-open-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-orange);
+  color: #1b1b19;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* Carta + pedido: una columna en celu; en compu el pedido va al costado y
+   acompaña el scroll. */
+.menu-layout {
+  display: block;
+}
+
+.menu-cart-aside {
+  display: none;
+}
+
+.menu-cart-panel {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-surface-card);
+  color: var(--color-body);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 1024px) {
+  .menu-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .menu-cart-aside {
+    display: block;
+    position: sticky;
+    top: 96px;
+  }
+
+  .menu-cart-aside .menu-cart-panel {
+    max-height: calc(100dvh - 120px);
+  }
+
+  .btn.menu-cart-open {
+    display: none;
+  }
+}
+
+/* Barra flotante (celu y tablet), arriba de la barra de abajo. */
+.menu-cart-bar {
+  position: fixed;
+  left: 50%;
+  translate: -50% 0;
+  bottom: 24px;
+  z-index: 98;
+  width: min(calc(100% - 32px), 440px);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-pill);
+  background: #1b1b19;
+  color: #ffffff;
+  font-size: 15px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  animation: cartBarIn var(--t-estado) var(--ease) both;
+}
+
+.menu-cart-bar-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-accent-orange);
+}
+
+.menu-cart-bar-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-orange);
+  color: #1b1b19;
+  font-size: 12px;
+  font-weight: 700;
+  animation: cartBadgeBump var(--t-estado) var(--ease-mascota, var(--ease));
+}
+
+.menu-cart-bar-label {
+  font-weight: 700;
+}
+
+.menu-cart-bar-total {
+  margin-left: auto;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes cartBarIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Cada producto que se suma hace saltar el número: se nota que entró. */
+@keyframes cartBadgeBump {
+  from {
+    transform: scale(1.35);
+  }
+}
+
+@media (max-width: 1023px) {
+  body.has-cart-bar {
+    padding-bottom: calc(var(--bottom-bar-h) + 24px + 80px);
+  }
+
+  /* Lo que se enfoca con Tab no queda escondido debajo de la barra. */
+  html:has(body.has-cart-bar) {
+    scroll-padding-bottom: 100px;
+  }
+}
+
+@media (max-width: 768px), (max-width: 1180px) and (max-height: 500px) {
+  html:has(body.has-cart-bar) {
+    scroll-padding-bottom: calc(var(--bottom-bar-h) + env(safe-area-inset-bottom, 0px) + 88px);
+  }
+}
+
+@media (max-width: 768px), (max-width: 1180px) and (max-height: 500px) {
+  .menu-cart-bar {
+    bottom: calc(var(--bottom-bar-h) + env(safe-area-inset-bottom, 0px) + 12px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .menu-cart-bar {
+    display: none;
+  }
+}
+
+/* Hoja del pedido (celu y tablet). */
+.menu-cart-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 10, 10, 0.55);
+  overscroll-behavior: contain;
+  /* Arrastrar el velo con el dedo no mueve la carta de atrás (la hoja,
+     que es su propio scroll, sigue deslizando). */
+  touch-action: none;
+  animation: modalFadeIn var(--t-estado) var(--ease);
+}
+
+.menu-cart-sheet {
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100dvh - 48px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  animation: passPopIn var(--t-estado) var(--ease);
+}
+
+.menu-cart-sheet:focus {
+  outline: none;
+}
+
+.menu-cart-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 60px;
+  padding: 12px 16px 12px 20px;
+  border-bottom: 1px solid var(--color-hairline);
+  background: var(--color-surface-card);
+}
+
+.menu-cart-head h2:focus {
+  outline: none;
+}
+
+.menu-cart-head h2:focus-visible {
+  outline: 2px solid var(--color-accent-orange);
+  outline-offset: 2px;
+}
+
+.menu-cart-head h2 {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 0;
+  font-size: 18px;
+  color: var(--color-ink);
+}
+
+.menu-cart-head-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.menu-cart-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-canvas-soft);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.menu-cart-body {
+  flex: 1 0 auto;
+  padding: 12px 20px 16px;
+}
+
+.menu-cart-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-cart-lines li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 76px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.menu-cart-line-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.menu-cart-line-name small {
+  font-weight: 400;
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.menu-cart-line-total {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+/* En la columna de compu (360 px) no entran nombre, cantidad y subtotal en
+   un renglón: el nombre va arriba, igual que en celu. */
+.menu-cart-aside .menu-cart-lines li {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "name name"
+    "qty total";
+  row-gap: 6px;
+}
+
+.menu-cart-aside .menu-cart-line-name {
+  grid-area: name;
+}
+
+.menu-cart-aside .menu-cart-lines .qty-stepper {
+  grid-area: qty;
+  justify-self: start;
+}
+
+.menu-cart-aside .menu-cart-line-total {
+  grid-area: total;
+}
+
+.menu-cart-clear {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-muted);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.menu-cart-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.menu-cart-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.menu-cart-field > span,
+.menu-cart-field > legend {
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-body);
+}
+
+.menu-cart-field > legend {
+  margin-bottom: 6px;
+}
+
+.menu-cart-field em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.menu-cart-field input:not([type="radio"]),
+.menu-cart-field select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  font-size: 16px;
+}
+
+.menu-cart-field input[aria-invalid="true"] {
+  border-color: #b42318;
+}
+
+/* "¿Cómo lo pagás?": dos opciones como un control segmentado. */
+.menu-cart-pay-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.menu-cart-pay-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  color: var(--color-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.menu-cart-pay-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.menu-cart-pay-option.is-on {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  font-weight: 600;
+}
+
+.menu-cart-pay-option:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent-orange);
+  outline-offset: 2px;
+}
+
+.menu-cart-error {
+  margin: -6px 0 0;
+  font-size: 13px;
+  color: #b42318;
+}
+
+.menu-cart-foot .menu-cart-error {
+  margin: 0 0 10px;
+}
+
+.menu-cart-foot {
+  position: sticky;
+  bottom: 0;
+  padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-hairline);
+  background: var(--color-surface-card);
+}
+
+/* Pantalla baja (celu acostado, notebook chica): el pie pegado dejaba unos
+   60 px para los productos. Ahí todo scrollea junto. */
+@media (max-height: 640px) {
+  .menu-cart-head,
+  .menu-cart-foot {
+    position: static;
+  }
+}
+
+.menu-cart-field input::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+.menu-cart-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--color-body);
+}
+
+.menu-cart-total strong {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+/* Aviso de que se paga antes: siempre a la vista, con el tono de marca. */
+.menu-cart-pay-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-accent-orange-border, #f2cbb4);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-orange-subtle);
+  color: var(--color-ink);
+  font-size: 13.5px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.menu-cart-pay-notice svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-accent-orange-text);
+}
+
+.menu-cart-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.btn.menu-cart-send {
+  width: 100%;
+  min-height: 48px;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn.menu-cart-send:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.menu-cart-hint {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.menu-cart-sent,
+.menu-cart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.menu-cart-empty p {
+  margin: 0;
+  max-width: 32ch;
+  color: var(--color-body);
+}
+
+.menu-cart-empty .menu-cart-pay-notice {
+  margin: 8px 0 0;
+}
+
+.menu-cart-sent .pass-festejo {
+  margin: 4px auto 0;
+}
+
+.menu-cart-sent .menu-cart-pay-notice {
+  width: 100%;
+  margin: 4px 0;
+}
+
+.menu-cart-sent-code {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-ink);
+}
+
+.menu-cart-sent-text {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 14px;
+  color: var(--color-body);
+}
+
+.menu-cart-sent-lines {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.menu-cart-reopen {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: #0b6b43;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .menu-cart-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .menu-cart-sheet {
+    max-width: none;
+    max-height: 92dvh;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+    animation-name: cartSheetIn;
+  }
+
+  .menu-cart-lines li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "name name"
+      "qty total";
+    row-gap: 6px;
+  }
+
+  .menu-cart-line-name {
+    grid-area: name;
+  }
+
+  .menu-cart-lines .qty-stepper {
+    grid-area: qty;
+    justify-self: start;
+  }
+
+  .menu-cart-line-total {
+    grid-area: total;
+  }
+
+  .menu-header-actions,
+  .menu-header-actions .btn {
+    width: 100%;
+  }
+}
+
+@keyframes cartSheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
   }
 }
 
@@ -5790,7 +6967,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
     display: none;
   }
 
-  .booking-slot {
+  /* Solo en el carrusel horizontal: con `.booking-slot` a secas, la grilla
+     hora × cancha heredaba los 168 px y entre 641 y 768 las celdas quedaban
+     sueltas en columnas más anchas. */
+  .booking-slots-grid .booking-slot {
     flex: 0 0 auto;
     width: 168px;
     scroll-snap-align: start;
@@ -5848,6 +7028,38 @@ input[type="range"]::-webkit-slider-thumb:hover {
    fondo blanco forzado, invisible. Se las suma al mismo light-lock.
    ========================================================================== */
 @media (prefers-color-scheme: dark) {
+  /* Etiquetas naranjas: #a8501a sobre el marrón oscuro daba 2,9:1. Con el
+     token, dentro de las zonas que quedan claras (admin, pizarra) vuelve al
+     naranja oscuro. */
+  .badge-amber,
+  .badge-indigo {
+    color: var(--color-accent-orange-text);
+  }
+
+  /* La verde era una píldora clara que resaltaba entre las oscuras. Las
+     zonas que quedan claras (pizarra, categorías, admin) y las etiquetas
+     sobre foto la mantienen. Con :where() la exclusión no suma
+     especificidad: la etiqueta numerada de la home ("01 |") sigue ganando. */
+  .badge-emerald:where(:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *, .photo-bento-body *)) {
+    background: rgba(52, 211, 153, 0.12);
+    border-color: rgba(52, 211, 153, 0.35);
+    color: #34d399;
+  }
+
+  /* Carrito de la carta: el rojo y el verde pensados para fondo claro daban
+     2,6:1 sobre la hoja oscura. */
+  .menu-cart-error {
+    color: #ff8a80;
+  }
+
+  .menu-cart-field input[aria-invalid="true"] {
+    border-color: #ff8a80;
+  }
+
+  .menu-cart-reopen {
+    color: #34d399;
+  }
+
   :root {
     --color-canvas: #131310;
     --color-canvas-soft: #1c1c17;
@@ -5879,7 +7091,45 @@ input[type="range"]::-webkit-slider-thumb:hover {
     --text-muted: #9c9886;
 
     --color-accent-orange-subtle: #2a2016;
+    /* El naranja de enlace de modo claro (#a8501a) daba 2,9:1 acá. */
+    --color-text-link: #ff9a5a;
+    --color-text-link-secondary: #ff9a5a;
     --color-accent-orange-border: #4a3420;
+    /* Los textos chicos en naranja, verde y rojo oscuros (1.8) no se leen
+       sobre fondo oscuro: acá van sus versiones claras. */
+    --color-accent-orange-text: #ff9a5a;
+  }
+
+  /* Sin las zonas que quedan en claro también en modo oscuro (pizarra,
+     categorías, admin): ahí siguen los tonos oscuros. */
+  .whatsapp-text:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *),
+  .btn-secondary-whatsapp:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *) {
+    color: #34d399;
+  }
+
+  .maps-text:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *) {
+    color: #ff8a80;
+  }
+
+  .booking-date-weekend-badge,
+  .fixture-round-badge:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *) {
+    color: #ff9a5a;
+  }
+
+  /* El día elegido es una píldora clara en modo oscuro: sus textos pasan a
+     tonos oscuros (antes quedaban el gris y el naranja pensados para la
+     píldora negra, 2,2 y 2,7:1). */
+  .booking-date-btn.active .booking-date-weekend-badge {
+    color: #a8501a;
+  }
+
+  .booking-date-btn.active .booking-date-day,
+  .booking-date-btn.active .booking-date-month {
+    color: #55554f;
+  }
+
+  .booking-date-btn.active .booking-date-num {
+    color: #c2410c;
   }
 
   body::before {
@@ -5955,6 +7205,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
     --color-accent-orange-subtle: #fdf6f0;
     --color-accent-orange-border: #f2cbb4;
+    --color-accent-orange-text: #c2410c;
+    --color-text-link: #a8501a;
+    --color-text-link-secondary: #a8501a;
 
     background: #ffffff;
     color-scheme: light;
@@ -6005,51 +7258,365 @@ textarea:focus-visible {
 }
 
 .mascot-hero-animated {
-  animation: mascotFloat 3.8s ease-in-out infinite;
   transform-origin: center bottom;
 }
 
-.mascot-section-badge {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Fotos del club: el mismo tratamiento en todas (un poco menos de
+   saturación, sobre todo del azul de la cancha, y algo más de contraste).
+   Es por CSS hasta que lleguen los originales; después se puede pasar a
+   los archivos. */
+.hero-night-photo img,
+.fc-stage-img,
+.photo-bento-img {
+  filter: saturate(0.82) contrast(1.06);
 }
 
-.mascot-section-img {
-  width: clamp(105px, 14vw, 152px);
+/* Íconos de interfaz (lucide, 20 px). En naranja de marca sobre fondos
+   claros; dentro de botones rellenos toman el color del texto. */
+.icono-marca {
+  flex: 0 0 auto;
+  color: var(--color-accent-orange);
+}
+
+.btn svg,
+.booking-court-tab svg {
+  flex: 0 0 auto;
+}
+
+.booking-court-tab:has(svg) {
+  gap: 6px;
+}
+
+/* ==========================================================================
+   MASCOTA · sistema
+   Tres tamaños: XL en el hero (lo maneja landing.css), M en encabezados de
+   sección y tarjetas, S en footer y ayudante. Solo la del hero reacciona
+   (inclinación y flotación); las demás entran una vez y quedan quietas.
+   Ninguna pisa un control: cada una tiene su lugar en el flujo, sin
+   position absolute ni márgenes negativos sobre lo que sigue.
+   Está acá y no en landing.css porque el footer (y sus mascotas) también
+   se ve en las subpáginas, que no cargan landing.css.
+   ========================================================================== */
+:root {
+  --mascota-m: 160px;
+  --mascota-s: 96px;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --mascota-m: 120px;
+  }
+}
+
+/* Componente <Mascota>: tamaño M o S según el prop size. */
+.mascota {
+  display: block;
+  max-width: 100%;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.16));
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mascota-m {
+  width: var(--mascota-m);
+}
+
+.mascota-s {
+  width: var(--mascota-s);
+}
+
+/* Cierre de la pizarra táctica y ficha del test de nivel. */
+.mascot-cta {
+  margin-bottom: 16px;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.22));
+}
+
+.mascot-card {
+  flex: 0 0 auto;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.22));
+}
+
+/* Encabezado con mascota: texto a la izquierda, mascota en su columna.
+   La mascota sola (sin botón) queda al costado del título también en
+   tablet, donde el resto de los encabezados se apila. */
+.section-header-row:has(.mascot-section-badge) {
+  flex-wrap: nowrap;
+  gap: 24px;
+}
+
+.section-header-row:has(> .mascot-section-badge) {
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.section-header-row:has(.mascot-section-badge) > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mascot-section-badge {
+  position: static;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mascot-section-img,
+.flash-mascot,
+.footer-mascot {
   display: block;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.3));
+  transform-origin: center bottom;
+  transition: transform var(--t-estado) var(--ease);
 }
 
-.mascot-section-img:hover {
-  transform: translateY(-6px) scale(1.05);
+.mascot-section-img,
+.flash-mascot {
+  width: var(--mascota-m);
 }
 
-@keyframes pulseLive {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(232, 114, 42, 0.45);
+/* Mascota + botón: la mascota arriba, el botón abajo, sin tocarse. */
+.header-aside {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* Al pasar el mouse, un giro chico. Sin resorte y sin moverse con el
+   scroll: eso queda para la del hero. */
+@media (hover: hover) {
+  .mascot-section-img:hover,
+  .flash-mascot:hover,
+  .footer-mascot-box:hover .footer-mascot {
+    transform: rotate(-3deg);
   }
-  50% {
-    box-shadow: 0 0 0 8px rgba(232, 114, 42, 0);
+}
+
+/* Entrada: una sola vez, cuando el encabezado entra en pantalla. */
+@media (prefers-reduced-motion: no-preference) {
+  .section-header-row.reveal-up .mascot-section-badge {
+    opacity: 0;
+    transform: translateY(16px) scale(0.94);
+    transition:
+      opacity var(--t-entrada) var(--ease-mascota),
+      transform var(--t-entrada) var(--ease-mascota);
+    transition-delay: 120ms;
+  }
+
+  .section-header-row.reveal-up.in-view .mascot-section-badge {
+    opacity: 1;
+    transform: none;
   }
 }
 
-.pulse-badge-live {
-  animation: pulseLive 2.4s infinite;
+/* Turnos flash: la mascota en su celda, a la izquierda, apoyada abajo. */
+.flash-card > .flash-mascot {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin: 0;
 }
 
+/* Footer: tamaño S, al lado del texto. */
+.footer-mascot-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 380px;
+  margin-top: 40px;
+  padding: 12px 16px 12px 12px;
+  border-radius: 18px;
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-hairline-strong);
+}
+
+.footer-mascot {
+  flex: 0 0 auto;
+  width: var(--mascota-s);
+}
+
+.footer-mascot-text {
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* Canchas Abiertas sin partidos: la mascota invita a armar uno. El
+   recuadro de carga mide lo mismo para que no salte al terminar. */
+.open-empty {
+  grid-column: 1 / -1;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px 24px;
+}
+
+.open-empty.is-loading {
+  font-size: 14px;
+}
+
+.open-empty-title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.open-empty-desc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Pase digital: la mascota festeja la reserva. */
+.pass-festejo {
+  flex: 0 0 auto;
+  margin: -6px 0 -6px -4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pass-festejo {
+    animation: mascotaFesteja var(--t-entrada) var(--ease-mascota) 120ms both;
+  }
+}
+
+@keyframes mascotaFesteja {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(-10deg) scale(0.8);
+  }
+}
+
+/* Páginas de estado (404, error). */
+.estado-marca {
+  min-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 16px 72px;
+  text-align: center;
+}
+
+.estado-marca-mascota {
+  margin-bottom: 20px;
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.25));
+}
+
+.estado-marca-kicker {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent-orange-text);
+}
+
+.estado-marca-title {
+  margin: 0;
+  font-family: var(--font-barlow-condensed), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  line-height: 0.95;
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.estado-marca-text {
+  max-width: 44ch;
+  margin: 12px 0 24px;
+  font-size: 15.5px;
+  color: var(--text-secondary);
+}
+
+.estado-marca-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .estado-marca-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .estado-marca-actions .btn {
+    width: 100%;
+    height: 46px;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .estado-marca-mascota {
+    animation: mascotaFesteja var(--t-entrada) var(--ease-mascota) both;
+  }
+}
+
+/* Celu: los encabezados se apilan y no hay columna libre para la mascota
+   sin achicar el título; queda la del hero, la del footer y la del estado
+   vacío de Canchas Abiertas. */
+@media (max-width: 768px) {
+  /* Encabezado apilado: botón a la izquierda, mascota a la derecha. */
+  .header-aside {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .header-aside .mascot-section-badge {
+    order: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-header-row .mascot-section-badge,
+  .flash-card > .flash-mascot {
+    display: none;
+  }
+
+  .header-aside > :not(.mascot-section-badge) {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+
+/* Red de seguridad para lo que no tenga su propia guardia. Las demoras
+   también van a cero: si no, lo que entra con "both" quedaba invisible hasta
+   360 ms y aparecía de golpe. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* 6.3 · Al apretar, todos los botones y chips se hunden igual. Va al final
+   para ganarle al hover (misma especificidad). */
+.booking-date-btn:active,
+.booking-court-tab:active,
+.booking-slot:active:not(:disabled),
+.fc-pill:active,
+.player-count-btn:active,
+.americano-count-btn:active,
+.pass-copy-btn:active,
+.floating-live-action:active {
+  transform: scale(0.98);
 }

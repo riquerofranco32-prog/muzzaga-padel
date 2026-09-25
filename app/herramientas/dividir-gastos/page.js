@@ -3,12 +3,14 @@ import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import BottomNav from "../../../components/BottomNav";
 import SplitCostCalculator from "../../../components/SplitCostCalculator";
+import { pageMetadata } from "../../../lib/pageMeta";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Calculadora para dividir cancha y cantina · Muzzaga Pádel",
   description:
     "Dividí en segundos el costo del turno de pádel y las consumiciones de cantina entre tus amigos. Copiá el desglose directo a WhatsApp.",
-};
+  path: "/herramientas/dividir-gastos",
+});
 
 export default function DividirGastosPage() {
   return (
@@ -17,13 +19,13 @@ export default function DividirGastosPage() {
       <main style={{ paddingTop: 90, minHeight: "80vh" }}>
         <div className="container" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
-            <Link href="/" style={{ color: "var(--color-accent-orange)", textDecoration: "none", fontWeight: 600 }}>
-              ← Volver al Inicio
+            <Link className="back-link" href="/" style={{ color: "var(--color-accent-orange-text)", textDecoration: "none", fontWeight: 600 }}>
+              ← Volver al inicio
             </Link>
             <span>/</span>
             <span>Herramientas</span>
             <span>/</span>
-            <span style={{ color: "var(--text-primary)" }}>Dividir Gastos</span>
+            <span style={{ color: "var(--text-primary)" }}>Dividir gastos</span>
           </div>
         </div>
 
@@ -44,10 +46,10 @@ export default function DividirGastosPage() {
               ¿Ya tienen el equipo listo?
             </h3>
             <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 20 }}>
-              Elegí día y horario para tu partido en nuestras canchas de cristal profesionales.
+              Elegí día y horario para tu partido en nuestras canchas de cristal templado.
             </p>
             <Link href="/#turnos" className="btn btn-linear-primary" style={{ padding: "10px 24px" }}>
-              Reservar Cancha en Muzzaga →
+              Reservar turno →
             </Link>
           </div>
         </div>

@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import Portal from "./Portal";
+import useDialogFocus from "../lib/useDialogFocus";
+import Mascota from "./Mascota";
 
 // Antes esta pantalla mostraba un CBU y un alias inventados (placeholder de
 // ejemplo) como si fueran los datos reales del club, con botón "Copiar" y
@@ -13,17 +17,22 @@ const TITULAR = process.env.NEXT_PUBLIC_PAYMENT_TITULAR || "Muzzaga Pádel";
 
 import { trackEvent } from "../lib/analytics";
 import { buildGoogleCalendarUrl, downloadIcsCalendar } from "../lib/calendar";
+import { CalendarPlus, Download, Users, Check } from "lucide-react";
 
 export default function BookingPassModal({
   bookingCode,
   booking,
   whatsappUrl,
   onClose,
+  // Solo con credenciales de Mercado Pago en el servidor. Sin ellas el botón
+  // abría un "Modo demostración": ahora directamente no aparece.
+  mpEnabled = false,
 }) {
   const [copiedField, setCopiedField] = useState(null);
   const [shareSuccess, setShareSuccess] = useState(false);
   const [payingMp, setPayingMp] = useState(false);
   const [mpMessage, setMpMessage] = useState(null);
+  const dialogRef = useDialogFocus(Boolean(booking), onClose);
 
   // Guardar pase en localStorage para consulta offline (Sprint 2.4)
   useEffect(() => {
@@ -65,9 +74,7 @@ export default function BookingPassModal({
       if (data.ok && data.init_point) {
         window.location.href = data.init_point;
       } else if (data.ok && data.mock) {
-        setMpMessage(
-          "Modo demostración: El cobro online de Mercado Pago se activará con las credenciales del club. Por ahora, confirmá la seña de $30.000 directamente por WhatsApp."
-        );
+        setMpMessage("El pago online no está disponible ahora. Coordiná la seña por WhatsApp.");
       } else {
         setMpMessage(
           data.error || "No pudimos conectar con Mercado Pago. Coordiná la seña por WhatsApp."
@@ -130,8 +137,17 @@ export default function BookingPassModal({
   if (!booking) return null;
 
   return (
-    <div className="admin-modal-backdrop" onClick={onClose}>
-      <div className="digital-pass-modal" onClick={(e) => e.stopPropagation()}>
+    <Portal>
+    <div className="admin-modal-backdrop" onClick={onClose} style={{ zIndex: 1001 }}>
+      <div
+        className="digital-pass-modal"
+        onClick={(e) => e.stopPropagation()}
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Pase digital de tu reserva"
+        tabIndex={-1}
+      >
         {/* CONFIRMATION BANNER */}
         <div
           style={{
@@ -145,7 +161,8 @@ export default function BookingPassModal({
             gap: 10,
           }}
         >
-          <span style={{ fontSize: 20 }}>🎉</span>
+          {/* Reserva confirmada: la mascota festeja (entra una vez y queda quieta). */}
+          <Mascota pose="trofeo-paleta" size="s" className="pass-festejo" />
           <div style={{ fontSize: 12.5, color: "var(--color-ink)", lineHeight: 1.35 }}>
             <strong>¡Listo!</strong> Tu turno queda reservado. Para confirmarlo de forma definitiva, aboná la seña y envianos el comprobante.
           </div>
@@ -155,7 +172,7 @@ export default function BookingPassModal({
         <div className="digital-pass-card">
           <div className="pass-header-row">
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <img
+              <Image
                 src="/img/logo_badge.png"
                 alt="Muzzaga"
                 width={30}
@@ -186,7 +203,7 @@ export default function BookingPassModal({
                     letterSpacing: "0.06em",
                   }}
                 >
-                  Pase Digital de Cancha
+                  Pase digital de cancha
                 </span>
               </div>
             </div>
@@ -225,7 +242,7 @@ export default function BookingPassModal({
           {/* FINANCIALS */}
           <div className="pass-financial-row">
             <div>
-              <span className="pass-label">Total Cancha (90 min)</span>
+              <span className="pass-label">Total cancha (90 min)</span>
               <div className="pass-price-val">
                 ${booking.total.toLocaleString("es-AR")}
               </div>
@@ -241,7 +258,7 @@ export default function BookingPassModal({
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <span className="pass-label">Seña para Confirmar</span>
+              <span className="pass-label">Seña para confirmar</span>
               <div className="pass-sena-val">
                 ${Math.round(booking.total / 2).toLocaleString("es-AR")}
               </div>
@@ -269,7 +286,7 @@ export default function BookingPassModal({
                       className={`pass-copy-btn${copiedField === "alias" ? " copied" : ""}`}
                       onClick={() => copyValue("alias", REAL_ALIAS)}
                     >
-                      {copiedField === "alias" ? "Copiado" : "Copiar Alias"}
+                      {copiedField === "alias" ? "Copiado" : "Copiar alias"}
                     </button>
                   </div>
                 )}
@@ -308,9 +325,7 @@ export default function BookingPassModal({
                   margin: 0,
                 }}
               >
-                Te confirmamos el alias o CBU para la seña por WhatsApp al
-                coordinar el turno — así evitamos pasarte un dato de pago
-                desactualizado.
+                Consultá el alias por WhatsApp o en el mostrador.
               </p>
             )}
           </div>
@@ -318,51 +333,55 @@ export default function BookingPassModal({
           {/* ACTION BUTTONS */}
           <div className="pass-actions-col">
             {/* MERCADO PAGO / WHATSAPP ACTIONS */}
-            {mpMessage && (
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "var(--color-ink)",
-                  background: "rgba(56, 189, 248, 0.12)",
-                  border: "1px solid rgba(56, 189, 248, 0.3)",
-                  borderRadius: 6,
-                  padding: "8px 10px",
-                  lineHeight: 1.35,
-                }}
-              >
-                {mpMessage}
-              </div>
-            )}
+            {mpEnabled && (
+              <>
+                {mpMessage && (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "var(--color-ink)",
+                      background: "rgba(56, 189, 248, 0.12)",
+                      border: "1px solid rgba(56, 189, 248, 0.3)",
+                      borderRadius: 6,
+                      padding: "8px 10px",
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {mpMessage}
+                  </div>
+                )}
 
-            <button
-              type="button"
-              className="btn"
-              disabled={payingMp}
-              style={{
-                width: "100%",
-                justifyContent: "center",
-                height: 44,
-                fontSize: 14,
-                fontWeight: 700,
-                background: "#009ee3",
-                color: "#ffffff",
-                border: "none",
-                gap: 8,
-                boxShadow: "0 2px 8px rgba(0, 158, 227, 0.25)",
-              }}
-              onClick={handlePayMercadoPago}
-            >
-              {payingMp ? (
-                "Generando pago seguro…"
-              ) : (
-                <>
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M19 4H5c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H5V8h14v10z" />
-                  </svg>
-                  Pagar Seña con Mercado Pago (${Math.round((booking.total || 60000) / 2).toLocaleString("es-AR")})
-                </>
-              )}
-            </button>
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={payingMp}
+                  style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    height: 44,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    background: "#009ee3",
+                    color: "#ffffff",
+                    border: "none",
+                    gap: 8,
+                    boxShadow: "0 2px 8px rgba(0, 158, 227, 0.25)",
+                  }}
+                  onClick={handlePayMercadoPago}
+                >
+                  {payingMp ? (
+                    "Generando pago seguro…"
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M19 4H5c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H5V8h14v10z" />
+                      </svg>
+                      Pagar seña con Mercado Pago (${Math.round((booking.total || 60000) / 2).toLocaleString("es-AR")})
+                    </>
+                  )}
+                </button>
+              </>
+            )}
 
             <a
               href={whatsappUrl}
@@ -385,7 +404,7 @@ export default function BookingPassModal({
               >
                 <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.067-1.127-.072-.27-.087-.621-.21-1.077-.407-1.927-.834-3.176-2.778-3.272-2.906-.096-.129-.778-1.037-.778-1.977 0-.94.492-1.401.667-1.593.175-.192.38-.24.507-.24.127 0 .254.002.365.007.119.006.279-.045.437.334.162.388.555 1.353.603 1.451.048.098.08.213.016.341-.064.128-.096.208-.192.32-.096.112-.202.25-.288.336-.096.096-.197.201-.085.393.112.192.497.82 1.066 1.328.733.654 1.352.857 1.544.953.192.096.304.08.416-.048.112-.128.48-1.558.608-.752.128-.192.256-.16.432-.096.176.064 1.114.525 1.306.621.192.096.32.144.368.224.048.08.048.464-.096.869z" />
               </svg>
-              O confirmar seña por WhatsApp →
+              {mpEnabled ? "O confirmar" : "Confirmar"} seña por WhatsApp →
             </a>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -396,7 +415,7 @@ export default function BookingPassModal({
                 className="btn btn-secondary"
                 style={{ justifyContent: "center", height: 38, fontSize: 12 }}
               >
-                📅 Google Calendar
+                <CalendarPlus size={20} className="icono-marca" aria-hidden="true" /> Google Calendar
               </a>
               <button
                 type="button"
@@ -404,7 +423,7 @@ export default function BookingPassModal({
                 style={{ justifyContent: "center", height: 38, fontSize: 12 }}
                 onClick={handleDownloadCalendar}
               >
-                📥 Apple / Outlook (.ics)
+                <Download size={20} className="icono-marca" aria-hidden="true" /> Apple / Outlook (.ics)
               </button>
             </div>
 
@@ -419,7 +438,7 @@ export default function BookingPassModal({
               }}
               onClick={handleShareGroup}
             >
-              {shareSuccess ? "✓ ¡Mensaje para el grupo copiado!" : "👥 Compartir al grupo de WhatsApp"}
+              {shareSuccess ? <><Check size={20} className="icono-marca" aria-hidden="true" /> Mensaje para el grupo copiado</> : <><Users size={20} className="icono-marca" aria-hidden="true" /> Compartir al grupo de WhatsApp</>}
             </button>
 
             <button
@@ -440,6 +459,6 @@ export default function BookingPassModal({
         </div>
       </div>
     </div>
+    </Portal>
   );
 }
-

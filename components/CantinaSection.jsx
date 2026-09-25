@@ -141,7 +141,7 @@ export default function CantinaSection() {
             fontStyle: "italic",
           }}
         >
-          Las opciones sin TACC y veganas están marcadas en el menú ↑
+          Las opciones sin TACC están marcadas en el menú ↑
         </p>
       </div>
     </section>

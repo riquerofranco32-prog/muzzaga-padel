@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BentoPhotoCard } from "./PhotoCard";
 import { CALCULATOR_ITEMS } from "../data/menu";
 import { CLUB_INFO } from "../data/club";
+import Mascota from "./Mascota";
 
 const FEATURED_ITEMS = CALCULATOR_ITEMS.slice(0, 6);
 
@@ -19,20 +20,18 @@ export default function HomeCantinaTeaser() {
               className="badge-linear badge-amber"
               style={{ marginBottom: 6 }}
             >
-              Gastronomía &amp; Encuentro
+              Gastronomía y encuentro
             </span>
-            <h2 className="section-title">Cantina Propia &amp; 3er Tiempo</h2>
+            <h2 className="section-title">Cantina propia y tercer tiempo</h2>
             <p className="section-desc">
               Pizzas artesanales al horno, empanadas, cervezas frías y el mejor
               ambiente para seguir jugando afuera de la pista.
             </p>
           </div>
           <div className="mascot-section-badge">
-            <img
-              src="/img/mascotas/muzzaguito-pizza-cerveza.webp"
+            <Mascota
+              pose="pizza-cerveza"
               alt="Muzzaguito con pizza y cerveza en la cantina"
-              width={160}
-              height={160}
               className="mascot-section-img"
             />
           </div>
@@ -41,8 +40,8 @@ export default function HomeCantinaTeaser() {
           <BentoPhotoCard
             src="/img/cantina_beer_court.jpg"
             alt="Cerveza helada y vista a la pista en la cantina de Muzzaga"
-            caption="Cantina Muzzaga · Tercer Tiempo con Vista a las Canchas"
-            badge="Tercer Tiempo"
+            caption="Cantina Muzzaga · tercer tiempo con vista a las canchas"
+            badge="Tercer tiempo"
             badgeClassName="badge-amber"
             title="Cervezas heladas y vista a las dos canchas"
           >
@@ -52,13 +51,13 @@ export default function HomeCantinaTeaser() {
 
           <BentoPhotoCard
             src="/img/bar_coffee_snacks.jpg"
-            alt="Buffet y minutas caseras en la cantina de Muzzaga"
-            caption="Cantina Muzzaga · Comida Casera y Buffet de Pistas"
-            badge="Cocina Propia"
+            alt="Empanadas caseras y el partido de la Selección en la pantalla de la cantina"
+            caption="Cantina Muzzaga · empanadas y fútbol en la pantalla"
+            badge="Cocina propia"
             badgeClassName="badge-emerald"
-            title="Pizzas a la piedra y sándwiches de mila"
+            title="Empanadas y el partido en la pantalla"
           >
-            Muzzas bien cargadas, tostados en pan de miga y opciones Sin TACC
+            Muzzas bien cargadas, tostados en pan de miga y opciones sin TACC
             listas para cuando termines de jugar.
           </BentoPhotoCard>
         </div>

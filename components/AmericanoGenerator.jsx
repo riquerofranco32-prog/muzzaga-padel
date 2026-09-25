@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import {
   generateFixtures,
   buildAmericanoShareMessage,
   buildAmericanoWhatsAppUrl,
 } from "../lib/americano";
+import Mascota from "./Mascota";
+import { Share2, Check, Copy } from "lucide-react";
 
 const DEFAULT_NAMES = ["Jugador 1", "Jugador 2", "Jugador 3", "Jugador 4"];
 
@@ -72,19 +73,17 @@ export default function AmericanoGenerator() {
         <div className="section-header-row">
           <div>
             <span className="badge-linear badge-amber" style={{ marginBottom: 8 }}>
-              Herramienta Comunitaria
+              Herramienta para grupos
             </span>
-            <h2 className="section-title">Generador de Torneo Americano</h2>
+            <h2 className="section-title">Generador de torneo americano</h2>
             <p className="section-desc">
               Armá las rotaciones de parejas al instante para que todos jueguen con y contra todos en partidos de 4 o 6 games. Anotá los resultados en vivo y compartilo por WhatsApp.
             </p>
           </div>
           <div className="mascot-section-badge">
-            <Image
-              src="/img/mascotas/muzzaguito-trofeo-paleta.webp"
+            <Mascota
+              pose="trofeo-paleta"
               alt="Muzzaguito festejando con la copa del americano"
-              width={160}
-              height={160}
               className="mascot-section-img"
             />
           </div>
@@ -105,7 +104,8 @@ export default function AmericanoGenerator() {
                   className={`americano-count-btn${playerCount === count ? " active" : ""}`}
                   onClick={() => handleCountChange(count)}
                 >
-                  {count} jugadores
+                  {count}
+                  <span className="sr-only"> jugadores</span>
                 </button>
               ))}
             </div>
@@ -143,9 +143,9 @@ export default function AmericanoGenerator() {
               }}
             >
               <div>
-                <span className="badge-linear badge-emerald">Fixture Automático</span>
+                <span className="badge-linear badge-emerald">Fixture automático</span>
                 <h3 style={{ fontSize: 17, color: "var(--text-primary)", margin: "4px 0 0" }}>
-                  Rondas &amp; Cruces de Parejas
+                  Rondas y cruces de parejas
                 </h3>
               </div>
 
@@ -164,7 +164,7 @@ export default function AmericanoGenerator() {
                   }}
                   title="Abrir en WhatsApp y enviar fixture al grupo"
                 >
-                  <span>📲</span>
+                  <Share2 size={20} aria-hidden="true" />
                   <span>WhatsApp</span>
                 </a>
 
@@ -175,7 +175,7 @@ export default function AmericanoGenerator() {
                   onClick={copyFixture}
                   title="Copiar fixture completo al portapapeles"
                 >
-                  {copied ? "✓ Copiado" : "📋 Copiar"}
+                  {copied ? <><Check size={20} className="icono-marca" aria-hidden="true" /> Copiado</> : <><Copy size={20} className="icono-marca" aria-hidden="true" /> Copiar</>}
                 </button>
               </div>
             </div>
@@ -210,14 +210,14 @@ export default function AmericanoGenerator() {
                           }
                           placeholder="0"
                           style={{
-                            width: 32,
-                            height: 28,
+                            width: 44,
+                            height: 44,
                             textAlign: "center",
-                            fontSize: 13,
+                            fontSize: 16,
                             fontWeight: 700,
-                            borderRadius: 4,
-                            border: "1px solid var(--border)",
-                            background: "var(--surface)",
+                            borderRadius: 8,
+                            border: "1px solid var(--color-hairline-strong)",
+                            background: "var(--color-surface-card)",
                             color: "var(--text-primary)",
                             padding: 0,
                           }}
@@ -236,14 +236,14 @@ export default function AmericanoGenerator() {
                           }
                           placeholder="0"
                           style={{
-                            width: 32,
-                            height: 28,
+                            width: 44,
+                            height: 44,
                             textAlign: "center",
-                            fontSize: 13,
+                            fontSize: 16,
                             fontWeight: 700,
-                            borderRadius: 4,
-                            border: "1px solid var(--border)",
-                            background: "var(--surface)",
+                            borderRadius: 8,
+                            border: "1px solid var(--color-hairline-strong)",
+                            background: "var(--color-surface-card)",
                             color: "var(--text-primary)",
                             padding: 0,
                           }}

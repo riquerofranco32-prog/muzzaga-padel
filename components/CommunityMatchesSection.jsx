@@ -1,18 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createOpenMatch,
   getOpenMatches,
   joinOpenMatch,
 } from "../app/open-matches/actions";
 import { PRECIO_POR_JUGADOR } from "../data/pricing";
+import Portal from "./Portal";
+import useDialogFocus from "../lib/useDialogFocus";
+import Mascota from "./Mascota";
+import ScrollRow from "./ScrollRow";
+import { X } from "lucide-react";
 
 const WHATSAPP = "5492995974176";
+
+const CATEGORY_TABS = [
+  { id: "all", label: "Todas las categorías" },
+  { id: "7ma", label: "7ma (Iniciación)" },
+  { id: "6ta", label: "6ta (Intermedio)" },
+  { id: "5ta", label: "5ta (Avanzado)" },
+  { id: "Libre", label: "Libre / 4ta" },
+  { id: "Damas", label: "Damas" },
+];
 
 export default function CommunityMatchesSection() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const cardsRef = useRef(null);
   const [selectedCat, setSelectedCat] = useState("all");
 
   // Join Modal State
@@ -23,6 +39,8 @@ export default function CommunityMatchesSection() {
 
   // Create Modal State
   const [createModal, setCreateModal] = useState(false);
+  const joinDialogRef = useDialogFocus(Boolean(joinModal), () => setJoinModal(null));
+  const createDialogRef = useDialogFocus(createModal, () => setCreateModal(false));
   const [createForm, setCreateForm] = useState({
     category: "6ta Categoría (3.0 - 3.9)",
     courtName: "Cancha 1 · Cristal",
@@ -40,10 +58,19 @@ export default function CommunityMatchesSection() {
 
   async function loadMatches() {
     setLoading(true);
-    const res = await getOpenMatches();
+    setLoadFailed(false);
+    let res;
+    try {
+      res = await getOpenMatches();
+    } catch {
+      res = { ok: false };
+    }
     setLoading(false);
     if (res.ok) {
       setMatches(res.matches);
+    } else {
+      // Antes un error se mostraba como "no hay partidos".
+      setLoadFailed(true);
     }
   }
 
@@ -100,13 +127,13 @@ export default function CommunityMatchesSection() {
   return (
     <section id="canchas-abiertas" className="section-community">
       <div className="container">
-        <div className="section-header-row" style={{ alignItems: "center" }}>
+        <div className="section-header-row">
           <div>
             <span
               className="badge-linear badge-amber"
               style={{ marginBottom: 6 }}
             >
-              En Vivo · Matchmaking &amp; Comunidad
+              Comunidad · Partidos abiertos
             </span>
             <h2 className="section-title">Canchas Abiertas en Catriel</h2>
             <p className="section-desc">
@@ -116,11 +143,9 @@ export default function CommunityMatchesSection() {
           </div>
           <div className="header-aside">
             <div className="mascot-section-badge">
-              <img
-                src="/img/mascotas/muzzaguito-pizza-good-vibes.webp"
+              <Mascota
+                pose="pizza-good-vibes"
                 alt="Muzzaguito compartiendo pizza con la comunidad"
-                width={150}
-                height={150}
                 className="mascot-section-img"
               />
             </div>
@@ -129,29 +154,14 @@ export default function CommunityMatchesSection() {
               className="btn btn-secondary"
               onClick={() => setCreateModal(true)}
             >
-              + Publicar Partido Abierto
+              + Publicar partido
             </button>
           </div>
         </div>
 
         {/* CATEGORY FILTER PILLS */}
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            overflowX: "auto",
-            paddingBottom: 8,
-            marginBottom: 20,
-          }}
-        >
-          {[
-            { id: "all", label: "Todas las Categorías" },
-            { id: "7ma", label: "7ma (Iniciación)" },
-            { id: "6ta", label: "6ta (Intermedio)" },
-            { id: "5ta", label: "5ta (Avanzado)" },
-            { id: "Libre", label: "Libre / 4ta" },
-            { id: "Damas", label: "Damas" },
-          ].map((tab) => (
+        <ScrollRow className="open-category-tabs">
+          {CATEGORY_TABS.map((tab) => (
             <button
               key={tab.id}
               type="button"
@@ -161,48 +171,48 @@ export default function CommunityMatchesSection() {
               {tab.label}
             </button>
           ))}
-        </div>
+        </ScrollRow>
 
-        <div className="open-cards-grid">
-          {filteredMatches.length === 0 ? (
-            <div
-              className="booking-empty"
-              style={{
-                gridColumn: "1 / -1",
-                padding: "36px 24px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
-              <div style={{ maxWidth: 460 }}>
-                <strong style={{ display: "block", fontSize: 16, marginBottom: 6, color: "var(--text-primary)" }}>
-                  No hay partidos abiertos programados hoy
+        <div className="open-cards-grid" ref={cardsRef} tabIndex={-1}>
+          {loading && matches.length === 0 ? (
+            // Solo en la primera carga (al sumarse o publicar, las tarjetas
+            // quedan mientras se actualizan). Mismo recuadro que el estado
+            // vacío: antes, mientras cargaba, decía "No hay partidos".
+            <div className="booking-empty open-empty is-loading" role="status">
+              Buscando partidos…
+            </div>
+          ) : loadFailed ? (
+            <div className="booking-empty open-empty" role="alert">
+              <p className="open-empty-desc">No pudimos cargar los partidos.</p>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  cardsRef.current?.focus({ preventScroll: true });
+                  loadMatches();
+                }}
+              >
+                Reintentar
+              </button>
+            </div>
+          ) : filteredMatches.length === 0 ? (
+            <div className="booking-empty open-empty">
+              <Mascota pose="pelota-padel-life" className="open-empty-mascot" />
+              <div>
+                <strong className="open-empty-title">
+                  {selectedCat === "all"
+                    ? "Todavía no hay partidos"
+                    : `Todavía no hay partidos de ${CATEGORY_TABS.find((t) => t.id === selectedCat)?.label || selectedCat}`}
                 </strong>
-                <p style={{ margin: 0, fontSize: 14, color: "var(--text-secondary)" }}>
-                  ¡Sé el primero en armar uno para tu nivel o sumate al grupo oficial de WhatsApp del club para enterarte al instante de nuevas convocatorias!
-                </p>
+                <p className="open-empty-desc">Armá el tuyo y sumá gente de tu nivel.</p>
               </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
-                <button
-                  type="button"
-                  className="btn btn-linear-primary"
-                  onClick={() => setCreateModal(true)}
-                  style={{ height: 40 }}
-                >
-                  + Publicar Partido Abierto
-                </button>
-                <a
-                  href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("¡Hola Muzzaga! Quiero sumarme al grupo de WhatsApp de Canchas Abiertas.")}`}
-                  target="_blank"
-                  rel="noopener"
-                  className="btn btn-secondary-whatsapp"
-                  style={{ height: 40, gap: 8 }}
-                >
-                  Sumarme al Grupo de WhatsApp →
-                </a>
-              </div>
+              <button
+                type="button"
+                className="btn btn-linear-primary"
+                onClick={() => setCreateModal(true)}
+              >
+                Publicar partido
+              </button>
             </div>
           ) : (
             filteredMatches.map((match) => {
@@ -249,7 +259,7 @@ export default function CommunityMatchesSection() {
                       style={{
                         fontSize: 14,
                         color: "var(--text-secondary)",
-                        minHeight: 40,
+                        minHeight: 44,
                       }}
                     >
                       {match.desc}
@@ -279,7 +289,7 @@ export default function CommunityMatchesSection() {
                             }
                             title="Hacé clic para sumarte a este lugar"
                           >
-                            +1 ¡Sumarme!
+                            +1 Sumarme
                           </button>
                         ),
                       )}
@@ -318,7 +328,7 @@ export default function CommunityMatchesSection() {
                         className="badge-linear badge-emerald"
                         style={{ fontSize: 12 }}
                       >
-                        ✓ Partido Completo
+                        ✓ Partido completo
                       </span>
                     ) : (
                       <button
@@ -353,6 +363,7 @@ export default function CommunityMatchesSection() {
 
       {/* MODAL PARA SUMARSE A UN SLOT */}
       {joinModal && (
+        <Portal>
         <div
           className="admin-modal-backdrop"
           onClick={() => setJoinModal(null)}
@@ -360,6 +371,11 @@ export default function CommunityMatchesSection() {
           <div
             className="admin-modal-card"
             onClick={(e) => e.stopPropagation()}
+            ref={joinDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Sumarme al partido abierto"
+            tabIndex={-1}
           >
             <div
               style={{
@@ -376,14 +392,15 @@ export default function CommunityMatchesSection() {
                   margin: 0,
                 }}
               >
-                Sumarme a Cancha Abierta
+                Sumarme al partido
               </h3>
               <button
                 type="button"
                 className="admin-modal-close"
                 onClick={() => setJoinModal(null)}
+                aria-label="Cerrar"
               >
-                ✕
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
 
@@ -401,7 +418,7 @@ export default function CommunityMatchesSection() {
             <form onSubmit={handleJoinSubmit}>
               <div style={{ marginBottom: 12 }}>
                 <label className="admin-field-label">
-                  Tu Nombre y Apellido:
+                  Tu nombre y apellido:
                 </label>
                 <input
                   type="text"
@@ -416,7 +433,7 @@ export default function CommunityMatchesSection() {
 
               <div style={{ marginBottom: 18 }}>
                 <label className="admin-field-label">
-                  Tu Teléfono (WhatsApp):
+                  Tu teléfono (WhatsApp):
                 </label>
                 <input
                   type="tel"
@@ -441,10 +458,12 @@ export default function CommunityMatchesSection() {
             </form>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* MODAL PARA CREAR CONVOCATORIA */}
       {createModal && (
+        <Portal>
         <div
           className="admin-modal-backdrop"
           onClick={() => setCreateModal(false)}
@@ -452,6 +471,11 @@ export default function CommunityMatchesSection() {
           <div
             className="admin-modal-card"
             onClick={(e) => e.stopPropagation()}
+            ref={createDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Publicar partido abierto"
+            tabIndex={-1}
           >
             <div
               style={{
@@ -468,20 +492,21 @@ export default function CommunityMatchesSection() {
                   margin: 0,
                 }}
               >
-                Publicar Convocatoria Abierta
+                Publicar partido abierto
               </h3>
               <button
                 type="button"
                 className="admin-modal-close"
                 onClick={() => setCreateModal(false)}
+                aria-label="Cerrar"
               >
-                ✕
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
 
             <form onSubmit={handleCreateSubmit}>
               <div style={{ marginBottom: 12 }}>
-                <label className="admin-field-label">Categoría / Nivel:</label>
+                <label className="admin-field-label">Categoría o nivel:</label>
                 <select
                   className="admin-modal-select"
                   value={createForm.category}
@@ -556,7 +581,7 @@ export default function CommunityMatchesSection() {
               >
                 <div>
                   <label className="admin-field-label">
-                    Tu Nombre (Organizador):
+                    Tu nombre (organizador):
                   </label>
                   <input
                     type="text"
@@ -611,11 +636,12 @@ export default function CommunityMatchesSection() {
                 style={{ width: "100%", height: 44, justifyContent: "center" }}
                 disabled={createSubmitting}
               >
-                {createSubmitting ? "Publicando..." : "Publicar Convocatoria →"}
+                {createSubmitting ? "Publicando..." : "Publicar partido →"}
               </button>
             </form>
           </div>
         </div>
+        </Portal>
       )}
     </section>
   );

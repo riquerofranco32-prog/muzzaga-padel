@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Mascota from "./Mascota";
 import Link from "next/link";
 import { getCategoryForRating } from "../data/levels";
 import {
@@ -8,6 +9,7 @@ import {
   buildLevelWhatsAppUrl,
   evaluatePlayerSkills,
 } from "../lib/levelShare";
+import { Clock, BrickWall, Zap, Share2, Trophy, MessageCircle } from "lucide-react";
 
 export default function RatingCalculator() {
   const [mode, setMode] = useState("quiz"); // 'quiz' | 'slider'
@@ -64,14 +66,18 @@ export default function RatingCalculator() {
           className={`rating-tab-btn${mode === "quiz" ? " active" : ""}`}
           onClick={() => setMode("quiz")}
         >
-          Test Guiado (3 Preguntas)
+          {/* Un solo span: como hijos sueltos del botón (flex), el espacio antes
+              de "(3 preguntas)" se perdía. */}
+          <span>
+            Test guiado<span className="rating-tab-extra"> (3 preguntas)</span>
+          </span>
         </button>
         <button
           type="button"
           className={`rating-tab-btn${mode === "slider" ? " active" : ""}`}
           onClick={() => setMode("slider")}
         >
-          Ajuste Manual
+          Ajuste manual
         </button>
       </div>
 
@@ -188,7 +194,7 @@ export default function RatingCalculator() {
       {/* CARNET DIGITAL OFICIAL DEL JUGADOR */}
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95))",
+          background: "linear-gradient(135deg, var(--color-surface-card), var(--color-canvas-soft))",
           border: "1.5px solid var(--color-hairline-strong, #e2e8f0)",
           borderRadius: "var(--radius-lg, 14px)",
           padding: "16px 18px",
@@ -224,26 +230,22 @@ export default function RatingCalculator() {
                 fontWeight: 800,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
-                color: "var(--color-accent-orange, #ff5722)",
+                color: "var(--color-accent-orange-text)",
                 display: "block",
               }}
             >
-              Ficha Oficial de Jugador
+              Ficha de jugador
             </span>
             <strong style={{ fontSize: 15, color: "var(--color-ink)" }}>
               Muzzaga Pádel Club
             </strong>
           </div>
 
-          <img
-            src="/img/mascotas/muzzaguito-enredado-grip.webp"
+          <Mascota
+            pose="enredado-grip"
+            size="s"
             alt="Muzzaguito enredado con el grip"
-            style={{
-              width: 74,
-              height: 74,
-              objectFit: "contain",
-              filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.22))",
-            }}
+            className="mascot-card"
           />
         </div>
 
@@ -260,8 +262,9 @@ export default function RatingCalculator() {
               fontSize: 12.5,
               padding: "4px 10px",
               borderRadius: 6,
-              border: "1px solid var(--border)",
-              background: "rgba(255,255,255,0.8)",
+              border: "1px solid var(--color-hairline-strong)",
+              background: "var(--color-canvas)",
+              color: "var(--color-ink)",
               boxSizing: "border-box",
             }}
           />
@@ -272,6 +275,7 @@ export default function RatingCalculator() {
             display: "flex",
             alignItems: "baseline",
             justifyContent: "space-between",
+            gap: 12,
             background: "rgba(255, 122, 26, 0.06)",
             border: "1px solid rgba(255, 122, 26, 0.2)",
             borderRadius: 8,
@@ -291,7 +295,7 @@ export default function RatingCalculator() {
             </span>
           </div>
 
-          <div style={{ textAlign: "right" }}>
+          <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
             <div style={{ fontSize: 10, color: "var(--color-muted)", textTransform: "uppercase", fontWeight: 700 }}>
               Rating Int.
             </div>
@@ -312,17 +316,17 @@ export default function RatingCalculator() {
             marginBottom: 14,
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
-            <span style={{ color: "var(--color-muted)" }}>🕒 Experiencia:</span>
-            <strong style={{ color: "var(--color-ink)" }}>{skills.experience}</strong>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
+            <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><Clock size={20} className="icono-marca" aria-hidden="true" /> Experiencia:</span>
+            <strong style={{ color: "var(--color-ink)", textAlign: "right" }}>{skills.experience}</strong>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
-            <span style={{ color: "var(--color-muted)" }}>🧱 Rebote en Cristal:</span>
-            <strong style={{ color: "var(--color-ink)" }}>{skills.wallPlay}</strong>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, borderBottom: "1px dashed var(--color-hairline, #e2e8f0)", paddingBottom: 4 }}>
+            <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><BrickWall size={20} className="icono-marca" aria-hidden="true" /> Rebote en el cristal:</span>
+            <strong style={{ color: "var(--color-ink)", textAlign: "right" }}>{skills.wallPlay}</strong>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span style={{ color: "var(--color-muted)" }}>🎾 Red &amp; Remate:</span>
-            <strong style={{ color: "var(--color-ink)" }}>{skills.netPlay}</strong>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+            <span style={{ color: "var(--color-muted)", display: "inline-flex", alignItems: "center", gap: 6 }}><Zap size={20} className="icono-marca" aria-hidden="true" /> Red y remate:</span>
+            <strong style={{ color: "var(--color-ink)", textAlign: "right" }}>{skills.netPlay}</strong>
           </div>
         </div>
 
@@ -340,19 +344,20 @@ export default function RatingCalculator() {
             style={{
               width: "100%",
               justifyContent: "center",
-              minHeight: 42,
+              minHeight: 44,
               fontSize: 13.5,
               textDecoration: "none",
             }}
             title="Compartir mi nivel de pádel con mi compañero o grupo"
           >
-            <span>📲</span>
-            <span>Compartir Ficha por WhatsApp</span>
+            <Share2 size={20} aria-hidden="true" />
+            <span>Compartir ficha por WhatsApp</span>
           </a>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div className="rating-share-actions">
+            {/* Antes era "#torneos", que en esta página no existe: no llevaba a ningún lado. */}
             <a
-              href="#torneos"
+              href="/torneos"
               className="btn btn-secondary"
               style={{
                 justifyContent: "center",
@@ -362,7 +367,7 @@ export default function RatingCalculator() {
                 textAlign: "center",
               }}
             >
-              🏆 Ver Torneos
+              <Trophy size={20} className="icono-marca" aria-hidden="true" /> Ver torneos
             </a>
 
             <a
@@ -378,7 +383,7 @@ export default function RatingCalculator() {
                 textAlign: "center",
               }}
             >
-              💬 Partidos Parejos
+              <MessageCircle size={20} className="icono-marca" aria-hidden="true" /> Partidos parejos
             </a>
           </div>
         </div>

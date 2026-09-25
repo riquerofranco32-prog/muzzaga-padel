@@ -1,3 +1,6 @@
+import Image from "next/image";
+import Mascota from "./Mascota";
+
 const GoogleMapsIcon = () => (
   <svg viewBox="0 0 24 24" width="15" height="15" fill="none">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335" />
@@ -25,7 +28,7 @@ export default function Footer() {
                 marginBottom: 8,
               }}
             >
-              <img
+              <Image
                 src="/img/logo_badge.png"
                 alt="Muzzaga Pádel"
                 width={32}
@@ -44,19 +47,18 @@ export default function Footer() {
               }}
             >
               Club de pádel en Catriel, Río Negro. Canchas de cristal
-              profesionales, torneos y cantina propia.
+              templado, torneos y cantina propia.
             </p>
 
             <div className="footer-mascot-box">
-              <img
-                src="/img/mascotas/muzzaguito-mochila-pulgar.webp"
+              <Mascota
+                pose="mochila-pulgar"
+                size="s"
                 alt="Muzzaguito con su mochila haciendo pulgar arriba"
-                width={180}
-                height={168}
                 className="footer-mascot"
               />
               <span className="footer-mascot-text">
-                ¡Nos vemos en la pista! 🎾 Muzzaguito te acompaña en cada partido.
+                ¡Nos vemos en la cancha! Muzzaguito te acompaña en cada partido.
               </span>
             </div>
           </div>
@@ -79,12 +81,13 @@ export default function Footer() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 8,
+                  alignItems: "flex-start",
+                  gap: 0,
                   fontSize: 14,
                 }}
               >
                 <a href="/#turnos" style={{ color: "var(--text-secondary)" }}>
-                  Elegí tu Turno
+                  Elegí tu turno
                 </a>
                 <a
                   href="/#canchas-abiertas"
@@ -93,16 +96,16 @@ export default function Footer() {
                   Canchas Abiertas
                 </a>
                 <a href="/torneos" style={{ color: "var(--text-secondary)" }}>
-                  Torneos Oficiales
+                  Torneos
                 </a>
                 <a href="/menu" style={{ color: "var(--text-secondary)" }}>
-                  Menú de Cantina
+                  Menú de la cantina
                 </a>
                 <a
                   href="/herramientas/dividir-gastos"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Herramientas para Jugadores
+                  Herramientas para jugadores
                 </a>
               </div>
             </div>
@@ -124,7 +127,8 @@ export default function Footer() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 8,
+                  alignItems: "flex-start",
+                  gap: 0,
                   fontSize: 14,
                 }}
               >
@@ -150,7 +154,7 @@ export default function Footer() {
                   rel="noopener"
                   className="maps-text"
                 >
-                  <GoogleMapsIcon /> Google Maps Oficial
+                  <GoogleMapsIcon /> Google Maps
                 </a>
               </div>
             </div>
@@ -163,7 +167,7 @@ export default function Footer() {
             reservados.
           </div>
           <div>
-            2 Canchas de Cristal · Cantina Propia · Iluminación LED
+            2 canchas de cristal · Cantina propia · Iluminación LED
           </div>
         </div>
       </div>

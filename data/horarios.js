@@ -79,12 +79,29 @@ export function getClubStatus(
 
   // Después de medianoche sigue abierto si el turno de ayer todavía no cerró.
   const today = openWindow(iso, blockedDates, schedule);
-  const yesterday = openWindow(isoAddDays(iso, -1), blockedDates, schedule);
+  const yesterdayIso = isoAddDays(iso, -1);
+  const yesterday = openWindow(yesterdayIso, blockedDates, schedule);
   let closesInMin = null;
+  let closesAt = null;
   if (today && minutes >= today.start && minutes < today.end) {
     closesInMin = today.end - minutes;
+    closesAt = schedule[isoWeekday(iso)].end;
   } else if (yesterday && minutes + DAY_MIN < yesterday.end) {
     closesInMin = yesterday.end - (minutes + DAY_MIN);
+    closesAt = schedule[isoWeekday(yesterdayIso)].end;
+  }
+
+  // Próxima apertura (si está cerrado): hoy más tarde o alguno de los
+  // próximos 7 días. dayOffset 0 = hoy, 1 = mañana.
+  let nextOpen = null;
+  if (closesInMin == null) {
+    for (let offset = 0; offset <= 7 && !nextOpen; offset++) {
+      const day = isoAddDays(iso, offset);
+      const w = openWindow(day, blockedDates, schedule);
+      if (w && (offset > 0 || minutes < w.start)) {
+        nextOpen = { dayOffset: offset, weekday: isoWeekday(day), start: schedule[isoWeekday(day)].start };
+      }
+    }
   }
 
   const isOpen = closesInMin != null;
@@ -104,10 +121,32 @@ export function getClubStatus(
     isOpen,
     state,
     closesInMin,
+    closesAt,
+    nextOpen,
     statusText: STATUS_TEXT[state],
     scheduleLabel: SCHEDULE[isoWeekday(iso)]?.label || "14:00 a 00:30 hs",
     isNight: hour >= 19 || hour < 6, // Iluminación LED activa después de las 19:00 o madrugada
   };
+}
+
+const WEEKDAYS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+
+/**
+ * Estado en una línea, solo con lo que sale del horario:
+ * "Abierto ahora · cierra a las 00:30", "Abierto · cierra en 40 min",
+ * "Cerrado · abre hoy a las 14:00", "Cerrado · abre el lunes a las 14:00".
+ * @param {ReturnType<typeof getClubStatus>} status
+ */
+export function clubStatusLine(status) {
+  if (status.isOpen) {
+    return status.state === "cierra-pronto"
+      ? `Abierto · cierra en ${status.closesInMin} min`
+      : `Abierto ahora · cierra a las ${status.closesAt}`;
+  }
+  const n = status.nextOpen;
+  if (!n) return "Cerrado";
+  const when = n.dayOffset === 0 ? "hoy" : n.dayOffset === 1 ? "mañana" : `el ${WEEKDAYS[n.weekday]}`;
+  return `Cerrado · abre ${when} a las ${n.start}`;
 }
 
 export function isClubOpenNow(date = new Date()) {

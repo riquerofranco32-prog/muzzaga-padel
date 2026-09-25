@@ -5,6 +5,8 @@ import {
   buildTacticWhatsAppUrl,
   buildRopeWhatsAppUrl,
 } from "../lib/tacticalShare";
+import { Share2, Handshake } from "lucide-react";
+import ScrollRow from "./ScrollRow";
 
 const PRESET_TACTICS = [
   {
@@ -24,8 +26,8 @@ const PRESET_TACTICS = [
       r2: { x: 210, y: 430, label: "R2" }, // Rival en esquina
     },
     bouncePos: { x: 245, y: 430 },
-    wallPos: { x: 275, y: 410 },
-    trajectory: "M 130 195 Q 185 300, 245 430 Q 265 425, 278 405",
+    wallPos: { x: 282, y: 395 },
+    trajectory: "M 130 195 Q 185 300, 245 430 Q 268 420, 282 397",
     phases: [
       {
         phase: "1. Armado",
@@ -47,7 +49,7 @@ const PRESET_TACTICS = [
   },
   {
     id: "smash_x3",
-    title: "Smash por 3 (Definición)",
+    title: "Smash por 3 (definición)",
     category: "Definición",
     difficulty: "★★★★★",
     effectiveness: "94%",
@@ -74,8 +76,8 @@ const PRESET_TACTICS = [
         desc: "Impacto a las 12 en punto con 'muñecazo' hacia afuera.",
       },
       {
-        phase: "3. Rebote Cristal",
-        desc: "Impacto en el cristal de 10mm a más de 2.5m de altura.",
+        phase: "3. Rebote en el cristal",
+        desc: "Impacto en el cristal de fondo a más de 2,5 m de altura.",
       },
       {
         phase: "4. Salida x3",
@@ -94,14 +96,14 @@ const PRESET_TACTICS = [
     desc: "Acompañá la bola cuando sale del cristal de fondo. Ganá tiempo con un globo alto y profundo para que tu pareja y vos puedan tomar la red.",
     tip: "Flexioná las rodillas, pala por debajo de la pelota y terminá el gesto apuntando al techo.",
     players: {
-      p1: { x: 75, y: 455, label: "J1 (Vos)" },
-      p2: { x: 175, y: 440, label: "J2 (Pareja)" },
+      p1: { x: 95, y: 440, label: "J1 (Vos)" },
+      p2: { x: 185, y: 440, label: "J2 (Pareja)" },
       r1: { x: 100, y: 190, label: "R1 (Red)" },
       r2: { x: 200, y: 190, label: "R2 (Red)" },
     },
-    bouncePos: { x: 60, y: 475 },
+    bouncePos: { x: 48, y: 462 },
     wallPos: null,
-    trajectory: "M 60 475 Q 90 280, 225 90",
+    trajectory: "M 48 462 Q 90 280, 225 90",
     phases: [
       {
         phase: "1. Espera",
@@ -154,14 +156,14 @@ const PRESET_TACTICS = [
         desc: "La pelota cae a los pies del rival obligándolo a levantar.",
       },
       {
-        phase: "4. Volea Firme",
+        phase: "4. Volea firme",
         desc: "Paso adelante de tu pareja para liquidar en la red.",
       },
     ],
   },
   {
     id: "bandeja_doble",
-    title: "Bandeja a la doble pared (Esquina)",
+    title: "Bandeja a la doble pared (esquina)",
     category: "Construcción",
     difficulty: "★★★★☆",
     effectiveness: "90%",
@@ -209,15 +211,15 @@ const PRESET_TACTICS = [
     desc: "Cuando el smash del rival rebota en tu cristal de fondo y cruza la red despacio, amortiguás la bola con toque ultra cortado para dejarla pegada a la red de su lado.",
     tip: "Aflojá la muñeca en el último instante y retrocedé la pala ligeramente al impactar para quitar toda la inercia.",
     players: {
-      p1: { x: 140, y: 240, label: "J1 (Vos)" },
+      p1: { x: 140, y: 285, label: "J1 (Vos)" },
       p2: { x: 80, y: 350, label: "J2" },
       r1: { x: 130, y: 150, label: "R1 (Pegador)" },
       r2: { x: 220, y: 180, label: "R2" },
     },
-    bouncePos: { x: 140, y: 245 },
+    bouncePos: { x: 165, y: 238 },
     wallPos: null,
     trajectory:
-      "M 130 150 Q 140 400, 140 460 Q 140 350, 140 240 Q 145 235, 145 230",
+      "M 130 150 Q 140 400, 140 460 Q 140 350, 140 285 Q 152 250, 165 238",
     phases: [
       {
         phase: "1. Anticipación",
@@ -242,7 +244,7 @@ const PRESET_TACTICS = [
 const ROPE_THEORY_PHASES = [
   {
     id: "saque",
-    name: "1. Saque & Subida",
+    name: "1. Saque y subida",
     desc: "El sacador avanza a la red en línea recta mientras el compañero ya está afirmado esperando la devolución.",
     p1: { x: 175, y: 260, label: "Sacador" },
     p2: { x: 85, y: 210, label: "Compañero" },
@@ -250,7 +252,7 @@ const ROPE_THEORY_PHASES = [
   },
   {
     id: "bloqueo",
-    name: "2. Bloqueo en Red (Ataque)",
+    name: "2. Bloqueo en la red (ataque)",
     desc: "Ambos pegados a 2 metros de la red. La 'cuerda' imaginaria los mantiene a 3 metros de distancia mutua cubriendo el centro y esquinas.",
     p1: { x: 180, y: 200, label: "Drive Red" },
     p2: { x: 90, y: 200, label: "Revés Red" },
@@ -264,7 +266,7 @@ const ROPE_THEORY_PHASES = [
   },
   {
     id: "defensa",
-    name: "3. Defensa en Fondo",
+    name: "3. Defensa en el fondo",
     desc: "Ambos detrás de la línea de saque para defender con cristales. Si uno sale a la esquina, el otro cubre el centro.",
     p1: { x: 210, y: 440, label: "Drive Fondo" },
     p2: { x: 120, y: 425, label: "Revés Cobertura" },
@@ -272,7 +274,7 @@ const ROPE_THEORY_PHASES = [
   },
   {
     id: "cobertura_globo",
-    name: "4. Basculación por Globo",
+    name: "4. Basculación por globo",
     desc: "El rival tira globo cruzado: el jugador de revés retrocede en diagonal y su compañero bascula al centro para defender juntos.",
     p1: { x: 140, y: 380, label: "Apoyo Central" },
     p2: { x: 80, y: 450, label: "Recupera Globo" },
@@ -368,9 +370,9 @@ export default function TacticalCourtSimulator() {
               className="badge-linear badge-indigo"
               style={{ marginBottom: 8 }}
             >
-              Simulador 3D / 2D Oficial · Muzzaga Pádel
+              Simulador táctico · Muzzaga Pádel
             </span>
-            <h2 className="section-title">Pizarra Táctica Interactiva</h2>
+            <h2 className="section-title">Pizarra táctica interactiva</h2>
             <p className="section-desc">
               Analizá jugadas maestras, entendé la sincronización de pareja y
               posicioná a tus jugadores sobre el césped y cristal de Muzzaga.
@@ -387,7 +389,7 @@ export default function TacticalCourtSimulator() {
                 replayAnimation();
               }}
             >
-              Jugadas Pro
+              Jugadas pro
             </button>
             <button
               type="button"
@@ -401,7 +403,7 @@ export default function TacticalCourtSimulator() {
               className={`rating-tab-btn${boardMode === "free" ? " active" : ""}`}
               onClick={() => setBoardMode("free")}
             >
-              Pizarra Libre
+              Pizarra libre
             </button>
           </div>
         </div>
@@ -431,10 +433,10 @@ export default function TacticalCourtSimulator() {
                   }}
                 >
                   {boardMode === "presets"
-                    ? "Animación en Vivo"
+                    ? "Animación en vivo"
                     : boardMode === "rope"
-                      ? "Sincronía de Pareja"
-                      : "Modo Libre"}
+                      ? "Sincronía de pareja"
+                      : "Modo libre"}
                 </span>
               </div>
 
@@ -452,7 +454,7 @@ export default function TacticalCourtSimulator() {
                     borderColor: "rgba(255,255,255,0.2)",
                   }}
                 >
-                  Repetir Tiro
+                  Repetir tiro
                 </button>
               )}
             </div>
@@ -516,7 +518,7 @@ export default function TacticalCourtSimulator() {
                 strokeWidth="2.5"
               />
 
-              {/* Padel Glass Walls (Cristal Templado 10mm Muzzaga) */}
+              {/* Paredes de cristal */}
               <rect
                 x="18"
                 y="16"
@@ -647,12 +649,14 @@ export default function TacticalCourtSimulator() {
               />
               <circle cx="15" cy="250" r="4" fill="#E8722A" />
               <circle cx="285" cy="250" r="4" fill="#E8722A" />
+              {/* En el extremo derecho: en el medio chocaba con jugadores y
+                  piques de casi todas las jugadas. */}
               <text
-                x="150"
-                y="246"
+                x="280"
+                y="242"
                 fill="#ffffff"
                 fontSize="9"
-                textAnchor="middle"
+                textAnchor="end"
                 opacity="0.8"
                 fontWeight="600"
               >
@@ -691,7 +695,7 @@ export default function TacticalCourtSimulator() {
                     textAnchor="middle"
                     fontWeight="bold"
                   >
-                    ⚠️ {rope.dangerZone.label}
+                    {rope.dangerZone.label}
                   </text>
                 </>
               )}
@@ -707,7 +711,7 @@ export default function TacticalCourtSimulator() {
                 <g
                   style={{
                     opacity: isPlayingAnim ? 1 : 0,
-                    transition: "opacity 0.18s ease",
+                    transition: "opacity var(--t-estado) var(--ease)",
                   }}
                 >
                   {/* Trajectory glow path */}
@@ -883,7 +887,7 @@ export default function TacticalCourtSimulator() {
             </svg>
 
             <div className="court-glass-indicator">
-              Césped de Alta Densidad · Cristales Templados 10mm Muzzaga
+              Césped sintético · Cristal templado
             </div>
           </div>
 
@@ -917,9 +921,10 @@ export default function TacticalCourtSimulator() {
                 </div>
 
                 {/* SELECTOR DE JUGADAS */}
-                <div
+                <ScrollRow
+                  axis="y"
                   className="tactic-buttons-list"
-                  style={{ maxHeight: 220, overflowY: "auto", paddingRight: 4 }}
+                  style={{ maxHeight: 220, paddingRight: 4 }}
                 >
                   {PRESET_TACTICS.map((item) => (
                     <button
@@ -948,7 +953,7 @@ export default function TacticalCourtSimulator() {
                       </div>
                     </button>
                   ))}
-                </div>
+                </ScrollRow>
 
                 {/* DETALLE Y SPECS */}
                 <div className="tactic-detail-box">
@@ -1010,7 +1015,7 @@ export default function TacticalCourtSimulator() {
                         marginBottom: 6,
                       }}
                     >
-                      Secuencia de Golpe Paso a Paso:
+                      Secuencia del golpe, paso a paso:
                     </span>
                     <div
                       style={{
@@ -1048,13 +1053,13 @@ export default function TacticalCourtSimulator() {
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
-                        color: "var(--color-accent-orange)",
+                        color: "var(--color-accent-orange-text)",
                         fontWeight: 600,
                         fontSize: 12.5,
                         marginBottom: 2,
                       }}
                     >
-                      <span>Consejo de los Profesores:</span>
+                      <span>Consejo de los profes:</span>
                     </div>
                     <p
                       style={{
@@ -1090,8 +1095,8 @@ export default function TacticalCourtSimulator() {
                     }}
                     title="Enviar esta jugada táctica a tu compañero por WhatsApp"
                   >
-                    <span style={{ fontSize: 16 }}>📲</span>
-                    <span>Compartir Jugada con mi Pareja</span>
+                    <Share2 size={20} aria-hidden="true" />
+                    <span>Compartir jugada con mi pareja</span>
                   </a>
                 </div>
               </>
@@ -1105,7 +1110,7 @@ export default function TacticalCourtSimulator() {
                     className="badge-linear badge-emerald"
                     style={{ marginBottom: 6 }}
                   >
-                    Sincronización Táctica de Pareja
+                    Sincronización táctica de pareja
                   </span>
                   <h4
                     style={{
@@ -1114,7 +1119,7 @@ export default function TacticalCourtSimulator() {
                       margin: "4px 0 6px",
                     }}
                   >
-                    La Teoría de la Cuerda en Pádel
+                    La teoría de la cuerda en pádel
                   </h4>
                   <p
                     style={{
@@ -1175,7 +1180,7 @@ export default function TacticalCourtSimulator() {
                       marginBottom: 4,
                     }}
                   >
-                    Regla de Oro del Doble:
+                    Regla de oro del doble:
                   </strong>
                   <span style={{ fontSize: 12.5, color: "var(--color-ink)" }}>
                     "Nunca te quedes mirando el golpe de tu compañero: ajustá tu
@@ -1206,8 +1211,8 @@ export default function TacticalCourtSimulator() {
                   }}
                   title="Enviar este movimiento táctico de pareja a tu compañero por WhatsApp"
                 >
-                  <span style={{ fontSize: 16 }}>🤝</span>
-                  <span>Compartir Sincronización con mi Pareja</span>
+                  <Handshake size={20} aria-hidden="true" />
+                  <span>Compartir sincronización con mi pareja</span>
                 </a>
               </>
             )}
@@ -1220,7 +1225,7 @@ export default function TacticalCourtSimulator() {
                     className="badge-linear badge-amber"
                     style={{ marginBottom: 6 }}
                   >
-                    Entrenador Táctico Interactivo
+                    Entrenador táctico interactivo
                   </span>
                   <h4
                     style={{
@@ -1229,7 +1234,7 @@ export default function TacticalCourtSimulator() {
                       margin: "4px 0 6px",
                     }}
                   >
-                    Diseñá tu Propia Estrategia
+                    Diseñá tu propia estrategia
                   </h4>
                   <p
                     style={{
@@ -1265,10 +1270,10 @@ export default function TacticalCourtSimulator() {
                     }}
                   >
                     {[
-                      { id: "p1", name: "J1 (Tu Jugador)", color: "#E8722A" },
-                      { id: "p2", name: "J2 (Tu Pareja)", color: "#E8722A" },
-                      { id: "r1", name: "R1 (Rival Drive)", color: "#38bdf8" },
-                      { id: "r2", name: "R2 (Rival Revés)", color: "#38bdf8" },
+                      { id: "p1", name: "J1 (tu jugador)", color: "#E8722A" },
+                      { id: "p2", name: "J2 (tu pareja)", color: "#E8722A" },
+                      { id: "r1", name: "R1 (rival de drive)", color: "#38bdf8" },
+                      { id: "r2", name: "R2 (rival de revés)", color: "#38bdf8" },
                     ].map((btn) => (
                       <button
                         key={btn.id}
@@ -1304,7 +1309,7 @@ export default function TacticalCourtSimulator() {
                     onClick={resetFreeCourt}
                     style={{ flex: 1, justifyContent: "center" }}
                   >
-                    Reiniciar Posiciones
+                    Reiniciar posiciones
                   </button>
                 </div>
               </>
@@ -1320,7 +1325,7 @@ export default function TacticalCourtSimulator() {
                 rel="noopener"
                 className="tactical-clases-link whatsapp-text"
               >
-                Consultar por Clases Tácticas por WhatsApp →
+                Consultar por clases por WhatsApp →
               </a>
             </div>
           </div>
