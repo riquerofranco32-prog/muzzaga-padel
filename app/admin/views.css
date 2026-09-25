@@ -379,6 +379,17 @@
   color: var(--text);
 }
 
+.admin-root .admin-order-pay {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #047857;
+}
+
+.admin-root .admin-order-pay.is-pending {
+  color: #b4501a;
+}
+
 .admin-root .admin-order-items {
   list-style: none;
   margin: 0;
@@ -408,6 +419,14 @@
   min-height: 36px;
   padding: 6px 14px;
   font-size: 13px;
+}
+
+/* "Cancelar" es un link, pero se toca en celu: 44 px como el resto. */
+.admin-root .admin-order-actions .admin-link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
 }
 
 .admin-root .admin-order-danger {
@@ -466,8 +485,13 @@
   border-bottom: none;
 }
 
+/* Sin opacity: el texto tiene que seguir llegando a AA. */
 .admin-root .admin-order-history li.is-cancelado {
-  opacity: 0.6;
+  color: var(--text-muted);
+}
+
+.admin-root .admin-order-history li.is-cancelado strong {
+  text-decoration: line-through;
 }
 
 .admin-root .admin-order-charging {

@@ -771,6 +771,28 @@
   transition: all 0.15s ease;
 }
 
+.admin-root .admin-top-icon-btn {
+  position: relative;
+}
+
+.admin-root .admin-bell-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--accent-orange);
+  color: #1b1b19;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .admin-root .admin-top-icon-btn:hover {
   background: #f9fafb;
   color: #111827;

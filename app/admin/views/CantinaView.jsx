@@ -36,6 +36,7 @@ import {
 import {
   OPEN_ORDER_STATUSES,
   ORDER_STATUS_LABELS,
+  payLabel,
 } from "../../../lib/cantinaOrder";
 import { MENU_CATEGORIES, MENU_ITEMS } from "../../../data/menu";
 import StaffPinModal from "../ui/StaffPinModal";
@@ -115,10 +116,11 @@ export default function CantinaView({ onExpiredSession, onToast }) {
     return () => clearInterval(id);
   }, [date]);
 
-  async function setOrderStatus(order, status, saleId) {
+  async function setOrderStatus(order, status, { saleId, undo } = {}) {
     const res = await adminSetCantinaOrderStatus(order.id, status, saleId);
     setConfirmCancel(null);
     if (!res.ok) {
+      if (res.orderChanged) loadOrders();
       if (!onExpiredSession?.(res)) {
         onToast?.(res.error || "No se pudo actualizar el pedido.", { tone: "error" });
       }
@@ -129,7 +131,18 @@ export default function CantinaView({ onExpiredSession, onToast }) {
       setCart([]);
     }
     loadOrders();
-    if (!saleId) onToast?.(`Pedido #${order.code} · ${ORDER_STATUS_LABELS[status].toLowerCase()}`);
+    const from = order.status;
+    onToast?.(
+      `Pedido #${order.code} · ${ORDER_STATUS_LABELS[status].toLowerCase()}`,
+      undo
+        ? {
+            action: {
+              label: "Deshacer",
+              onClick: () => setOrderStatus({ ...order, status }, from),
+            },
+          }
+        : undefined,
+    );
     return true;
   }
 
@@ -146,6 +159,12 @@ export default function CantinaView({ onExpiredSession, onToast }) {
       `Pedido #${order.code} en la venta: elegí cómo lo pagan.${replaced ? " La venta que estaba armada se descartó." : ""}`,
     );
   }
+
+  // Si la venta queda vacía (tacho o "−"), el pedido de la carta se suelta:
+  // si no, la próxima venta cualquiera lo daba por cobrado.
+  useEffect(() => {
+    if (cart.length === 0) setPendingOrder(null);
+  }, [cart.length]);
 
   useEffect(() => {
     loadSales();
@@ -221,14 +240,23 @@ export default function CantinaView({ onExpiredSession, onToast }) {
       return;
     }
     setSubmitting(true);
+    // Con un pedido de la carta, la misma venta lo cobra y lo pasa a cocina
+    // (se prepara recién pago); si ya lo cobró otra pantalla, no se registra.
+    const chargedOrder = pendingOrder;
     const res = await adminAddCantinaSale({
       date,
       items: cart,
       method,
       chargeTo: method === "cuenta" ? chargeTo : undefined,
+      orderId: chargedOrder?.id,
     });
     setSubmitting(false);
     if (!res.ok) {
+      if (res.orderChanged) {
+        setPendingOrder(null);
+        setCart([]);
+        loadOrders();
+      }
       if (!onExpiredSession?.(res)) {
         onToast?.(res.error || "No se pudo registrar la venta.", {
           tone: "error",
@@ -239,16 +267,17 @@ export default function CantinaView({ onExpiredSession, onToast }) {
     setCart([]);
     setIsCartOpen(false);
     loadSales();
-    const chargedOrder = pendingOrder;
     if (chargedOrder) {
       setPendingOrder(null);
-      await setOrderStatus(chargedOrder, "entregado", res.saleId);
+      loadOrders();
     }
     const account = dayBookings.find((b) => b.id === chargeTo);
     onToast?.(
-      method === "cuenta"
-        ? `Cargado a la cuenta de ${account?.playerName || "el turno"} · ${formatARS(res.total)}`
-        : `Venta registrada · ${formatARS(res.total)}`,
+      chargedOrder
+        ? `Pedido #${chargedOrder.code} cobrado · ${formatARS(res.total)}: ya puede ir a la cocina`
+        : method === "cuenta"
+          ? `Cargado a la cuenta de ${account?.playerName || "el turno"} · ${formatARS(res.total)}`
+          : `Venta registrada · ${formatARS(res.total)}`,
       {
         action: {
           label: "Deshacer",
@@ -264,8 +293,12 @@ export default function CantinaView({ onExpiredSession, onToast }) {
               return;
             }
             loadSales();
-            // El pedido que cerraba esa venta vuelve a quedar abierto.
-            if (chargedOrder) await setOrderStatus(chargedOrder, "preparando");
+            // El pedido que se cobró con esa venta vuelve a esperar el pago.
+            if (chargedOrder) {
+              await setOrderStatus({ ...chargedOrder, status: "preparando" }, "nuevo", {
+                saleId: res.saleId,
+              });
+            }
             onToast?.("Venta deshecha");
           },
         },
@@ -600,6 +633,11 @@ export default function CantinaView({ onExpiredSession, onToast }) {
                 <p className="admin-order-who">
                   {o.name} · {o.deliverTo}
                 </p>
+                <p className={`admin-order-pay${o.status === "nuevo" ? " is-pending" : ""}`}>
+                  {o.status === "nuevo"
+                    ? `Sin pagar · paga ${payLabel(o.payWith)}. Cobralo para que la cocina lo empiece.`
+                    : `Pagado${o.paidAt ? ` a las ${formatTime(o.paidAt)}` : ""} · en cocina`}
+                </p>
                 <ul className="admin-order-items">
                   {(o.items || []).map((it) => (
                     <li key={it.id || it.name}>
@@ -629,30 +667,25 @@ export default function CantinaView({ onExpiredSession, onToast }) {
                     </>
                   ) : (
                     <>
-                      {o.status === "nuevo" && (
+                      {/* Se cobra antes de preparar: sin pagar solo se
+                          puede cobrar (o cancelar); pagado, entregar. */}
+                      {o.status === "nuevo" ? (
                         <button
                           type="button"
-                          className="btn btn-secondary"
-                          onClick={() => setOrderStatus(o, "preparando")}
+                          className="btn btn-linear-primary"
+                          onClick={() => chargeOrder(o)}
                         >
-                          Preparando
+                          Cobrar
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-linear-primary"
+                          onClick={() => setOrderStatus(o, "entregado", { undo: true })}
+                        >
+                          Entregado
                         </button>
                       )}
-                      <button
-                        type="button"
-                        className="btn btn-linear-primary"
-                        onClick={() => chargeOrder(o)}
-                      >
-                        Cobrar
-                      </button>
-                      <button
-                        type="button"
-                        className="admin-link-btn"
-                        onClick={() => setOrderStatus(o, "entregado")}
-                        title="Entregado y cobrado por fuera de esta pantalla"
-                      >
-                        Entregado
-                      </button>
                       <button
                         type="button"
                         className="admin-link-btn"

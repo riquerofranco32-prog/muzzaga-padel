@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Bell, ExternalLink, LayoutDashboard, LogOut, PanelLeft, PanelLeftClose, Search, Tv } from "lucide-react";
 import {
   adminAddPayment,
   adminCancelBooking,
   adminCreateManualBooking,
+  adminGetAlerts,
   adminGetClients,
   adminGetClubConfig,
   adminSetTestFlag,
@@ -116,6 +117,10 @@ export default function AdminPage() {
   const [paymentSubmitting, setPaymentSubmitting] = useState(false);
 
   const { toasts, show: showToast, dismiss: dismissToast } = useToasts();
+  // Alertas de la campana (pedidos de la carta esperando pago, caja sin
+  // cerrar, saldos…): se piden cada 30 s mientras el panel está abierto.
+  const [alerts, setAlerts] = useState([]);
+  const webOrdersSeen = useRef(null);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   // Búsqueda que llega desde el command palette a Clientes. La key fuerza a
   // la vista a arrancar con esa búsqueda aunque ya estuviera montada.
@@ -134,6 +139,33 @@ export default function AdminPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    async function refreshAlerts() {
+      const res = await adminGetAlerts();
+      if (cancelled || !res?.ok) return;
+      setAlerts(res.alerts);
+      // Pedido nuevo de la carta: aviso aunque se esté en otra vista.
+      const count = res.alerts.find((a) => a.id === "web-orders")?.count || 0;
+      if (webOrdersSeen.current !== null && count > webOrdersSeen.current) {
+        showToast("Entró un pedido de la carta: se cobra antes de pasar a la cocina.", {
+          duration: 10000,
+          action: { label: "Ver", onClick: () => navigate("cantina") },
+        });
+      }
+      webOrdersSeen.current = count;
+    }
+    refreshAlerts();
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") refreshAlerts();
+    }, 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -732,10 +764,31 @@ export default function AdminPage() {
                   type="button"
                   className="admin-top-icon-btn"
                   title="Notificaciones"
-                  onClick={() => showToast("Sin alertas pendientes", "info")}
-                  aria-label="Notificaciones"
+                  onClick={() => {
+                    if (alerts.length === 0) {
+                      showToast("Sin alertas pendientes");
+                      return;
+                    }
+                    alerts.forEach((a) =>
+                      showToast(`${a.title} · ${a.detail}`, {
+                        tone: a.tone === "danger" ? "error" : "success",
+                        duration: 8000,
+                        action: a.view ? { label: "Ver", onClick: () => navigate(a.view) } : undefined,
+                      }),
+                    );
+                  }}
+                  aria-label={
+                    alerts.length
+                      ? `Notificaciones: ${alerts.length} pendiente${alerts.length === 1 ? "" : "s"}`
+                      : "Notificaciones"
+                  }
                 >
                   <Bell size={15} />
+                  {alerts.length > 0 && (
+                    <span className="admin-bell-badge" aria-hidden="true">
+                      {alerts.length}
+                    </span>
+                  )}
                 </button>
                 <Link
                   href="/admin/monitor"

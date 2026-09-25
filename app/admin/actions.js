@@ -52,10 +52,7 @@ import {
   clearLoginAttempts,
   registerFailedLogin,
 } from "../../lib/adminRateLimit";
-import {
-  OPEN_ORDER_STATUSES,
-  ORDER_STATUSES,
-} from "../../lib/cantinaOrder";
+import { OPEN_ORDER_STATUSES } from "../../lib/cantinaOrder";
 import {
   STAFF_PIN,
   STAFF_ROLES,
@@ -1006,7 +1003,9 @@ const TOP_PRODUCTS_DAYS = 30;
 
 /**
  * Registra una venta de cantina. `method: "cuenta"` + `chargeTo` la carga a
- * la cuenta de un turno: no entra a la caja hasta que se cobra.
+ * la cuenta de un turno: no entra a la caja hasta que se cobra. Con
+ * `orderId` cobra un pedido de la carta: lo pasa a cocina en la misma
+ * operación, y si ya lo cobró otra pantalla no registra la venta.
  */
 export async function adminAddCantinaSale({
   date,
@@ -1014,6 +1013,7 @@ export async function adminAddCantinaSale({
   method,
   notes,
   chargeTo,
+  orderId,
 }) {
   const denied = await requireAdmin();
   if (denied) return denied;
@@ -1059,19 +1059,54 @@ export async function adminAddCantinaSale({
       }
     }
     const ref = db.ref("cantinaSales").push();
-    await ref.set({
-      date: saleDate,
-      items: cleanItems,
-      total,
-      method: isOnAccount
-        ? "cuenta"
-        : CANTINA_PAYMENT_METHODS.includes(method)
-          ? method
-          : "efectivo",
-      ...(isOnAccount ? { chargeTo } : {}),
-      notes: clip(notes, 200),
-      createdAt: Date.now(),
-    });
+    const forOrder = orderId !== undefined && orderId !== null;
+    if (forOrder) {
+      if (!isId(orderId)) return { ok: false, error: "Pedido inválido." };
+      // Primero se reserva el pedido (solo si sigue esperando el pago) y
+      // después se guarda la venta: dos pantallas no lo cobran dos veces.
+      const paid = await db.ref(`cantinaOrders/${orderId}`).transaction((order) => {
+        if (order === null) return null; // ver adminVoidCantinaSale
+        if (order.status !== "nuevo") return; // ya cobrado o cancelado: aborta
+        const now = Date.now();
+        return { ...order, status: "preparando", saleId: ref.key, paidAt: now, updatedAt: now };
+      });
+      if (!paid.committed || !paid.snapshot.exists()) {
+        return {
+          ok: false,
+          error: "Ese pedido ya se cobró o se canceló en otra pantalla.",
+          orderChanged: true,
+        };
+      }
+    }
+    try {
+      await ref.set({
+        date: saleDate,
+        items: cleanItems,
+        total,
+        method: isOnAccount
+          ? "cuenta"
+          : CANTINA_PAYMENT_METHODS.includes(method)
+            ? method
+            : "efectivo",
+        ...(isOnAccount ? { chargeTo } : {}),
+        ...(forOrder ? { orderId } : {}),
+        notes: clip(notes, 200),
+        createdAt: Date.now(),
+      });
+    } catch (error) {
+      // La venta no se guardó: el pedido vuelve a esperar el pago.
+      if (forOrder) {
+        await db
+          .ref(`cantinaOrders/${orderId}`)
+          .transaction((order) =>
+            order && order.saleId === ref.key
+              ? { ...order, status: "nuevo", saleId: null, paidAt: null }
+              : order,
+          )
+          .catch(() => {});
+      }
+      throw error;
+    }
     return { ok: true, saleId: ref.key, total };
   } catch (error) {
     return { ok: false, error: "No se pudo registrar la venta." };
@@ -1224,8 +1259,12 @@ export async function adminGetCantinaOrders(date) {
   if (!ISO_DATE.test(day)) return { ok: false, error: "Fecha inválida." };
 
   try {
-    const orders = await loadByDateRange(getDb(), "cantinaOrders", day, day);
+    // El tercer tiempo cruza la medianoche: la vista de un día también trae
+    // los pedidos abiertos de la víspera y del día siguiente.
     const isOpen = (o) => OPEN_ORDER_STATUSES.includes(o.status);
+    const orders = (
+      await loadByDateRange(getDb(), "cantinaOrders", isoAddDays(day, -1), isoAddDays(day, 1))
+    ).filter((o) => o.date === day || isOpen(o));
     orders.sort((a, b) =>
       isOpen(a) !== isOpen(b)
         ? isOpen(a)
@@ -1241,15 +1280,28 @@ export async function adminGetCantinaOrders(date) {
   }
 }
 
+// Qué cambios de estado valen, y desde dónde. El cobro (nuevo → preparando)
+// lo hace adminAddCantinaSale junto con la venta.
+const ORDER_TRANSITIONS = {
+  entregado: ["preparando"], // se entrega ya pago
+  preparando: ["entregado"], // "Deshacer" de Entregado
+  nuevo: ["preparando"], // "Deshacer" del cobro: con el mismo saleId
+  cancelado: ["nuevo", "preparando"],
+};
+
 /**
- * Cambia el estado de un pedido de la web. Con `saleId` queda enlazado a la
- * venta con la que se cobró.
+ * Cambia el estado de un pedido de la web. Si otra pantalla ya lo cambió y
+ * el paso no vale (por ejemplo entregar uno cancelado), no toca nada.
+ * Volver a "nuevo" (deshacer el cobro) exige el `saleId` de ese cobro.
  */
 export async function adminSetCantinaOrderStatus(orderId, status, saleId) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  if (!isId(orderId) || !ORDER_STATUSES.includes(status)) {
+  if (!isId(orderId) || !ORDER_TRANSITIONS[status]) {
+    return { ok: false, error: "Pedido inválido." };
+  }
+  if (status === "nuevo" && !isId(saleId)) {
     return { ok: false, error: "Pedido inválido." };
   }
   if (!isFirebaseConfigured()) {
@@ -1259,15 +1311,26 @@ export async function adminSetCantinaOrderStatus(orderId, status, saleId) {
     const db = getDb();
     const result = await db.ref(`cantinaOrders/${orderId}`).transaction((order) => {
       if (order === null) return null; // ver adminVoidCantinaSale
+      if (!ORDER_TRANSITIONS[status].includes(order.status)) return; // aborta
+      if (status === "nuevo" && order.saleId !== saleId) return;
+      const now = Date.now();
       return {
         ...order,
         status,
-        updatedAt: Date.now(),
-        ...(isId(saleId) ? { saleId } : {}),
+        updatedAt: now,
+        // Deshecho el cobro, vuelve a esperar el pago.
+        ...(status === "nuevo" ? { saleId: null, paidAt: null } : {}),
       };
     });
-    if (!result.committed || !result.snapshot.exists()) {
+    if (!result.snapshot.exists()) {
       return { ok: false, error: "Ese pedido ya no existe." };
+    }
+    if (!result.committed) {
+      return {
+        ok: false,
+        error: "Ese pedido ya cambió en otra pantalla: actualicé la lista.",
+        orderChanged: true,
+      };
     }
     return { ok: true };
   } catch (error) {
@@ -2106,7 +2169,7 @@ export async function adminGetAlerts() {
         today,
       ),
       loadStaffMembers(db),
-      loadByDateRange(db, "cantinaOrders", today, today),
+      loadByDateRange(db, "cantinaOrders", yesterday, today),
     ]);
     const alerts = [];
 
@@ -2114,9 +2177,10 @@ export async function adminGetAlerts() {
     if (newOrders.length) {
       alerts.push({
         id: "web-orders",
+        count: newOrders.length,
         tone: "warning",
-        title: `${plural(newOrders.length, "pedido")} de la carta sin atender`,
-        detail: `Entraron por la web: ${ars(newOrders.reduce((s, o) => s + (o.total || 0), 0))} en total.`,
+        title: `${plural(newOrders.length, "pedido")} de la carta esperando pago`,
+        detail: `Se cobran antes de pasar a la cocina: ${ars(newOrders.reduce((s, o) => s + (o.total || 0), 0))} en total.`,
         view: "cantina",
       });
     }
