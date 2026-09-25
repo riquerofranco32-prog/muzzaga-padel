@@ -1769,11 +1769,13 @@ select:focus-visible,
   padding: var(--spacing-section) 0;
 }
 
+/* start: con center, la columna de categorías (más corta) quedaba
+   centrada contra el test y dejaba un hueco de 236 px arriba. */
 .rating-grid-layout {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 40px;
-  align-items: center;
+  align-items: start;
 }
 
 .rating-category-card {
@@ -1784,6 +1786,7 @@ select:focus-visible,
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   margin-bottom: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   transition:
@@ -1791,10 +1794,30 @@ select:focus-visible,
     opacity var(--t-hover) var(--ease);
 }
 
-.rating-category-card:hover {
-  border-color: var(--color-accent-orange-border);
-  transform: translateX(4px);
-  background: var(--color-canvas-soft);
+/* Ver torneos + Partidos parejos: en celu angosto uno debajo del otro
+   (lado a lado, "Partidos parejos" bajaba a dos renglones). */
+.rating-share-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .rating-share-actions {
+    grid-template-columns: 1fr;
+  }
+
+  /* "Test guiado (3 preguntas)" bajaba a dos renglones al lado de "Ajuste
+     manual": las tres preguntas están justo abajo. */
+  .rating-tab-extra {
+    display: none;
+  }
+}
+
+/* "1.5 - 2.9" en un renglón: se achicaba y quedaba en dos o tres. */
+.rating-category-card > .badge-linear {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -5729,6 +5752,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .rating-grid-layout {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+
+  /* Apilado, el test va primero: antes quedaba debajo de las tres
+     categorías y del aviso de Canchas Abiertas. */
+  .rating-grid-layout > :last-child {
+    order: -1;
   }
 
   .rating-box {

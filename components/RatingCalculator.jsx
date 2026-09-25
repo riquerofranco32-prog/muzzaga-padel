@@ -66,7 +66,8 @@ export default function RatingCalculator() {
           className={`rating-tab-btn${mode === "quiz" ? " active" : ""}`}
           onClick={() => setMode("quiz")}
         >
-          Test guiado (3 preguntas)
+          Test guiado
+          <span className="rating-tab-extra"> (3 preguntas)</span>
         </button>
         <button
           type="button"
@@ -190,7 +191,7 @@ export default function RatingCalculator() {
       {/* CARNET DIGITAL OFICIAL DEL JUGADOR */}
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95))",
+          background: "linear-gradient(135deg, var(--color-surface-card), var(--color-canvas-soft))",
           border: "1.5px solid var(--color-hairline-strong, #e2e8f0)",
           borderRadius: "var(--radius-lg, 14px)",
           padding: "16px 18px",
@@ -258,8 +259,9 @@ export default function RatingCalculator() {
               fontSize: 12.5,
               padding: "4px 10px",
               borderRadius: 6,
-              border: "1px solid var(--border)",
-              background: "rgba(255,255,255,0.8)",
+              border: "1px solid var(--color-hairline-strong)",
+              background: "var(--color-canvas)",
+              color: "var(--color-ink)",
               boxSizing: "border-box",
             }}
           />
@@ -270,6 +272,7 @@ export default function RatingCalculator() {
             display: "flex",
             alignItems: "baseline",
             justifyContent: "space-between",
+            gap: 12,
             background: "rgba(255, 122, 26, 0.06)",
             border: "1px solid rgba(255, 122, 26, 0.2)",
             borderRadius: 8,
@@ -289,7 +292,7 @@ export default function RatingCalculator() {
             </span>
           </div>
 
-          <div style={{ textAlign: "right" }}>
+          <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
             <div style={{ fontSize: 10, color: "var(--color-muted)", textTransform: "uppercase", fontWeight: 700 }}>
               Rating Int.
             </div>
@@ -348,9 +351,10 @@ export default function RatingCalculator() {
             <span>Compartir ficha por WhatsApp</span>
           </a>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div className="rating-share-actions">
+            {/* Antes era "#torneos", que en esta página no existe: no llevaba a ningún lado. */}
             <a
-              href="#torneos"
+              href="/torneos"
               className="btn btn-secondary"
               style={{
                 justifyContent: "center",
