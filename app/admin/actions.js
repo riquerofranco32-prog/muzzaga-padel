@@ -53,6 +53,10 @@ import {
   registerFailedLogin,
 } from "../../lib/adminRateLimit";
 import {
+  OPEN_ORDER_STATUSES,
+  ORDER_STATUSES,
+} from "../../lib/cantinaOrder";
+import {
   STAFF_PIN,
   STAFF_ROLES,
   isPinTaken,
@@ -1206,6 +1210,71 @@ export async function adminSettleCantinaSale(saleId, method) {
   }
 }
 
+/**
+ * Pedidos que entraron por la carta (/menu → POST /api/cantina-orders) en un
+ * día: los abiertos primero, del más viejo al más nuevo (así se preparan en
+ * orden), y después los entregados y cancelados, del más nuevo al más viejo.
+ */
+export async function adminGetCantinaOrders(date) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isFirebaseConfigured()) return { ok: true, orders: [] };
+  const day = date || todayInClub();
+  if (!ISO_DATE.test(day)) return { ok: false, error: "Fecha inválida." };
+
+  try {
+    const orders = await loadByDateRange(getDb(), "cantinaOrders", day, day);
+    const isOpen = (o) => OPEN_ORDER_STATUSES.includes(o.status);
+    orders.sort((a, b) =>
+      isOpen(a) !== isOpen(b)
+        ? isOpen(a)
+          ? -1
+          : 1
+        : isOpen(a)
+          ? (a.createdAt || 0) - (b.createdAt || 0)
+          : (b.createdAt || 0) - (a.createdAt || 0),
+    );
+    return { ok: true, orders };
+  } catch (error) {
+    return { ok: false, error: "No se pudieron cargar los pedidos de la web." };
+  }
+}
+
+/**
+ * Cambia el estado de un pedido de la web. Con `saleId` queda enlazado a la
+ * venta con la que se cobró.
+ */
+export async function adminSetCantinaOrderStatus(orderId, status, saleId) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  if (!isId(orderId) || !ORDER_STATUSES.includes(status)) {
+    return { ok: false, error: "Pedido inválido." };
+  }
+  if (!isFirebaseConfigured()) {
+    return { ok: false, error: "Firebase no está configurado." };
+  }
+  try {
+    const db = getDb();
+    const result = await db.ref(`cantinaOrders/${orderId}`).transaction((order) => {
+      if (order === null) return null; // ver adminVoidCantinaSale
+      return {
+        ...order,
+        status,
+        updatedAt: Date.now(),
+        ...(isId(saleId) ? { saleId } : {}),
+      };
+    });
+    if (!result.committed || !result.snapshot.exists()) {
+      return { ok: false, error: "Ese pedido ya no existe." };
+    }
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "No se pudo actualizar el pedido." };
+  }
+}
+
 /** Productos más vendidos de los últimos días, para la fila de accesos rápidos. */
 export async function adminGetTopProducts(limit = 8) {
   const denied = await requireAdmin();
@@ -2027,7 +2096,7 @@ export async function adminGetAlerts() {
     const db = getDb();
     const { isoDate: today, hhmm } = nowInClubTimezone();
     const yesterday = isoAddDays(today, -1);
-    const [day, prev, recentSales, members] = await Promise.all([
+    const [day, prev, recentSales, members, webOrders] = await Promise.all([
       loadDayRecords(db, today),
       loadDayRecords(db, yesterday),
       loadByDateRange(
@@ -2037,8 +2106,20 @@ export async function adminGetAlerts() {
         today,
       ),
       loadStaffMembers(db),
+      loadByDateRange(db, "cantinaOrders", today, today),
     ]);
     const alerts = [];
+
+    const newOrders = webOrders.filter((o) => o.status === "nuevo");
+    if (newOrders.length) {
+      alerts.push({
+        id: "web-orders",
+        tone: "warning",
+        title: `${plural(newOrders.length, "pedido")} de la carta sin atender`,
+        detail: `Entraron por la web: ${ars(newOrders.reduce((s, o) => s + (o.total || 0), 0))} en total.`,
+        view: "cantina",
+      });
+    }
 
     if (!members.some((m) => m.active !== false)) {
       alerts.push({
