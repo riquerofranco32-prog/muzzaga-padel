@@ -124,9 +124,27 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
   // scrollear a mano para verlo.
   useEffect(() => {
     if (!selected || !formRef.current) return;
-    formRef.current.scrollIntoView({ behavior: scrollBehavior(), block: "center" });
+    formRef.current.scrollIntoView({
+      behavior: scrollBehavior(),
+      block: "center",
+    });
     const firstInput = formRef.current.querySelector("input");
     firstInput?.focus({ preventScroll: true });
+  }, [selected, isDrawer]);
+
+  // En celu el formulario es un drawer fijo sobre la página: sin esto, la
+  // landing de atrás se sigue moviendo al arrastrar sobre el fondo oscuro
+  // (rubber-banding de iOS), como si el sitio se "bugueara" al elegir turno.
+  useEffect(() => {
+    if (!selected || !isDrawer) return;
+    const root = document.documentElement;
+    const scrollbar = window.innerWidth - root.clientWidth;
+    root.style.overflow = "hidden";
+    if (scrollbar) root.style.paddingRight = `${scrollbar}px`;
+    return () => {
+      root.style.overflow = "";
+      root.style.paddingRight = "";
+    };
   }, [selected, isDrawer]);
 
   useEffect(() => {
@@ -266,7 +284,11 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
 
   return (
     <div className="booking-calendar">
-      <ScrollRow className="booking-dates" role="group" aria-label="Elegí el día">
+      <ScrollRow
+        className="booking-dates"
+        role="group"
+        aria-label="Elegí el día"
+      >
         {days.map((day) => (
           <button
             key={day.iso}
@@ -341,13 +363,18 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
         {!activeDay?.closed && !loadError && !visibleSlots && (
           <div
             className="booking-matrix-container is-loading"
-            style={{ "--court-columns": courtFilter === "all" ? courts.length : 1 }}
+            style={{
+              "--court-columns": courtFilter === "all" ? courts.length : 1,
+            }}
             role="status"
             aria-label="Cargando disponibilidad"
           >
             <div className="booking-matrix-header" aria-hidden="true">
               <div>Horario</div>
-              {(courtFilter === "all" ? courts : courts.filter((c) => c.id === courtFilter)).map((c) => (
+              {(courtFilter === "all"
+                ? courts
+                : courts.filter((c) => c.id === courtFilter)
+              ).map((c) => (
                 <div key={c.id}>
                   {c.name} ({c.type})
                 </div>
@@ -358,7 +385,10 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
                 <div className="booking-matrix-time-col">
                   <span className="skeleton-bar" style={{ width: 44 }} />
                 </div>
-                {(courtFilter === "all" ? courts : courts.filter((c) => c.id === courtFilter)).map((c) => (
+                {(courtFilter === "all"
+                  ? courts
+                  : courts.filter((c) => c.id === courtFilter)
+                ).map((c) => (
                   <div key={c.id} className="booking-slot is-skeleton">
                     <span className="skeleton-bar" style={{ width: "46%" }} />
                     <span className="skeleton-bar" style={{ width: 72 }} />
@@ -419,7 +449,12 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
                             alignItems: "center",
                           }}
                         >
-                          <span style={{ fontSize: 12, color: "var(--color-muted)" }}>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              color: "var(--color-muted)",
+                            }}
+                          >
                             No disponible
                           </span>
                         </div>
@@ -465,198 +500,209 @@ export default function BookingCalendar({ serverToday, mpEnabled = false }) {
 
       {selected && selectedPricing && (
         <MaybePortal enabled={isDrawer}>
-        <div
-          className="booking-drawer-backdrop"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setSelected(null);
-          }}
-        >
-          <form
-            className="booking-form"
-            ref={formRef}
-            onSubmit={handleConfirm}
-            role={isDrawer ? "dialog" : undefined}
-            aria-modal={isDrawer || undefined}
-            aria-label="Confirmar reserva"
+          <div
+            className="booking-drawer-backdrop"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setSelected(null);
+            }}
           >
-            <div className="booking-form-header">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <h3 style={{ margin: 0 }}>Confirmar reserva</h3>
-                  <p style={{ margin: "4px 0 0" }}>
-                    {selected.start} hs ·{" "}
-                    {courts.find((c) => c.id === selected.courtId)?.name}
-                  </p>
+            <form
+              className="booking-form"
+              ref={formRef}
+              onSubmit={handleConfirm}
+              role={isDrawer ? "dialog" : undefined}
+              aria-modal={isDrawer || undefined}
+              aria-label="Confirmar reserva"
+            >
+              <div className="booking-form-header">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <div>
+                    <h3 style={{ margin: 0 }}>Confirmar reserva</h3>
+                    <p style={{ margin: "4px 0 0" }}>
+                      {selected.start} hs ·{" "}
+                      {courts.find((c) => c.id === selected.courtId)?.name}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelected(null)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      fontSize: 20,
+                      cursor: "pointer",
+                      color: "var(--color-muted)",
+                      padding: "0 4px",
+                      lineHeight: 1,
+                    }}
+                    aria-label="Cerrar formulario"
+                  >
+                    <X size={20} aria-hidden="true" />
+                  </button>
                 </div>
+                <div
+                  style={{
+                    marginTop: 6,
+                    padding: "8px 12px",
+                    background:
+                      "var(--color-surface-hover, rgba(255,255,255,0.05))",
+                    borderRadius: "var(--radius-md, 8px)",
+                    border:
+                      "1px solid var(--color-hairline, rgba(255,255,255,0.1))",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: "var(--color-ink)",
+                    }}
+                  >
+                    ${selectedPricing.total.toLocaleString("es-AR")}
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--color-body)" }}>
+                    ${selectedPricing.perPlayer.toLocaleString("es-AR")} por
+                    jugador si son cuatro
+                  </div>
+                </div>
+              </div>
+
+              <label>
+                <span>Tu nombre y apellido</span>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej. Lucas Rossi"
+                  value={form.playerName}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, playerName: e.target.value }))
+                  }
+                />
+              </label>
+
+              <label>
+                <span>Teléfono de contacto (WhatsApp)</span>
+                <input
+                  type="tel"
+                  required
+                  placeholder="Ej. 299 597 4176"
+                  value={form.playerPhone}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, playerPhone: e.target.value }))
+                  }
+                />
+              </label>
+
+              {isRemembered && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    background: "rgba(16, 185, 129, 0.08)",
+                    border: "1px solid rgba(16, 185, 129, 0.25)",
+                    borderRadius: 6,
+                    padding: "6px 10px",
+                    fontSize: 12,
+                    color: "#059669",
+                    marginTop: -4,
+                    marginBottom: 6,
+                  }}
+                >
+                  <span>✓ Datos autocompletados para reservar más rápido</span>
+                  <button
+                    type="button"
+                    onClick={handleForgetProfile}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "var(--color-muted)",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      fontSize: 11,
+                      padding: 0,
+                      marginLeft: 8,
+                    }}
+                    title="Borrar datos guardados en este dispositivo"
+                  >
+                    Cambiar
+                  </button>
+                </div>
+              )}
+
+              <label>
+                <span>Cantidad de jugadores</span>
+                <select
+                  value={form.playersCount}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      playersCount: Number(e.target.value),
+                    }))
+                  }
+                >
+                  {[1, 2, 3, 4].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="type-switcher">
                 <button
                   type="button"
-                  onClick={() => setSelected(null)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: 20,
-                    cursor: "pointer",
-                    color: "var(--color-muted)",
-                    padding: "0 4px",
-                    lineHeight: 1,
-                  }}
-                  aria-label="Cerrar formulario"
+                  className={`type-btn${form.fullCourt ? " active" : ""}`}
+                  onClick={() => setForm((f) => ({ ...f, fullCourt: true }))}
+                  aria-pressed={form.fullCourt}
                 >
-                  <X size={20} aria-hidden="true" />
+                  <strong>Cancha completa</strong>
+                  <span>${selectedPricing.total.toLocaleString("es-AR")}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`type-btn${!form.fullCourt ? " active" : ""}`}
+                  onClick={() => setForm((f) => ({ ...f, fullCourt: false }))}
+                  aria-pressed={!form.fullCourt}
+                >
+                  <strong>Por jugador</strong>
+                  <span>
+                    ${selectedPricing.perPlayer.toLocaleString("es-AR")} c/u
+                  </span>
                 </button>
               </div>
-            <div
-              style={{
-                marginTop: 6,
-                padding: "8px 12px",
-                background:
-                  "var(--color-surface-hover, rgba(255,255,255,0.05))",
-                borderRadius: "var(--radius-md, 8px)",
-                border:
-                  "1px solid var(--color-hairline, rgba(255,255,255,0.1))",
-              }}
-            >
               <div
                 style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: "var(--color-ink)",
+                  fontSize: 12,
+                  color: "var(--color-body)",
+                  marginTop: -6,
+                  marginBottom: 4,
                 }}
               >
-                ${selectedPricing.total.toLocaleString("es-AR")}
-              </div>
-              <div style={{ fontSize: 12, color: "var(--color-body)" }}>
                 ${selectedPricing.perPlayer.toLocaleString("es-AR")} por jugador
                 si son cuatro
               </div>
-            </div>
-          </div>
 
-          <label>
-            <span>Tu nombre y apellido</span>
-            <input
-              type="text"
-              required
-              placeholder="Ej. Lucas Rossi"
-              value={form.playerName}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, playerName: e.target.value }))
-              }
-            />
-          </label>
+              {submitError && <p className="booking-error">{submitError}</p>}
 
-          <label>
-            <span>Teléfono de contacto (WhatsApp)</span>
-            <input
-              type="tel"
-              required
-              placeholder="Ej. 299 597 4176"
-              value={form.playerPhone}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, playerPhone: e.target.value }))
-              }
-            />
-          </label>
-
-          {isRemembered && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: "rgba(16, 185, 129, 0.08)",
-                border: "1px solid rgba(16, 185, 129, 0.25)",
-                borderRadius: 6,
-                padding: "6px 10px",
-                fontSize: 12,
-                color: "#059669",
-                marginTop: -4,
-                marginBottom: 6,
-              }}
-            >
-              <span>✓ Datos autocompletados para reservar más rápido</span>
               <button
-                type="button"
-                onClick={handleForgetProfile}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "var(--color-muted)",
-                  textDecoration: "underline",
-                  cursor: "pointer",
-                  fontSize: 11,
-                  padding: 0,
-                  marginLeft: 8,
-                }}
-                title="Borrar datos guardados en este dispositivo"
+                type="submit"
+                className="btn btn-linear-primary"
+                disabled={submitting || !isFormValid}
+                style={{ width: "100%" }}
               >
-                Cambiar
+                {submitting
+                  ? "Confirmando…"
+                  : "Confirmar y avisar por WhatsApp →"}
               </button>
-            </div>
-          )}
-
-          <label>
-            <span>Cantidad de jugadores</span>
-            <select
-              value={form.playersCount}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, playersCount: Number(e.target.value) }))
-              }
-            >
-              {[1, 2, 3, 4].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <div className="type-switcher">
-            <button
-              type="button"
-              className={`type-btn${form.fullCourt ? " active" : ""}`}
-              onClick={() => setForm((f) => ({ ...f, fullCourt: true }))}
-              aria-pressed={form.fullCourt}
-            >
-              <strong>Cancha completa</strong>
-              <span>${selectedPricing.total.toLocaleString("es-AR")}</span>
-            </button>
-            <button
-              type="button"
-              className={`type-btn${!form.fullCourt ? " active" : ""}`}
-              onClick={() => setForm((f) => ({ ...f, fullCourt: false }))}
-              aria-pressed={!form.fullCourt}
-            >
-              <strong>Por jugador</strong>
-              <span>
-                ${selectedPricing.perPlayer.toLocaleString("es-AR")} c/u
-              </span>
-            </button>
+            </form>
           </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--color-body)",
-              marginTop: -6,
-              marginBottom: 4,
-            }}
-          >
-            ${selectedPricing.perPlayer.toLocaleString("es-AR")} por jugador si
-            son cuatro
-          </div>
-
-          {submitError && <p className="booking-error">{submitError}</p>}
-
-            <button
-              type="submit"
-              className="btn btn-linear-primary"
-              disabled={submitting || !isFormValid}
-              style={{ width: "100%" }}
-            >
-              {submitting ? "Confirmando…" : "Confirmar y avisar por WhatsApp →"}
-            </button>
-          </form>
-        </div>
         </MaybePortal>
       )}
 
