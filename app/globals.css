@@ -548,8 +548,9 @@ select:focus-visible,
   justify-content: space-between;
   gap: 16px;
   background: color-mix(in srgb, var(--color-canvas) 88%, transparent);
+  /* Sin -webkit-backdrop-filter a mano: el compilador de CSS lo agrega, y
+     con las dos líneas deja solo la de Safari (Chrome no desenfoca). */
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-pill);
   padding: 0 10px 0 20px;
@@ -1082,7 +1083,6 @@ select:focus-visible,
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   /* Literal, no var(--color-ink): el fondo de esta etiqueta es siempre
      blanco (no sigue el tema), pero el texto usaba la variable que SÍ se
      redefine en dark mode (queda casi blanco sobre blanco → invisible). */
@@ -5637,7 +5637,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   gap: 14px;
   background: color-mix(in srgb, var(--color-canvas) 95%, transparent);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-hairline-strong);
   border-radius: var(--radius-pill);
   padding: 8px 18px 8px 14px;
