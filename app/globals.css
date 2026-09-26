@@ -1475,15 +1475,31 @@ select:focus-visible,
   color: var(--color-body);
 }
 
+/* Verde "Disponible" (el mismo de las etiquetas verdes del sitio), naranja
+   "Tu selección" como el borde de la tarjeta elegida, y gris lo que no se
+   puede tomar. Antes las tres eran naranjas. */
 .slot-badge {
   font-size: 11px;
   font-weight: 600;
-  color: var(--color-accent-orange-text);
-  background: var(--bg-card);
-  border: 1px solid var(--color-accent-orange-border);
+  color: #0f7b4f;
+  background: #e7f5ee;
+  border: 1px solid #a8dfc8;
   padding: 2px 8px;
   border-radius: var(--radius-pill);
   transition: transform var(--t-hover) var(--ease);
+}
+
+.booking-slot.selected .slot-badge {
+  color: var(--color-accent-orange-text);
+  background: var(--bg-card);
+  border-color: var(--color-accent-orange-border);
+}
+
+.booking-slot.taken .slot-badge,
+.booking-slot.past .slot-badge {
+  color: var(--color-muted);
+  background: transparent;
+  border-color: var(--color-hairline-strong);
 }
 
 .booking-slot:hover:not(:disabled) .slot-badge {
@@ -7161,6 +7177,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
      sobre foto la mantienen. Con :where() la exclusión no suma
      especificidad: la etiqueta numerada de la home ("01 |") sigue ganando. */
   .badge-emerald:where(:not(#pizarra-tactica *, #todas-las-categorias *, .admin-root *, .admin-dashboard-layout *, .admin-login-wrapper *, .photo-bento-body *)) {
+    background: rgba(52, 211, 153, 0.12);
+    border-color: rgba(52, 211, 153, 0.35);
+    color: #34d399;
+  }
+
+  /* "Disponible" de la grilla de turnos: el mismo verde oscuro. */
+  .slot-badge {
     background: rgba(52, 211, 153, 0.12);
     border-color: rgba(52, 211, 153, 0.35);
     color: #34d399;
