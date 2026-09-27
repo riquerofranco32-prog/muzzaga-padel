@@ -154,7 +154,7 @@ export default function ClientesView({
           </div>
           <div className="admin-kravio-kpi-content">
             <div className="admin-kravio-kpi-left">
-              <div className="admin-kravio-kpi-number" style={{ color: "#111827" }}>
+              <div className="admin-kravio-kpi-number" style={{ color: "#141412" }}>
                 {list.length}
               </div>
               <span className="admin-cell-sub">Registrados en la base del club</span>
@@ -235,7 +235,7 @@ export default function ClientesView({
 
           <div className="admin-kravio-table-tools">
             <div className="admin-kravio-search-field">
-              <Search size={14} style={{ color: "#9ca3af" }} aria-hidden />
+              <Search size={14} style={{ color: "#5f5b52" }} aria-hidden />
               <input
                 type="text"
                 className="admin-search-input"
@@ -247,7 +247,7 @@ export default function ClientesView({
               {searchInput && (
                 <button
                   type="button"
-                  style={{ border: "none", background: "transparent", cursor: "pointer", color: "#9ca3af" }}
+                  style={{ border: "none", background: "transparent", cursor: "pointer", color: "#5f5b52" }}
                   onClick={() => setSearchInput("")}
                   aria-label="Limpiar búsqueda"
                 >

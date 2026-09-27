@@ -34,7 +34,7 @@
 }
 
 .admin-root .admin-kpi-sub-text {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-muted);
   line-height: 1.35;
 }
@@ -68,7 +68,7 @@
 }
 .admin-root .admin-kpi-tone-dark .admin-kravio-kpi-title,
 .admin-root .admin-kpi-tone-dark .admin-kpi-sub-text {
-  color: #cbd5e1;
+  color: #cfc7b6;
 }
 .admin-root .admin-kpi-tone-dark .admin-kpi-icon {
   color: var(--accent-orange);
@@ -77,10 +77,10 @@
 /* ---------- Modal de PIN (StaffPinModal.jsx) ---------- */
 .admin-root.admin-pin-backdrop {
   --surface: #ffffff;
-  --surface-muted: #f9fafb;
-  --border: #e5e7eb;
-  --text: #1f2937;
-  --text-muted: #6b7280;
+  --surface-muted: #faf8f3;
+  --border: #e7e2d6;
+  --text: #1b1b19;
+  --text-muted: #5f5b52;
   --accent-orange: #e8651a;
   --danger: #dc2626;
   position: fixed;
@@ -122,7 +122,7 @@
 }
 .admin-pin-head h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
 }
 .admin-pin-head > div {
@@ -130,7 +130,7 @@
   min-width: 0;
 }
 .admin-pin-head > div span {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-muted);
 }
 .admin-pin-head-icon {
@@ -165,7 +165,7 @@
   flex-direction: column;
 }
 .admin-pin-desc {
-  font-size: 13px;
+  font-size: 14.5px;
   line-height: 1.45;
   margin-bottom: 12px;
 }
@@ -178,10 +178,10 @@
   border-radius: 8px;
   background: var(--surface-muted);
   border: 1px solid var(--border);
-  font-size: 13px;
+  font-size: 14.5px;
 }
 .admin-pin-target span {
-  font-size: 11px;
+  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
@@ -244,7 +244,7 @@
   margin-top: 12px;
   padding: 8px 12px;
   border-radius: 8px;
-  font-size: 12.5px;
+  font-size: 14px;
   background: #fef2f2;
   border: 1px solid #fecaca;
   color: #b91c1c;
@@ -285,4 +285,728 @@
   .admin-pin-card {
     animation: none;
   }
+}
+
+/* ---------- Mobile (<768px): ajustes transversales del panel ----------
+   Va al final de ui.css (último CSS del admin) para ganarle a las reglas de
+   cada vista sin subir especificidad. */
+@media (max-width: 767px) {
+  /* KPIs en 2 columnas compactas: antes eran 3-4 cards de 142px apiladas que
+     ocupaban toda la primera pantalla. Si quedan impares, la última va entera. */
+  .admin-root :is(.admin-kpis-3, .admin-kpi-grid) {
+    /* !important: Reportes define la grilla inline. */
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .admin-root :is(.admin-kpis-3, .admin-kpi-grid) > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .admin-root .admin-kravio-kpi-card {
+    min-height: 0;
+    padding: 12px 14px;
+  }
+
+  .admin-root .admin-kravio-kpi-header {
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .admin-root .admin-kravio-kpi-title {
+    font-size: 13.5px;
+  }
+
+  .admin-root .admin-kravio-kpi-number {
+    font-size: 22px;
+  }
+
+  /* Decorativo: en media columna no entra al lado del número. */
+  .admin-root .admin-kravio-kpi-sparkline {
+    display: none;
+  }
+
+  /* Agenda: una columna 1fr se estiraba al ancho mínimo del contenido y
+     empujaba el gráfico y el feed fuera de la pantalla. */
+  .admin-root .admin-kravio-middle {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-root :is(.admin-kravio-trend-card, .admin-kravio-updates-card) {
+    padding: 16px;
+  }
+
+  .admin-root .admin-kravio-card-head {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Botón sin acción (rango fijo "Esta semana"): en mobile sólo roba lugar. */
+  .admin-root .admin-kravio-range-btn {
+    display: none;
+  }
+
+  /* Los buscadores con wrapper propio heredaban el borde y los 44px del
+     input genérico: quedaba una caja dentro de otra, más ancha que la card. */
+  .admin-root :is(.admin-kravio-updates-search, .admin-kravio-search-field) {
+    min-height: 44px;
+    min-width: 0;
+  }
+
+  .admin-root :is(.admin-kravio-updates-search, .admin-kravio-search-field) input {
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    align-self: stretch; /* toda la caja de 44px enfoca el input */
+    font-size: 16px; /* <16px hace zoom automático en iOS */
+  }
+
+  .admin-root .admin-kravio-updates-tab {
+    min-height: 36px;
+  }
+
+  .admin-root .admin-kravio-table-tools {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .admin-root .admin-kravio-search-field {
+    flex: 1 1 100%;
+  }
+
+  .admin-root .admin-kravio-table-tools .admin-kravio-filter-btn {
+    flex: 1;
+    justify-content: center;
+    min-height: 40px;
+  }
+
+  /* globals.css pone width:100% a .btn-secondary/.btn-linear-primary en
+     mobile (pensado para la landing): en las barras de acciones del admin
+     dejaba "Ayer", "Hoy", CSV, PDF y el refresh como bloques apilados. */
+  .admin-root :is(.admin-view-toolbar-actions, .admin-daystrip-actions)
+    :is(.btn-secondary, .btn-linear-primary) {
+    width: auto;
+  }
+
+  .admin-root .admin-daystrip {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .admin-root .admin-daystrip-viewing {
+    display: none;
+  }
+
+  /* Filtros segmentados y chips: una fila con scroll horizontal en vez de
+     partirse en dos renglones con un botón huérfano. */
+  .admin-root :is(.admin-segmented, .admin-chips) {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .admin-root :is(.admin-segmented, .admin-chips) > button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .admin-root .admin-segmented button {
+    min-height: 36px;
+  }
+}
+
+/* ---------- Legibilidad ("que hasta mi mamá lo entienda") ----------
+   Los dueños son personas grandes: botones con texto, nada que dependa de
+   pasar el mouse, y tamaños que se leen sin anteojos. */
+.admin-root .admin-topbar-brand {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.admin-root .admin-topbar-brand img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.admin-root .admin-kravio-topbar {
+  justify-content: flex-end;
+}
+
+.admin-root .admin-top-icon-btn {
+  width: auto;
+  min-width: 44px;
+  height: 44px;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.admin-root .admin-sidebar-logout {
+  width: 100%;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-kravio-kpi-title {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-kpi-sub-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 767px) {
+  .admin-root .admin-kravio-topbar {
+    justify-content: space-between;
+    padding-bottom: 12px;
+  }
+
+  .admin-root .admin-topbar-brand {
+    display: inline-flex;
+  }
+
+  .admin-root .admin-top-tv {
+    display: none;
+  }
+
+  /* "Buscar" con su palabra: una lupa sola no se entiende. */
+  .admin-root .admin-palette-trigger .admin-palette-label {
+    display: inline;
+  }
+
+  .admin-root .admin-fab {
+    width: auto;
+    height: 52px;
+    gap: 6px;
+    padding: 0 20px 0 16px;
+    border-radius: 999px;
+    background: var(--accent-orange);
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgb(196 82 15 / 0.35);
+  }
+
+  .admin-root .admin-bottom-nav button {
+    min-height: 56px;
+    font-size: 13px;
+  }
+
+  .admin-root .admin-bottom-nav svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .admin-root .admin-main-inner {
+    padding-bottom: calc(150px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------- Modales: siempre alcanzables ----------
+   El backdrop centraba con flex y la card no tenía alto máximo: si el
+   contenido era largo, el título y "Cerrar" quedaban fuera de pantalla. */
+.admin-root .admin-modal-backdrop {
+  align-items: safe center;
+  overflow-y: auto;
+}
+
+.admin-root .admin-modal-card {
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 767px) {
+  .admin-root .admin-modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .admin-root .admin-modal-card {
+    max-width: none;
+    max-height: 94dvh;
+    border-radius: 18px 18px 0 0;
+    padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------- Detalle de turno (BookingDetailModal) ---------- */
+.admin-root .admin-detail {
+  max-width: 560px;
+  font-size: 16px;
+}
+
+.admin-root .admin-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-root .admin-detail-when {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-detail-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.admin-root .admin-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.admin-root .admin-detail-tags:empty {
+  display: none;
+}
+
+.admin-root .admin-detail-tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-detail-tag.is-vip {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+
+.admin-root .admin-detail-tag.is-new {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #047857;
+}
+
+.admin-root .admin-detail-tag.is-fixed {
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+  color: #5b21b6;
+}
+
+.admin-root .admin-detail-tag.is-danger {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.admin-root .admin-detail-phone,
+.admin-root .admin-detail-notes {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-detail-notes {
+  font-style: italic;
+}
+
+.admin-root .admin-detail-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-root .admin-detail-money {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+}
+
+.admin-root .admin-detail-money strong {
+  font-size: 26px;
+  line-height: 1.15;
+}
+
+.admin-root .admin-detail-money span {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-detail-money.is-owing {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.admin-root .admin-detail-money.is-owing strong {
+  color: #b91c1c;
+}
+
+.admin-root .admin-detail-money.is-paid {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.admin-root .admin-detail-money.is-paid strong {
+  color: #047857;
+}
+
+.admin-root .admin-detail-pay {
+  margin-bottom: 20px;
+}
+
+.admin-root .admin-detail-question {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.admin-root .admin-detail-pay-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.admin-root .admin-detail-pay-btn {
+  min-height: 56px;
+  padding: 0 12px;
+  border: 2px solid #15803d;
+  border-radius: var(--radius-card);
+  background: #ffffff;
+  color: #14532d;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-root .admin-detail-pay-btn:hover:not(:disabled) {
+  background: #15803d;
+  color: #ffffff;
+}
+
+.admin-root .admin-detail-pay-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.admin-root .admin-detail-link {
+  margin-top: 12px;
+  padding: 8px 0;
+  border: none;
+  background: none;
+  color: #c2410c;
+  font-size: 15.5px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.admin-root .admin-detail-link.is-danger {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.admin-root .admin-detail-partial,
+.admin-root .admin-detail-move {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+}
+
+.admin-root .admin-detail-partial label,
+.admin-root .admin-detail-move label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-root .admin-detail :is(.admin-input-field, .admin-modal-select) {
+  width: 100%;
+}
+
+.admin-root .admin-dashboard-layout .admin-detail-submit,
+.admin-root .admin-dashboard-layout .admin-detail-wide {
+  width: 100%;
+  min-height: 48px;
+  font-size: 16px;
+  justify-content: center;
+}
+
+.admin-root .admin-detail-section {
+  margin-bottom: 20px;
+}
+
+.admin-root .admin-detail-subtitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-detail-payments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-root .admin-detail-payments li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  font-size: 16px;
+}
+
+.admin-root .admin-detail-payments strong {
+  margin-left: auto;
+}
+
+.admin-root .admin-detail-wa {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.admin-root .admin-detail-wa a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #86efac;
+  border-radius: var(--radius-control);
+  background: #f0fdf4;
+  color: #14532d;
+  font-size: 15.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-root .admin-detail-more {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.admin-root .admin-detail-more summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.admin-root .admin-detail-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-root .admin-detail-more summary::before {
+  content: "▸";
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.admin-root .admin-detail-more[open] summary::before {
+  content: "▾";
+}
+
+.admin-root .admin-detail-more-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+
+.admin-root .admin-detail-hint {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-detail-error {
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 15px;
+}
+
+.admin-root .admin-detail-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px;
+}
+
+.admin-root .admin-dashboard-layout .admin-detail-row .btn {
+  min-height: 48px;
+  width: 100%;
+  justify-content: center;
+}
+
+.admin-root .admin-detail-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-control);
+  background: #ffffff;
+  color: #b91c1c;
+  font-size: 15.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .admin-root .admin-detail-pay-methods,
+  .admin-root .admin-detail-wa {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-root .admin-detail-danger.is-strong {
+  background: #fef2f2;
+}
+
+/* ---------- Nueva reserva (CreateBookingModal) ---------- */
+.admin-root .admin-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-root .admin-create-form > label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-root .admin-create-type {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.admin-root .admin-create-type button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 60px;
+  padding: 8px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-root .admin-create-type button small {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.admin-root .admin-create-type button[aria-checked="true"] {
+  border-color: var(--accent-orange);
+  background: var(--accent-orange-soft);
+  color: #9a3412;
+}
+
+.admin-root .admin-create-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.admin-root .admin-create-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-root .admin-create-form .admin-create-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  font-size: 16px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.admin-root .admin-create-check input {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  accent-color: var(--accent-orange);
+}
+
+.admin-root .admin-create-summary {
+  padding: 12px 14px;
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  font-size: 16px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.admin-root .admin-create-summary strong {
+  color: var(--text);
+  font-size: 18px;
+}
+
+/* Etiquetas de formulario: en minúscula normal y más grandes. */
+.admin-root .admin-detail .admin-field-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: 0;
 }

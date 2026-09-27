@@ -299,14 +299,14 @@ export default function ReportesView({ onExpiredSession }) {
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
           <div>
-            <h1 style={{ fontSize: 20, margin: 0, fontWeight: 800, color: "#111827", letterSpacing: "0.02em" }}>
+            <h1 style={{ fontSize: 20, margin: 0, fontWeight: 800, color: "#141412", letterSpacing: "0.02em" }}>
               MUZZAGA PÁDEL CLUB · REPORTE EJECUTIVO
             </h1>
-            <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "#4b5563" }}>
+            <p style={{ margin: "4px 0 0", fontSize: 14, color: "#4a473f" }}>
               Período auditado: {formatDate(period.from, "long")} al {formatDate(period.to, "long")}
             </p>
           </div>
-          <div style={{ textAlign: "right", fontSize: 11, color: "#6b7280" }}>
+          <div style={{ textAlign: "right", fontSize: 13, color: "#4a473f" }}>
             <div>Emisión: {formatDate(today, "long")}</div>
             <div style={{ color: "#ea580c", fontWeight: 600 }}>Sistema Muzzaga Admin</div>
           </div>
@@ -620,7 +620,7 @@ export default function ReportesView({ onExpiredSession }) {
             style={{
               marginTop: 40,
               paddingTop: 24,
-              borderTop: "1px dashed #9ca3af",
+              borderTop: "1px dashed #8a857a",
               pageBreakInside: "avoid",
             }}
           >
@@ -634,24 +634,24 @@ export default function ReportesView({ onExpiredSession }) {
             >
               <div>
                 <div style={{ height: 40 }} />
-                <div style={{ borderTop: "1px solid #111827", paddingTop: 6, fontSize: 11, fontWeight: 700 }}>
+                <div style={{ borderTop: "1px solid #141412", paddingTop: 6, fontSize: 13, fontWeight: 700 }}>
                   Administración del Club
                 </div>
-                <span style={{ fontSize: 10, color: "#6b7280" }}>Firma y Sello</span>
+                <span style={{ fontSize: 12, color: "#4a473f" }}>Firma y Sello</span>
               </div>
               <div>
                 <div style={{ height: 40 }} />
-                <div style={{ borderTop: "1px solid #111827", paddingTop: 6, fontSize: 11, fontWeight: 700 }}>
+                <div style={{ borderTop: "1px solid #141412", paddingTop: 6, fontSize: 13, fontWeight: 700 }}>
                   Responsable de Turnos &amp; Caja
                 </div>
-                <span style={{ fontSize: 10, color: "#6b7280" }}>Firma y Aclaración</span>
+                <span style={{ fontSize: 12, color: "#4a473f" }}>Firma y Aclaración</span>
               </div>
               <div>
                 <div style={{ height: 40 }} />
-                <div style={{ borderTop: "1px solid #111827", paddingTop: 6, fontSize: 11, fontWeight: 700 }}>
+                <div style={{ borderTop: "1px solid #141412", paddingTop: 6, fontSize: 13, fontWeight: 700 }}>
                   Auditoría General
                 </div>
-                <span style={{ fontSize: 10, color: "#6b7280" }}>Conformidad</span>
+                <span style={{ fontSize: 12, color: "#4a473f" }}>Conformidad</span>
               </div>
             </div>
           </div>

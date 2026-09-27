@@ -1,8 +1,14 @@
 "use client";
 
 import { priceFor, slotTimesFor } from "../../lib/clubConfig";
-import { IconClose, IconPlus, STATUS_OPTIONS } from "./adminHelpers";
+import { formatARS, formatDate } from "../../lib/format";
+import { IconClose } from "./adminHelpers";
 
+/**
+ * Nueva reserva o bloqueo de cancha. Solo dos tipos a propósito: los pagos
+ * se anotan después desde el detalle del turno (marcar "pagado" acá dejaba
+ * turnos pagos sin plata en la caja).
+ */
 export default function CreateBookingModal({
   activeDate,
   clubConfig,
@@ -20,272 +26,234 @@ export default function CreateBookingModal({
   const selectedSlot =
     slotTimes.find((s) => s.start === modalForm.startTime) || slotTimes[0];
   const modalRate = priceFor(clubConfig, activeDate, modalForm.startTime);
-  const perPlayerPrice = modalRate.perPlayer;
   const modalPrice = modalForm.fullCourt
     ? modalRate.total
     : (modalForm.playersCount || 4) * modalRate.perPlayer;
+  const isBlock = modalForm.status === "bloqueado";
+  const set = (patch) => setModalForm({ ...modalForm, ...patch });
 
   return (
     <div className="admin-modal-backdrop" onClick={onClose}>
-      <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 18,
-          }}
-        >
-          <h3
-            style={{
-              fontSize: 18,
-              color: "var(--color-ink)",
-              margin: 0,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <IconPlus size={16} /> Cargar Turno Manual / Bloquear
-          </h3>
+      <div
+        className="admin-modal-card admin-detail"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="admin-create-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="admin-detail-head">
+          <div>
+            <p className="admin-detail-when">
+              {formatDate(activeDate, "long")}
+            </p>
+            <h3 id="admin-create-title" className="admin-detail-name">
+              {isBlock ? "Bloquear la cancha" : "Nueva reserva"}
+            </h3>
+          </div>
           <button
             type="button"
-            className="admin-modal-close"
+            className="admin-detail-close"
             onClick={onClose}
             aria-label="Cerrar"
           >
-            <IconClose size={14} />
+            <IconClose size={16} /> Cerrar
           </button>
         </div>
 
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} className="admin-create-form">
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-              marginBottom: 12,
-            }}
+            className="admin-create-type"
+            role="radiogroup"
+            aria-label="Tipo"
           >
-            <div>
-              <label className="admin-field-label">Cancha:</label>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={!isBlock}
+              onClick={() => set({ status: "confirmado" })}
+            >
+              Reserva de un cliente
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={isBlock}
+              onClick={() => set({ status: "bloqueado" })}
+            >
+              Bloquear la cancha
+              <small>Mantenimiento, clase, evento</small>
+            </button>
+          </div>
+
+          <div className="admin-create-row">
+            <label>
+              <span className="admin-field-label">Cancha</span>
               <select
                 className="admin-modal-select"
                 value={modalForm.courtId}
-                onChange={(e) =>
-                  setModalForm({ ...modalForm, courtId: e.target.value })
-                }
+                onChange={(e) => set({ courtId: e.target.value })}
               >
                 {clubConfig.courts.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name} ({c.type})
+                    {c.name}
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
 
-            <div>
-              <label className="admin-field-label">Horario:</label>
+            <label>
+              <span className="admin-field-label">Horario</span>
               <select
                 className="admin-modal-select"
                 value={modalForm.startTime}
-                onChange={(e) =>
-                  setModalForm({ ...modalForm, startTime: e.target.value })
-                }
+                onChange={(e) => set({ startTime: e.target.value })}
               >
                 {slotTimes.map(({ start: t, end }) => (
                   <option key={t} value={t}>
                     {t} a {end}
-                    {clubConfig.pricing.picoEnabled &&
-                      (priceFor(clubConfig, activeDate, t).band === "pico"
-                        ? " · pico"
-                        : " · valle")}
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           </div>
 
-          <div style={{ marginBottom: 12 }}>
-            <label className="admin-field-label">
-              Nombre del Jugador o Motivo:
-            </label>
+          <label>
+            <span className="admin-field-label">
+              {isBlock ? "¿Por qué se bloquea?" : "Nombre de quien reserva"}
+            </span>
             <input
               type="text"
               required
               list="admin-clients-datalist"
-              placeholder="Ej. Juan Pérez (o 'Clase Profe Nico')"
+              autoComplete="off"
+              placeholder={
+                isBlock ? "Ej. Clase del profe Nico" : "Ej. Juan Pérez"
+              }
               className="admin-input-field"
               value={modalForm.playerName}
-              onChange={(e) =>
-                setModalForm({ ...modalForm, playerName: e.target.value })
-              }
+              onChange={(e) => set({ playerName: e.target.value })}
               onBlur={onPlayerNameBlur}
             />
-            <datalist id="admin-clients-datalist">
-              {clients.map((c) => (
-                <option key={c.phone || c.name} value={c.name} />
-              ))}
-            </datalist>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-              marginBottom: 12,
-            }}
-          >
-            <div>
-              <label className="admin-field-label">Teléfono de Contacto:</label>
-              <input
-                type="tel"
-                placeholder="Ej. 299 597 4176"
-                className="admin-input-field"
-                value={modalForm.playerPhone}
-                onChange={(e) =>
-                  setModalForm({ ...modalForm, playerPhone: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
-              <label className="admin-field-label">Estado Inicial:</label>
-              <select
-                className="admin-modal-select"
-                value={modalForm.status}
-                onChange={(e) =>
-                  setModalForm({ ...modalForm, status: e.target.value })
-                }
-              >
-                {STATUS_OPTIONS.filter((o) => o.value !== "cancelado").map(
-                  (o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ),
-                )}
-              </select>
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-              marginBottom: 12,
-            }}
-          >
-            <div>
-              <label className="admin-field-label">
-                Cantidad de Jugadores:
-              </label>
-              <select
-                className="admin-modal-select"
-                value={modalForm.playersCount}
-                onChange={(e) =>
-                  setModalForm({
-                    ...modalForm,
-                    playersCount: Number(e.target.value),
-                  })
-                }
-                disabled={modalForm.fullCourt}
-              >
-                {[1, 2, 3, 4].map((n) => (
-                  <option key={n} value={n}>
-                    {n} {n === 1 ? "jugador" : "jugadores"}
-                  </option>
+            {!isBlock && (
+              <datalist id="admin-clients-datalist">
+                {clients.map((c) => (
+                  <option key={c.phone || c.name} value={c.name} />
                 ))}
-              </select>
-            </div>
-
-            <label className="admin-checkbox-row">
-              <input
-                type="checkbox"
-                checked={modalForm.fullCourt}
-                onChange={(e) =>
-                  setModalForm({ ...modalForm, fullCourt: e.target.checked })
-                }
-              />
-              Cancha completa
-            </label>
-          </div>
-
-          <div className="admin-modal-hint">
-            Se va a guardar de <strong>{modalForm.startTime}</strong> a{" "}
-            <strong>{selectedSlot?.end}</strong> hs · Total{" "}
-            <strong>${modalPrice.toLocaleString("es-AR")}</strong>
-            {!modalForm.fullCourt &&
-              ` (${modalForm.playersCount} × $${perPlayerPrice.toLocaleString("es-AR")})`}
-          </div>
-
-          <div style={{ marginBottom: modalForm.isRecurring ? 12 : 18 }}>
-            <label className="admin-checkbox-row">
-              <input
-                type="checkbox"
-                checked={modalForm.isRecurring}
-                onChange={(e) =>
-                  setModalForm({ ...modalForm, isRecurring: e.target.checked })
-                }
-              />
-              Turno fijo (repetir mismo día y horario todas las semanas)
-            </label>
-            {modalForm.isRecurring && (
-              <div style={{ marginTop: 8 }}>
-                <label className="admin-field-label">
-                  Cantidad de semanas:
-                </label>
-                <input
-                  type="number"
-                  min={2}
-                  max={26}
-                  className="admin-input-field"
-                  style={{ maxWidth: 120 }}
-                  value={modalForm.recurringWeeks}
-                  onChange={(e) =>
-                    setModalForm({
-                      ...modalForm,
-                      recurringWeeks: Number(e.target.value),
-                    })
-                  }
-                />
-                <p className="admin-field-hint">
-                  Empieza el {activeDate}. Si alguna semana ese horario ya está
-                  ocupado o el día está cerrado, se saltea sola y se avisa
-                  cuánto se pudo crear.
-                </p>
-              </div>
+              </datalist>
             )}
-          </div>
+          </label>
 
-          <div style={{ marginBottom: 18 }}>
-            <label className="admin-field-label">
-              Notas u Observaciones (opcional):
+          {!isBlock && (
+            <>
+              <label>
+                <span className="admin-field-label">Teléfono (opcional)</span>
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="Ej. 299 597 4176"
+                  className="admin-input-field"
+                  value={modalForm.playerPhone}
+                  onChange={(e) => set({ playerPhone: e.target.value })}
+                />
+              </label>
+
+              <label className="admin-create-check">
+                <input
+                  type="checkbox"
+                  checked={modalForm.fullCourt}
+                  onChange={(e) => set({ fullCourt: e.target.checked })}
+                />
+                <span>
+                  Pagan la cancha entera ({formatARS(modalRate.total)})
+                </span>
+              </label>
+
+              {!modalForm.fullCourt && (
+                <label>
+                  <span className="admin-field-label">
+                    ¿Cuántos jugadores pagan? ({formatARS(modalRate.perPlayer)}{" "}
+                    cada uno)
+                  </span>
+                  <select
+                    className="admin-modal-select"
+                    value={modalForm.playersCount}
+                    onChange={(e) =>
+                      set({ playersCount: Number(e.target.value) })
+                    }
+                  >
+                    {[1, 2, 3, 4].map((n) => (
+                      <option key={n} value={n}>
+                        {n} {n === 1 ? "jugador" : "jugadores"}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </>
+          )}
+
+          <label className="admin-create-check">
+            <input
+              type="checkbox"
+              checked={modalForm.isRecurring}
+              onChange={(e) => set({ isRecurring: e.target.checked })}
+            />
+            <span>Repetir todas las semanas (turno fijo)</span>
+          </label>
+          {modalForm.isRecurring && (
+            <label>
+              <span className="admin-field-label">¿Por cuántas semanas?</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min={2}
+                max={26}
+                className="admin-input-field"
+                value={modalForm.recurringWeeks}
+                onChange={(e) =>
+                  set({ recurringWeeks: Number(e.target.value) })
+                }
+              />
+              <span className="admin-detail-hint">
+                Si alguna semana ese horario ya está ocupado o el club está
+                cerrado, esa semana se saltea y te avisamos.
+              </span>
             </label>
+          )}
+
+          <label>
+            <span className="admin-field-label">Nota (opcional)</span>
             <input
               type="text"
-              placeholder="Ej. Cumpleaños, clase con profe, cancha en mantenimiento"
+              placeholder="Ej. Cumpleaños"
               className="admin-input-field"
               value={modalForm.notes}
-              onChange={(e) =>
-                setModalForm({ ...modalForm, notes: e.target.value })
-              }
+              onChange={(e) => set({ notes: e.target.value })}
             />
+          </label>
+
+          <div className="admin-create-summary">
+            {selectedSlot?.start} a {selectedSlot?.end} hs
+            {!isBlock && (
+              <>
+                {" "}
+                · <strong>{formatARS(modalPrice)}</strong>
+              </>
+            )}
           </div>
 
           <button
             type="submit"
-            className="btn btn-linear-primary"
-            style={{ width: "100%", height: 44, justifyContent: "center" }}
+            className="btn btn-linear-primary admin-detail-submit"
             disabled={modalSubmitting}
           >
             {modalSubmitting
-              ? "Guardando..."
-              : modalForm.isRecurring
-                ? "Crear Turno Fijo →"
-                : "Confirmar y Guardar Turno →"}
+              ? "Guardando…"
+              : isBlock
+                ? "Bloquear la cancha"
+                : modalForm.isRecurring
+                  ? "Guardar turno fijo"
+                  : "Guardar la reserva"}
           </button>
         </form>
       </div>

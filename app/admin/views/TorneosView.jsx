@@ -250,7 +250,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
           gap: 12,
         }}
       >
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", minWidth: 0, maxWidth: "100%" }}>
           <div className="admin-segmented" role="group" aria-label="Filtro de torneos">
             <button
               type="button"
@@ -282,15 +282,15 @@ export default function TorneosView({ onExpiredSession, onToast }) {
             </button>
           </div>
 
-          <div className="admin-input-icon" style={{ minWidth: 220 }}>
-            <Search size={15} aria-hidden />
+          <div className="admin-kravio-search-field" style={{ minWidth: "min(220px, 100%)" }}>
+            <Search size={14} style={{ color: "#5f5b52" }} aria-hidden />
             <input
               type="search"
               aria-label="Buscar torneos o parejas"
               placeholder="Buscar torneo o jugador..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ height: 34, fontSize: 13 }}
+              style={{ height: 34, fontSize: 14.5 }}
             />
           </div>
         </div>
@@ -313,7 +313,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
           style={{ padding: "20px 24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
         >
           <div style={{ gridColumn: "1 / -1", borderBottom: "1px solid var(--border)", paddingBottom: 10 }}>
-            <strong style={{ fontSize: 15, color: "var(--color-ink)" }}>Nuevo Torneo o Americano</strong>
+            <strong style={{ fontSize: 16, color: "var(--color-ink)" }}>Nuevo Torneo o Americano</strong>
             <p className="admin-cell-sub" style={{ marginTop: 2 }}>
               Configurá la categoría, fecha y el arancel por pareja para comenzar a inscribir.
             </p>
@@ -463,7 +463,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                       </strong>
                       <div
                         style={{
-                          fontSize: 12.5,
+                          fontSize: 14,
                           color: "var(--text-muted)",
                           marginTop: 3,
                           display: "flex",
@@ -486,10 +486,10 @@ export default function TorneosView({ onExpiredSession, onToast }) {
 
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{ textAlign: "right", display: "none", mdDisplay: "block" }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "#15803d" }}>
+                      <div style={{ fontSize: 14.5, fontWeight: 700, color: "#15803d" }}>
                         {formatARS(totalIncome)}
                       </div>
-                      <div style={{ fontSize: 11, color: "var(--text-muted)" }}>recaudado</div>
+                      <div style={{ fontSize: 13, color: "var(--text-muted)" }}>recaudado</div>
                     </div>
 
                     <span className={`badge-linear ${statusInfo.tone}`}>
@@ -498,7 +498,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
 
                     <span
                       style={{
-                        fontSize: 12,
+                        fontSize: 13.5,
                         color: "var(--text-muted)",
                         transform: isOpen ? "rotate(180deg)" : "none",
                         transition: "transform 0.15s ease",
@@ -527,7 +527,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)" }}>
+                        <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text-muted)" }}>
                           Estado:
                         </span>
                         <select
@@ -547,7 +547,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                         type="button"
                         className="admin-table-action-btn delete"
                         onClick={() => handleDeleteTournament(t.id)}
-                        style={{ fontSize: 12 }}
+                        style={{ fontSize: 13.5 }}
                       >
                         <Trash2 size={13} /> Eliminar Torneo
                       </button>
@@ -599,7 +599,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                           ) : (
                             t.players.map((p, idx) => (
                               <tr key={p.id}>
-                                <td style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 600 }}>
+                                <td style={{ color: "var(--text-muted)", fontSize: 13.5, fontWeight: 600 }}>
                                   #{idx + 1}
                                 </td>
                                 <td>
@@ -608,7 +608,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                                       {getInitials(p.name)}
                                     </div>
                                     <div>
-                                      <strong style={{ fontSize: 13.5, color: "var(--color-ink)", display: "block" }}>
+                                      <strong style={{ fontSize: 15, color: "var(--color-ink)", display: "block" }}>
                                         {p.name}
                                       </strong>
                                       {p.partner && (
@@ -622,7 +622,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                                 <td>
                                   {p.phone ? (
                                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                      <span style={{ fontSize: 13 }}>{p.phone}</span>
+                                      <span style={{ fontSize: 14.5 }}>{p.phone}</span>
                                       <a
                                         href={`https://wa.me/${toWhatsappNumber(p.phone)}`}
                                         target="_blank"
@@ -634,7 +634,7 @@ export default function TorneosView({ onExpiredSession, onToast }) {
                                       </a>
                                     </div>
                                   ) : (
-                                    <span style={{ fontSize: 12, color: "var(--text-muted)" }}>—</span>
+                                    <span style={{ fontSize: 13.5, color: "var(--text-muted)" }}>—</span>
                                   )}
                                 </td>
                                 <td>

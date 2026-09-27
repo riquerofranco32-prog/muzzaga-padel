@@ -12,14 +12,6 @@ import {
 // Iconos y helpers compartidos entre las vistas del admin. Vivían todos
 // inline en page.js; con 6 vistas ahora, cada una los necesita por separado.
 
-export const STATUS_OPTIONS = [
-  { value: "confirmado", label: "Confirmado" },
-  { value: "señado", label: "Señado" },
-  { value: "pagado", label: "Pagado Total" },
-  { value: "bloqueado", label: "Bloqueado / Mantenimiento" },
-  { value: "cancelado", label: "Cancelado" },
-];
-
 export const PAYMENT_METHODS = [
   { value: "efectivo", label: "Efectivo" },
   { value: "transferencia", label: "Transferencia" },
@@ -32,13 +24,7 @@ export {
   buildReminderMessage,
   buildDepositRequestMessage,
   buildConfirmationMessage,
-  exportBookingsToCSV,
 } from "../../lib/adminMessages";
-
-/** Clase de color del badge según estado. Sin acento para usarla como clase CSS. */
-export function statusClass(status) {
-  return `is-${status === "señado" ? "senado" : status || "confirmado"}`;
-}
 
 /**
  * Si la cookie venció mientras el panel estaba abierto, los actions

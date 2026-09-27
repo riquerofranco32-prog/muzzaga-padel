@@ -1,7 +1,7 @@
 "use client";
 
-import { Banknote, Plus, Users, X } from "lucide-react";
-import { paymentState, pendingAmount, paidAmount } from "../../../../lib/metrics";
+import { Plus } from "lucide-react";
+import { paymentState, pendingAmount } from "../../../../lib/metrics";
 import { hasSlotStarted } from "../../../../lib/clubConfig";
 import { isoWeekday } from "../../../../lib/booking";
 import { formatARS } from "../../../../lib/format";
@@ -21,13 +21,18 @@ function paymentBadge(b) {
   if (state === "bloqueado") return { state, label: "Bloqueado" };
   if (state === "prueba") return { state, label: "Prueba" };
   if (state === "pagado") return { state, label: "Pagado" };
-  if (state === "senado") return { state, label: `Seña ${formatARS(paidAmount(b))}` };
+  if (state === "senado") return { state, label: `Pagó seña · debe ${formatARS(pendingAmount(b))}` };
   return { state, label: `Debe ${formatARS(pendingAmount(b))}` };
 }
 
 /**
  * Grilla tipo timeline: columnas = canchas, filas = franjas. Con 7 franjas
- * el día entero entra en pantalla en desktop.
+ * el día entero entra en pantalla en desktop. En mobile cada franja es un
+ * bloque con el horario arriba y una tarjeta por cancha.
+ *
+ * Cada turno es un solo botón que abre el detalle (cobrar, mover, cancelar).
+ * Cancelar no está acá a propósito: un toque de más no puede liberar una
+ * cancha; el detalle pide confirmación con PIN.
  */
 export default function CourtTimeline({
   courts,
@@ -35,10 +40,8 @@ export default function CourtTimeline({
   activeDate,
   clubConfig,
   now,
-  isDimmed,
   onAssign,
   onOpenDetail,
-  onCancel,
 }) {
   const rows = [];
   for (const s of slots) {
@@ -109,9 +112,12 @@ export default function CourtTimeline({
                         type="button"
                         className="admin-slot-assign"
                         onClick={() => onAssign(court.id, row.start)}
-                        aria-label={`Asignar ${court.name} a las ${row.start}`}
+                        aria-label={`Reservar ${court.name} a las ${row.start}`}
                       >
-                        <Plus {...ICON} /> Asignar
+                        <span className="admin-slot-court">{court.name}</span>
+                        <span className="admin-slot-free-label">
+                          <Plus {...ICON} /> Libre · Reservar
+                        </span>
                       </button>
                     </div>
                   );
@@ -121,6 +127,7 @@ export default function CourtTimeline({
                 if (!b) {
                   return (
                     <div key={court.id} role="gridcell" className="admin-slot is-taken" data-state="bloqueado">
+                      <span className="admin-slot-court">{court.name}</span>
                       <span className="admin-slot-name">Ocupado</span>
                     </div>
                   );
@@ -131,7 +138,7 @@ export default function CourtTimeline({
                   <div
                     key={court.id}
                     role="gridcell"
-                    className={`admin-slot is-taken${isDimmed?.(b) ? " is-dimmed" : ""}`}
+                    className="admin-slot is-taken"
                     data-state={badge.state}
                   >
                     <button
@@ -140,47 +147,22 @@ export default function CourtTimeline({
                       onClick={() => onOpenDetail(b)}
                       aria-label={`${b.playerName}, ${row.start} en ${court.name}. ${badge.label}. Ver detalle`}
                     >
+                      <span className="admin-slot-court">{court.name}</span>
                       <span className="admin-slot-name">{b.playerName}</span>
-                      <span className="admin-slot-meta">
-                        {badge.state !== "bloqueado" && (
-                          <>
-                            <Users size={12} strokeWidth={1.75} aria-hidden /> {b.playersCount || 4}
-                          </>
-                        )}
-                        <span className="admin-slot-badge">{badge.label}</span>
-                      </span>
+                      <span className="admin-slot-badge">{badge.label}</span>
                     </button>
-                    <div className="admin-slot-actions">
-                      {pendingAmount(b) > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => onOpenDetail(b)}
-                          aria-label={`Cobrar a ${b.playerName}`}
-                          title="Cobrar"
-                        >
-                          <Banknote {...ICON} />
-                        </button>
-                      )}
-                      {b.playerPhone && (
-                        <a
-                          href={`https://wa.me/${toWhatsappNumber(b.playerPhone)}`}
-                          target="_blank"
-                          rel="noopener"
-                          aria-label={`WhatsApp a ${b.playerName}`}
-                          title="WhatsApp"
-                        >
-                          <WhatsAppMiniIcon size={14} />
-                        </a>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => onCancel(b.id, court.id, row.start)}
-                        aria-label={`Cancelar turno de ${b.playerName}`}
-                        title="Cancelar y liberar"
+                    {b.playerPhone && (
+                      <a
+                        className="admin-slot-whatsapp"
+                        href={`https://wa.me/${toWhatsappNumber(b.playerPhone)}`}
+                        target="_blank"
+                        rel="noopener"
+                        aria-label={`Mandar WhatsApp a ${b.playerName}`}
+                        title="Mandar WhatsApp"
                       >
-                        <X {...ICON} />
-                      </button>
-                    </div>
+                        <WhatsAppMiniIcon size={18} />
+                      </a>
+                    )}
                   </div>
                 );
               })}

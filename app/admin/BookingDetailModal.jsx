@@ -10,7 +10,7 @@ import {
   adminSettleCantinaSale,
   adminDeleteBooking,
 } from "./actions";
-import { onAccountTotal } from "../../lib/metrics";
+import { bookingTotal, onAccountTotal } from "../../lib/metrics";
 import { formatDate, plural } from "../../lib/format";
 import StaffPinModal from "./ui/StaffPinModal";
 import {
@@ -25,6 +25,12 @@ import {
   buildConfirmationMessage,
 } from "./adminHelpers";
 
+/**
+ * Detalle de un turno. Ordenado por la pregunta que se hace el dueño:
+ * "¿me pagó?" → cartel grande con lo que debe y cobro de un toque por
+ * medio de pago. Lo que se usa poco (mover, cancelar, eliminar) va plegado
+ * en "Más opciones" para que no se toque sin querer.
+ */
 export default function BookingDetailModal({
   booking,
   clubConfig,
@@ -45,6 +51,7 @@ export default function BookingDetailModal({
   onToast,
 }) {
   const [isMoving, setIsMoving] = useState(false);
+  const [isOtherAmount, setIsOtherAmount] = useState(false);
   const [isDeletePinOpen, setIsDeletePinOpen] = useState(false);
   const [moveCourtId, setMoveCourtId] = useState(booking.courtId || "cancha-1");
   const [moveDate, setMoveDate] = useState(booking.date || "");
@@ -102,531 +109,229 @@ export default function BookingDetailModal({
   const accountSales = sales.filter(
     (s) => s.method === "cuenta" && s.chargeTo === booking.id && !s.voided,
   );
+  // bookingTotal y no booking.total: los turnos web no guardan total y se
+  // valúan con la tarifa del horario (antes el detalle mostraba "Total $0").
+  const total = bookingTotal(booking);
+  const paid = paidAmount(booking);
+  const pending = pendingAmount(booking);
   // Seña según el % de Configuración (antes fija en $15.000).
-  const deposit = depositFor(clubConfig, booking.total || 0);
+  const deposit = depositFor(clubConfig, total);
+  const phone = booking.playerPhone
+    ? toWhatsappNumber(booking.playerPhone)
+    : null;
+  const waLink = (text) =>
+    `https://wa.me/${phone}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
+  const isCancelled = booking.status === "cancelado";
 
   return (
     <div className="admin-modal-backdrop" onClick={onClose}>
-      <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 18,
-          }}
-        >
-          <h3 style={{ fontSize: 18, color: "var(--color-ink)", margin: 0 }}>
-            Turno {formatDate(booking.date)} · {booking.startTime}
-            {booking.isTest && " · PRUEBA"}
-          </h3>
+      <div
+        className="admin-modal-card admin-detail"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="admin-detail-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="admin-detail-head">
+          <div>
+            <p className="admin-detail-when">
+              {booking.courtName} · {formatDate(booking.date)} ·{" "}
+              {booking.startTime}
+              {booking.endTime ? ` a ${booking.endTime}` : ""} hs
+            </p>
+            <h3 id="admin-detail-title" className="admin-detail-name">
+              {booking.playerName}
+            </h3>
+            <div className="admin-detail-tags">
+              {booking.isTest && (
+                <span className="admin-detail-tag">Prueba</span>
+              )}
+              {isCancelled && (
+                <span className="admin-detail-tag is-danger">Cancelado</span>
+              )}
+              {clientCat?.category === "VIP" && (
+                <span
+                  className="admin-detail-tag is-vip"
+                  title={`${plural(clientData.count, "turno jugado", "turnos jugados")} en Muzzaga`}
+                >
+                  Cliente VIP · {plural(clientData.count, "turno", "turnos")}
+                </span>
+              )}
+              {clientCat?.category === "Frecuente" && (
+                <span className="admin-detail-tag">
+                  Viene seguido · {plural(clientData.count, "turno", "turnos")}
+                </span>
+              )}
+              {clientCat?.category === "Nuevo" && (
+                <span className="admin-detail-tag is-new">Primera vez</span>
+              )}
+              {booking.recurringId && (
+                <span className="admin-detail-tag is-fixed">
+                  Turno fijo (todas las semanas)
+                </span>
+              )}
+            </div>
+            {booking.playerPhone && (
+              <p className="admin-detail-phone">Tel. {booking.playerPhone}</p>
+            )}
+            {booking.notes && (
+              <p className="admin-detail-notes">Nota: {booking.notes}</p>
+            )}
+          </div>
           <button
             type="button"
-            className="admin-modal-close"
+            className="admin-detail-close"
             onClick={onClose}
             aria-label="Cerrar"
           >
-            <IconClose size={14} />
+            <IconClose size={16} /> Cerrar
           </button>
         </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
-            Organizador
+        {/* ¿ME PAGÓ? */}
+        {booking.isTest ? (
+          <div className="admin-detail-money">
+            <strong>Turno de prueba</strong>
+            <span>No suma en la caja ni en los números del mes.</span>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginTop: 2,
-              flexWrap: "wrap",
-            }}
-          >
-            <strong style={{ fontSize: 16 }}>{booking.playerName}</strong>
-            {clientCat && clientCat.category === "VIP" && (
-              <span
-                style={{
-                  background: "rgba(245, 158, 11, 0.15)",
-                  color: "#b45309",
-                  border: "1px solid rgba(245, 158, 11, 0.35)",
-                  borderRadius: 12,
-                  padding: "2px 8px",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  whiteSpace: "nowrap",
-                }}
-                title={`${plural(clientData.count, "turno jugado", "turnos jugados")} en Muzzaga`}
-              >
-                VIP ({plural(clientData.count, "turno", "turnos")})
-              </span>
-            )}
-            {clientCat && clientCat.category === "Frecuente" && (
-              <span
-                style={{
-                  background: "rgba(59, 130, 246, 0.1)",
-                  color: "#1d4ed8",
-                  border: "1px solid rgba(59, 130, 246, 0.25)",
-                  borderRadius: 12,
-                  padding: "2px 8px",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  whiteSpace: "nowrap",
-                }}
-                title={plural(
-                  clientData.count,
-                  "turno jugado",
-                  "turnos jugados",
-                )}
-              >
-                Frecuente ({clientData.count})
-              </span>
-            )}
-            {clientCat && clientCat.category === "Nuevo" && (
-              <span
-                style={{
-                  background: "rgba(16, 185, 129, 0.08)",
-                  color: "#15803d",
-                  border: "1px solid rgba(16, 185, 129, 0.2)",
-                  borderRadius: 12,
-                  padding: "2px 8px",
-                  fontSize: 11,
-                  fontWeight: 500,
-                  whiteSpace: "nowrap",
-                }}
-                title="Primer turno en el club"
-              >
-                1er turno
-              </span>
-            )}
-            {booking.recurringId && (
-              <span
-                style={{
-                  background: "rgba(124, 58, 237, 0.1)",
-                  color: "#6d28d9",
-                  border: "1px solid rgba(124, 58, 237, 0.25)",
-                  borderRadius: 12,
-                  padding: "2px 8px",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  whiteSpace: "nowrap",
-                }}
-                title="Esta semana es una ocurrencia de un turno fijo"
-              >
-                Turno fijo
-              </span>
-            )}
-          </div>
-          {booking.playerPhone && (
+        ) : (
+          !isCancelled && (
             <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginTop: 4,
-              }}
+              className={`admin-detail-money${pending > 0 ? " is-owing" : " is-paid"}`}
             >
-              <span
-                style={{
-                  fontSize: 13,
-                  color: "var(--text-secondary)",
-                  fontFamily: "var(--font-mono)",
-                }}
-              >
-                {booking.playerPhone}
+              <strong>
+                {pending > 0
+                  ? `Debe ${formatARS(pending)}`
+                  : "✓ Pagado completo"}
+              </strong>
+              <span>
+                Turno {formatARS(total)} · Ya pagó {formatARS(paid)}
               </span>
-              <a
-                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}`}
-                target="_blank"
-                rel="noopener"
-                className="admin-table-action-btn"
-                title="Chat WhatsApp"
-              >
-                <WhatsAppMiniIcon />
-              </a>
             </div>
-          )}
+          )
+        )}
 
-          {booking.playerPhone && (
-            <div
-              style={{
-                display: "flex",
-                gap: 6,
-                flexWrap: "wrap",
-                marginTop: 8,
-              }}
-            >
-              <a
-                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildReminderMessage(booking))}`}
-                target="_blank"
-                rel="noopener"
-                className="btn btn-secondary"
-                style={{
-                  height: 26,
-                  fontSize: 11,
-                  padding: "0 8px",
-                  textDecoration: "none",
-                }}
-                title="Enviar recordatorio con saldo pendiente"
-              >
-                Recordatorio
-              </a>
-              <a
-                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildDepositRequestMessage(booking, clubConfig.paymentAlias, deposit))}`}
-                target="_blank"
-                rel="noopener"
-                className="btn btn-secondary"
-                style={{
-                  height: 26,
-                  fontSize: 11,
-                  padding: "0 8px",
-                  textDecoration: "none",
-                }}
-                title="Pedir seña con Alias bancario"
-              >
-                Pedir seña
-              </a>
-              <a
-                href={`https://wa.me/${toWhatsappNumber(booking.playerPhone)}?text=${encodeURIComponent(buildConfirmationMessage(booking))}`}
-                target="_blank"
-                rel="noopener"
-                className="btn btn-secondary"
-                style={{
-                  height: 26,
-                  fontSize: 11,
-                  padding: "0 8px",
-                  textDecoration: "none",
-                }}
-                title="Enviar confirmación de turno"
-              >
-                Confirmar
-              </a>
-            </div>
-          )}
-          <div
-            style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 6 }}
-          >
-            {booking.courtName}
-          </div>
-          {booking.notes && (
-            <div
-              style={{
-                fontSize: 13,
-                color: "var(--text-secondary)",
-                marginTop: 6,
-                fontStyle: "italic",
-              }}
-            >
-              Nota: {booking.notes}
-            </div>
-          )}
-        </div>
-
-        {/* REPROGRAMAR / MOVER TURNO SECTION */}
-        <div
-          style={{
-            marginBottom: 16,
-            padding: 12,
-            background: isMoving
-              ? "var(--color-surface-2, #f8fafc)"
-              : "transparent",
-            border: "1px dashed var(--color-hairline, #e2e8f0)",
-            borderRadius: 8,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <span style={{ fontSize: 13, fontWeight: 600 }}>
-              Reprogramar / mover de cancha
-            </span>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              style={{ height: 28, padding: "0 8px", fontSize: 12 }}
-              onClick={() => {
-                setIsMoving(!isMoving);
-                setMoveError("");
-              }}
-            >
-              {isMoving ? "Cancelar" : "Cambiar Pista u Horario"}
-            </button>
-          </div>
-
-          {isMoving && (
-            <form onSubmit={handleMoveSubmit} style={{ marginTop: 12 }}>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-secondary)",
-                  margin: "0 0 10px",
-                }}
-              >
-                Mové este turno a otra cancha o fecha conservando la seña y los
-                cobros ya cargados.
-              </p>
-
-              {moveError && (
-                <div
-                  style={{
-                    padding: "6px 10px",
-                    background: "#fef2f2",
-                    color: "#dc2626",
-                    fontSize: 12,
-                    borderRadius: 6,
-                    marginBottom: 10,
-                  }}
+        {!isCancelled && pending > 0 && (
+          <div className="admin-detail-pay">
+            <p className="admin-detail-question">
+              ¿Cómo te pagó los {formatARS(pending)}?
+            </p>
+            <div className="admin-detail-pay-methods">
+              {PAYMENT_METHODS.map((m) => (
+                <button
+                  key={m.value}
+                  type="button"
+                  className="admin-detail-pay-btn"
+                  disabled={paymentSubmitting}
+                  onClick={() =>
+                    onAddPayment(null, { method: m.value, amount: pending })
+                  }
                 >
-                  {moveError}
-                </div>
-              )}
+                  {m.label}
+                </button>
+              ))}
+            </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 10,
-                  marginBottom: 10,
-                }}
+            {!isOtherAmount ? (
+              <button
+                type="button"
+                className="admin-detail-link"
+                onClick={() => setIsOtherAmount(true)}
               >
-                <div>
-                  <label className="admin-field-label">Nueva Cancha</label>
+                Pagó solo una parte (por ejemplo, la seña)
+              </button>
+            ) : (
+              <form onSubmit={onAddPayment} className="admin-detail-partial">
+                <label>
+                  <span className="admin-field-label">¿Cuánto pagó?</span>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min="1"
+                    className="admin-input-field"
+                    value={paymentForm.amount}
+                    onChange={(e) =>
+                      setPaymentForm({ ...paymentForm, amount: e.target.value })
+                    }
+                    autoFocus
+                  />
+                </label>
+                {deposit > 0 && deposit < pending && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() =>
+                      setPaymentForm({
+                        ...paymentForm,
+                        amount: String(deposit),
+                      })
+                    }
+                  >
+                    Poner la seña ({formatARS(deposit)})
+                  </button>
+                )}
+                <label>
+                  <span className="admin-field-label">¿Con qué pagó?</span>
                   <select
                     className="admin-modal-select"
-                    value={moveCourtId}
-                    onChange={(e) => setMoveCourtId(e.target.value)}
+                    value={paymentForm.method}
+                    onChange={(e) =>
+                      setPaymentForm({ ...paymentForm, method: e.target.value })
+                    }
                   >
-                    {clubConfig.courts.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.type ? `${c.name} (${c.type})` : c.name}
+                    {PAYMENT_METHODS.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
                       </option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="admin-field-label">Nueva Fecha</label>
-                  <input
-                    type="date"
-                    className="admin-input-field"
-                    value={moveDate}
-                    onChange={(e) => setMoveDate(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 12 }}>
-                <label className="admin-field-label">Nuevo Horario</label>
-                <select
-                  className="admin-modal-select"
-                  value={moveStartTime}
-                  onChange={(e) => setMoveStartTime(e.target.value)}
+                </label>
+                <button
+                  type="submit"
+                  className="btn btn-linear-primary admin-detail-submit"
+                  disabled={paymentSubmitting || !paymentForm.amount}
                 >
-                  {moveTimes.length === 0 && (
-                    <option value="">Ese día el club no abre</option>
-                  )}
-                  {moveTimes.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-linear-primary"
-                style={{ width: "100%", height: 36, fontSize: 13 }}
-                disabled={moveSubmitting}
-              >
-                {moveSubmitting ? "Moviendo..." : "Confirmar Traslado de Turno"}
-              </button>
-            </form>
-          )}
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 10,
-            marginBottom: 16,
-            padding: "10px 0",
-            borderTop: "1px solid var(--color-hairline)",
-            borderBottom: "1px solid var(--color-hairline)",
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-              Total
-            </div>
-            <strong>${(booking.total || 0).toLocaleString("es-AR")}</strong>
+                  {paymentSubmitting
+                    ? "Guardando…"
+                    : paymentForm.amount
+                      ? `Anotar cobro de ${formatARS(paymentForm.amount)}`
+                      : "Anotar cobro"}
+                </button>
+              </form>
+            )}
           </div>
-          <div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-              Cobrado
-            </div>
-            <strong style={{ color: "#047857" }}>
-              ${paidAmount(booking).toLocaleString("es-AR")}
-            </strong>
-          </div>
-          <div>
-            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-              Saldo pendiente
-            </div>
-            <strong
-              style={{
-                color: pendingAmount(booking) > 0 ? "#b45309" : "#047857",
-              }}
-            >
-              ${pendingAmount(booking).toLocaleString("es-AR")}
-            </strong>
-          </div>
-        </div>
+        )}
 
-        <div className="admin-saldo-bar-track" style={{ marginBottom: 16 }}>
-          <div
-            className="admin-saldo-bar-fill"
-            style={{
-              width: `${
-                booking.total
-                  ? Math.min(
-                      100,
-                      Math.round((paidAmount(booking) / booking.total) * 100),
-                    )
-                  : 0
-              }%`,
-            }}
-          />
-        </div>
-
-        <div style={{ marginBottom: 12 }}>
-          <label className="admin-field-label">Cobros registrados</label>
-          {booking.payments && Object.keys(booking.payments).length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {booking.payments && Object.keys(booking.payments).length > 0 && (
+          <div className="admin-detail-section">
+            <h4 className="admin-detail-subtitle">Pagos anotados</h4>
+            <ul className="admin-detail-payments">
               {Object.entries(booking.payments)
                 .sort((a, b) => (a[1].createdAt || 0) - (b[1].createdAt || 0))
                 .map(([id, p]) => (
-                  <div
-                    key={id}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      fontSize: 13,
-                      padding: "6px 8px",
-                      borderRadius: 6,
-                      background: "var(--color-surface-2, #f4f4f5)",
-                    }}
-                  >
+                  <li key={id}>
                     <span>
                       {PAYMENT_METHODS.find((m) => m.value === p.method)
                         ?.label || p.method}
                     </span>
-                    <strong>${Number(p.amount).toLocaleString("es-AR")}</strong>
+                    <strong>{formatARS(Number(p.amount))}</strong>
                     <button
                       type="button"
-                      className="admin-table-action-btn delete"
+                      className="admin-detail-link is-danger"
                       onClick={() => onRemovePayment(id)}
-                      title="Eliminar cobro"
                     >
-                      <IconTrash size={12} />
+                      Borrar
                     </button>
-                  </div>
+                  </li>
                 ))}
-            </div>
-          ) : (
-            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
-              Todavía no se registró ningún cobro.
-            </div>
-          )}
-        </div>
-
-        {pendingAmount(booking) > 0 && (
-          <form
-            onSubmit={onAddPayment}
-            style={{
-              display: "flex",
-              gap: 8,
-              alignItems: "flex-end",
-              flexWrap: "wrap",
-              marginBottom: 12,
-            }}
-          >
-            <div>
-              <label className="admin-field-label">Método</label>
-              <select
-                className="admin-modal-select"
-                value={paymentForm.method}
-                onChange={(e) =>
-                  setPaymentForm({ ...paymentForm, method: e.target.value })
-                }
-              >
-                {PAYMENT_METHODS.map((m) => (
-                  <option key={m.value} value={m.value}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="admin-field-label">Monto</label>
-              <input
-                type="number"
-                min="1"
-                className="admin-input-field"
-                style={{ width: 120 }}
-                value={paymentForm.amount}
-                onChange={(e) =>
-                  setPaymentForm({ ...paymentForm, amount: e.target.value })
-                }
-              />
-            </div>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              style={{ height: 38, padding: "0 10px", fontSize: 12 }}
-              onClick={() =>
-                setPaymentForm({
-                  ...paymentForm,
-                  amount: String(deposit),
-                })
-              }
-            >
-              Seña {formatARS(deposit)}
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              style={{ height: 38, padding: "0 10px", fontSize: 12 }}
-              onClick={() =>
-                setPaymentForm({
-                  ...paymentForm,
-                  amount: String(pendingAmount(booking)),
-                })
-              }
-            >
-              Saldo total
-            </button>
-            <button
-              type="submit"
-              className="btn btn-linear-primary"
-              style={{ height: 38, padding: "0 14px", fontSize: 12.5 }}
-              disabled={paymentSubmitting || !paymentForm.amount}
-            >
-              {paymentSubmitting ? "Guardando..." : "Agregar cobro"}
-            </button>
-          </form>
+            </ul>
+          </div>
         )}
 
         {accountSales.length > 0 && (
           <div className="admin-account-block">
             <div className="admin-account-head">
-              <strong>Consumos de cantina a cuenta</strong>
+              <strong>Lo que consumió en la cantina (a cuenta)</strong>
               <strong>{formatARS(onAccountTotal(accountSales))}</strong>
             </div>
             <ul>
@@ -656,7 +361,7 @@ export default function BookingDetailModal({
                       }
                     }}
                   >
-                    <option value="">Cobrar…</option>
+                    <option value="">Cobrar con…</option>
                     {PAYMENT_METHODS.map((m) => (
                       <option key={m.value} value={m.value}>
                         {m.label}
@@ -669,84 +374,193 @@ export default function BookingDetailModal({
           </div>
         )}
 
-        {booking.status !== "cancelado" && (
-          <button
-            type="button"
-            className="admin-table-action-btn delete"
-            style={{ width: "auto", padding: "6px 12px", fontSize: 12.5 }}
-            onClick={() => {
-              onCancel(booking.id, booking.courtId, booking.startTime);
-              onClose();
-            }}
-          >
-            <IconTrash size={12} /> Cancelar turno
-          </button>
+        {phone && (
+          <div className="admin-detail-section">
+            <h4 className="admin-detail-subtitle">Mandarle un WhatsApp</h4>
+            <div className="admin-detail-wa">
+              <a href={waLink()} target="_blank" rel="noopener">
+                <WhatsAppMiniIcon size={18} /> Abrir el chat
+              </a>
+              <a
+                href={waLink(buildReminderMessage(booking))}
+                target="_blank"
+                rel="noopener"
+              >
+                Recordarle el turno
+              </a>
+              {pending > 0 && (
+                <a
+                  href={waLink(
+                    buildDepositRequestMessage(
+                      booking,
+                      clubConfig.paymentAlias,
+                      deposit,
+                    ),
+                  )}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Pedirle la seña
+                </a>
+              )}
+              <a
+                href={waLink(buildConfirmationMessage(booking))}
+                target="_blank"
+                rel="noopener"
+              >
+                Confirmarle el turno
+              </a>
+            </div>
+          </div>
         )}
 
-        {booking.recurringId && onCancelSeries && (
-          <button
-            type="button"
-            className="admin-table-action-btn delete"
-            style={{
-              width: "auto",
-              padding: "6px 12px",
-              fontSize: 12.5,
-              marginLeft: 8,
-            }}
-            title="Cancela todas las semanas futuras de este turno fijo"
-            onClick={() => {
-              onCancelSeries(booking.recurringId, booking.playerName);
-              onClose();
-            }}
-          >
-            <IconTrash size={12} /> Cancelar serie completa
-          </button>
-        )}
+        <details className="admin-detail-more">
+          <summary>Más opciones (cambiar horario, cancelar…)</summary>
 
-        <button
-          type="button"
-          className="admin-table-action-btn delete"
-          style={{
-            width: "auto",
-            padding: "6px 12px",
-            fontSize: 12.5,
-            color: "#dc2626",
-            borderColor: "#fca5a5",
-            marginLeft: 8,
-          }}
-          onClick={() => setIsDeletePinOpen(true)}
-          title="Elimina el turno definitivamente de la base requiriendo PIN"
-        >
-          <IconTrash size={12} /> Eliminar definitivamente
-        </button>
+          <div className="admin-detail-more-body">
+            {!isMoving ? (
+              <button
+                type="button"
+                className="btn btn-secondary admin-detail-wide"
+                onClick={() => {
+                  setIsMoving(true);
+                  setMoveError("");
+                }}
+              >
+                Cambiar de cancha, día u horario
+              </button>
+            ) : (
+              <form onSubmit={handleMoveSubmit} className="admin-detail-move">
+                <p className="admin-detail-hint">
+                  El turno se pasa al nuevo horario con la seña y los pagos que
+                  ya tiene.
+                </p>
 
-        {onToggleTest && (
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={{
-              height: 32,
-              padding: "4px 12px",
-              fontSize: 12,
-              marginLeft: 8,
-            }}
-            onClick={() => onToggleTest(booking)}
-            title="Los datos de prueba siguen ocupando el horario pero no suman en caja, reportes ni clientes"
-          >
-            {booking.isTest
-              ? "Contar como turno real"
-              : "Marcar como dato de prueba"}
-          </button>
-        )}
+                {moveError && (
+                  <div className="admin-detail-error" role="alert">
+                    {moveError}
+                  </div>
+                )}
+
+                <label>
+                  <span className="admin-field-label">Cancha</span>
+                  <select
+                    className="admin-modal-select"
+                    value={moveCourtId}
+                    onChange={(e) => setMoveCourtId(e.target.value)}
+                  >
+                    {clubConfig.courts.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.type ? `${c.name} (${c.type})` : c.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span className="admin-field-label">Día</span>
+                  <input
+                    type="date"
+                    className="admin-input-field"
+                    value={moveDate}
+                    onChange={(e) => setMoveDate(e.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  <span className="admin-field-label">Horario</span>
+                  <select
+                    className="admin-modal-select"
+                    value={moveStartTime}
+                    onChange={(e) => setMoveStartTime(e.target.value)}
+                  >
+                    {moveTimes.length === 0 && (
+                      <option value="">Ese día el club no abre</option>
+                    )}
+                    {moveTimes.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="admin-detail-row">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setIsMoving(false)}
+                  >
+                    Volver
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-linear-primary"
+                    disabled={moveSubmitting}
+                  >
+                    {moveSubmitting ? "Cambiando…" : "Guardar el cambio"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {!isCancelled && (
+              <button
+                type="button"
+                className="admin-detail-danger"
+                onClick={() => {
+                  onCancel(booking.id, booking.courtId, booking.startTime);
+                  onClose();
+                }}
+              >
+                <IconTrash size={14} /> Cancelar este turno (libera la cancha)
+              </button>
+            )}
+
+            {booking.recurringId && onCancelSeries && (
+              <button
+                type="button"
+                className="admin-detail-danger"
+                onClick={() => {
+                  onCancelSeries(booking.recurringId, booking.playerName);
+                  onClose();
+                }}
+              >
+                <IconTrash size={14} /> Cancelar el turno fijo de todas las
+                semanas
+              </button>
+            )}
+
+            {onToggleTest && (
+              <button
+                type="button"
+                className="btn btn-secondary admin-detail-wide"
+                onClick={() => onToggleTest(booking)}
+                title="Los datos de prueba siguen ocupando el horario pero no suman en caja, reportes ni clientes"
+              >
+                {booking.isTest
+                  ? "Es un turno real (que cuente en la caja)"
+                  : "Es una prueba (que no cuente en la caja)"}
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="admin-detail-danger is-strong"
+              onClick={() => setIsDeletePinOpen(true)}
+            >
+              <IconTrash size={14} /> Borrar el turno para siempre
+            </button>
+          </div>
+        </details>
       </div>
 
       {isDeletePinOpen && (
         <StaffPinModal
           isOpen={isDeletePinOpen}
-          title="Eliminar Turno Definitivamente"
-          description={`¿Confirmás que querés eliminar definitivamente el turno de ${booking.playerName}? Se liberará el horario de la cancha y se borrará el registro de la base.`}
+          title="Borrar el turno para siempre"
+          description={`¿Seguro que querés borrar el turno de ${booking.playerName}? Se libera la cancha y el turno desaparece del sistema. No se puede deshacer.`}
           targetName={`${booking.playerName} · ${booking.courtName} (${booking.date} ${booking.startTime} hs)`}
-          confirmButtonText="Eliminar Turno"
+          confirmButtonText="Sí, borrar"
           confirmButtonTone="danger"
           onClose={() => setIsDeletePinOpen(false)}
           onConfirm={async ({ pin, reason }) => {
@@ -757,11 +571,11 @@ export default function BookingDetailModal({
             });
             if (res.ok) {
               setIsDeletePinOpen(false);
-              onToast?.(`Turno eliminado por ${res.staff}`);
+              onToast?.(`Turno borrado por ${res.staff}`);
               onDeletedBooking?.();
               onClose();
             } else {
-              throw new Error(res.error || "No se pudo eliminar el turno.");
+              throw new Error(res.error || "No se pudo borrar el turno.");
             }
           }}
         />

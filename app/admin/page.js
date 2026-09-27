@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   Bell,
   ExternalLink,
-  LayoutDashboard,
   LogOut,
   PanelLeft,
   PanelLeftClose,
@@ -25,7 +24,6 @@ import {
   adminGetWeekStats,
   adminLogout,
   adminRemovePayment,
-  adminUpdateStatus,
   checkAdminSession,
   getAdminDayData,
   verifyAdminPassword,
@@ -92,7 +90,6 @@ export default function AdminPage() {
   const [activeDate, setActiveDate] = useState(todayInClub);
   const [dayData, setDayData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   // Modal de creación de turno
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -323,27 +320,6 @@ export default function AdminPage() {
     loadWeekStats();
   }
 
-  async function handleStatusChange(
-    bookingId,
-    newStatus,
-    { isUndo = false } = {},
-  ) {
-    const previous = dayData?.bookings.find((b) => b.id === bookingId)?.status;
-    const res = await adminUpdateStatus(bookingId, newStatus);
-    if (!res.ok) return showError(res, "No se pudo actualizar el estado.");
-    refreshMoney();
-    const canUndo = !isUndo && previous && previous !== newStatus;
-    showToast(isUndo ? "Cambio deshecho" : "Estado actualizado", {
-      action: canUndo
-        ? {
-            label: "Deshacer",
-            onClick: () =>
-              handleStatusChange(bookingId, previous, { isUndo: true }),
-          }
-        : undefined,
-    });
-  }
-
   function handleCancel(bookingId, courtId, startTime) {
     setCancelTarget({ bookingId, courtId, startTime });
   }
@@ -382,21 +358,23 @@ export default function AdminPage() {
     setDetailBooking(booking);
   }
 
-  async function handleAddPayment(e) {
-    e.preventDefault();
+  /**
+   * Registra un cobro. Sin `direct` usa el formulario ("otro monto"); con
+   * `direct` es el cobro de un toque del detalle ({ method, amount }).
+   */
+  async function handleAddPayment(e, direct) {
+    e?.preventDefault();
     if (!detailBooking) return;
+    const method = direct?.method ?? paymentForm.method;
+    const amount = direct?.amount ?? paymentForm.amount;
     setPaymentSubmitting(true);
-    const res = await adminAddPayment(
-      detailBooking.id,
-      paymentForm.method,
-      paymentForm.amount,
-    );
+    const res = await adminAddPayment(detailBooking.id, method, amount);
     setPaymentSubmitting(false);
     if (!res.ok) return showError(res, "No se pudo registrar el cobro.");
     const bookingId = detailBooking.id;
-    setPaymentForm({ method: paymentForm.method, amount: "" });
+    setPaymentForm({ method, amount: "" });
     refreshMoney();
-    showToast(`Cobro registrado · ${formatARS(paymentForm.amount)}`, {
+    showToast(`Cobro registrado · ${formatARS(amount)}`, {
       action: {
         label: "Deshacer",
         onClick: async () => {
@@ -532,7 +510,7 @@ export default function AdminPage() {
   if (!sessionChecked) {
     return (
       <div className="admin-login-wrapper">
-        <p style={{ color: "var(--color-muted)", fontSize: 14 }}>
+        <p style={{ color: "var(--color-muted)", fontSize: 15.5 }}>
           Verificando sesión…
         </p>
       </div>
@@ -545,75 +523,41 @@ export default function AdminPage() {
       <div className="admin-login-wrapper">
         <div className="admin-login-card">
           <div className="admin-login-header">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 16,
-                marginBottom: 12,
-              }}
-            >
+            <div className="admin-login-brand">
               <img
-                src="/img/logo_badge.png"
-                alt="Muzzaga Pádel"
-                width={56}
-                height={56}
-                style={{
-                  width: 56,
-                  height: 56,
-                  objectFit: "contain",
-                }}
+                src="/img/logo_full_dark.png"
+                alt="Muzzaga · más que pádel"
+                width={1024}
+                height={895}
+                className="admin-login-logo"
               />
               <img
                 src="/img/mascotas/muzzaguito-lentes-paleta.webp"
-                alt="Muzzaguito Staff Admin"
-                width={76}
-                height={76}
-                style={{
-                  width: 76,
-                  height: 76,
-                  objectFit: "contain",
-                  filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.3))",
-                }}
+                alt=""
+                width={84}
+                height={84}
+                className="admin-login-mascot"
               />
             </div>
-            <h1
-              style={{
-                fontSize: 22,
-                color: "var(--color-ink)",
-                fontWeight: 700,
-                margin: 0,
-              }}
-            >
-              Muzzaga Pádel Admin
-            </h1>
-            <p
-              style={{
-                fontSize: 13,
-                color: "var(--text-secondary)",
-                marginTop: 4,
-              }}
-            >
-              Panel de Control y Gestión Operativa de Canchas
-            </p>
+            <h1 className="admin-login-title">Panel del club</h1>
+            <p className="admin-login-sub">Muzzaga Pádel · Catriel</p>
           </div>
 
           <form onSubmit={handleLogin}>
             <label
               style={{
-                fontSize: 13,
+                fontSize: 14.5,
                 color: "var(--text-secondary)",
                 display: "block",
                 marginBottom: 6,
               }}
             >
-              Contraseña de Administrador:
+              Contraseña
             </label>
             <input
               type="password"
               className="admin-input-field"
-              placeholder="Ingresá contraseña"
+              placeholder="Escribí la contraseña del club"
               value={pinInput}
               onChange={(e) => setPinInput(e.target.value)}
               autoFocus
@@ -626,13 +570,14 @@ export default function AdminPage() {
               className="btn btn-linear-primary"
               style={{
                 width: "100%",
-                height: 44,
+                height: 52,
+                fontSize: 17,
                 marginTop: 16,
                 justifyContent: "center",
               }}
               disabled={authLoading}
             >
-              {authLoading ? "Verificando..." : "Ingresar al Panel →"}
+              {authLoading ? "Entrando…" : "Entrar"}
             </button>
           </form>
 
@@ -640,12 +585,13 @@ export default function AdminPage() {
             <Link
               href="/"
               style={{
-                fontSize: 13,
-                color: "var(--accent-sky)",
+                fontSize: 14.5,
+                color: "var(--brand-strong)",
+                fontWeight: 600,
                 textDecoration: "none",
               }}
             >
-              ← Volver a la Landing Pública
+              ← Volver a la web del club
             </Link>
           </div>
         </div>
@@ -662,24 +608,22 @@ export default function AdminPage() {
         >
           <div className="admin-sidebar-brand">
             <Link href="/admin" className="admin-sidebar-brand-inner">
-              <img
-                src="/img/logo_badge.png"
-                alt="Muzzaga"
-                width={30}
-                height={30}
-                style={{
-                  width: 30,
-                  height: 30,
-                  objectFit: "contain",
-                  display: "block",
-                  flexShrink: 0,
-                }}
-              />
-              {!sidebarCollapsed && (
-                <div>
-                  <strong>Muzzaga Pádel</strong>
-                  <span>Catriel, Río Negro</span>
-                </div>
+              {sidebarCollapsed ? (
+                <img
+                  src="/img/logo_badge.png"
+                  alt="Muzzaga Pádel"
+                  width={36}
+                  height={36}
+                  className="admin-sidebar-badge"
+                />
+              ) : (
+                <img
+                  src="/img/logo_full.png"
+                  alt="Muzzaga · más que pádel"
+                  width={1024}
+                  height={895}
+                  className="admin-sidebar-logo"
+                />
               )}
             </Link>
             <button
@@ -716,11 +660,9 @@ export default function AdminPage() {
                 style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
               >
                 <Search size={14} />
-                <span>Buscar…</span>
+                <span>Buscar cliente o sección</span>
               </span>
-              <kbd className="admin-kbd" style={{ fontSize: 10 }}>
-                Ctrl K
-              </kbd>
+
             </button>
           )}
 
@@ -755,7 +697,7 @@ export default function AdminPage() {
               title={sidebarCollapsed ? "Monitor TV Pistas" : undefined}
             >
               <Tv {...ICON_PROPS} />
-              {!sidebarCollapsed && <span>Monitor TV Pistas</span>}
+              {!sidebarCollapsed && <span>Pantalla de la TV</span>}
             </Link>
             <Link
               href="/"
@@ -764,34 +706,18 @@ export default function AdminPage() {
               title={sidebarCollapsed ? "Ver Web Pública" : undefined}
             >
               <ExternalLink {...ICON_PROPS} />
-              {!sidebarCollapsed && <span>Ver Web</span>}
+              {!sidebarCollapsed && <span>Ver la web del club</span>}
             </Link>
 
-            {/* Kravio User Card */}
-            <div
-              className="admin-sidebar-user-card"
+            <button
+              type="button"
+              className="admin-sidebar-link admin-sidebar-logout"
               onClick={handleLogout}
-              title="Cerrar sesión"
-              role="button"
-              tabIndex={0}
+              title={sidebarCollapsed ? "Cerrar sesión" : undefined}
             >
-              <div className="admin-sidebar-avatar">
-                <span>SM</span>
-                <span className="admin-sidebar-avatar-dot ping" />
-              </div>
-              {!sidebarCollapsed && (
-                <>
-                  <div className="admin-sidebar-user-info">
-                    <strong>Staff Muzzaga</strong>
-                    <span>admin@muzzaga.com</span>
-                  </div>
-                  <LogOut
-                    size={15}
-                    style={{ color: "var(--text-muted)", flexShrink: 0 }}
-                  />
-                </>
-              )}
-            </div>
+              <LogOut {...ICON_PROPS} />
+              {!sidebarCollapsed && <span>Cerrar sesión</span>}
+            </button>
           </div>
         </aside>
 
@@ -800,29 +726,27 @@ export default function AdminPage() {
           <div className="admin-main-inner">
             {/* Kravio Top Breadcrumbs Bar */}
             <div className="admin-kravio-topbar">
-              <div className="admin-breadcrumbs">
-                <LayoutDashboard size={14} />
-                <span>Panel General</span>
-                <span
-                  className="admin-breadcrumb-sep"
-                  style={{ color: "#d1d5db" }}
-                >
-                  /
-                </span>
-                <span className="admin-breadcrumb-active">
-                  {view === "agenda"
-                    ? "Agenda & Control"
-                    : findNavItem(view).label}
+              {/* En desktop la marca está en el sidebar; en mobile va acá. */}
+              <div className="admin-topbar-brand">
+                <img
+                  src="/img/logo_badge.png"
+                  alt=""
+                  width={34}
+                  height={34}
+                />
+                <span>
+                  <strong>Muzzaga</strong>
+                  <small>Panel del club</small>
                 </span>
               </div>
               <div className="admin-kravio-top-tools">
                 <button
                   type="button"
-                  className="admin-top-icon-btn"
-                  title="Notificaciones"
+                  className="admin-top-icon-btn admin-top-alerts"
+                  title="Avisos"
                   onClick={() => {
                     if (alerts.length === 0) {
-                      showToast("Sin alertas pendientes");
+                      showToast("No hay avisos. Todo en orden.");
                       return;
                     }
                     alerts.forEach((a) =>
@@ -837,11 +761,12 @@ export default function AdminPage() {
                   }}
                   aria-label={
                     alerts.length
-                      ? `Notificaciones: ${alerts.length} pendiente${alerts.length === 1 ? "" : "s"}`
-                      : "Notificaciones"
+                      ? `Avisos: ${alerts.length} pendiente${alerts.length === 1 ? "" : "s"}`
+                      : "Avisos"
                   }
                 >
-                  <Bell size={15} />
+                  <Bell size={18} />
+                  <span>Avisos</span>
                   {alerts.length > 0 && (
                     <span className="admin-bell-badge" aria-hidden="true">
                       {alerts.length}
@@ -851,11 +776,11 @@ export default function AdminPage() {
                 <Link
                   href="/admin/monitor"
                   target="_blank"
-                  className="admin-top-icon-btn"
-                  title="Monitor TV Pistas"
-                  aria-label="Monitor TV Pistas"
+                  className="admin-top-icon-btn admin-top-tv"
+                  title="Abrir la pantalla de la TV del club"
+                  aria-label="Pantalla de la TV"
                 >
-                  <Tv size={15} />
+                  <Tv size={18} />
                 </Link>
               </div>
             </div>
@@ -866,7 +791,7 @@ export default function AdminPage() {
                 <h1 className="admin-page-title">
                   {view === "agenda" ? (
                     <>
-                      {greetingWord()}, Staff Muzzaga{" "}
+                      {greetingWord()}{" "}
                       <span className="admin-wave-hand" aria-hidden="true">
                         👋
                       </span>
@@ -918,7 +843,7 @@ export default function AdminPage() {
                     }}
                   >
                     <Search {...ICON_PROPS} />
-                    <span className="admin-palette-label">Buscar…</span>
+                    <span className="admin-palette-label">Buscar</span>
                   </span>
                   <kbd className="admin-kbd">Ctrl K</kbd>
                 </button>
@@ -927,8 +852,9 @@ export default function AdminPage() {
                     type="button"
                     onClick={copyDaySchedule}
                     className="btn btn-secondary"
+                    title="Copia la lista de turnos del día para pegarla en WhatsApp"
                   >
-                    Copiar planilla
+                    Copiar turnos del día
                   </button>
                 )}
                 <button
@@ -937,7 +863,7 @@ export default function AdminPage() {
                   className="btn btn-linear-primary admin-cta-new"
                   title="Nueva reserva (N)"
                 >
-                  <IconPlus /> Nueva Reserva <kbd className="admin-kbd">N</kbd>
+                  <IconPlus /> Nueva reserva
                 </button>
               </div>
             </header>
@@ -948,16 +874,10 @@ export default function AdminPage() {
                 setActiveDate={setActiveDate}
                 dayData={dayData}
                 loading={loading}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                weekStats={weekStats}
                 clubConfig={clubConfig}
-                onGoToCaja={() => navigate("caja")}
                 onRefresh={() => loadDayData(activeDate)}
                 onOpenCreate={openCreateModal}
                 onOpenDetail={openDetail}
-                onStatusChange={handleStatusChange}
-                onCancel={handleCancel}
               />
             )}
             {view === "calendario" && (

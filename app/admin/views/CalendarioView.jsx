@@ -83,7 +83,7 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
           <div className="admin-kravio-kpi-card">
             <div className="admin-kravio-kpi-header">
               <span className="admin-kravio-kpi-title">Ocupación Mensual</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#ea580c" }}>%</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: "#ea580c" }}>%</span>
             </div>
             <div className="admin-kravio-kpi-content">
               <div className="admin-kravio-kpi-left">
@@ -106,7 +106,7 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
           <div className="admin-kravio-kpi-card">
             <div className="admin-kravio-kpi-header">
               <span className="admin-kravio-kpi-title">Turnos en el Mes</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#15803d" }}>🎾</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: "#15803d" }}>🎾</span>
             </div>
             <div className="admin-kravio-kpi-content">
               <div className="admin-kravio-kpi-left">
@@ -129,7 +129,7 @@ export default function CalendarioView({ onSelectDate, onExpiredSession }) {
           <div className="admin-kravio-kpi-card">
             <div className="admin-kravio-kpi-header">
               <span className="admin-kravio-kpi-title">Recaudación Cobrada</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#0284c7" }}>$</span>
+              <span style={{ fontSize: 14.5, fontWeight: 700, color: "#0284c7" }}>$</span>
             </div>
             <div className="admin-kravio-kpi-content">
               <div className="admin-kravio-kpi-left">

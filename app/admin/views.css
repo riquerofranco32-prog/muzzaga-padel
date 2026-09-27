@@ -25,7 +25,7 @@
 
 .admin-root .admin-btn-lg {
   min-height: 48px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -111,13 +111,13 @@
   border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14.5px;
   cursor: pointer;
 }
 
 .admin-root .admin-chips button[aria-pressed="true"] {
-  background: var(--sidebar-bg);
-  border-color: var(--sidebar-bg);
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
   color: #ffffff;
 }
 
@@ -127,7 +127,7 @@
   color: var(--text-muted);
   border-radius: 4px;
   padding: 2px 8px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -172,7 +172,7 @@
 }
 
 .admin-root .admin-closed-banner span {
-  font-size: 13px;
+  font-size: 14.5px;
   color: var(--text-secondary);
 }
 
@@ -200,8 +200,8 @@
 }
 
 .admin-root .admin-cash-formula > div.is-result {
-  background: var(--sidebar-bg);
-  border-color: var(--sidebar-bg);
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
   color: #ffffff;
 }
 
@@ -298,7 +298,7 @@
   display: inline-block;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
   background: var(--tone-bg);
   color: var(--tone-fg);
@@ -357,31 +357,31 @@
 
 .admin-root .admin-order-code {
   font-family: var(--font-code);
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text);
 }
 
 .admin-root .admin-order-time {
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--text-muted);
 }
 
 .admin-root .admin-order-total {
   margin-left: auto;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text);
 }
 
 .admin-root .admin-order-who {
   margin: 0;
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
 }
 
 .admin-root .admin-order-pay {
   margin: 0;
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
   color: #047857;
 }
@@ -394,7 +394,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  font-size: 13.5px;
+  font-size: 15px;
   color: var(--text-secondary);
 }
 
@@ -403,7 +403,7 @@
   padding: 6px 10px;
   border-radius: var(--radius-control);
   background: #fdf3e2;
-  font-size: 13px;
+  font-size: 14.5px;
   color: #92400e;
 }
 
@@ -418,7 +418,7 @@
 .admin-root .admin-order-actions .btn {
   min-height: 36px;
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 /* "Cancelar" es un link, pero se toca en celu: 44 px como el resto. */
@@ -454,7 +454,7 @@
 
 .admin-root .admin-order-history {
   margin-top: 10px;
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 .admin-root .admin-order-history summary {
@@ -499,7 +499,7 @@
   padding: 8px 12px;
   border-radius: var(--radius-control);
   background: var(--accent-orange-soft);
-  font-size: 13px;
+  font-size: 14.5px;
   color: var(--text);
 }
 
@@ -516,7 +516,7 @@
 }
 
 .admin-root .admin-pos-group-title {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -590,14 +590,14 @@
 }
 
 .admin-root .admin-product-name {
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 500;
   line-height: 1.25;
   padding-right: 22px;
 }
 
 .admin-root .admin-product-price {
-  font-size: 14px;
+  font-size: 15.5px;
   font-weight: 700;
 }
 
@@ -613,7 +613,7 @@
   border-radius: 999px;
   background: var(--accent-strong);
   color: #ffffff;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 700;
 }
 
@@ -661,13 +661,13 @@
 .admin-root .admin-pos-line-name {
   display: flex;
   flex-direction: column;
-  font-size: 13.5px;
+  font-size: 15px;
   min-width: 0;
 }
 
 .admin-root .admin-pos-line-name small {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 13.5px;
 }
 
 .admin-root .admin-pos-qty {
@@ -700,7 +700,7 @@
 }
 
 .admin-root .admin-pos-line-total {
-  font-size: 13.5px;
+  font-size: 15px;
   min-width: 72px;
   text-align: right;
 }
@@ -756,19 +756,19 @@
 }
 
 .admin-root .admin-sale-time {
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--text-muted);
 }
 
 .admin-root .admin-sale-items {
   display: flex;
   flex-direction: column;
-  font-size: 13.5px;
+  font-size: 15px;
   min-width: 0;
 }
 
 .admin-root .admin-sale-items small {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-muted);
 }
 
@@ -781,7 +781,7 @@
 .admin-root .admin-sale-actions select {
   min-height: 30px !important;
   padding: 2px 8px !important;
-  font-size: 12.5px !important;
+  font-size: 14px !important;
 }
 
 .admin-root .admin-account-block {
@@ -810,7 +810,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 0;
-  font-size: 13px;
+  font-size: 14.5px;
 }
 
 @media (max-width: 1024px) {
@@ -821,7 +821,7 @@
 
 @media (max-width: 767px) {
   .admin-root .admin-pos {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     padding-bottom: 64px;
   }
 
@@ -867,9 +867,9 @@
     padding: 0 16px;
     border: none;
     border-radius: 999px;
-    background: var(--sidebar-bg);
+    background: var(--accent-strong);
     color: #ffffff;
-    font-size: 14px;
+    font-size: 15.5px;
     box-shadow: 0 8px 20px rgb(0 0 0 / 0.25);
     cursor: pointer;
   }

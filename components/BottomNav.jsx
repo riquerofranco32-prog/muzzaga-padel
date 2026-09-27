@@ -48,16 +48,20 @@ function useCompactOnScroll(ref) {
   }, [ref]);
 }
 
-// En la home, Turnos o Abiertas según la sección que se está mirando.
+// En la home, la pestaña de la sección que se está mirando. Se observan todas
+// las secciones: si no, "Abiertas" quedaba marcada al volver al hero o al
+// seguir bajando a instalaciones, FAQ, etc.
+const HOME_SECTION_TAB = { top: "turnos", turnos: "turnos", "canchas-abiertas": "canchas-abiertas", torneos: "torneos", cantina: "menu" };
+
 function useHomeSection(enabled) {
   const [section, setSection] = useState("turnos");
   useEffect(() => {
     if (!enabled) return;
-    const targets = ["turnos", "canchas-abiertas"].map((id) => document.getElementById(id)).filter(Boolean);
+    const targets = [...document.querySelectorAll("section[id]")];
     if (!targets.length) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) if (entry.isIntersecting) setSection(entry.target.id);
+        for (const entry of entries) if (entry.isIntersecting) setSection(HOME_SECTION_TAB[entry.target.id] ?? null);
       },
       { rootMargin: "-45% 0px -45% 0px" },
     );

@@ -1,0 +1,410 @@
+/* ==========================================================================
+   MARCA MUZZAGA en el admin. Carga última (app/admin/layout.js).
+   Toma la identidad de la landing: negro cálido (#1b1b19), naranja
+   (#e8722a) y Barlow Condensed para titulares y números. El marco (sidebar,
+   barras de celu) va oscuro como el hero nocturno; el contenido, claro sobre
+   crema. Para botones con texto blanco se usa el naranja oscuro (#c2410c):
+   el naranja de marca con blanco no llega al contraste mínimo.
+   ========================================================================== */
+
+.admin-root .admin-dashboard-layout,
+.admin-root .admin-login-wrapper {
+  --night: #1b1b19;
+  --night-soft: #262521;
+  --on-night: #f3f1e9;
+  --on-night-soft: #cfcabd;
+  --brand: #e8722a;
+  --brand-strong: #c2410c;
+  --brand-hover: #9a3412;
+  --brand-tint: rgba(232, 114, 42, 0.14);
+
+  --bg: #f5f2ea;
+  --surface-muted: #faf8f3;
+  --border: #e7e2d6;
+  --border-strong: #d3ccbd;
+  --text: #1b1b19;
+  --text-secondary: #3d3b35;
+  --text-muted: #57544c;
+  --accent: #1b1b19;
+  --accent-strong: #1b1b19;
+  --accent-text: #1b1b19;
+  --accent-soft: rgba(27, 27, 25, 0.06);
+  --accent-orange: var(--brand);
+  --accent-orange-soft: var(--brand-tint);
+  --font-display: var(--font-barlow-condensed), "Arial Narrow", sans-serif;
+}
+
+.admin-root .admin-dashboard-layout {
+  background: var(--bg);
+}
+
+.admin-root .admin-dashboard-layout :focus-visible,
+.admin-root .admin-login-wrapper :focus-visible {
+  outline-color: var(--brand);
+}
+
+/* ---------- Titulares y números: Barlow Condensed ---------- */
+.admin-root :is(.admin-page-title, .admin-greeting-title) {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+}
+
+.admin-root .admin-section-title {
+  font-family: var(--font-display);
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.admin-root .admin-kravio-kpi-number {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.admin-root .admin-detail-name,
+.admin-root .admin-detail-money strong {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.005em;
+}
+
+.admin-root .admin-detail-name {
+  font-size: 30px;
+  text-transform: uppercase;
+}
+
+.admin-root .admin-detail-money strong {
+  font-size: 34px;
+}
+
+/* ---------- Botones principales en naranja ---------- */
+.admin-root .btn-linear-primary,
+.admin-root .admin-dashboard-layout .btn-linear-primary,
+.admin-root .admin-login-wrapper .btn-linear-primary {
+  background: var(--brand-strong);
+  border-color: var(--brand-strong);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.admin-root .btn-linear-primary:hover:not(:disabled),
+.admin-root .admin-dashboard-layout .btn-linear-primary:hover:not(:disabled) {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+}
+
+.admin-root .admin-fab {
+  background: var(--brand-strong);
+}
+
+/* ---------- Sidebar oscuro con el logo ---------- */
+.admin-root .admin-sidebar {
+  background: var(--night);
+  border-right: none;
+  color: var(--on-night);
+  --text: var(--on-night);
+  --text-primary: var(--on-night);
+  --text-secondary: var(--on-night-soft);
+  --text-muted: var(--on-night-soft);
+}
+
+.admin-root .admin-sidebar-brand {
+  position: relative;
+  justify-content: center;
+  padding: 18px 14px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-root .admin-sidebar-brand-inner {
+  justify-content: center;
+}
+
+.admin-root .admin-sidebar-logo {
+  display: block;
+  width: 150px;
+  height: auto;
+}
+
+.admin-root .admin-sidebar-badge {
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.admin-root .admin-sidebar-collapse-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  color: var(--on-night-soft);
+}
+
+.admin-root .admin-sidebar.collapsed .admin-sidebar-brand {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-root .admin-sidebar.collapsed .admin-sidebar-collapse-btn {
+  position: static;
+}
+
+.admin-root .admin-sidebar-collapse-btn:hover,
+.admin-root .admin-sidebar-search-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.admin-root .admin-sidebar-search-btn {
+  min-height: 44px;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--on-night-soft);
+  box-shadow: none;
+}
+
+.admin-root .admin-sidebar-group-title {
+  color: #a39e91;
+}
+
+.admin-root .admin-sidebar-link {
+  color: #e9e5da;
+}
+
+.admin-root .admin-sidebar-link svg {
+  opacity: 1;
+  color: var(--on-night-soft);
+}
+
+.admin-root .admin-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.admin-root .admin-sidebar-link.active {
+  background: rgba(232, 114, 42, 0.18);
+  border-color: rgba(232, 114, 42, 0.3);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.admin-root .admin-sidebar-link.active svg {
+  color: var(--brand);
+}
+
+.admin-root .admin-sidebar-footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-root .admin-sidebar-logout {
+  color: var(--on-night-soft);
+}
+
+/* ---------- Agenda ---------- */
+.admin-root .admin-daychip[aria-selected="true"] {
+  background: var(--night);
+  border-color: var(--night);
+  box-shadow: inset 0 -4px 0 var(--brand);
+}
+
+/* Próximo turno como cartel de marcador: la pieza más llamativa del día. */
+.admin-root .admin-next-turn {
+  border: none;
+  background: var(--night);
+  color: var(--on-night);
+  box-shadow: 0 8px 24px rgba(27, 27, 25, 0.18);
+}
+
+.admin-root .admin-next-turn:hover {
+  background: var(--night-soft);
+}
+
+.admin-root .admin-next-turn-label {
+  color: var(--brand);
+}
+
+.admin-root .admin-next-turn-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.admin-root .admin-next-turn-money {
+  color: #86efac;
+}
+
+.admin-root .admin-next-turn-money.is-owing {
+  color: #fca5a5;
+}
+
+.admin-root .admin-next-turn-cta {
+  background: var(--brand-strong);
+}
+
+.admin-root .admin-timeline-head {
+  background: var(--night);
+  color: var(--on-night);
+}
+
+.admin-root .admin-timeline-head small {
+  color: var(--on-night-soft);
+}
+
+.admin-root .admin-timeline-head strong {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.admin-root .admin-timeline-time strong {
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+/* ---------- Login con la cancha de noche de fondo ---------- */
+.admin-root .admin-login-wrapper {
+  background:
+    linear-gradient(rgba(15, 15, 13, 0.72), rgba(15, 15, 13, 0.9)),
+    url("/img/court_glass_night_match.jpg") center / cover no-repeat,
+    var(--night);
+}
+
+.admin-root .admin-login-wrapper > p {
+  color: var(--on-night-soft) !important;
+}
+
+.admin-root .admin-login-card {
+  border: none;
+  border-top: 5px solid var(--brand);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+}
+
+.admin-root .admin-login-brand {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.admin-root .admin-login-logo {
+  width: 150px;
+  height: auto;
+}
+
+.admin-root .admin-login-mascot {
+  width: 84px;
+  height: 84px;
+  margin-left: 2px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.25));
+}
+
+.admin-root .admin-login-title {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.admin-root .admin-login-sub {
+  margin: 2px 0 0;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.admin-root .admin-login-wrapper label {
+  font-size: 15px !important;
+  font-weight: 600;
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- Celu: barras de arriba y de abajo oscuras ---------- */
+@media (max-width: 767px) {
+  .admin-root :is(.admin-page-title, .admin-greeting-title) {
+    font-size: 28px;
+  }
+
+  .admin-root .admin-kravio-kpi-number {
+    font-size: 30px;
+  }
+
+  .admin-root .admin-kravio-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    margin: -16px -16px 16px;
+    padding: 10px 16px;
+    background: var(--night);
+    border-bottom: 3px solid var(--brand);
+  }
+
+  .admin-root .admin-topbar-brand {
+    gap: 10px;
+    color: var(--on-night);
+  }
+
+  .admin-root .admin-topbar-brand img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .admin-root .admin-topbar-brand span {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+  }
+
+  .admin-root .admin-topbar-brand strong {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .admin-root .admin-topbar-brand small {
+    font-size: 13px;
+    color: var(--on-night-soft);
+  }
+
+  .admin-root .admin-kravio-topbar .admin-top-icon-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+  }
+
+  .admin-root .admin-bottom-nav {
+    background: var(--night);
+    border-top: none;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.18);
+  }
+
+  .admin-root .admin-bottom-nav button {
+    color: var(--on-night-soft);
+  }
+
+  .admin-root .admin-bottom-nav button[aria-current="page"] {
+    background: rgba(232, 114, 42, 0.2);
+    color: #ffffff;
+  }
+
+  .admin-root .admin-bottom-nav button[aria-current="page"] svg {
+    color: var(--brand);
+  }
+}

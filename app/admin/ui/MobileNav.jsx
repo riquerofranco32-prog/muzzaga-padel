@@ -9,6 +9,8 @@ import { ICON_PROPS, MOBILE_PRIMARY_IDS, NAV_ITEMS } from "../nav";
  * Mobile (<768px): bottom nav con 4 secciones + "Más", y "Nueva Reserva"
  * como FAB. En desktop no se renderiza nada visible (CSS).
  */
+const FAB_VIEWS = ["agenda", "calendario", "clientes"];
+
 export default function MobileNav({
   view,
   onNavigate,
@@ -38,14 +40,13 @@ export default function MobileNav({
 
   return (
     <>
-      <button
-        type="button"
-        className="admin-fab"
-        onClick={onNewBooking}
-        aria-label="Nueva reserva"
-      >
-        <Plus size={24} strokeWidth={2} aria-hidden />
-      </button>
+      {/* Solo donde se reserva: en Caja o Cantina tapaba contenido y no aplica. */}
+      {FAB_VIEWS.includes(view) && (
+        <button type="button" className="admin-fab" onClick={onNewBooking}>
+          <Plus size={22} strokeWidth={2.25} aria-hidden />
+          Nueva reserva
+        </button>
+      )}
 
       <nav className="admin-bottom-nav" aria-label="Secciones">
         {primary.map(({ id, label, shortLabel, icon: Icon }) => (

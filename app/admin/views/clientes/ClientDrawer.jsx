@@ -149,7 +149,7 @@ export default function ClientDrawer({ client, onClose, onToast, onDeleted }) {
             <label className="admin-field-label" htmlFor="client-note" style={{ margin: 0 }}>
               Notas internas del staff
             </label>
-            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+            <span style={{ fontSize: 13, color: "var(--text-muted)" }}>
               Visible solo para recepción
             </span>
           </div>
@@ -159,7 +159,7 @@ export default function ClientDrawer({ client, onClose, onToast, onDeleted }) {
                 key={tag}
                 type="button"
                 className="btn btn-secondary"
-                style={{ padding: "2px 8px", height: 24, fontSize: 11, borderRadius: 12 }}
+                style={{ padding: "2px 8px", height: 24, fontSize: 13, borderRadius: 12 }}
                 onClick={() => {
                   if (!note.includes(tag)) {
                     setNote((prev) => (prev.trim() ? `${prev.trim()} · ${tag}` : tag));
@@ -293,7 +293,7 @@ export default function ClientDrawer({ client, onClose, onToast, onDeleted }) {
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              fontSize: 13,
+              fontSize: 14.5,
               fontWeight: 600,
             }}
             onClick={() => setIsPinModalOpen(true)}

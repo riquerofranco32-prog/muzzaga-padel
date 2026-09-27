@@ -16,48 +16,44 @@ export const NAV_ITEMS = [
   { id: "agenda", label: "Agenda", icon: CalendarDays },
   { id: "calendario", label: "Calendario", icon: Calendar },
   { id: "clientes", label: "Clientes", icon: Users },
-  { id: "caja", label: "Caja & Cierre Z", shortLabel: "Caja", icon: Wallet },
+  { id: "caja", label: "Caja del día", shortLabel: "Caja", icon: Wallet },
   { id: "cantina", label: "Cantina", icon: UtensilsCrossed },
   { id: "torneos", label: "Torneos", icon: Trophy },
-  { id: "reportes", label: "Reportes", icon: BarChart3 },
-  { id: "configuracion", label: "Configuración", icon: Settings },
-  { id: "actividad", label: "Actividad del equipo", shortLabel: "Actividad", icon: History },
+  { id: "reportes", label: "Números del mes", shortLabel: "Números", icon: BarChart3 },
+  { id: "configuracion", label: "Ajustes del club", shortLabel: "Ajustes", icon: Settings },
+  { id: "actividad", label: "Quién hizo qué", shortLabel: "Movimientos", icon: History },
 ];
 
+// Ordenado por uso: arriba lo de todos los días.
 export const NAV_GROUPS = [
   {
-    title: "Gestión Canchas",
+    title: "Todos los días",
     items: [
-      { id: "agenda", label: "Agenda del Día", icon: CalendarDays },
-      { id: "calendario", label: "Calendario & Ocupación", icon: Calendar },
-      { id: "clientes", label: "Clientes & Padelistas", icon: Users },
+      { id: "agenda", label: "Agenda de hoy", icon: CalendarDays },
+      { id: "caja", label: "Caja del día", icon: Wallet },
+      { id: "cantina", label: "Cantina", icon: UtensilsCrossed },
     ],
   },
   {
-    title: "Operaciones & Club",
+    title: "El club",
     items: [
-      { id: "caja", label: "Caja & Cierre Z", shortLabel: "Caja", icon: Wallet },
-      { id: "cantina", label: "Cantina & Stock", icon: UtensilsCrossed },
-      { id: "torneos", label: "Torneos & Americanos", icon: Trophy },
+      { id: "calendario", label: "Calendario", icon: Calendar },
+      { id: "clientes", label: "Clientes", icon: Users },
+      { id: "torneos", label: "Torneos", icon: Trophy },
     ],
   },
   {
-    title: "Analytics & Finanzas",
+    title: "Números y ajustes",
     items: [
-      { id: "reportes", label: "Reportes & Métricas", icon: BarChart3 },
-    ],
-  },
-  {
-    title: "Sistema",
-    items: [
-      { id: "configuracion", label: "Configuración", icon: Settings },
-      { id: "actividad", label: "Actividad del equipo", icon: History },
+      { id: "reportes", label: "Números del mes", icon: BarChart3 },
+      { id: "configuracion", label: "Ajustes del club", icon: Settings },
+      { id: "actividad", label: "Quién hizo qué", icon: History },
     ],
   },
 ];
 
 /** Las 4 fijas de la bottom nav; el resto va en "Más". */
-export const MOBILE_PRIMARY_IDS = ["agenda", "calendario", "cantina", "caja"];
+export const MOBILE_PRIMARY_IDS = ["agenda", "caja", "cantina", "calendario"];
 
 export const ICON_PROPS = { size: 18, strokeWidth: 1.75, "aria-hidden": true };
 

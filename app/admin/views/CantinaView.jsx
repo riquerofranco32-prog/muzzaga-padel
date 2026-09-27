@@ -567,11 +567,11 @@ export default function CantinaView({ onExpiredSession, onToast }) {
         <div className="admin-kravio-kpi-card">
           <div className="admin-kravio-kpi-header">
             <span className="admin-kravio-kpi-title">A Cuenta / Turnos</span>
-            <Receipt size={17} style={{ color: onAccount > 0 ? "#ea580c" : "#6b7280" }} />
+            <Receipt size={17} style={{ color: onAccount > 0 ? "#ea580c" : "#5f5b52" }} />
           </div>
           <div className="admin-kravio-kpi-content">
             <div className="admin-kravio-kpi-left">
-              <div className="admin-kravio-kpi-number" style={{ color: onAccount > 0 ? "#ea580c" : "#111827" }}>
+              <div className="admin-kravio-kpi-number" style={{ color: onAccount > 0 ? "#ea580c" : "#141412" }}>
                 {formatARS(onAccount)}
               </div>
               <span className="admin-cell-sub">Cargado a cuentas de turnos</span>
@@ -586,7 +586,7 @@ export default function CantinaView({ onExpiredSession, onToast }) {
           </div>
           <div className="admin-kravio-kpi-content">
             <div className="admin-kravio-kpi-left">
-              <div className="admin-kravio-kpi-number" style={{ color: "#111827" }}>
+              <div className="admin-kravio-kpi-number" style={{ color: "#141412" }}>
                 {activeSalesCount}
               </div>
               <span className="admin-cell-sub">Ventas activas registradas</span>
@@ -777,7 +777,7 @@ export default function CantinaView({ onExpiredSession, onToast }) {
         >
           <span
             style={{
-              fontSize: 12,
+              fontSize: 13.5,
               fontWeight: 700,
               color: "#ea580c",
               display: "flex",
@@ -795,7 +795,7 @@ export default function CantinaView({ onExpiredSession, onToast }) {
               style={{
                 padding: "3px 10px",
                 height: 28,
-                fontSize: 12,
+                fontSize: 13.5,
                 borderRadius: 20,
                 background: "#ffffff",
                 display: "inline-flex",
@@ -806,7 +806,7 @@ export default function CantinaView({ onExpiredSession, onToast }) {
             >
               <Plus size={12} strokeWidth={2.5} style={{ color: "#ea580c" }} />
               <span>{item.name}</span>
-              <strong style={{ color: "#15803d", fontSize: 11 }}>
+              <strong style={{ color: "#15803d", fontSize: 13 }}>
                 {formatARS(item.price)}
               </strong>
             </button>

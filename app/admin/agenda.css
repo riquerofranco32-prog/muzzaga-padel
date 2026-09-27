@@ -10,11 +10,12 @@
   white-space: nowrap;
 }
 
-/* Colores de estado de cobro (grilla, leyenda) */
+/* Colores de estado de cobro (grilla, leyenda): rojo = debe,
+   amarillo = pagó seña, verde = pagado. Semáforo, sin leyenda que aprender. */
 .admin-root [data-state="pendiente"] {
-  --state-bg: #eaf2fb;
-  --state-border: #b9d3ee;
-  --state-fg: #0b4a7d;
+  --state-bg: #fdeeee;
+  --state-border: #f2b8b8;
+  --state-fg: #a11d1d;
 }
 .admin-root [data-state="senado"] {
   --state-bg: #fdf3e2;
@@ -80,8 +81,8 @@
 }
 
 .admin-root .admin-daychip[aria-selected="true"] {
-  background: #1f2937;
-  border-color: #111827;
+  background: #1b1b19;
+  border-color: #141412;
   color: #ffffff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
@@ -94,7 +95,7 @@
 }
 
 .admin-root .admin-daychip-name {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -140,7 +141,7 @@
 }
 
 .admin-root .admin-daystrip-viewing {
-  font-size: 13px;
+  font-size: 14.5px;
   color: var(--text-muted);
 }
 
@@ -204,7 +205,7 @@
 
 .admin-root .admin-timeline-head strong {
   padding: 10px 12px;
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -239,11 +240,11 @@
 }
 
 .admin-root .admin-timeline-time strong {
-  font-size: 14px;
+  font-size: 15.5px;
 }
 
 .admin-root .admin-timeline-time span {
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-muted);
 }
 
@@ -263,7 +264,7 @@
   top: -10px;
   background: var(--danger);
   color: #ffffff;
-  font-size: 10.5px;
+  font-size: 12.5px;
   font-weight: 600;
   padding: 1px 5px;
   border-radius: 4px;
@@ -281,33 +282,35 @@
   display: flex;
 }
 
+/* Siempre visible (antes aparecía recién con el mouse encima): un horario
+   libre tiene que leerse "libre" sin adivinar. */
 .admin-root .admin-slot-assign {
   flex: 1;
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
+  min-height: 56px;
   border: none;
   background: transparent;
-  color: var(--accent-text);
+  color: var(--text-secondary);
   font-weight: 500;
-  font-size: 13px;
+  font-size: 15.5px;
   cursor: pointer;
   border-radius: var(--radius-control);
-  opacity: 0;
-  transition: opacity 0.12s ease;
 }
 
-.admin-root .admin-slot.is-free:hover .admin-slot-assign,
+.admin-root .admin-slot-free-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-root .admin-slot-assign:hover,
 .admin-root .admin-slot-assign:focus-visible {
-  opacity: 1;
-  background: var(--accent-soft);
-}
-
-@media (hover: none) {
-  .admin-root .admin-slot-assign {
-    opacity: 1;
-  }
+  background: var(--accent-orange-soft);
+  color: var(--accent-orange);
 }
 
 .admin-root .admin-slot.is-taken {
@@ -318,10 +321,6 @@
   color: var(--state-fg);
 }
 
-.admin-root .admin-slot.is-dimmed {
-  opacity: 0.35;
-}
-
 .admin-root .admin-slot-main {
   flex: 1;
   min-width: 0;
@@ -329,57 +328,55 @@
   flex-direction: column;
   justify-content: center;
   gap: 3px;
-  padding: 6px 10px;
+  min-height: 56px;
+  padding: 8px 12px;
   border: none;
   background: transparent;
   color: inherit;
   text-align: left;
   cursor: pointer;
+  border-radius: var(--radius-control);
+}
+
+.admin-root .admin-slot-main:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* El nombre de la cancha ya está en el encabezado de la grilla en desktop;
+   en mobile (sin encabezado) se muestra dentro de cada tarjeta. */
+.admin-root .admin-slot-court {
+  display: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
 .admin-root .admin-slot-name {
-  font-weight: 600;
-  font-size: 13.5px;
+  font-weight: 700;
+  font-size: 16px;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.admin-root .admin-slot-meta {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-}
-
 .admin-root .admin-slot-badge {
-  margin-left: 4px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
 }
 
-.admin-root .admin-slot-actions {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  padding: 4px;
-}
-
-.admin-root .admin-slot-actions :is(button, a) {
+.admin-root .admin-slot-whatsapp {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--state-fg);
-  cursor: pointer;
+  width: 44px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--state-border);
+  color: #15803d;
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
 }
 
-.admin-root .admin-slot-actions :is(button, a):hover {
-  background: rgba(0, 0, 0, 0.07);
+.admin-root .admin-slot-whatsapp:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .admin-root .admin-timeline-legend {
@@ -389,7 +386,7 @@
   list-style: none;
   padding: 0;
   margin: 10px 0 0;
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--text-muted);
 }
 
@@ -431,7 +428,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  font-size: 13.5px;
+  font-size: 15px;
 }
 
 .admin-root .admin-cash-line-total {
@@ -460,7 +457,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-muted);
   padding-right: 6px;
   text-align: right;
@@ -496,7 +493,7 @@
 }
 
 .admin-root .admin-weekchart-value {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-muted);
   margin-bottom: 2px;
 }
@@ -515,7 +512,7 @@
 }
 
 .admin-root .admin-weekchart-stack .is-turnos {
-  background: #cbd5e1;
+  background: #cfc7b6;
   border-radius: 0 0 3px 3px;
   transition: background 0.15s ease;
 }
@@ -527,7 +524,7 @@
 }
 
 .admin-root .admin-weekchart-col.is-today .is-turnos {
-  background: #1f2937;
+  background: #1b1b19;
 }
 
 .admin-root .admin-weekchart-col.is-today .is-cantina {
@@ -544,7 +541,7 @@
   grid-template-columns: 44px repeat(7, 1fr);
   gap: 0 8px;
   margin-top: 6px;
-  font-size: 11.5px;
+  font-size: 13px;
   text-transform: uppercase;
   color: var(--text-muted);
   text-align: center;
@@ -559,7 +556,7 @@
   display: flex;
   gap: 14px;
   margin-top: 10px;
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-muted);
 }
 
@@ -607,7 +604,7 @@
   padding: 3px;
   gap: 3px;
   border-radius: var(--radius-control);
-  background: #f3f4f6;
+  background: #f1ede4;
   border: 1px solid var(--border);
 }
 
@@ -618,7 +615,7 @@
   border-radius: 6px;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -626,13 +623,13 @@
 
 .admin-root .admin-segmented button[aria-pressed="true"] {
   background: #ffffff;
-  color: #111827;
+  color: #141412;
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .admin-root .admin-cell-sub {
-  font-size: 12px;
+  font-size: 13.5px;
   color: var(--text-muted);
   margin-top: 2px;
 }
@@ -646,7 +643,7 @@
   margin-left: 6px;
   padding: 1px 6px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
   vertical-align: 1px;
@@ -676,25 +673,127 @@
     font-size: 22px;
   }
 
+  /* Grilla en mobile: sin scroll lateral. Cada franja es un bloque con el
+     horario arriba y una tarjeta por cancha (2 por fila como máximo). */
   .admin-root .admin-timeline {
-    --time-col: 52px;
-    --slot-h: 72px;
+    background: transparent;
+    border: none;
+    overflow: visible;
   }
 
   .admin-root .admin-timeline-head,
+  .admin-root .admin-timeline-now {
+    display: none;
+  }
+
   .admin-root .admin-timeline-row {
-    grid-template-columns: var(--time-col) repeat(
-        var(--courts),
-        minmax(132px, 1fr)
-      );
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    padding: 12px 0;
+    min-height: 0;
   }
 
-  .admin-root .admin-bookings-tools {
-    margin-left: 0;
-    width: 100%;
+  .admin-root .admin-timeline-time {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 6px;
+    padding: 0;
+    border: none;
   }
 
-  .admin-root .admin-bookings-tools .admin-search-wrap {
-    flex: 1;
+  .admin-root .admin-timeline-time strong {
+    font-size: 17px;
   }
+
+  .admin-root .admin-timeline-time span {
+    font-size: 15.5px;
+  }
+
+  .admin-root .admin-timeline-time span::before {
+    content: "a ";
+  }
+
+  .admin-root .admin-slot {
+    margin: 0;
+    background: var(--surface);
+  }
+
+  .admin-root .admin-slot-court {
+    display: block;
+  }
+
+  .admin-root .admin-slot-name {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+/* ---------- Próximo turno + Canchas del día ---------- */
+.admin-root .admin-next-turn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border: 1px solid #fed7aa;
+  border-radius: var(--radius-card);
+  background: #fff7ed;
+  color: #7c2d12;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-root .admin-next-turn:hover {
+  border-color: #fdba74;
+}
+
+.admin-root .admin-next-turn-label {
+  width: 100%;
+  font-size: 14.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #c2410c;
+}
+
+.admin-root .admin-next-turn-title {
+  font-size: 17px;
+}
+
+.admin-root .admin-next-turn-money {
+  font-size: 16px;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.admin-root .admin-next-turn-money.is-owing {
+  color: #b91c1c;
+}
+
+.admin-root .admin-next-turn-cta {
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #ea580c;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.admin-root .admin-day-courts-head {
+  margin-bottom: 12px;
+}
+
+.admin-root .admin-day-courts-hint {
+  margin: 4px 0 0;
+  font-size: 15.5px;
+  color: var(--text-secondary);
 }
